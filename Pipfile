@@ -8,6 +8,8 @@ pytest = "*"
 
 [dev-packages]
 pycodestyle = "*"
+codecov = "*"
+pytest-cov = "*"
 
 [requires]
 python_version = "3.7"
