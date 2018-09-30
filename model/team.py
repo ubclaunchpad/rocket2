@@ -2,7 +2,7 @@
 class Team:
     __display_name = ""
     __platform = ""
-    __member_list = []
+    __members = set()
     __github_team_name = ""
 
     def __init__(self, display_name):
@@ -21,14 +21,13 @@ class Team:
         return self.__platform
 
     def add_member(self, uuid):
-        self.__member_list.append(uuid)
+        self.__members.add(uuid)
 
-    def remove_member(self, uuid):
-        if self.__member_list.__contains__(uuid):
-            self.__member_list.remove(uuid)
+    def discard_member(self, uuid):
+        self.__members.discard(uuid)
 
     def get_members(self):
-        return self.__member_list
+        return self.__members
 
     def set_github_team_name(self, github_team_name):
         self.__github_team_name = github_team_name
