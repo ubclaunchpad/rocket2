@@ -10,6 +10,7 @@ pytest = "*"
 pycodestyle = "*"
 codecov = "*"
 pytest-cov = "*"
+pydocstyle = "*"
 
 [requires]
 python_version = "3.7"
