@@ -1,5 +1,8 @@
 # 🚀 Rocket 2.0
 
+[![Build Status](https://travis-ci.org/ubclaunchpad/rocket2.0.svg?branch=master)](https://travis-ci.org/ubclaunchpad/rocket2.0)
+[![codecov](https://codecov.io/gh/ubclaunchpad/rocket2.0/branch/master/graph/badge.svg)](https://codecov.io/gh/ubclaunchpad/rocket2.0)
+
 Rocket 2.0 is a from-the-ground-up rebuild of [Rocket](https://github.com/ubclaunchpad/rocket),
 UBC Launch Pad's in-house management Slack bot.
 
