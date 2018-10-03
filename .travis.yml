@@ -6,8 +6,8 @@ install:
     - pipenv install --dev
     - gem install mdl
 script:
-    - pycodestyle .
-    - pydocstyle .
+    - pipenv run pycodestyle .
+    - pipenv run pydocstyle .
     - mdl .
-    - cd tests/ && pytest --cov=./
-    - codecov
+    - cd tests/ && pipenv run pytest --cov=./
+    - pipenv run codecov
