@@ -3,6 +3,8 @@ import uuid
 
 
 class Team:
+    """Represent a team with related fields and methods."""
+
     __team_id = 0
     __display_name = ""
     __platform = ""
