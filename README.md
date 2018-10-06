@@ -33,3 +33,11 @@ pipenv shell
 ```
 
 and then commands like `pycodestyle` and `pytest` can be run like normal.
+
+Additionally, we use [Travis CI](https://travis-ci.org/ubclaunchpad/rocket2.0) as
+a CI system. To run the same checks locally, please install our git hooks:
+
+```bash
+cd scripts/
+make install
+```
