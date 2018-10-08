@@ -8,7 +8,7 @@
   * `--name` yourname
   * `--email` emailaddress
   * `--pos` yourposition
-  * `--github` repolink
+  * `--github` yourrepo
   * `--major` yourmajor
   * `--bio` yourbio
     * edit properties of your Launch Pad profile
