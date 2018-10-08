@@ -8,7 +8,7 @@
   * `-name` somename `-email` email `-pos` yourposition `-github` githublink `-major` yourmajor `-bio` yourbio
     * edit properties of your Launch Pad profile
   * ADMIN only option: `-member` MEMBER_ID
-    * edit properties of another user's profile
+    * edit properties of another user's Launch Pad profile
 
 * `-view` MEMBER_ID
   * view information about a user
