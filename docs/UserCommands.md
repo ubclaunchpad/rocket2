@@ -9,7 +9,7 @@ Options to specify input: <br/>
     `-name` somename `-email` email `-pos` yourposition `-github` githublink `-major` yourmajor `-bio` yourbio  <br/>
     edit properties of your Launch Pad profile <br/>
     ADMIN only options: `-member` MEMBER_ID <br/>
-        edit properties of another user's profile <br/>
+        edit properties of another user's profile
 
 
 `-view` MEMBER_ID <br/>
@@ -18,12 +18,12 @@ Options to specify input: <br/>
 
 `-add` <br/>
     `-team` TEAM_ID `-member` MEMBER_ID <br/>
-    add user to team <br/>
+    add user to team
 
 
 `-rmv` <br/>
     `-team` TEAM_ID `-member` MEMBER_ID <br/>
-    remove user from team <br/>
+    remove user from team
 
 
 `-help` <br/>
@@ -33,12 +33,12 @@ Options to specify input: <br/>
 ADMIN only:  <br/>
 
 `-delete` MEMBER_ID <br/>
-    permanently delete member's Launch Pad profile <br/>
+    permanently delete member's Launch Pad profile
 
 
 `-add_admin` MEMBER_ID <br/>
-    make existing user admin <br/>
+    make existing user admin
 
 
 `-rmv_admin` MEMBER_ID <br/>
-    remove admin rights from user <br/>
+    remove admin rights from user 
