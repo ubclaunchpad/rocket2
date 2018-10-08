@@ -26,11 +26,17 @@
 * `delete` MEMBER_ID
   * permanently delete member's Launch Pad profile
 
-* `add_admin` MEMBER_ID
-  * make existing user admin
+* `admin`
+  * `--add` MEMBER_ID
+    * make existing user admin
+  * `--remove` MEMBER_ID
+    * remove admin rights from user
 
-* `remove_admin` MEMBER_ID
-  * remove admin rights from user
+* `lead`
+  * `--add` MEMBER_ID
+    * make existing user team lead
+  * `--remove` MEMBER_ID
+    * remove existing user as team lead
 
 * `add`
   * `--team` TEAM_ID `--member` MEMBER_ID
@@ -39,11 +45,3 @@
 * `remove`
   * `--team` TEAM_ID `--member` MEMBER_ID
     * remove user from team
-
-* `add_lead`
-  * `--team` TEAM_ID `--member` MEMBER_ID
-    * set user as team lead for specified team
-
-* `remove_lead`
-  * `--team` TEAM_ID `--member` MEMBER_ID
-    * remove user as team lead for specified team
