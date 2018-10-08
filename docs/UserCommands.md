@@ -5,7 +5,12 @@
 ## Options to specify input
 
 * `edit`
-  * `--name` name `--email` email `--pos` position `--github` link `--major` major `--bio` bio
+  * `--name` yourname
+  * `--email` emailaddress
+  * `--pos` yourposition
+  * `--github` repolink
+  * `--major` yourmajor
+  * `--bio` yourbio
     * edit properties of your Launch Pad profile
   * ADMIN only option: `--member` MEMBER_ID
     * edit properties of another user's Launch Pad profile
