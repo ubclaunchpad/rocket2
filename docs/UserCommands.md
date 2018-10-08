@@ -12,7 +12,7 @@
   * `--major` yourmajor
   * `--bio` yourbio
     * edit properties of your Launch Pad profile
-  * ADMIN only option: `--member` MEMBER_ID
+  * ADMIN or TEAM LEAD only option: `--member` MEMBER_ID
     * edit properties of another user's Launch Pad profile
 
 * `view` MEMBER_ID
@@ -37,6 +37,8 @@
     * make existing user team lead
   * `--remove` MEMBER_ID
     * remove existing user as team lead
+
+## TEAM LEAD only
 
 * `add`
   * `--team` TEAM_ID `--member` MEMBER_ID
