@@ -35,7 +35,15 @@ pipenv shell
 and then commands like `pycodestyle` and `pytest` can be run like normal.
 
 Additionally, we use [Travis CI](https://travis-ci.org/ubclaunchpad/rocket2.0) as
-a CI system. To run the same checks locally, please install our git hooks:
+a CI system. To run the same checks locally, we provide `scripts/build_check.sh`;
+this can be run with:
+
+```bash
+./scripts/build_check.sh
+```
+
+You can also install it as a
+[pre-commit hook](https://git-scm.com/book/en/v2/Customizing-Git-Git-Hooks) for git:
 
 ```bash
 cd scripts/
