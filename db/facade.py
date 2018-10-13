@@ -3,7 +3,7 @@ Database Facade
 '''
 
 
-class DatabaseFacade:
+class DBFacade:
     '''
     Self-explanatory
     '''
