@@ -11,6 +11,7 @@ pycodestyle = "*"
 codecov = "*"
 pytest-cov = "*"
 pydocstyle = "*"
+ipython = "*"
 
 [requires]
 python_version = "3.7"
