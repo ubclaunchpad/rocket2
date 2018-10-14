@@ -5,16 +5,13 @@ import uuid
 class Team:
     """Represent a team with related fields and methods."""
 
-    __team_id = 0
-    __display_name = ""
-    __platform = ""
-    __members = set()
-    __github_team_name = ""
-
     def __init__(self, display_name):
         """Initialize the team with a unique ID and given name."""
         self.__team_id = uuid.uuid4()
         self.__display_name = display_name
+        self.__platform = ""
+        self.__members = set()
+        self.__github_team_name = ""
 
     def get_team_id(self):
         """Return this team's unique ID."""
