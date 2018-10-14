@@ -5,19 +5,17 @@ from model.permissions import Permissions
 class User:
     """Represent a user with related fields and methods."""
 
-    __slack_id = ""
-    __name = ""
-    __email = ""
-    __github_username = ""
-    __major = ""
-    __position = ""
-    __biography = ""
-    __image_url = ""
-    __permissions_level = Permissions.member
-
     def __init__(self, slack_id):
         """Initialize the user with a given Slack ID."""
         self.__slack_id = slack_id
+        self.__name = ""
+        self.__email = ""
+        self.__github_username = ""
+        self.__major = ""
+        self.__position = ""
+        self.__biography = ""
+        self.__image_url = ""
+        self.__permissions_level = Permissions.member
 
     def get_slack_id(self):
         """Return this user's Slack ID."""
