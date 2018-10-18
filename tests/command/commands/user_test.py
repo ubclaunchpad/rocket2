@@ -1,5 +1,6 @@
-"""Test user command parsing"""
+"""Test user command parsing."""
 from command.commands.user import UserCommand
+
 
 help_text = "User Command Reference:\n\n @rocket user\n\n Options:\n\n edit \n --name NAME\n" \
              " --email ADDRESS\n --pos YOURPOSITION\n --major YOURMAJOR\n --bio YOURBIO\n 'edit properties of your" \
@@ -11,43 +12,43 @@ help_text = "User Command Reference:\n\n @rocket user\n\n Options:\n\n edit \n -
 
 
 def test_get_command_name():
-    """Test user command get_name method"""
+    """Test user command get_name method."""
     testcommand = UserCommand()
     assert testcommand.get_name() == "user"
 
 
 def test_get_help():
-    """Test user command get_help method"""
+    """Test user command get_help method."""
     testcommand = UserCommand()
     assert testcommand.get_help() == help_text
 
 
 def test_handle_view():
-    """Test user command view parser and handle method"""
+    """Test user command view parser and handle method."""
     testcommand = UserCommand()
     assert testcommand.handle('user view asd') == "asd"
 
 
 def test_handle_help():
-    """Test user command help parser"""
+    """Test user command help parser."""
     testcommand = UserCommand()
     assert testcommand.handle('user help') == help_text
 
 
 def test_handle_delete():
-    """Test user command delete parser"""
+    """Test user command delete parser."""
     testcommand = UserCommand()
     assert testcommand.handle('user delete asd') == "deleting asd"
 
 
 def test_handle_edit_name():
-    """Test user command edit parser with one field"""
+    """Test user command edit parser with one field."""
     testcommand = UserCommand()
     assert testcommand.handle("user edit --name rob") == "user edited: name: rob, "
 
 
 def test_handle_edit():
-    """Test user command edit parser with all field"""
+    """Test user command edit parser with all field."""
     testcommand = UserCommand()
     assert testcommand.handle("user edit --name rob --member id --email rob@rob.com --pos "
                               "dev --github rob@.github.com --major 'Computer Science' "
