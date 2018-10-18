@@ -54,9 +54,12 @@ def test_handle_edit_name():
 
 def test_handle_edit():
     """Test user command edit parser with all field."""
+    result = "user edited: member: id, name: rob, email: rob@rob.com, " \
+             "position: dev, github: rob@.github.com, major: Computer " \
+             "Science, bio: Im a human"
     testcommand = UserCommand()
-    assert testcommand.handle("user edit --name rob --member id --email rob@rob.com --pos "
-                              "dev --github rob@.github.com --major 'Computer Science' "
-                              "--bio 'Im a human'") == "user edited: member: id, name: rob, email: rob@rob.com, " \
-                                                       "position: dev, github: rob@.github.com, major: Computer " \
-                                                       "Science, bio: Im a human"
+    assert testcommand.handle("user edit --name rob --member id "
+                              "--email rob@rob.com --pos "
+                              "dev --github rob@.github.com "
+                              "--major 'Computer Science' "
+                              "--bio 'Im a human'") == result
