@@ -49,7 +49,8 @@ def test_handle_delete():
 def test_handle_edit_name():
     """Test user command edit parser with one field."""
     testcommand = UserCommand()
-    assert testcommand.handle("user edit --name rob") == "user edited: name: rob, "
+    assert testcommand.handle("user edit --name rob") == \
+        "user edited: name: rob, "
 
 
 def test_handle_edit():
