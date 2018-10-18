@@ -54,7 +54,7 @@ def test_handle_edit_name():
 
 
 def test_handle_edit():
-    """Test user command edit parser with all field."""
+    """Test user command edit parser with all fields."""
     result = "user edited: member: id, name: rob, email: rob@rob.com, " \
              "position: dev, github: rob@.github.com, major: Computer " \
              "Science, bio: Im a human"
