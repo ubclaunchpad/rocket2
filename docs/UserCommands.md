@@ -12,6 +12,7 @@
   * `--major` YOURMAJOR
   * `--bio` YOURMAJOR
     * edit properties of your Launch Pad profile
+    * surround arguments with spaces with single quotes
   * ADMIN or TEAM LEAD only option: `--member` MEMBER_ID
     * edit properties of another user's Launch Pad profile
 
