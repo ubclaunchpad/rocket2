@@ -1,4 +1,5 @@
 """Test the facade for the database."""
+from unittest import mock
 from db.facade import DBFacade
 from model.user import User
 
@@ -8,7 +9,8 @@ def test_string_rep():
     assert str(DBFacade()) == "Database Facade"
 
 
-def test_store_user():
+@mock.patch('db.facade.DynamoDB')
+def test_store_user(ddb):
     """Test no errors in storing a user."""
     dbf = DBFacade()
     try:
