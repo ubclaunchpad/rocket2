@@ -58,3 +58,11 @@ class DynamoDB:
         :return: returns a list of user models that fit the query parameters.
         """
         return []
+
+    def delete_user(self, slack_id):
+        """
+        TODO: Removes a user from the users table.
+
+        :param slack_id: the slack_id of the user to be removed
+        """
+        pass
