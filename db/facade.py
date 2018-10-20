@@ -18,28 +18,9 @@ class DBFacade:
         #                          endpoint_url="http://localhost:8000")
         pass
 
-    def create_tables(self):
-        """Create the user table, for testing."""
-        # self.ddb.create_table(
-        #       TableName='users',
-        #       AttributeDefinitions=[
-        #           {
-        #               'AttributeName': 'slack_id',
-        #               'AttributeType': 'S'
-        #           },
-        #       ],
-        #       KeySchema=[
-        #           {
-        #               'AttributeName': 'slack_id',
-        #               'KeyType': 'HASH'
-        #           },
-        #       ],
-        #       ProvisionedThroughput={
-        #           'ReadCapacityUnits': 50,
-        #           'WriteCapacityUnits': 50
-        #       }
-        #   )
-        pass
+    def __str__(self):
+        """Return a string representing this class."""
+        return "Database Facade"
 
     def store_user(self, user):
         """
@@ -78,4 +59,3 @@ class DBFacade:
         :return: returns a list of user models that fit the query parameters.
         """
         return []
-
