@@ -5,7 +5,7 @@ name = "pypi"
 
 [packages]
 pytest = "*"
-"boto3" = "*"
+boto3 = "*"
 
 [dev-packages]
 pycodestyle = "*"
