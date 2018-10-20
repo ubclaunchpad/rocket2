@@ -5,14 +5,14 @@ class Team:
     """Represent a team with related fields and methods."""
 
     def __init__(self, display_name):
-        """Initialize the team with a unique ID and given name."""
-        self.__github_team_name = self.unique_github_team_name(display_name)
+        """Initialize the team with a Github team name and given name."""
+        self.__github_team_name = self.generate_github_team_name(display_name)
         self.__display_name = display_name
         self.__platform = ""
         self.__members = set()
 
     @staticmethod
-    def unique_github_team_name(display_name):
+    def generate_github_team_name(display_name):
         """Generate a unique Github team name based on given display name."""
         # stub
         return ""
