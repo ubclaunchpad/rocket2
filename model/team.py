@@ -37,18 +37,18 @@ class Team:
         """Return this team's working platform."""
         return self.__platform
 
-    def add_member(self, uuid):
-        """Add a new member's unique ID to the team's set of members' IDs."""
-        self.__members.add(uuid)
+    def add_member(self, slack_id):
+        """Add a new member's Slack ID to the team's set of members' IDs."""
+        self.__members.add(slack_id)
 
-    def discard_member(self, uuid):
-        """Discard the member of the team with the ID in the argument."""
-        self.__members.discard(uuid)
+    def discard_member(self, slack_id):
+        """Discard the member of the team with the Slack ID in the argument."""
+        self.__members.discard(slack_id)
 
     def get_members(self):
-        """Return the set of all members' unique IDs."""
+        """Return the set of all members' Slack IDs."""
         return self.__members
 
-    def is_member(self, uuid):
+    def is_member(self, slack_id):
         """Identify if any member has the ID specified in the argument."""
-        return uuid in self.__members
+        return slack_id in self.__members
