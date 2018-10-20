@@ -5,8 +5,10 @@ class Team:
     """Represent a team with related fields and methods."""
 
     def __init__(self, github_team_name, display_name):
-        """Initialize the team with given valid Github team name
-        and display name."""
+        """Initialize the team.
+
+        Parameters are a valid Github team name and display name.
+        """
         self.__github_team_name = github_team_name
         self.__display_name = display_name
         self.__platform = ""
