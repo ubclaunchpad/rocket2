@@ -41,20 +41,19 @@ def test_get_members():
     team = Team("team")
     assert team.get_members() == set()
 
-
-def test_discard_member():
-    """Test the Team class method discard_member(uuid)."""
-    team = Team("team")
-    team.discard_member(uuid.uuid4())
-    assert team.get_members() == set()
-
-
 def test_add_member():
     """Test the Team class method add_member(uuid)."""
     team = Team("team")
     new_uuid = uuid.uuid4()
     team.add_member(new_uuid)
     assert new_uuid in team.get_members()
+
+
+def test_discard_member():
+    """Test the Team class method discard_member(slack_id)."""
+    team = Team("team")
+    team.discard_member(uuid.uuid4())
+    assert team.get_members() == set()
 
 
 def test_manage_member():
