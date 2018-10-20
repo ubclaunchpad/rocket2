@@ -9,3 +9,12 @@ def test_send_dm():
         assert True
     except:
         assert False
+
+def test_send_to_channel():
+    """Test the Bot class method send_to_channel()."""
+    bot = Bot()
+    try:
+        bot.send_dm("Hahahaha", "#random")
+        assert True
+    except:
+        assert False

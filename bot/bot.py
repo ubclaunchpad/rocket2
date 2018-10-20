@@ -2,9 +2,7 @@
 import os
 from slackclient import SlackClient
 
-# slack_token = os.environ["SLACK_API_TOKEN"]
-slack_token = "xoxp-450677644563-450964940005-450690754371-72246adde9effadb4b6d89791edb6316"
-
+slack_token = os.environ["SLACK_API_TOKEN"]
 class Bot:
   """Utility class for interacting with Slack API"""
   def __init__(self):
@@ -25,11 +23,17 @@ class Bot:
     return
 
   def send_to_channel(self, message, channel_name):
+    """Send message to channel with name channel_name"""
     response = self.sc.api_call(
       "chat.postMessage",
       channel=channel_name,
       text=message
     )
+
+    if not response['ok']:
+      raise Exception('API Call error: {}'.format(response["error"]))
+
+    return
 
 
 # Example of how we are going to use SlackBot interface
