@@ -3,7 +3,7 @@ python:
     - "3.7-dev"
 install:
     - sudo apt-get update
-    - sudo apt-get install -y defaultjdk
+    - sudo apt-get install -y default-jdk
     - pip install pipenv
     - pipenv install --dev
     - gem install mdl
