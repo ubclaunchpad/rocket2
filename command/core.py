@@ -1,10 +1,12 @@
 from slackeventsapi import SlackEventAdapter
+from command.commands.user import UserCommand
 import os
 
+commands = {}
+commands["user"] = UserCommand()
 slack_signing_secret = os.environ["SLACK_SIGNING_SECRET"]
 slack_events_adapter = SlackEventAdapter(slack_signing_secret, "/slack/events")
-
-commands = {}
+    
 
 @slack_events_adapter.on("app_mention")
 def handle_mention(event_data):
@@ -14,6 +16,6 @@ def handle_mention(event_data):
         pass
     else:
         command = s[1] + ' ' + s[2]
-        commands[user].handle(command)
-
+        commands[s[1]].handle(command)
+    
 slack_events_adapter.start(port=3000)
