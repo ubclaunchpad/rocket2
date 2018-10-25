@@ -56,6 +56,12 @@ class DBFacade:
         """
         TODO: Query for specific users by parameter.
 
+        Query using a list of parameters (tuples), where the first element of
+        the tuple is the item attribute, second being the item value.
+
+        Example: [('permission_level', 'admin')]
+
+        :param parameters: list of parameters (tuples)
         :return: returns a list of user models that fit the query parameters.
         """
         return []
