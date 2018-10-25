@@ -4,17 +4,11 @@ python:
 install:
     - sudo apt-get update
     - sudo apt-get install -y default-jdk
-    - pip install pipenv
+    - pip install pipenv awscli
     - pipenv install --dev
     - gem install mdl
 before_script:
-    - printf "Setting up DynamoDB, locally...\n"
-    - wget https://s3-us-west-2.amazonaws.com/dynamodb-local/dynamodb_local_latest.tar.gz
-    - mkdir DynamoDB
-    - tar -xvf dynamodb_local_latest.tar.gz --directory DynamoDB
-    - cd DynamoDB
-    - java -Djava.library.path=./DynamoDBLocal_lib -jar DynamoDBLocal.jar -sharedDb &
-    - cd ..
+    - scripts/download_dynamodb_and_run.sh
 script:
     - pipenv run pycodestyle .
     - pipenv run pydocstyle .
