@@ -67,6 +67,6 @@ def test_is_member():
 
 
 def test_print():
-    """Test print team class"""
+    """Test print team class."""
     team = Team("brussel-sprouts", "Brussel Sprouts")
     print(team)

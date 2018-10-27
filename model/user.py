@@ -76,3 +76,13 @@ class User:
     def set_permissions_level(self, permissions_level):
         """Set this user's permissions level to the given argument."""
         self.__permissions_level = permissions_level
+
+    def __str__(self):
+        """Prints information on the user class."""
+        return "User, slack_id: {}, name: {}, email: {}, github: {}," \
+               " major: {}, position: {}, bio: {}, image_url: {}," \
+               " permission level: {}".format(
+                self.__slack_id, self.__name, self.__email,
+                self.__github_username, self.__major,
+                self.__position, self.__biography, self.__image_url,
+                self.__permissions_level)

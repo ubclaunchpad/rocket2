@@ -59,7 +59,7 @@ class UserCommand:
         return self.__help
 
     def handle(self, command):
-        """Handle command by splitting into substrings and giving to parser."""
+        """Handle command by splitting string and giving to parser."""
         command_arg = shlex.split(command)
         args = self.parser.parse_args(command_arg)
         if args.which == "view":

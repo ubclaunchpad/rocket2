@@ -88,6 +88,6 @@ def test_set_permissions_level():
 
 
 def test_print():
-    """Test print user class"""
+    """Test print user class."""
     user = User("U0G9QF9C6")
     print(user)
