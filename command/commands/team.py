@@ -36,7 +36,7 @@ class TeamCommand:
     parser_create = subparsers.add_parser("create")
     parser_create.set_defaults(which="create")
     parser_create.add_argument("team_name", type=str, action='store')
-    parser_create.add_argument("display_name", type=str, action='store')
+    parser_create.add_argument("--name", type=str, action='store')
 
     """Parser for add command."""
     parser_add = subparsers.add_parser("add")
@@ -87,7 +87,9 @@ class TeamCommand:
 
         elif args.which == "create":
             # stub
-            return "team " + args.display_name + ", id " + args.team_name
+            if args.name is None:
+                return "id " + args.team_name
+            return "team " + args.name + ", id " + args.team_name
 
         elif args.which == "add":
             # stub

@@ -44,7 +44,8 @@ def test_handle_delete():
 def test_handle_create():
     """Test team command create parser."""
     testcommand = TeamCommand()
-    assert testcommand.handle("team create b-s 'B S'") == "team B S, id b-s"
+    assert testcommand.handle("team create b-s") == "id b-s"
+    assert testcommand.handle("team create b-s --name B") == "team B, id b-s"
 
 
 def test_handle_add():
