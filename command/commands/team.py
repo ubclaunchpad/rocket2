@@ -19,6 +19,10 @@ class TeamCommand:
     parser_view.set_defaults(which="view")
     parser_view.add_argument("team_name", type=str, action='store')
 
+    """Parser for help command."""
+    parser_view = subparsers.add_parser("help")
+    parser_view.set_defaults(which="help")
+
     """Parser for delete command."""
     parser_delete = subparsers.add_parser("delete")
     parser_delete.set_defaults(which="delete")
@@ -45,6 +49,9 @@ class TeamCommand:
         if args.which == "view":
             # stub
             return "viewing " + args.team_name
+
+        elif args.which == "help":
+            return self.get_help()
 
         elif args.which == "delete":
             # stub

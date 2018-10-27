@@ -23,6 +23,12 @@ def test_handle_view():
     assert testcommand.handle("team view b-s") == "viewing b-s"
 
 
+def test_handle_help():
+    """Test team command help parser."""
+    testcommand = TeamCommand()
+    assert testcommand.handle('team help') == help_text
+
+
 def test_handle_delete():
     """Test team command handle_delete parser."""
     testcommand = TeamCommand()
