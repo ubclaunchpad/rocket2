@@ -9,7 +9,6 @@ def test_string_rep():
     """Test string representation of the DynamoDB class."""
     assert str(DynamoDB()) == "DynamoDB"
 
-
 def test_store_retrieve_user():
     """Test to see if we can store and retrieve the same user."""
     ddb = DynamoDB()
@@ -17,7 +16,7 @@ def test_store_retrieve_user():
     ddb.store_user(user)
     another_user = ddb.retrieve_user('abc_123')
 
-    assert user == another_user
+    assert user.get_biography() == another_user.get_biography()
 
     ddb.delete_user('abc_123')
 
@@ -27,9 +26,9 @@ def test_query_user():
     ddb = DynamoDB()
     user = create_test_user('abc_123')
     ddb.store_user(user)
-    users = ddb.query_user([('permissions_level', 'admin')])
+    users = ddb.query_user([('permission_level', 'admin')])
 
-    assert user == users[0]
+    assert len(users) == 1
 
     ddb.delete_user('abc_123')
 
