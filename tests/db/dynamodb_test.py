@@ -58,7 +58,7 @@ def test_query_team():
     ddb = DynamoDB()
     team = create_test_team('rocket2.0', 'Rocket 2.0')
     ddb.store_team(team)
-    teams = ddb.query_team('rocket2.0')
+    teams = ddb.query_team([('display_name', 'Rocket 2.0')])
 
     assert len(teams) == 1
 
