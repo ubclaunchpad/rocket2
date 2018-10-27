@@ -3,6 +3,15 @@ from model.permissions import Permissions
 from model.user import User
 
 
+def test_user_equality():
+    """Test the User class method __eq__() and __ne__()."""
+    user = User("brussel-sprouts")
+    user2 = User("brussel-sprouts")
+    user3 = User("brussel-trouts")
+    assert user == user2
+    assert user != user3
+
+
 def test_get_slack_id():
     """Test the User class method get_slack_id()."""
     user = User("U0G9QF9C6")
