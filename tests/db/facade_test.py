@@ -15,7 +15,6 @@ def test_store_user(ddb):
     dbf = DBFacade(ddb)
     test_user = create_test_user('abc_123')
     dbf.store_user(test_user)
-    print(ddb.method_calls)
     ddb.store_user.assert_called_with(test_user)
 
 
