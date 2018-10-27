@@ -4,6 +4,9 @@
 
 ## Options to specify input
 
+* `list`
+    * outputs the Github team names and display names of all teams
+
 * `view` GITHUB_TEAM_NAME
     * view information and members of a team
 
@@ -14,7 +17,11 @@
 
 * `add` GITHUB_TEAM_NAME 'DISPLAY NAME'
     * create a new team with the specified values
-    * display name must be a quoted string if it includes whitespace
+
+* `edit` GITHUB_TEAM_NAME
+    * `--name` 'DISPLAY NAME'
+    * `--platform` PLATFORM
+        * edit properties of specified team
 
 ## ADMIN only
 

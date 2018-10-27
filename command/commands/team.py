@@ -14,6 +14,10 @@ class TeamCommand:
     parser.add_argument("team")
     subparsers = parser.add_subparsers()
 
+    """Parser for list command."""
+    parser_list = subparsers.add_parser("list")
+    parser_list.set_defaults(which="list")
+
     """Parser for view command."""
     parser_view = subparsers.add_parser("view")
     parser_view.set_defaults(which="view")
@@ -29,10 +33,10 @@ class TeamCommand:
     parser_delete.add_argument("team_name", type=str, action='store')
 
     """Parser for add command."""
-    parser_delete = subparsers.add_parser("add")
-    parser_delete.set_defaults(which="add")
-    parser_delete.add_argument("team_name", type=str, action='store')
-    parser_delete.add_argument("display_name", type=str, action='store')
+    parser_add = subparsers.add_parser("add")
+    parser_add.set_defaults(which="add")
+    parser_add.add_argument("team_name", type=str, action='store')
+    parser_add.add_argument("display_name", type=str, action='store')
 
     def get_name(self):
         """Return the command type."""
@@ -46,7 +50,11 @@ class TeamCommand:
         """Handle command by splitting into substrings and giving to parser."""
         command_arg = shlex.split(command)
         args = self.parser.parse_args(command_arg)
-        if args.which == "view":
+        if args.which == "list":
+            # stub
+            return "listing all teams"
+
+        elif args.which == "view":
             # stub
             return "viewing " + args.team_name
 

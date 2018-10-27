@@ -17,6 +17,12 @@ def test_get_help():
     assert testcommand.get_help() == help_text
 
 
+def test_handle_list():
+    """Test team command handle_list parser."""
+    testcommand = TeamCommand()
+    assert testcommand.handle("team list") == "listing all teams"
+
+
 def test_handle_view():
     """Test team command handle_view parser."""
     testcommand = TeamCommand()
