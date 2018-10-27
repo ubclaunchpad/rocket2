@@ -27,7 +27,12 @@ def test_query_user():
     user = create_test_user('abc_123')
     ddb.store_user(user)
     users = ddb.query_user([('permission_level', 'admin')])
+    strict_users = ddb.query_user([('permission_level', 'admin'),
+                                   ('slack_id', 'abc_123')])
+    all_users = ddb.query_user([])
 
     assert len(users) == 1
+    assert len(all_users) == 1
+    assert len(strict_users) == 1
 
     ddb.delete_user('abc_123')

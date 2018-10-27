@@ -2,6 +2,7 @@
 import boto3
 from boto3.dynamodb.conditions import Attr
 from model.user import User
+from functools import reduce
 
 
 class DynamoDB:
@@ -75,7 +76,7 @@ class DynamoDB:
 
     def retrieve_user(self, slack_id):
         """
-        TODO: Retrieve user from users table.
+        Retrieve user from users table.
 
         :return: returns a user model if slack id is found.
         """
@@ -101,24 +102,36 @@ class DynamoDB:
 
     def query_user(self, parameters):
         """
-        TODO: Query for specific users by parameter.
+        Query for specific users by parameter.
 
         Query using a list of parameters (tuples), where the first element of
         the tuple is the item attribute, second being the item value.
 
         Example: [('permission_level', 'admin')]
 
+        If parameters is an empty list, returns all the users.
+
         :param parameters: list of parameters (tuples)
         :return: returns a list of user models that fit the query parameters.
         """
         user_list = []
-        response = self.ddb.Table('users')
-        for p in parameters:
-            response = response.scan(
-                FilterExpression=Attr(p[0]).eq(p[1])
+        users = self.ddb.Table('users')
+        response = None
+        if len(parameters) > 0:
+            # There are 1 or more parameters that we should care about
+            filter_expr = Attr(parameters[0][0]).eq(parameters[0][1])
+
+            for p in parameters[1:]:
+                filter_expr &= Attr(p[0]).eq(p[1])
+
+            response = users.scan(
+                FilterExpression=filter_expr
             )
-        response = response['Items']
-        for r in response:
+        else:
+            # No parameters; return all users in table
+            response = users.scan()
+
+        for r in response['Items']:
             slack_id = r['slack_id']
             user = User(slack_id)
 
@@ -135,7 +148,7 @@ class DynamoDB:
 
     def delete_user(self, slack_id):
         """
-        TODO: Removes a user from the users table.
+        Remove a user from the users table.
 
         :param slack_id: the slack_id of the user to be removed
         """
