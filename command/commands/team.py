@@ -50,6 +50,13 @@ class TeamCommand:
     parser_remove.add_argument("team_name", type=str, action='store')
     parser_remove.add_argument("slack_id", type=str, action='store')
 
+    """Parser for edit command."""
+    parser_edit = subparsers.add_parser("edit")
+    parser_edit.set_defaults(which='edit')
+    parser_edit.add_argument("team_name", type=str, action='store')
+    parser_edit.add_argument("--name", type=str, action='store')
+    parser_edit.add_argument("--platform", type=str, action='store')
+
     def get_name(self):
         """Return the command type."""
         return self.__command_name
@@ -89,3 +96,12 @@ class TeamCommand:
         elif args.which == "remove":
             # stub
             return "removed " + args.slack_id + " from " + args.team_name
+
+        elif args.which == "edit":
+            # stub
+            msg = "team edited: {}, ".format(args.team_name)
+            if args.name is not None:
+                msg += "name: {}, ".format(args.name)
+            if args.platform is not None:
+                msg += "platform: {}, ".format(args.platform)
+            return msg

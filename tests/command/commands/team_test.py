@@ -57,3 +57,14 @@ def test_handle_remove():
     """Test team command remove parser."""
     testcommand = TeamCommand()
     assert testcommand.handle("team remove b-s ID") == "removed ID from b-s"
+
+
+def test_handle_edit():
+    """Test team command edit parser."""
+    testcommand = TeamCommand()
+    inputstring = "team edit b-s --name 'B S'"
+    outputstring = "team edited: b-s, name: B S, "
+    assert testcommand.handle(inputstring) == outputstring
+    inputstring += " --platform web"
+    outputstring += "platform: web, "
+    assert testcommand.handle(inputstring) == outputstring
