@@ -32,11 +32,23 @@ class TeamCommand:
     parser_delete.set_defaults(which="delete")
     parser_delete.add_argument("team_name", type=str, action='store')
 
+    """Parser for create command."""
+    parser_create = subparsers.add_parser("create")
+    parser_create.set_defaults(which="create")
+    parser_create.add_argument("team_name", type=str, action='store')
+    parser_create.add_argument("display_name", type=str, action='store')
+
     """Parser for add command."""
     parser_add = subparsers.add_parser("add")
     parser_add.set_defaults(which="add")
     parser_add.add_argument("team_name", type=str, action='store')
-    parser_add.add_argument("display_name", type=str, action='store')
+    parser_add.add_argument("slack_id", type=str, action='store')
+
+    """Parser for remove command."""
+    parser_remove = subparsers.add_parser("remove")
+    parser_remove.set_defaults(which="remove")
+    parser_remove.add_argument("team_name", type=str, action='store')
+    parser_remove.add_argument("slack_id", type=str, action='store')
 
     def get_name(self):
         """Return the command type."""
@@ -66,6 +78,14 @@ class TeamCommand:
             # stub
             return args.team_name + " was deleted"
 
+        elif args.which == "create":
+            # stub
+            return "team " + args.display_name + ", id " + args.team_name
+
         elif args.which == "add":
             # stub
-            return "new team " + args.display_name + ", id " + args.team_name
+            return "added " + args.slack_id + " to " + args.team_name
+
+        elif args.which == "remove":
+            # stub
+            return "removed " + args.slack_id + " from " + args.team_name

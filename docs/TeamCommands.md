@@ -17,13 +17,19 @@ All parameters with whitespace must be enclosed by quotation marks.
 
 ## TEAM LEAD or ADMIN only
 
-* `add` GITHUB_TEAM_NAME DISPLAY_NAME
+* `create` GITHUB_TEAM_NAME DISPLAY_NAME
     * create a new team with the specified values
 
 * `edit` GITHUB_TEAM_NAME
     * `--name` DISPLAY_NAME
     * `--platform` PLATFORM
         * edit properties of specified team
+
+* `add` GITHUB_TEAM_NAME SLACK_ID
+    * add the specified user to the team
+
+* `remove` GITHUB_TEAM_NAME SLACK_ID
+    * remove the specified user from the team
 
 ## ADMIN only
 

@@ -41,7 +41,19 @@ def test_handle_delete():
     assert testcommand.handle("team delete b-s") == "b-s was deleted"
 
 
+def test_handle_create():
+    """Test team command create parser."""
+    testcommand = TeamCommand()
+    assert testcommand.handle("team create b-s 'B S'") == "team B S, id b-s"
+
+
 def test_handle_add():
     """Test team command add parser."""
     testcommand = TeamCommand()
-    assert testcommand.handle("team add b-s 'B S'") == "new team B S, id b-s"
+    assert testcommand.handle("team add b-s ID") == "added ID to b-s"
+
+
+def test_handle_remove():
+    """Test team command remove parser."""
+    testcommand = TeamCommand()
+    assert testcommand.handle("team remove b-s ID") == "removed ID from b-s"
