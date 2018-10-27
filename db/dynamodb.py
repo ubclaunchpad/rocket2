@@ -14,13 +14,13 @@ class DynamoDB:
                                   endpoint_url="http://localhost:8000")
 
         if not self.check_valid_table('users'):
-            self.create_tables()
+            self.create_user_tables()
 
     def __str__(self):
         """Return a string representing this class."""
         return "DynamoDB"
 
-    def create_tables(self):
+    def create_user_tables(self):
         """Create the user table, for testing."""
         self.ddb.create_table(
             TableName='users',
@@ -41,6 +41,39 @@ class DynamoDB:
                 'WriteCapacityUnits': 50
             }
         )
+    def create_team_tables(self):
+        """Create the team table, for testing."""
+        self.ddb.create_table(
+            TableName='teams',
+            AttributeDefinitions=[
+                {
+                    'AttributeName': 'github_team_name',
+                    'AttributeType': 'S',
+                    'AttributeName': 'display_name',
+                    'AttributeType': 'S'
+                },
+            ],
+            KeySchema=[
+                {
+                    'AttributeName': 'github_team_name',
+                    'KeyType': 'HASH'
+                },
+            ],
+            ProvisionedThroughput={
+                'ReadCapacityUnits': 50,
+                'WriteCapacityUnits': 50
+            }
+        )
+
+    def check_valid_table(self, table_name):
+        """
+        Check if table with table_name exists.
+
+        :param table_name: table identifier
+        :return: boolean value, true if table exists, false otherwise
+        """
+        existing_tables = self.ddb.tables.all()
+        return any(map(lambda t: t.name == table_name, existing_tables))
 
     def store_user(self, user):
         """
@@ -62,20 +95,23 @@ class DynamoDB:
                 'permission_level': user.get_permissions_level().name
             }
         )
-
-    def check_valid_table(self, table_name):
+    def store_team(self, team):
         """
-        Check if table with table_name exists.
+        Store team into teams table.
 
-        :param table_name: table identifier
-        :return: boolean value, true if table exists, false otherwise
+        :param team:
         """
-        existing_tables = self.ddb.tables.all()
-        return any(map(lambda t: t.name == table_name, existing_tables))
+
+    def store_team(self, team):
+        """
+        Store team into teams table.
+
+        :param team: A team model to store
+        """
 
     def retrieve_user(self, slack_id):
         """
-        TODO: Retrieve user from users table.
+        Retrieve user from users table.
 
         :return: returns a user model if slack id is found.
         """
@@ -99,10 +135,16 @@ class DynamoDB:
 
         return user
 
+    def retrieve_team(self, team_name):
+        """
+        Retrieve team from teams table.
+
+        :param team_name:
+        :return:
+        """
+
     def query_user(self, parameters):
         """
-        TODO: Query for specific users by parameter.
-
         Query using a list of parameters (tuples), where the first element of
         the tuple is the item attribute, second being the item value.
 
@@ -133,9 +175,21 @@ class DynamoDB:
             user_list.append(user)
         return user_list
 
+    def query_team(self, parameters):
+        """
+        Query using a list of parameters (tuples), where the first element of
+        the tuple is the item attribute, second being the item value.
+
+        //TODO write team param example
+        Example: [('permission_level', 'admin')]
+
+        :param parameters:
+        :return: returns a list of user models that fit the query parameters.
+        """
+
     def delete_user(self, slack_id):
         """
-        TODO: Removes a user from the users table.
+        Removes a user from the users table.
 
         :param slack_id: the slack_id of the user to be removed
         """
@@ -146,3 +200,10 @@ class DynamoDB:
                 'slack_id': slack_id
             }
         )
+
+    def delete_team(self, team_name):
+        """
+        Removes a team from the teams table.
+
+        :param team_name: the team_name of the team to be removed
+        """
