@@ -2,9 +2,13 @@ language: python
 python:
     - "3.7-dev"
 install:
-    - pip install pipenv
+    - sudo apt-get update
+    - sudo apt-get install -y default-jdk
+    - pip install pipenv awscli
     - pipenv install --dev
     - gem install mdl
+before_script:
+    - scripts/download_dynamodb_and_run.sh
 script:
     - pipenv run pycodestyle .
     - pipenv run pydocstyle .

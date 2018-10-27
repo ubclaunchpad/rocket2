@@ -1,6 +1,9 @@
 """Database Facade."""
 from .dynamodb import DynamoDB
+<<<<<<< HEAD
 from model.user import User
+=======
+>>>>>>> refs/remotes/origin/dynamodb
 
 
 class DBFacade:
@@ -10,10 +13,9 @@ class DBFacade:
     Currently, we plan on having DynamoDB, but other databases, such as MongoDB
     or Postgres are also being considered.
     """
-
-    def __init__(self):
+    def __init__(self, db=DynamoDB()):
         """Initialize facade using DynamoDB settings (for now)."""
-        self.ddb = DynamoDB()
+        self.ddb = db
 
     def __str__(self):
         """Return a string representing this class."""
