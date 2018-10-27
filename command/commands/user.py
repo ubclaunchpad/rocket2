@@ -23,6 +23,7 @@ class UserCommand:
     """Top level User parser."""
     parser = argparse.ArgumentParser(prog="user")
     parser.add_argument("user")
+    parser.set_defaults(which="help")
     subparsers = parser.add_subparsers()
 
     """Parser for view command."""

@@ -78,7 +78,7 @@ class User:
         self.__permissions_level = permissions_level
 
     def __str__(self):
-        """Prints information on the user class."""
+        """Print information on the user class."""
         return "User, slack_id: {}, name: {}, email: {}, github: {}," \
                " major: {}, position: {}, bio: {}, image_url: {}," \
                " permission level: {}".format(

@@ -51,7 +51,7 @@ class Team:
         return slack_id in self.__members
 
     def __self__(self):
-        """Prints information on the team class."""
+        """Print information on the team class."""
         return "Team, github name: {}, display name: {}. platform: {}" \
                "members: {}".format(self.get_github_team_name(),
                                     self.get_display_name(),
