@@ -2,6 +2,8 @@
 
 `@rocket team`
 
+All parameters with whitespace must be enclosed by quotation marks.
+
 ## Options to specify input
 
 * `list`
@@ -15,11 +17,11 @@
 
 ## TEAM LEAD or ADMIN only
 
-* `add` GITHUB_TEAM_NAME 'DISPLAY NAME'
+* `add` GITHUB_TEAM_NAME DISPLAY_NAME
     * create a new team with the specified values
 
 * `edit` GITHUB_TEAM_NAME
-    * `--name` 'DISPLAY NAME'
+    * `--name` DISPLAY_NAME
     * `--platform` PLATFORM
         * edit properties of specified team
 

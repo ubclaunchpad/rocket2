@@ -12,13 +12,13 @@ def test_get_command_name():
 
 
 def test_get_help():
-    """Test team command get_help parser."""
+    """Test team command get_help method."""
     testcommand = TeamCommand()
     assert testcommand.get_help() == help_text
 
 
 def test_handle_list():
-    """Test team command handle_list parser."""
+    """Test team command list parser."""
     testcommand = TeamCommand()
     assert testcommand.handle("team list") == "listing all teams"
 
