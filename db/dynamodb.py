@@ -2,6 +2,7 @@
 import boto3
 from boto3.dynamodb.conditions import Attr
 from model.user import User
+from model.permissions import Permissions
 from functools import reduce
 
 
@@ -96,7 +97,7 @@ class DynamoDB:
         user.set_position(response['position'])
         user.set_biography(response['bio'])
         user.set_image_url(response['image_url'])
-        user.set_permissions_level(response['permission_level'])
+        user.set_permissions_level(Permissions[response['permission_level']])
 
         return user
 
@@ -141,7 +142,7 @@ class DynamoDB:
             user.set_position(r['position'])
             user.set_biography(r['bio'])
             user.set_image_url(r['image_url'])
-            user.set_permissions_level(r['permission_level'])
+            user.set_permissions_level(Permissions[r['permission_level']])
 
             user_list.append(user)
         return user_list

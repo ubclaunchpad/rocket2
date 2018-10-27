@@ -16,7 +16,10 @@ def test_store_retrieve_user():
     ddb.store_user(user)
     another_user = ddb.retrieve_user('abc_123')
 
-    assert user.get_biography() == another_user.get_biography()
+    print(user.__dict__)
+    print(another_user.__dict__)
+
+    assert user == another_user
 
     ddb.delete_user('abc_123')
 
@@ -31,8 +34,8 @@ def test_query_user():
                                    ('slack_id', 'abc_123')])
     all_users = ddb.query_user([])
 
-    assert len(users) == 1
-    assert len(all_users) == 1
-    assert len(strict_users) == 1
+    assert user == users[0]
+    assert user == all_users[0]
+    assert user == strict_users[0]
 
     ddb.delete_user('abc_123')
