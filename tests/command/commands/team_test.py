@@ -24,7 +24,7 @@ def test_handle_list():
 
 
 def test_handle_view():
-    """Test team command handle_view parser."""
+    """Test team command view parser."""
     testcommand = TeamCommand()
     assert testcommand.handle("team view b-s") == "viewing b-s"
 
@@ -36,12 +36,12 @@ def test_handle_help():
 
 
 def test_handle_delete():
-    """Test team command handle_delete parser."""
+    """Test team command delete parser."""
     testcommand = TeamCommand()
     assert testcommand.handle("team delete b-s") == "b-s was deleted"
 
 
 def test_handle_add():
-    """Test team command handle_add parser."""
+    """Test team command add parser."""
     testcommand = TeamCommand()
     assert testcommand.handle("team add b-s 'B S'") == "new team B S, id b-s"
