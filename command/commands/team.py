@@ -51,6 +51,7 @@ class TeamCommand:
             return "viewing " + args.team_name
 
         elif args.which == "help":
+            # stub
             return self.get_help()
 
         elif args.which == "delete":
