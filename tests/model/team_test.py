@@ -64,3 +64,9 @@ def test_is_member():
     assert team.is_member(new_slack_id) is False
     team.add_member(new_slack_id)
     assert team.is_member(new_slack_id)
+
+
+def test_print():
+    """Test print team class"""
+    team = Team("brussel-sprouts", "Brussel Sprouts")
+    print(team)

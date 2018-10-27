@@ -85,3 +85,9 @@ def test_set_permissions_level():
     user = User("U0G9QF9C6")
     user.set_permissions_level(Permissions.admin)
     assert user.get_permissions_level() == Permissions.admin
+
+
+def test_print():
+    """Test print user class"""
+    user = User("U0G9QF9C6")
+    print(user)
