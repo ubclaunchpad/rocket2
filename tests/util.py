@@ -22,15 +22,14 @@ def create_test_user(slack_id):
     return u
 
 
-def create_test_team(team_name):
+def create_test_team(team_name, display_name):
     """
     Create a test team with team name, and with all other attributes the same.
 
     :param team_name: The github team name string
     :return: returns a filled-in user model (no empty strings)
     """
-    t = Team(team_name)
-    t.set_display_name('Brussle Sprouts')
+    t = Team(team_name, display_name)
     t.set_platform('slack')
     t.add_member('abc_123')
     return t

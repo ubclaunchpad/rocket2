@@ -53,8 +53,6 @@ class DynamoDB:
             AttributeDefinitions=[
                 {
                     'AttributeName': 'github_team_name',
-                    'AttributeType': 'S',
-                    'AttributeName': 'display_name',
                     'AttributeType': 'S'
                 },
             ],
@@ -107,6 +105,7 @@ class DynamoDB:
 
         :param team: A team model to store
         """
+        pass
 
     def retrieve_user(self, slack_id):
         """
@@ -141,12 +140,15 @@ class DynamoDB:
         :param team_name:
         :return:
         """
-        return Team
+        return Team(team_name, '')
 
     def query_user(self, parameters):
         """
-        Query using a list of parameters (tuples), where the first element of
-        the tuple is the item attribute, second being the item value.
+        Query for user using list of parameters.
+
+        Returns list of users that have **all** of the attributes specified in
+        the parameters. Every item in parameters is a tuple, where the first
+        element is the user attribute, and the second is the value.
 
         Example: [('permission_level', 'admin')]
 
@@ -177,8 +179,11 @@ class DynamoDB:
 
     def query_team(self, parameters):
         """
-        Query using a list of parameters (tuples), where the first element of
-        the tuple is the item attribute, second being the item value.
+        Query for teams using list of parameters.
+
+        Returns list of teams that have **all** of the attributes specified in
+        the parameters. Every item in parameters is a tuple, where the first
+        element is the user attribute, and the second is the value.
 
         //TODO write team param example
         Example: [('permission_level', 'admin')]
@@ -186,8 +191,7 @@ class DynamoDB:
         :param parameters:
         :return: returns a list of user models that fit the query parameters.
         """
-
-        return None
+        return []
 
     def delete_user(self, slack_id):
         """
@@ -209,3 +213,4 @@ class DynamoDB:
 
         :param team_name: the team_name of the team to be removed
         """
+        pass
