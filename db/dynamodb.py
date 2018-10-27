@@ -2,6 +2,7 @@
 import boto3
 from boto3.dynamodb.conditions import Attr
 from model.user import User
+from model.team import Team
 
 
 class DynamoDB:
@@ -15,6 +16,9 @@ class DynamoDB:
 
         if not self.check_valid_table('users'):
             self.create_user_tables()
+
+        if not self.check_valid_table('teams'):
+            self.create_team_tables()
 
     def __str__(self):
         """Return a string representing this class."""
@@ -41,6 +45,7 @@ class DynamoDB:
                 'WriteCapacityUnits': 50
             }
         )
+
     def create_team_tables(self):
         """Create the team table, for testing."""
         self.ddb.create_table(
@@ -95,16 +100,10 @@ class DynamoDB:
                 'permission_level': user.get_permissions_level().name
             }
         )
-    def store_team(self, team):
-        """
-        Store team into teams table.
-
-        :param team:
-        """
 
     def store_team(self, team):
         """
-        Store team into teams table.
+        //TODO: Store team into teams table.
 
         :param team: A team model to store
         """
@@ -137,11 +136,12 @@ class DynamoDB:
 
     def retrieve_team(self, team_name):
         """
-        Retrieve team from teams table.
+        //TODO: Retrieve team from teams table.
 
         :param team_name:
         :return:
         """
+        return Team
 
     def query_user(self, parameters):
         """
@@ -187,9 +187,11 @@ class DynamoDB:
         :return: returns a list of user models that fit the query parameters.
         """
 
+        return None
+
     def delete_user(self, slack_id):
         """
-        Removes a user from the users table.
+        //TODO: Removes a user from the users table.
 
         :param slack_id: the slack_id of the user to be removed
         """
@@ -203,7 +205,7 @@ class DynamoDB:
 
     def delete_team(self, team_name):
         """
-        Removes a team from the teams table.
+        //TODO: Removes a team from the teams table.
 
         :param team_name: the team_name of the team to be removed
         """
