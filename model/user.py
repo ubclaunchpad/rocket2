@@ -17,6 +17,14 @@ class User:
         self.__image_url = ""
         self.__permissions_level = Permissions.member
 
+    def __eq__(self, other):
+        """Return true if this user has the same attributes as the other."""
+        return str(self.__dict__) == str(other.__dict__)
+
+    def __ne__(self, other):
+        """Return the opposite of what is returned in self.__eq__(other)."""
+        return not (self == other)
+
     def get_slack_id(self):
         """Return this user's Slack ID."""
         return self.__slack_id
