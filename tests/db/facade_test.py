@@ -8,6 +8,7 @@ def test_string_rep():
     """Test string representation of the DBFacade class."""
     assert str(DBFacade()) == "Database Facade"
 
+
 @mock.patch('db.dynamodb.DynamoDB', autospec=True)
 def test_store_user(ddb):
     """Test storing user calls correct functions."""
@@ -33,4 +34,3 @@ def test_query_user(ddb):
     dbf = DBFacade(ddb)
     dbf.query_user(['permission_level', 'admin'])
     ddb.query_user.assert_called_with(['permission_level', 'admin'])
-

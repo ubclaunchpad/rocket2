@@ -1,6 +1,7 @@
 """Database Facade."""
 from .dynamodb import DynamoDB
 
+
 class DBFacade:
     """
     A database facade that gives an overall API for any databases.
@@ -8,10 +9,10 @@ class DBFacade:
     Currently, we plan on having DynamoDB, but other databases, such as MongoDB
     or Postgres are also being considered.
     """
+
     def __init__(self, db=DynamoDB()):
         """Initialize facade using DynamoDB settings (for now)."""
         self.ddb = db
-
 
     def __str__(self):
         """Return a string representing this class."""

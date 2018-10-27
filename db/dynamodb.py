@@ -3,6 +3,7 @@ import boto3
 from boto3.dynamodb.conditions import Attr
 from model.user import User
 
+
 class DynamoDB:
     """DynamoDB."""
 
@@ -41,7 +42,6 @@ class DynamoDB:
             }
         )
 
-
     def store_user(self, user):
         """
         Store user into users table.
@@ -62,16 +62,16 @@ class DynamoDB:
                 'permission_level': user.get_permissions_level().name
             }
         )
+
     def check_valid_table(self, table_name):
         """
-        Checks if table with table_name exists
+        Check if table with table_name exists.
 
         :param table_name: table identifier
         :return: boolean value, true if table exists, false otherwise
         """
         existing_tables = self.ddb.tables.all()
         return any(map(lambda t: t.name == table_name, existing_tables))
-
 
     def retrieve_user(self, slack_id):
         """
