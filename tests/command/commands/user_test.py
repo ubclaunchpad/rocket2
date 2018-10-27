@@ -28,6 +28,12 @@ def test_get_help():
     assert testcommand.get_help() == help_text
 
 
+def test_handle_default():
+    """Test user command default @rocket user parser."""
+    testcommand = UserCommand()
+    assert testcommand.handle('user') == help_text
+
+
 def test_handle_view():
     """Test user command view parser and handle method."""
     testcommand = UserCommand()
