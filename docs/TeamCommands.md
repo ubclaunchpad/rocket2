@@ -17,8 +17,10 @@ All parameters with whitespace must be enclosed by quotation marks.
 
 ## TEAM LEAD or ADMIN only
 
-* `create` GITHUB_TEAM_NAME DISPLAY_NAME
-  * create a new team with the specified values
+* `create` GITHUB_TEAM_NAME (DISPLAY_NAME)
+  * create a new team with a Github team name and optional display name
+
+The following can only be used by a team lead in the team or an admin.
 
 * `edit` GITHUB_TEAM_NAME
   * `--name` DISPLAY_NAME
@@ -30,8 +32,6 @@ All parameters with whitespace must be enclosed by quotation marks.
 
 * `remove` GITHUB_TEAM_NAME SLACK_ID
   * remove the specified user from the team
-
-## ADMIN only
 
 * `delete` GITHUB_TEAM_NAME
   * permanently delete the specified team
