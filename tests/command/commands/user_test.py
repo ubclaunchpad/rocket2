@@ -1,7 +1,6 @@
 """Test user command parsing."""
 from command.commands.user import UserCommand
 
-
 help_text = "User Command Reference:\n\n @rocket user\n\n Options:\n\n" \
              " edit \n --name NAME\n" \
              " --email ADDRESS\n --pos YOURPOSITION\n" \
@@ -26,12 +25,6 @@ def test_get_help():
     """Test user command get_help method."""
     testcommand = UserCommand()
     assert testcommand.get_help() == help_text
-
-
-def test_handle_default():
-    """Test user command default @rocket user parser."""
-    testcommand = UserCommand()
-    assert testcommand.handle('user') == help_text
 
 
 def test_handle_view():
