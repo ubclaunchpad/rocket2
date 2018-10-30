@@ -1,21 +1,23 @@
-from slackeventsapi import SlackEventAdapter
+"""Calls the appropriate handler depending on the event data."""
 from command.commands.user import UserCommand
-import os
 
-commands = {}
-commands["user"] = UserCommand()
-slack_signing_secret = os.environ["SLACK_SIGNING_SECRET"]
-slack_events_adapter = SlackEventAdapter(slack_signing_secret, "/slack/events")
-    
 
-@slack_events_adapter.on("app_mention")
-def handle_mention(event_data):
-    message = event_data["event"]["text"]
-    s = message.split(' ', 2)
-    if s[0] is not "@rocket":
-        pass
-    else:
-        command = s[1] + ' ' + s[2]
-        commands[s[1]].handle(command)
-    
-slack_events_adapter.start(port=3000)
+class Core:
+    """Encapsulate methods for handling events."""
+
+    def __init__(self):
+        """Initialize the dictionary of command handlers."""
+        self.__commands = {}
+        self.__commands["user"] = UserCommand()
+
+    def handle_app_mention(self, event_data):
+        """Handle the events associated with mentions of @rocket."""
+        message = (event_data["event"])["text"]
+        s = message.split(' ', 2)
+        if s[0] != "@rocket":
+            return False
+        else:
+            command_type = s[1]
+            command = command_type + ' ' + s[2]
+            self.__commands[command_type].handle(command)
+            return True
