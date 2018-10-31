@@ -3,7 +3,6 @@ import boto3
 from boto3.dynamodb.conditions import Attr
 from model.user import User
 from model.permissions import Permissions
-from functools import reduce
 
 
 class DynamoDB:
@@ -49,21 +48,26 @@ class DynamoDB:
         Store user into users table.
 
         :param user: A user model to store
+        :returns: Returns true if the user was stored, and false otherwise
         """
-        # Assume that the tables are already set up this way
-        user_table = self.ddb.Table('users')
-        user_table.put_item(
-            Item={
-                'slack_id': user.get_slack_id(),
-                'email': user.get_email(),
-                'github': user.get_github_username(),
-                'major': user.get_major(),
-                'position': user.get_position(),
-                'bio': user.get_biography(),
-                'image_url': user.get_image_url(),
-                'permission_level': user.get_permissions_level().name
-            }
-        )
+        # Check that there are no blank fields in the user
+        if User.is_valid(user):
+            user_table = self.ddb.Table('users')
+            user_table.put_item(
+                Item={
+                    'slack_id': user.get_slack_id(),
+                    'email': user.get_email(),
+                    'name': user.get_name(),
+                    'github': user.get_github_username(),
+                    'major': user.get_major(),
+                    'position': user.get_position(),
+                    'bio': user.get_biography(),
+                    'image_url': user.get_image_url(),
+                    'permission_level': user.get_permissions_level().name
+                }
+            )
+            return True
+        return False
 
     def check_valid_table(self, table_name):
         """
@@ -92,6 +96,7 @@ class DynamoDB:
         response = response['Item']
 
         user.set_email(response['email'])
+        user.set_name(response['name'])
         user.set_github_username(response['github'])
         user.set_major(response['major'])
         user.set_position(response['position'])
@@ -137,6 +142,7 @@ class DynamoDB:
             user = User(slack_id)
 
             user.set_email(r['email'])
+            user.set_name(r['name'])
             user.set_github_username(r['github'])
             user.set_major(r['major'])
             user.set_position(r['position'])

@@ -28,7 +28,7 @@ class DBFacade:
 
     def retrieve_user(self, slack_id):
         """
-        TODO: Retrieve user from users table.
+        Retrieve user from users table.
 
         :return: returns a user model if slack id is found.
         """
@@ -36,7 +36,7 @@ class DBFacade:
 
     def query_user(self, parameter):
         """
-        TODO: Query for specific users by parameter.
+        Query for specific users by parameter.
 
         Query using a list of parameters (tuples), where the first element of
         the tuple is the item attribute, second being the item value.

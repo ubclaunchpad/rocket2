@@ -13,6 +13,7 @@ def create_test_user(slack_id):
     u = User(slack_id)
     u.set_biography('I like puppies and kittens!')
     u.set_email('admin@ubc.ca')
+    u.set_name('Iemann Atmin')
     u.set_github_username('kibbles')
     u.set_image_url('https://google.ca')
     u.set_major('Computer Science')
