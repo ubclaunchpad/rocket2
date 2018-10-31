@@ -29,6 +29,14 @@ class User:
         """Return this user's Slack ID."""
         return self.__slack_id
 
+    def get_name(self):
+        """Return this user's display name."""
+        return self.__name
+
+    def set_name(self, name):
+        """Set this user's display name to the given name."""
+        self.__name = name
+
     def get_email(self):
         """Return this user's email."""
         return self.__email

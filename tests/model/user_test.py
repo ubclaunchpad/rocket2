@@ -18,6 +18,19 @@ def test_get_slack_id():
     assert user.get_slack_id() == "U0G9QF9C6"
 
 
+def test_get_name():
+    """Test the User class method get_name()."""
+    user = User("U0G9QF9C6")
+    assert user.get_name() == ""
+
+
+def test_set_name():
+    """Test the User class method set_name()."""
+    user = User("U0G9QF9C6")
+    user.set_name("Russell")
+    assert user.get_name() == "Russell"
+
+
 def test_get_email():
     """Test the User class method get_email()."""
     user = User("U0G9QF9C6")
