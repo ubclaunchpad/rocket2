@@ -23,7 +23,8 @@ The user's permission level is one of `['member', 'admin', 'team_lead']`.
 ## `teams` Table
 
 The `teams` table stores all teams where `github_team_name` is the primary index.
-All other attributes are specified in the `model/team.py` file, and are also listed here:
+All other attributes are specified in the `model/team.py` file,
+and are also listed here:
 
 Attribute Name | Description
 ---|---
