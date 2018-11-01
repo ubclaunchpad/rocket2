@@ -197,7 +197,6 @@ class DynamoDB:
         :return: returns a list of user models that fit the query parameters.
         """
         users = self.ddb.Table('users')
-        response = None
         if len(parameters) > 0:
             # There are 1 or more parameters that we should care about
             filter_expr = Attr(parameters[0][0]).eq(parameters[0][1])
@@ -228,7 +227,6 @@ class DynamoDB:
         :return: returns a list of user models that fit the query parameters.
         """
         teams = self.ddb.Table('teams')
-        response = None
         if len(parameters) > 0:
             # There are 1 or more parameters that we should care about
             if parameters[0][0] == 'members':
