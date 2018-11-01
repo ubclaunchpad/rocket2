@@ -231,10 +231,16 @@ class DynamoDB:
         response = None
         if len(parameters) > 0:
             # There are 1 or more parameters that we should care about
-            filter_expr = Attr(parameters[0][0]).eq(parameters[0][1])
+            if parameters[0][0] == 'members':
+                filter_expr = Attr(parameters[0][0]).contains(parameters[0][1])
+            else:
+                filter_expr = Attr(parameters[0][0]).eq(parameters[0][1])
 
             for p in parameters[1:]:
-                filter_expr &= Attr(p[0]).eq(p[1])
+                if p[0] == 'members':
+                    filter_expr &= Attr(p[0]).contains(p[1])
+                else:
+                    filter_expr &= Attr(p[0]).eq(p[1])
 
             response = teams.scan(
                 FilterExpression=filter_expr

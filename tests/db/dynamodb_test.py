@@ -58,8 +58,16 @@ def test_query_team():
     ddb = DynamoDB()
     team = create_test_team('rocket2.0', 'Rocket 2.0')
     ddb.store_team(team)
-    teams = ddb.query_team([('display_name', 'Rocket 2.0')])
+    another_team = ddb.query_team([('display_name', 'Rocket 2.0')])
+    same_team = ddb.query_team([('platform', 'slack')])
+    multiple_queries = ddb.query_team([('display_name', 'Rocket 2.0'),
+                                       ('platform', 'slack')])
+    member_team = ddb.query_team([('members', 'abc_123')])
+    all_team = ddb.query_team([])
 
-    assert len(teams) == 1
-
+    assert team == another_team[0]
+    assert team == all_team[0]
+    assert team == same_team[0]
+    assert team == multiple_queries[0]
+    assert team == member_team[0]
     ddb.delete_team('rocket2.0')
