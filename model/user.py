@@ -79,10 +79,4 @@ class User:
 
     def __str__(self):
         """Print information on the user class."""
-        return "User, slack_id: {}, name: {}, email: {}, github: {}," \
-               " major: {}, position: {}, bio: {}, image_url: {}," \
-               " permission level: {}".format(
-                self.__slack_id, self.__name, self.__email,
-                self.__github_username, self.__major,
-                self.__position, self.__biography, self.__image_url,
-                self.__permissions_level)
+        return str(self.__dict__)

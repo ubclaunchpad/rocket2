@@ -50,10 +50,6 @@ class Team:
         """Identify if any member has the ID specified in the argument."""
         return slack_id in self.__members
 
-    def __self__(self):
+    def __str__(self):
         """Print information on the team class."""
-        return "Team, github name: {}, display name: {}. platform: {}" \
-               "members: {}".format(self.get_github_team_name(),
-                                    self.get_display_name(),
-                                    self.get_platform(),
-                                    self.get_members())
+        return str(self.__dict__)
