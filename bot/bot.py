@@ -4,13 +4,9 @@ from slackclient import SlackClient
 class Bot:
   """Utility class for interacting with Slack API"""
 
-  def __init__(self):
+  def __init__(self, sc):
     """Initialize Bot by creating a SlackClient Object"""
-    token_not_found_message = "Token Not Found. Please add SLACK_API_TOKEN to your .env"
-    slack_token = os.getenv("SLACK_API_TOKEN", token_not_found_message)
-    if slack_token == token_not_found_message:
-      raise Exception(token_not_found_message)
-    self.sc = SlackClient(slack_token)
+    self.sc = sc
 
   def send_dm(self, message, slack_user_id):
     """Send direct message to user with id of slack_user_id"""
