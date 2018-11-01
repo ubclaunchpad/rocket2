@@ -18,4 +18,16 @@ Attribute Name | Description
 `image_url` | `String`; The user's avatar image URL
 `permission_level` | `String`; The user's permission level
 
-The user's permission levle is one of `['member', 'admin', 'team_lead']`.
+The user's permission level is one of `['member', 'admin', 'team_lead']`.
+
+## `teams` Table
+
+The `teams` table stores all teams where `github_team_name` is the primary index.
+All other attributes are specified in the `model/team.py` file, and are also listed here:
+
+Attribute Name | Description
+---|---
+`github_team_name` | `String`; The team's github name
+`display_name` | `String`; The teams's display
+`platform` | `String`; The team's working platform
+`members` | `String Set`; The team's set of members
