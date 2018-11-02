@@ -1,6 +1,7 @@
 """Test the data model for a user."""
 from model.permissions import Permissions
 from model.user import User
+from tests.util import create_test_user
 
 
 def test_user_equality():
@@ -10,6 +11,14 @@ def test_user_equality():
     user3 = User("brussel-trouts")
     assert user == user2
     assert user != user3
+
+
+def test_valid_user():
+    """Test the User static class method is_valid()."""
+    user = User("brussel-sprouts")
+    assert not User.is_valid(user)
+    user = create_test_user("brussel-sprouts")
+    assert User.is_valid(user)
 
 
 def test_get_slack_id():
