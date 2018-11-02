@@ -67,7 +67,3 @@ scripts/setup_localaws.sh
 cd DynamoDB/
 java -Djava.library.path=./DynamoDBLocal_lib -jar DynamoDBLocal.jar -sharedDb
 ```
-
-To have it executing in the background, simply add an ampersand (&) at the end
-of the java command. Just remember to kill it after you're done.
-

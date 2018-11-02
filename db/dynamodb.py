@@ -6,7 +6,7 @@ from model.permissions import Permissions
 
 
 class DynamoDB:
-    """DynamoDB."""
+    """Handles calls to database through API."""
 
     def __init__(self):
         """Initialize facade using DynamoDB settings (for now)."""
