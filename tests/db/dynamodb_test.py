@@ -1,6 +1,7 @@
 """Test the dynamodb interface (requires dynamodb running)."""
 from db.dynamodb import DynamoDB
 from tests.util import create_test_user, create_test_team
+from model.user import User
 
 
 def test_string_rep():
@@ -8,17 +9,23 @@ def test_string_rep():
     assert str(DynamoDB()) == "DynamoDB"
 
 
+def test_store_invalid_user():
+    """Test handling of invalid user."""
+    ddb = DynamoDB()
+    user = User('abc_123')
+    success = ddb.store_user(user)
+    assert not success
+
+
 def test_store_retrieve_user():
     """Test to see if we can store and retrieve the same user."""
     ddb = DynamoDB()
     user = create_test_user('abc_123')
 
-    ddb.store_user(user)
+    success = ddb.store_user(user)
     another_user = ddb.retrieve_user('abc_123')
 
-    print(user.__dict__)
-    print(another_user.__dict__)
-
+    assert success
     assert user == another_user
 
     ddb.delete_user('abc_123')
