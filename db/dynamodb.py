@@ -146,6 +146,7 @@ class DynamoDB:
         """
         user = User(d['slack_id'])
         user.set_email(d['email'])
+        user.set_name(d['name'])
         user.set_github_username(d['github'])
         user.set_major(d['major'])
         user.set_position(d['position'])
