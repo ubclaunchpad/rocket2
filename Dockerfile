@@ -1,4 +1,4 @@
-FROM python:3.7
+FROM python:3.7-alpine
 
 # Set up working directory
 WORKDIR /app
@@ -7,7 +7,6 @@ WORKDIR /app
 COPY . /app
 
 # Install everything
-RUN apt-get update
 RUN pip install pipenv
 RUN pipenv install
 
