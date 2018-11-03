@@ -53,6 +53,7 @@ def test_query_user():
     ddb.delete_user('abc_123')
 
 
+@pytest.mark.db
 def test_store_retrieve_team():
     """Test to see if we can store and retrieve the same team."""
     ddb = DynamoDB()
@@ -65,6 +66,7 @@ def test_store_retrieve_team():
     ddb.delete_team('rocket2.0')
 
 
+@pytest.mark.db
 def test_query_team():
     """Test to see if we can store and query the same team."""
     ddb = DynamoDB()
