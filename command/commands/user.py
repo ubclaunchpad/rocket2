@@ -6,26 +6,25 @@ import shlex
 class UserCommand:
     """Represent User Command Parser."""
 
+    command_name = "user"
+    help = "User Command Reference:\n\n @rocket user" \
+           "\n\n Options:\n\n" \
+           " edit \n --name NAME\n" \
+           " --email ADDRESS\n --pos YOURPOSITION\n" \
+           " --major YOURMAJOR\n --bio YOURBIO\n" \
+           " 'edit properties of your Launch Pad profile\n" \
+           " surround arguments with spaces with single quotes'" \
+           "\n ADMIN/TEAM LEAD ONLY option: --member MEMBER_ID\n" \
+           " 'edit properties of another " \
+           "user's Launch Pad profile'\n\n" \
+           " view MEMBER_ID\n 'view information about a user'" \
+           "\n\n " \
+           "help\n 'outputs options for user commands'\n\n " \
+           "ADMIN ONLY\n\n delete MEMBER_ID\n" \
+           " 'permanently delete member's Launch Pad profile'"
+
     def __init__(self):
         """Initialize user command parser."""
-        self.__command_name = "user"
-        self.__help = "User Command Reference:\n\n @rocket user" \
-                      "\n\n Options:\n\n" \
-                      " edit \n --name NAME\n" \
-                      " --email ADDRESS\n --pos YOURPOSITION\n" \
-                      " --major YOURMAJOR\n --bio YOURBIO\n" \
-                      " 'edit properties of your Launch Pad profile\n" \
-                      " surround arguments with spaces with single quotes'" \
-                      "\n ADMIN/TEAM LEAD ONLY option: --member MEMBER_ID\n" \
-                      " 'edit properties of another " \
-                      "user's Launch Pad profile'\n\n" \
-                      " view MEMBER_ID\n 'view information about a user'" \
-                      "\n\n " \
-                      "help\n 'outputs options for user commands'\n\n " \
-                      "ADMIN ONLY\n\n delete MEMBER_ID\n" \
-                      " 'permanently delete member's Launch Pad profile'"
-
-        """Top level User parser."""
         self.parser = argparse.ArgumentParser(prog="user")
         self.parser.add_argument("user")
         self.init_subparsers()
@@ -61,11 +60,11 @@ class UserCommand:
 
     def get_name(self):
         """Return the command type."""
-        return self.__command_name
+        return self.command_name
 
     def get_help(self):
         """Return command options for user events."""
-        return self.__help
+        return self.help
 
     def handle(self, command):
         """Handle command by splitting string and giving to parser."""
@@ -77,7 +76,7 @@ class UserCommand:
 
         elif args.which == "help":
             # stub
-            return self.__help
+            return self.help
 
         elif args.which == "delete":
             # stub

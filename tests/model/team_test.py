@@ -70,11 +70,9 @@ def test_print():
     """Test print team class."""
     team = Team("brussel-sprouts", "Brussel Sprouts")
     new_slack_id = "U0G9QF9C6"
-    other_slack_id = "U0H2A8D9"
     team.add_member(new_slack_id)
-    team.add_member(other_slack_id)
     team.set_platform("web")
     assert str(team) == "{'_Team__github_team_name': 'brussel-sprouts'," \
                         " '_Team__display_name': 'Brussel Sprouts'," \
                         " '_Team__platform': 'web'," \
-                        " '_Team__members': {'U0H2A8D9', 'U0G9QF9C6'}}"
+                        " '_Team__members': {'U0G9QF9C6'}}"
