@@ -6,6 +6,7 @@ name = "pypi"
 [packages]
 pytest = "*"
 boto3 = "*"
+slackclient = "*"
 
 [dev-packages]
 pycodestyle = "*"
@@ -13,6 +14,7 @@ codecov = "*"
 pytest-cov = "*"
 pydocstyle = "*"
 ipython = "*"
+awscli = "*"
 
 [requires]
 python_version = "3.7"

@@ -49,3 +49,21 @@ You can also install it as a
 cd scripts/
 make install
 ```
+
+### Testing the Database Locally
+
+Some tests must also be run on the DynamoDB database. We recommend that you
+download it and keep it running in the background while executing tests.
+
+```bash
+wget https://s3-us-west-2.amazonaws.com/dynamodb-local/dynamodb_local_latest.tar.gz
+mkdir DynamoDB
+tar -xvf dynamodb_local_latest.tar.gz --directory DynamoDB
+
+# Configure AWS
+scripts/setup_localaws.sh
+
+# Run DynamoDB through Java
+cd DynamoDB/
+java -Djava.library.path=./DynamoDBLocal_lib -jar DynamoDBLocal.jar -sharedDb
+```
