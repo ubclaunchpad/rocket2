@@ -8,6 +8,7 @@ pytest = "*"
 boto3 = "*"
 slackclient = "*"
 Flask = "*"
+gunicorn = "*"
 
 [dev-packages]
 pycodestyle = "*"
@@ -21,4 +22,4 @@ awscli = "*"
 python_version = "3.7"
 
 [scripts]
-launch = "flask run"
+launch = "gunicorn -w 4 server.server:app"
