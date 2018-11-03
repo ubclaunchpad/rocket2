@@ -12,14 +12,14 @@ class Core:
 
     def handle_app_mention(self, event_data):
         """Handle the events associated with mentions of @rocket."""
-        message = event_data["event"]["text"]["user"]
-        s = message.split(' ', 3)
+        message = event_data["event"]["text"]
+        user = event_data["event"]["user"]
+        s = message.split(' ', 2)
         if s[0] != "@rocket":
             return 0
         else:
             command_type = s[1]
             command = command_type + ' ' + s[2]
-            user = s[3]
             try:
                 self.__commands[command_type].handle(command, user)
                 return 1

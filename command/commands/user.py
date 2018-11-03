@@ -28,7 +28,7 @@ class UserCommand:
     """Parser for view command."""
     parser_view = subparsers.add_parser("view")
     parser_view.set_defaults(which="view")
-    parser_view.add_argument("slack_id", type=str, action='store')
+    parser_view.add_argument("--slack_id", type=str, action='store')
 
     """Parser for help command."""
     parser_help = subparsers.add_parser("help")
@@ -58,13 +58,16 @@ class UserCommand:
         """Return command options for user events."""
         return self.__help
 
-    def handle(self, command, user):
+    def handle(self, command, user_id):
         """Handle command by splitting into substrings and giving to parser."""
         command_arg = shlex.split(command)
         args = self.parser.parse_args(command_arg)
         if args.which == "view":
             # stub
-            return args.slack_id
+            if args.slack_id is not None:
+                return args.slack_id
+            else:
+                return user_id
 
         elif args.which == "help":
             # stub
