@@ -58,7 +58,7 @@ class UserCommand:
         """Return command options for user events."""
         return self.__help
 
-    def handle(self, command):
+    def handle(self, command, user):
         """Handle command by splitting into substrings and giving to parser."""
         command_arg = shlex.split(command)
         args = self.parser.parse_args(command_arg)
