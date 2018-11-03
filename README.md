@@ -42,6 +42,14 @@ this can be run with:
 ./scripts/build_check.sh
 ```
 
+The above tests would be run with the assumption that other applications, such
+as the local database, is also running. To run tests that explicitly do **not**
+involve the running of any database, run pytest with the following arguments:
+
+```bash
+pytest -m "not db"
+```
+
 You can also install it as a
 [pre-commit hook](https://git-scm.com/book/en/v2/Customizing-Git-Git-Hooks) for git:
 
