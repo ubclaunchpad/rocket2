@@ -5,8 +5,10 @@ from unittest import mock, TestCase
 
 
 class TestBot(TestCase):
+    """Test Case for Bot class."""
 
     def setUp(self):
+        """Set up the test case environment."""
         self.mock_sc = mock.MagicMock(SlackClient)
 
     def test_send_dm(self):
