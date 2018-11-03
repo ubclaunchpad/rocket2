@@ -1,5 +1,4 @@
 """Database Facade."""
-from .dynamodb import DynamoDB
 
 
 class DBFacade:
@@ -10,7 +9,7 @@ class DBFacade:
     or Postgres are also being considered.
     """
 
-    def __init__(self, db=DynamoDB()):
+    def __init__(self, db):
         """Initialize facade using DynamoDB settings (for now)."""
         self.ddb = db
 

@@ -2,13 +2,16 @@
 from db.dynamodb import DynamoDB
 from tests.util import create_test_user, create_test_team
 from model.user import User
+import pytest
 
 
+@pytest.mark.db
 def test_string_rep():
     """Test string representation of the DynamoDB class."""
     assert str(DynamoDB()) == "DynamoDB"
 
 
+@pytest.mark.db
 def test_store_invalid_user():
     """Test handling of invalid user."""
     ddb = DynamoDB()
@@ -17,6 +20,7 @@ def test_store_invalid_user():
     assert not success
 
 
+@pytest.mark.db
 def test_store_retrieve_user():
     """Test to see if we can store and retrieve the same user."""
     ddb = DynamoDB()
@@ -31,6 +35,7 @@ def test_store_retrieve_user():
     ddb.delete_user('abc_123')
 
 
+@pytest.mark.db
 def test_query_user():
     """Test to see if we can store and query the same user."""
     ddb = DynamoDB()

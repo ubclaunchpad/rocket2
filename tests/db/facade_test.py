@@ -4,9 +4,10 @@ from db.facade import DBFacade
 from tests.util import create_test_user, create_test_team
 
 
-def test_string_rep():
+@mock.patch('db.dynamodb.DynamoDB', autospec=True)
+def test_string_rep(ddb):
     """Test string representation of the DBFacade class."""
-    assert str(DBFacade()) == "Database Facade"
+    assert str(DBFacade(ddb)) == "Database Facade"
 
 
 @mock.patch('db.dynamodb.DynamoDB', autospec=True)
