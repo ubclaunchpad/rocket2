@@ -7,6 +7,7 @@ name = "pypi"
 pytest = "*"
 boto3 = "*"
 slackclient = "*"
+Flask = "*"
 
 [dev-packages]
 pycodestyle = "*"
@@ -18,3 +19,6 @@ awscli = "*"
 
 [requires]
 python_version = "3.7"
+
+[scripts]
+launch = "flask run"
