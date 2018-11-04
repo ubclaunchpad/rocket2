@@ -10,6 +10,6 @@ COPY . /app
 RUN pip install pipenv
 RUN pipenv install
 
-ENV FLASK_APP=server/server.py
+EXPOSE 5000
 
 CMD ["pipenv", "run", "launch"]
