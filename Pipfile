@@ -22,4 +22,4 @@ awscli = "*"
 python_version = "3.7"
 
 [scripts]
-launch = "gunicorn -w 4 server.server:app"
+launch = "gunicorn -b 0.0.0.0:5000 -w 4 server.server:app"
