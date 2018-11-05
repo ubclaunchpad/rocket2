@@ -57,3 +57,7 @@ class Team:
     def is_member(self, slack_id):
         """Identify if any member has the ID specified in the argument."""
         return slack_id in self.__members
+
+    def __str__(self):
+        """Print information on the team class."""
+        return str(self.__dict__)
