@@ -1,7 +1,6 @@
 """Test user command parsing."""
 from command.commands.user import UserCommand
 
-
 help_text = "User Command Reference:\n\n @rocket user\n\n Options:\n\n" \
              " edit \n --name NAME\n" \
              " --email ADDRESS\n --pos YOURPOSITION\n" \

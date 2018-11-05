@@ -73,3 +73,15 @@ def test_is_member():
     assert team.is_member(new_slack_id) is False
     team.add_member(new_slack_id)
     assert team.is_member(new_slack_id)
+
+
+def test_print():
+    """Test print team class."""
+    team = Team("brussel-sprouts", "Brussel Sprouts")
+    new_slack_id = "U0G9QF9C6"
+    team.add_member(new_slack_id)
+    team.set_platform("web")
+    assert str(team) == "{'_Team__github_team_name': 'brussel-sprouts'," \
+                        " '_Team__display_name': 'Brussel Sprouts'," \
+                        " '_Team__platform': 'web'," \
+                        " '_Team__members': {'U0G9QF9C6'}}"

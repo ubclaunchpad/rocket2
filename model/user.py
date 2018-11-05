@@ -99,3 +99,7 @@ class User:
     def set_permissions_level(self, permissions_level):
         """Set this user's permissions level to the given argument."""
         self.__permissions_level = permissions_level
+
+    def __str__(self):
+        """Print information on the user class."""
+        return str(self.__dict__)

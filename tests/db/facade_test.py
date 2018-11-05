@@ -1,7 +1,7 @@
 """Test the facade for the database."""
 from unittest import mock
 from db.facade import DBFacade
-from tests.util import create_test_user
+from tests.util import create_test_user, create_test_team
 
 
 @mock.patch('db.dynamodb.DynamoDB', autospec=True)
@@ -34,3 +34,29 @@ def test_query_user(ddb):
     dbf = DBFacade(ddb)
     dbf.query_user(['permission_level', 'admin'])
     ddb.query_user.assert_called_with(['permission_level', 'admin'])
+
+
+@mock.patch('db.dynamodb.DynamoDB', autospec=True)
+def test_store_team(ddb):
+    """Test storing team calls correct functions."""
+    dbf = DBFacade(ddb)
+    test_team = create_test_team('brussel-sprouts', 'Brussel Sprouts')
+    dbf.store_team(test_team)
+    ddb.store_team.assert_called_with(test_team)
+
+
+@mock.patch('db.dynamodb.DynamoDB', autospec=True)
+def test_retrieve_team(ddb):
+    """Test retrieving team calls correct functions."""
+    dbf = DBFacade(ddb)
+    team_name = 'brussel-sprouts'
+    dbf.retrieve_team(team_name)
+    ddb.retrieve_team.assert_called_with(team_name)
+
+
+@mock.patch('db.dynamodb.DynamoDB', autospec=True)
+def test_query_team(ddb):
+    """Test querying team calls correct functions."""
+    dbf = DBFacade(ddb)
+    dbf.query_team([('platform', 'slack')])
+    ddb.query_team.assert_called_with([('platform', 'slack')])

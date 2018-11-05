@@ -4,3 +4,5 @@
 *.pyc
 __pycache__/
 .env
+DynamoDB/
+inertia.toml
