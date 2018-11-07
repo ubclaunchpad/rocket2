@@ -71,4 +71,5 @@ def test_handle_user_command(MockUserCommand):
     }
     core = Core()
     assert core.handle_app_mention(event) == 1
-    MockUserCommand.return_value.handle.assert_called_once_with("user name")
+    MockUserCommand.\
+        return_value.handle.assert_called_once_with("user name", "U061F7AUR")
