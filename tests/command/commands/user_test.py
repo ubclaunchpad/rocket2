@@ -17,13 +17,13 @@ def test_get_help():
 def test_handle_nosubs():
     """Test user with no sub-parsers."""
     testcommand = UserCommand()
-    assert testcommand.handle('user') == UserCommand.help
+    assert testcommand.handle('user', "U0G9QF9C6") == UserCommand.help
 
 
 def test_handle_bad_args():
     """Test user with invalid arguments."""
     testcommand = UserCommand()
-    assert testcommand.handle('user geese-say-honk') == UserCommand.help
+    assert testcommand.handle('user geese-say-honk', "U0G9QF9C6") == UserCommand.help
 
 
 def test_handle_view():
