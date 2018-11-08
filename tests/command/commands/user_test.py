@@ -23,7 +23,7 @@ def test_handle_nosubs():
 def test_handle_bad_args():
     """Test user with invalid arguments."""
     testcommand = UserCommand()
-    assert testcommand.handle('user geese-say-honk', "U0G9QF9C6") == UserCommand.help
+    assert testcommand.handle('user geese', "U0G9QF9C6") == UserCommand.help
 
 
 def test_handle_view():
