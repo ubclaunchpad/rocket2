@@ -76,3 +76,19 @@ class DBFacade:
         :return: returns a list of team models that fit the query parameters.
         """
         return self.ddb.query_team(parameter)
+
+    def delete_team(self, team_name):
+        """
+        Remove a team from the teams table.
+
+        :param team_name: team_name: the team_name of the team to be removed
+        """
+        self.ddb.delete_team(team_name)
+
+    def delete_user(self, slack_id):
+        """
+        Remove a user from the users table.
+
+        :param slack_id: the slack_id of the user to be removed
+        """
+        self.ddb.delete_user(slack_id)

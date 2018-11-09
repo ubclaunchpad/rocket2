@@ -60,3 +60,21 @@ def test_query_team(ddb):
     dbf = DBFacade(ddb)
     dbf.query_team([('platform', 'slack')])
     ddb.query_team.assert_called_with([('platform', 'slack')])
+
+
+@mock.patch('db.dynamodb.DynamoDB', autospec=True)
+def test_delete_team(ddb):
+    """Test deleting team calls correct functions."""
+    dbf = DBFacade(ddb)
+    team_name = 'brussel-sprouts'
+    dbf.delete_team(team_name)
+    ddb.delete_team.assert_called_with(team_name)
+
+
+@mock.patch('db.dynamodb.DynamoDB', autospec=True)
+def test_delete_user(ddb):
+    """Test deleting user calls correct functions."""
+    dbf = DBFacade(ddb)
+    slack_id = 'abc_123'
+    dbf.delete_user(slack_id)
+    ddb.delete_user.assert_called_with(slack_id)
