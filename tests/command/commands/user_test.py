@@ -1,19 +1,6 @@
 """Test user command parsing."""
 from command.commands.user import UserCommand
 
-help_text = "User Command Reference:\n\n @rocket user\n\n Options:\n\n" \
-             " edit \n --name NAME\n" \
-             " --email ADDRESS\n --pos YOURPOSITION\n" \
-             " --major YOURMAJOR\n --bio YOURBIO\n" \
-             " 'edit properties of your Launch Pad profile\n" \
-             " surround arguments with spaces with single quotes'" \
-             "\n ADMIN/TEAM LEAD ONLY option: --member MEMBER_ID\n" \
-             " 'edit properties of another user's Launch Pad profile'\n\n" \
-             " view MEMBER_ID\n 'view information about a user'\n\n " \
-             "help\n 'outputs options for user commands'\n\n " \
-             "ADMIN ONLY\n\n delete MEMBER_ID\n" \
-             " 'permanently delete member's Launch Pad profile'"
-
 
 def test_get_command_name():
     """Test user command get_name method."""
@@ -24,7 +11,19 @@ def test_get_command_name():
 def test_get_help():
     """Test user command get_help method."""
     testcommand = UserCommand()
-    assert testcommand.get_help() == help_text
+    assert testcommand.get_help() == UserCommand.help
+
+
+def test_handle_nosubs():
+    """Test user with no sub-parsers."""
+    testcommand = UserCommand()
+    assert testcommand.handle('user', "U0G9QF9C6") == UserCommand.help
+
+
+def test_handle_bad_args():
+    """Test user with invalid arguments."""
+    testcommand = UserCommand()
+    assert testcommand.handle('user geese', "U0G9QF9C6") == UserCommand.help
 
 
 def test_handle_view():
@@ -38,7 +37,7 @@ def test_handle_view():
 def test_handle_help():
     """Test user command help parser."""
     testcommand = UserCommand()
-    assert testcommand.handle('user help', "U0G9QF9C6") == help_text
+    assert testcommand.handle('user help', "U0G9QF9C6") == UserCommand.help
 
 
 def test_handle_delete():

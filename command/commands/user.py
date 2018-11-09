@@ -31,7 +31,7 @@ class UserCommand:
 
     def init_subparsers(self):
         """Initialize subparsers for user command."""
-        subparsers = self.parser.add_subparsers()
+        subparsers = self.parser.add_subparsers(dest="which")
 
         """Parser for view command."""
         parser_view = subparsers.add_parser("view")
@@ -69,8 +69,18 @@ class UserCommand:
     def handle(self, command, user_id):
         """Handle command by splitting into substrings and giving to parser."""
         command_arg = shlex.split(command)
-        args = self.parser.parse_args(command_arg)
-        if args.which == "view":
+        args = None
+
+        try:
+            # Going for the nuclear option
+            args = self.parser.parse_args(command_arg)
+        except SystemExit:
+            return self.help
+
+        if args.which is None:
+            return self.help
+
+        elif args.which == "view":
             # stub
             if args.slack_id is not None:
                 return args.slack_id
