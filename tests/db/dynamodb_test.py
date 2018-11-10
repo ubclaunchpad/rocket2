@@ -36,6 +36,18 @@ def test_store_retrieve_user():
 
 
 @pytest.mark.db
+def test_retrieve_invalid_user():
+    """Test to see if we can retrieve a non-existant user."""
+    ddb = DynamoDB()
+    try:
+        user = ddb.retrieve_user('abc_123')
+
+        assert False
+    except LookupError as e:
+        assert str(e) == 'User "{}" not found'.format('abc_123')
+
+
+@pytest.mark.db
 def test_query_user():
     """Test to see if we can store and query the same user."""
     ddb = DynamoDB()

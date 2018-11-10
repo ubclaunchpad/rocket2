@@ -135,7 +135,10 @@ class DynamoDB:
             }
         )
 
-        return self.user_from_dict(response['Item'])
+        if 'Item' in response.keys():
+            return self.user_from_dict(response['Item'])
+        else:
+            raise LookupError('User "{}" not found'.format(slack_id))
 
     @staticmethod
     def user_from_dict(d):
