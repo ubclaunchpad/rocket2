@@ -26,6 +26,13 @@ def test_handle_bad_args():
     assert testcommand.handle('user geese', "U0G9QF9C6") == UserCommand.help
 
 
+def test_handle_bad_optional_args():
+    """Test user edit with invalid optional arguments."""
+    testcommand = UserCommand()
+    assert testcommand.handle('user edit --biology stuff', "U0G9QF9C6")\
+        == UserCommand.help
+
+
 def test_handle_view():
     """Test user command view parser and handle method."""
     user_id = "U0G9QF9C6"

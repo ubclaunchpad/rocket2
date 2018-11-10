@@ -1,6 +1,8 @@
 """Command parsing for user events."""
 import argparse
 import shlex
+from db.facade import DBFacade
+from db.dynamodb import DynamoDB
 
 
 class UserCommand:
@@ -22,6 +24,8 @@ class UserCommand:
            "help\n 'outputs options for user commands'\n\n " \
            "ADMIN ONLY\n\n delete MEMBER_ID\n" \
            " 'permanently delete member's Launch Pad profile'"
+    permission_error = "You do not have the sufficient " \
+                       "permission level for this command!"
 
     def __init__(self):
         """Initialize user command parser."""
@@ -93,7 +97,8 @@ class UserCommand:
 
         elif args.which == "delete":
             # stub
-            return "deleting " + args.slack_id
+            # return "deleting " + args.slack_id
+            return self.delete_helper(user_id, args.slack_id)
 
         elif args.which == "edit":
             # stub
@@ -113,3 +118,25 @@ class UserCommand:
             if args.bio is not None:
                 msg += "bio: {}".format(args.bio)
             return msg
+
+    def delete_helper(self, user_id, slack_id):
+        """
+        Delete user from database.
+
+        Delete user with slack_id from database if user with user_id has
+        admin permission level.
+
+        :param user_id: Slack ID of user who is calling the command
+        :param slack_id: Slack ID of user who is being deleted
+        :return: returns permission error message if not admin,
+                 returns deletion message if user is deleted.
+        """
+        message = "Deleted user with Slack ID: " + slack_id
+        db = DynamoDB()
+        facade = DBFacade(db)
+        command_user = facade.retrieve_user(user_id)
+        if command_user.get_permissions_level() == 3:
+            facade.delete_user(slack_id)
+            return message
+        else:
+            return self.permission_error
