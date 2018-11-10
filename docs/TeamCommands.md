@@ -18,7 +18,7 @@ All parameters with whitespace must be enclosed by quotation marks.
 ## TEAM LEAD or ADMIN only
 
 * `create` GITHUB_TEAM_NAME [`--name` DISPLAY_NAME] [`--platform` PLATFORM]
-  * create a new team with a Github team name and optional display name and optional platform
+  * create a new team with a Github team name and optional parameters
   * the user will be automatically added to the new team
 
 The following can only be used by a team lead in the team or an admin:
