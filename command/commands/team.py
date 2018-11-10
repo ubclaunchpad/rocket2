@@ -6,8 +6,8 @@ import shlex
 class TeamCommand:
     """Represent Team Command Parser."""
 
-    __command_name = "team"
-    __help = ""
+    command_name = "team"
+    help = ""
 
     """Top level Team parser."""
     parser = argparse.ArgumentParser(prog="team")
@@ -59,11 +59,11 @@ class TeamCommand:
 
     def get_name(self):
         """Return the command type."""
-        return self.__command_name
+        return self.command_name
 
     def get_help(self):
         """Return command options for team events."""
-        return self.__help
+        return self.help
 
     def handle(self, command):
         """Handle command by splitting into substrings and giving to parser."""
