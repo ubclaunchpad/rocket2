@@ -158,7 +158,7 @@ class DynamoDB:
     def retrieve_team(self, team_name):
         """
         Retrieve team from teams table.
-        
+
         :param: team_name: used as key for retrieving team objects.
         :raise: raises a LookupError if team id is not found.
         :return: the team object if team_name is found.
