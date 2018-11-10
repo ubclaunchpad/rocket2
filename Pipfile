@@ -9,6 +9,7 @@ boto3 = "*"
 slackclient = "*"
 Flask = "*"
 gunicorn = "*"
+slackeventsapi = "*"
 
 [dev-packages]
 pycodestyle = "*"
