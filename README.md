@@ -2,6 +2,7 @@
 
 [![Build Status](https://travis-ci.org/ubclaunchpad/rocket2.0.svg?branch=master)](https://travis-ci.org/ubclaunchpad/rocket2.0)
 [![codecov](https://codecov.io/gh/ubclaunchpad/rocket2.0/branch/master/graph/badge.svg)](https://codecov.io/gh/ubclaunchpad/rocket2.0)
+[![Deployed with Inertia](https://img.shields.io/badge/deploying%20with-inertia-blue.svg)](https://github.com/ubclaunchpad/inertia)
 
 Rocket 2.0 is a from-the-ground-up rebuild of [Rocket](https://github.com/ubclaunchpad/rocket),
 UBC Launch Pad's in-house management Slack bot.
@@ -42,10 +43,36 @@ this can be run with:
 ./scripts/build_check.sh
 ```
 
+The above tests would be run with the assumption that other applications, such
+as the local database, is also running. To run tests that explicitly do **not**
+involve the running of any database, run pytest with the following arguments:
+
+```bash
+pytest -m "not db"
+```
+
 You can also install it as a
 [pre-commit hook](https://git-scm.com/book/en/v2/Customizing-Git-Git-Hooks) for git:
 
 ```bash
 cd scripts/
 make install
+```
+
+### Testing the Database Locally
+
+Some tests must also be run on the DynamoDB database. We recommend that you
+download it and keep it running in the background while executing tests.
+
+```bash
+wget https://s3-us-west-2.amazonaws.com/dynamodb-local/dynamodb_local_latest.tar.gz
+mkdir DynamoDB
+tar -xvf dynamodb_local_latest.tar.gz --directory DynamoDB
+
+# Configure AWS
+scripts/setup_localaws.sh
+
+# Run DynamoDB through Java
+cd DynamoDB/
+java -Djava.library.path=./DynamoDBLocal_lib -jar DynamoDBLocal.jar -sharedDb
 ```

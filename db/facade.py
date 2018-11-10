@@ -1,6 +1,4 @@
 """Database Facade."""
-# import boto3
-from model.user import User
 
 
 class DBFacade:
@@ -11,12 +9,9 @@ class DBFacade:
     or Postgres are also being considered.
     """
 
-    def __init__(self):
+    def __init__(self, db):
         """Initialize facade using DynamoDB settings (for now)."""
-        # TODO change this to production and not localhost
-        # self.ddb = boto3.resource("dynamodb", region_name="",
-        #                          endpoint_url="http://localhost:8000")
-        pass
+        self.ddb = db
 
     def __str__(self):
         """Return a string representing this class."""
@@ -28,33 +23,19 @@ class DBFacade:
 
         :param user: A user model to store
         """
-        # Assume that the tables are already set up this way
-        # user_table = self.ddb.Table('users')
-        # user_table.put_item(
-        #       Item={
-        #           'slack_id':         user.get_slack_id(),
-        #           'email':            user.get_email(),
-        #           'github':           user.get_github_username(),
-        #           'major':            user.get_major(),
-        #           'position':         user.get_position(),
-        #           'bio':              user.get_biography(),
-        #           'image_url':        user.get_image_url(),
-        #           'permission_level': user.get_permissions_level().name
-        #           }
-        #       )
-        pass
+        self.ddb.store_user(user)
 
     def retrieve_user(self, slack_id):
         """
-        TODO: Retrieve user from users table.
+        Retrieve user from users table.
 
         :return: returns a user model if slack id is found.
         """
-        return User(slack_id)
+        return self.ddb.retrieve_user(slack_id)
 
     def query_user(self, parameter):
         """
-        TODO: Query for specific users by parameter.
+        Query for specific users by parameter.
 
         Query using a list of parameters (tuples), where the first element of
         the tuple is the item attribute, second being the item value.
@@ -64,4 +45,50 @@ class DBFacade:
         :param parameters: list of parameters (tuples)
         :return: returns a list of user models that fit the query parameters.
         """
-        return []
+        return self.ddb.query_user(parameter)
+
+    def store_team(self, team):
+        """
+        Store team into teams table.
+
+        :param team: A team model to store
+        """
+        self.ddb.store_team(team)
+
+    def retrieve_team(self, team_name):
+        """
+        Retrieve team from teams table.
+
+        :return: returns a team model if slack id is found.
+        """
+        return self.ddb.retrieve_team(team_name)
+
+    def query_team(self, parameter):
+        """
+        Query for specific teams by parameter.
+
+        Query using a list of parameters (tuples), where the first element of
+        the tuple is the item attribute, second being the item value.
+
+        Example: [('platform', 'slack')]
+
+        :param parameters: list of parameters (tuples)
+        :return: returns a list of team models that fit the query parameters.
+        """
+        return self.ddb.query_team(parameter)
+
+    def delete_team(self, team_name):
+        """
+        Remove a team from the teams table.
+
+        :param team_name: team_name: the team_name of the team to be removed
+        """
+        self.ddb.delete_team(team_name)
+
+    def delete_user(self, slack_id):
+        """
+        Remove a user from the users table.
+
+        :param slack_id: the slack_id of the user to be removed
+        """
+        self.ddb.delete_user(slack_id)

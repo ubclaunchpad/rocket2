@@ -6,6 +6,9 @@ name = "pypi"
 [packages]
 pytest = "*"
 boto3 = "*"
+slackclient = "*"
+Flask = "*"
+gunicorn = "*"
 
 [dev-packages]
 pycodestyle = "*"
@@ -13,6 +16,10 @@ codecov = "*"
 pytest-cov = "*"
 pydocstyle = "*"
 ipython = "*"
+awscli = "*"
 
 [requires]
 python_version = "3.7"
+
+[scripts]
+launch = "gunicorn -b 0.0.0.0:5000 -w 4 server.server:app"

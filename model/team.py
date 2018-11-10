@@ -14,6 +14,14 @@ class Team:
         self.__platform = ""
         self.__members = set()
 
+    def __eq__(self, other):
+        """Return true if this team has the same attributes as the other."""
+        return str(self.__dict__) == str(other.__dict__)
+
+    def __ne__(self, other):
+        """Return the opposite of what is returned in self.__eq__(other)."""
+        return not (self == other)
+
     def get_github_team_name(self):
         """Return this team's unique Github team name."""
         return self.__github_team_name
@@ -49,3 +57,7 @@ class Team:
     def is_member(self, slack_id):
         """Identify if any member has the ID specified in the argument."""
         return slack_id in self.__members
+
+    def __str__(self):
+        """Print information on the team class."""
+        return str(self.__dict__)

@@ -17,9 +17,32 @@ class User:
         self.__image_url = ""
         self.__permissions_level = Permissions.member
 
+    @staticmethod
+    def is_valid(user):
+        """Return true if this user has no missing fields."""
+        return all(map(lambda f: isinstance(f, Permissions) or
+                       len(f) > 0,
+                       user.__dict__.values()))
+
+    def __eq__(self, other):
+        """Return true if this user has the same attributes as the other."""
+        return str(self.__dict__) == str(other.__dict__)
+
+    def __ne__(self, other):
+        """Return the opposite of what is returned in self.__eq__(other)."""
+        return not self == other
+
     def get_slack_id(self):
         """Return this user's Slack ID."""
         return self.__slack_id
+
+    def get_name(self):
+        """Return this user's display name."""
+        return self.__name
+
+    def set_name(self, name):
+        """Set this user's display name to the given name."""
+        self.__name = name
 
     def get_email(self):
         """Return this user's email."""
@@ -76,3 +99,7 @@ class User:
     def set_permissions_level(self, permissions_level):
         """Set this user's permissions level to the given argument."""
         self.__permissions_level = permissions_level
+
+    def __str__(self):
+        """Print information on the user class."""
+        return str(self.__dict__)
