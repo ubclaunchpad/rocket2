@@ -238,7 +238,7 @@ class DynamoDB:
         Example: [('platform', 'slack')]
 
         Special attribute: member
-        Since the member attribute describes a set, this function would check to
+        The member attribute describes a set, so this function would check to
         see if an entry **contains** a certain member slack_id. You can specify
         multiple slack_id, but they must be in different parameters (one
         slack_id per tuple).
