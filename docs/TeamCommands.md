@@ -17,8 +17,8 @@ All parameters with whitespace must be enclosed by quotation marks.
 
 ## TEAM LEAD or ADMIN only
 
-* `create` GITHUB_TEAM_NAME [`--name` DISPLAY_NAME]
-  * create a new team with a Github team name and optional display name
+* `create` GITHUB_TEAM_NAME [`--name` DISPLAY_NAME] [`--platform` PLATFORM]
+  * create a new team with a Github team name and optional display name and optional platform
   * if user is not an admin, they will be automatically added to the new team
 
 The following can only be used by a team lead in the team or an admin:
@@ -28,10 +28,10 @@ The following can only be used by a team lead in the team or an admin:
   * [`--platform` PLATFORM]
     * edit properties of specified team
 
-* `add` GITHUB_TEAM_NAME SLACK_ID
+* `add` GITHUB_TEAM_NAME @Slack User
   * add the specified user to the team
 
-* `remove` GITHUB_TEAM_NAME SLACK_ID
+* `remove` GITHUB_TEAM_NAME @Slack User
   * remove the specified user from the team
 
 * `delete` GITHUB_TEAM_NAME

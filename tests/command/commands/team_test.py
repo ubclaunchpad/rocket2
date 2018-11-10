@@ -5,7 +5,7 @@ from command.commands.team import TeamCommand
 help_text = ""
 
 
-def test_get_command_name():
+def test_get_name():
     """Test team command get_name method."""
     testcommand = TeamCommand()
     assert testcommand.get_name() == "team"
@@ -44,8 +44,12 @@ def test_handle_delete():
 def test_handle_create():
     """Test team command create parser."""
     testcommand = TeamCommand()
-    assert testcommand.handle("team create b-s") == "id b-s"
-    assert testcommand.handle("team create b-s --name B") == "team B, id b-s"
+    inputstring = "team create b-s --name 'B S'"
+    outputstring = "new team: b-s, name: B S, "
+    assert testcommand.handle(inputstring) == outputstring
+    inputstring += " --platform web"
+    outputstring += "platform: web, "
+    assert testcommand.handle(inputstring) == outputstring
 
 
 def test_handle_add():
