@@ -125,6 +125,7 @@ class DynamoDB:
         """
         Retrieve user from users table.
 
+        :raises: raises LookupError if slack id is not found.
         :return: returns a user model if slack id is found.
         """
         user_table = self.ddb.Table('users')
