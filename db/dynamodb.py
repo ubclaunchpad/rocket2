@@ -110,16 +110,21 @@ class DynamoDB:
         Store team into teams table.
 
         :param team: A team model to store
+        :return: Returns true if stored succesfully; false otherwise
         """
-        teams_table = self.ddb.Table('teams')
-        teams_table.put_item(
-            Item={
-                'github_team_name': team.get_github_team_name(),
-                'display_name': team.get_display_name(),
-                'platform': team.get_platform(),
-                'members': team.get_members()
-            }
-        )
+        # Check that there are no blank fields in the team
+        if Team.is_valid(team):
+            teams_table = self.ddb.Table('teams')
+            teams_table.put_item(
+                Item={
+                    'github_team_name': team.get_github_team_name(),
+                    'display_name': team.get_display_name(),
+                    'platform': team.get_platform(),
+                    'members': team.get_members()
+                }
+            )
+            return True
+        return False
 
     def retrieve_user(self, slack_id):
         """
