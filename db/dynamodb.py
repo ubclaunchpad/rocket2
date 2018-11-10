@@ -235,7 +235,13 @@ class DynamoDB:
         the parameters. Every item in parameters is a tuple, where the first
         element is the user attribute, and the second is the value.
 
-        Example: [('permission_level', 'admin')]
+        Example: [('platform', 'slack')]
+
+        Special attribute: member
+        Since the member attribute describes a set, this function would check to
+        see if an entry **contains** a certain member slack_id. You can specify
+        multiple slack_id, but they must be in different parameters (one
+        slack_id per tuple).
 
         :param parameters:
         :return: returns a list of user models that fit the query parameters.
