@@ -9,53 +9,58 @@ class TeamCommand:
     command_name = "team"
     help = ""
 
-    """Top level Team parser."""
-    parser = argparse.ArgumentParser(prog="team")
-    parser.add_argument("team")
-    subparsers = parser.add_subparsers()
+    def __init__(self):
+        """Initialize team command parser."""
+        self.parser = argparse.ArgumentParser(prog="team")
+        self.parser.add_argument("team")
+        self.init_subparsers()
 
-    """Parser for list command."""
-    parser_list = subparsers.add_parser("list")
-    parser_list.set_defaults(which="list")
+    def init_subparsers(self):
+        """Initialize subparsers for team command."""
+        subparsers = self.parser.add_subparsers(dest="which")
 
-    """Parser for view command."""
-    parser_view = subparsers.add_parser("view")
-    parser_view.set_defaults(which="view")
-    parser_view.add_argument("team_name", type=str, action='store')
+        """Parser for list command."""
+        parser_list = subparsers.add_parser("list")
+        parser_list.set_defaults(which="list")
 
-    """Parser for help command."""
-    parser_view = subparsers.add_parser("help")
-    parser_view.set_defaults(which="help")
+        """Parser for view command."""
+        parser_view = subparsers.add_parser("view")
+        parser_view.set_defaults(which="view")
+        parser_view.add_argument("team_name", type=str, action='store')
 
-    """Parser for delete command."""
-    parser_delete = subparsers.add_parser("delete")
-    parser_delete.set_defaults(which="delete")
-    parser_delete.add_argument("team_name", type=str, action='store')
+        """Parser for help command."""
+        parser_view = subparsers.add_parser("help")
+        parser_view.set_defaults(which="help")
 
-    """Parser for create command."""
-    parser_create = subparsers.add_parser("create")
-    parser_create.set_defaults(which="create")
-    parser_create.add_argument("team_name", type=str, action='store')
-    parser_create.add_argument("--name", type=str, action='store')
+        """Parser for delete command."""
+        parser_delete = subparsers.add_parser("delete")
+        parser_delete.set_defaults(which="delete")
+        parser_delete.add_argument("team_name", type=str, action='store')
 
-    """Parser for add command."""
-    parser_add = subparsers.add_parser("add")
-    parser_add.set_defaults(which="add")
-    parser_add.add_argument("team_name", type=str, action='store')
-    parser_add.add_argument("slack_id", type=str, action='store')
+        """Parser for create command."""
+        parser_create = subparsers.add_parser("create")
+        parser_create.set_defaults(which="create")
+        parser_create.add_argument("team_name", type=str, action='store')
+        parser_create.add_argument("--name", type=str, action='store')
 
-    """Parser for remove command."""
-    parser_remove = subparsers.add_parser("remove")
-    parser_remove.set_defaults(which="remove")
-    parser_remove.add_argument("team_name", type=str, action='store')
-    parser_remove.add_argument("slack_id", type=str, action='store')
+        """Parser for add command."""
+        parser_add = subparsers.add_parser("add")
+        parser_add.set_defaults(which="add")
+        parser_add.add_argument("team_name", type=str, action='store')
+        parser_add.add_argument("slack_id", type=str, action='store')
 
-    """Parser for edit command."""
-    parser_edit = subparsers.add_parser("edit")
-    parser_edit.set_defaults(which='edit')
-    parser_edit.add_argument("team_name", type=str, action='store')
-    parser_edit.add_argument("--name", type=str, action='store')
-    parser_edit.add_argument("--platform", type=str, action='store')
+        """Parser for remove command."""
+        parser_remove = subparsers.add_parser("remove")
+        parser_remove.set_defaults(which="remove")
+        parser_remove.add_argument("team_name", type=str, action='store')
+        parser_remove.add_argument("slack_id", type=str, action='store')
+
+        """Parser for edit command."""
+        parser_edit = subparsers.add_parser("edit")
+        parser_edit.set_defaults(which='edit')
+        parser_edit.add_argument("team_name", type=str, action='store')
+        parser_edit.add_argument("--name", type=str, action='store')
+        parser_edit.add_argument("--platform", type=str, action='store')
 
     def get_name(self):
         """Return the command type."""
