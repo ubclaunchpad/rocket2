@@ -2,18 +2,22 @@
 from flask import Flask
 from slackeventsapi import SlackEventAdapter
 from command.core import Core
+import logging
 
 app = Flask(__name__)
 core = Core()
+logging.basicConfig(format='%(asctime)s - %(levelname)s : %(message)s',
+                    level=logging.INFO)
 
 
 @app.route('/')
 def check():
     """Display a Rocket status image."""
+    logging.info('ROCKET2 IS RUNNING')
     return "🚀"
 
 
-slack_events_adapter = SlackEventAdapter(SLACK_SIGNING_SECRET,
+slack_events_adapter = SlackEventAdapter(None,
                                          "/slack/events", app)
 
 
