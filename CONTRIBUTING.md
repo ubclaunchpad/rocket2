@@ -36,11 +36,11 @@ request before it can be merged.
 All pull requests must pass our Travis build before they can be merged.
 The Travis build checks for:
 
-* Passing unit tests (via [`pytest`](https://pytest.org))
+* Passing unit tests (via [pytest](https://pytest.org))
 * Minimum code coverage of unit tests (via [Codecov.io](https://codecov.io/))
-* PEP8 code style (via [`pycodestyle`](http://pycodestyle.pycqa.org/en/latest/))
-* Correctly-formatted docstrings (via [`pydocstyle`](http://www.pydocstyle.org/en/2.1.1/))
-* Correctly-formatted Markdown documentation (via [`mdl`](https://github.com/markdownlint/markdownlint))
+* PEP8 code style (via [pycodestyle](http://pycodestyle.pycqa.org/en/latest/))
+* Correctly-formatted docstrings (via [pydocstyle](http://www.pydocstyle.org/en/2.1.1/))
+* Correctly-formatted Markdown documentation (via [mdl](https://github.com/markdownlint/markdownlint))
 
 After your pull request has been approved and the Travis build passes,
 it can be merged into `master`. Please do so with an ordinary merge commit,

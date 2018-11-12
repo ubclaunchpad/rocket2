@@ -18,7 +18,7 @@ Attribute Name | Description
 `image_url` | `String`; The user's avatar image URL
 `permission_level` | `String`; The user's permission level
 
-The user's permission level is one of `['member', 'admin', 'team_lead']`.
+The user's permission level is one of [`member`, `admin`, `team_lead`].
 
 ## `teams` Table
 

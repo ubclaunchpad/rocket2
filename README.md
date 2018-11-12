@@ -9,7 +9,7 @@ UBC Launch Pad's in-house management Slack bot.
 
 ## Developer Installation
 
-We use [`pipenv`](https://pipenv.readthedocs.io/en/latest/) for dependency management.
+We use [pipenv](https://pipenv.readthedocs.io/en/latest/) for dependency management.
 
 ```bash
 git clone https://github.com/ubclaunchpad/rocket2.0.git

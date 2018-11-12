@@ -1,28 +1,52 @@
 # User Command Reference
 
-`@rocket user`
+Commands that manipulate user data.
 
-## Options to specify input
+## Options
 
-* `edit`
-  * `--name` NAME
-  * `--email` ADDRESS
-  * `--pos` YOURPOSITION
-  * `--github` YOURREPO
-  * `--major` YOURMAJOR
-  * `--bio` YOURMAJOR
-    * edit properties of your Launch Pad profile
-    * surround arguments with spaces with single quotes
-  * ADMIN or TEAM LEAD only option: `--member` MEMBER_ID
-    * edit properties of another user's Launch Pad profile
+```sh
+@rocket user {edit, view, help, delete} ...
+```
 
-* `view` MEMBER_ID
-  * view information about a user
+### Edit
 
-* `help`
-  * outputs options for user commands
+```sh
+@rocket user edit [--name NAME] [--email EMAIL] [--pos POSITION]
+                  [--github GITHUB_HANDLE] [--major MAJOR]
+                  [--bio BIOGRAPHY]
+```
 
-## ADMIN only
+Allows user to edit their Launch Pad profile. Admins and team leads can edit
+another user's Launch Pad profile by using `[--member SLACKID]` option.
 
-* `delete` MEMBER_ID
-  * permanently delete member's Launch Pad profile
+```sh
+# Normal use
+@rocket user edit --name "Steven Universe" --email "su@gmail.com"
+
+# Admin/Team lead use
+@rocket user edit --member "U061F7AUR" --name "LOL"
+```
+
+### View
+
+```sh
+@rocket user view SLACKID
+```
+
+Display information about a user.
+
+### Help
+
+```sh
+@rocket user help
+```
+
+Display options for the user commands.
+
+### Delete (Admin only)
+
+```sh
+@rocket user delete MEMBER_ID
+```
+
+Permanently delete a member's Launch Pad Profile. Can only be used by admins.
