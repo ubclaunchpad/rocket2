@@ -1,6 +1,4 @@
 """Utility class for interacting with Slack API."""
-import os
-from slackclient import SlackClient
 
 
 class Bot:
@@ -13,14 +11,13 @@ class Bot:
     def send_dm(self, message, slack_user_id):
         """Send direct message to user with id of slack_user_id."""
         response = self.sc.api_call(
-                            "chat.postMessage",
-                            channel=slack_user_id,
-                            text=message
-                            )
-        if not response['ok']:
-            print('API Call error: {}'.format(response["error"]))
-            return False
-        return True
+            "chat.postMessage",
+            channel=slack_user_id,
+            text=message
+        )
+        if 'ok' not in response:
+            # TODO log error
+            raise SlackAPIError(response['error'])
 
     def send_to_channel(self, message, channel_name):
         """Send message to channel with name channel_name."""
@@ -29,11 +26,18 @@ class Bot:
             channel=channel_name,
             text=message
         )
-        if not response['ok']:
-            print('API Call error: {}'.format(response["error"]))
-            return False
-        return True
+        if 'ok' not in response:
+            # TODO log error
+            raise SlackAPIError(response['error'])
 
 
-# Example of how we are going to use SlackBot interface
-# Bot().send_dm("Hello <@UD8UCTN05>", "UD8UCTN05")
+class SlackAPIError(Exception):
+    """Exception representing an error while calling Slack API."""
+
+    def __init__(self, error):
+        """
+        Initialize a new SlackAPIError.
+
+        :param error: Error string returned from Slack API.
+        """
+        self.error = error
