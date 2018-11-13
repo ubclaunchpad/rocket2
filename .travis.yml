@@ -10,8 +10,5 @@ install:
 before_script:
     - scripts/download_dynamodb_and_run.sh
 script:
-    - pipenv run pycodestyle .
-    - pipenv run pydocstyle .
-    - mdl .
-    - cd tests/ && pipenv run pytest --cov=./
+    - scripts/build_check.sh
     - pipenv run codecov
