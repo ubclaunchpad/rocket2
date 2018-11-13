@@ -3,6 +3,7 @@ import argparse
 import shlex
 from db.facade import DBFacade
 from db.dynamodb import DynamoDB
+from model.permissions import Permissions
 
 
 class UserCommand:
@@ -27,11 +28,13 @@ class UserCommand:
     permission_error = "You do not have the sufficient " \
                        "permission level for this command!"
 
-    def __init__(self):
-        """Initialize user command parser."""
+    def __init__(self, DBfacade, bot):
+        """Initialize user command."""
         self.parser = argparse.ArgumentParser(prog="user")
         self.parser.add_argument("user")
         self.init_subparsers()
+        self.facade = DBfacade
+        self.bot = bot
 
     def init_subparsers(self):
         """Initialize subparsers for user command."""
@@ -70,7 +73,7 @@ class UserCommand:
         """Return command options for user events."""
         return self.help
 
-    def handle(self, command, user_id):
+    def handle(self, command, user_id, channel):
         """Handle command by splitting into substrings and giving to parser."""
         command_arg = shlex.split(command)
         args = None
@@ -98,7 +101,7 @@ class UserCommand:
         elif args.which == "delete":
             # stub
             # return "deleting " + args.slack_id
-            return self.delete_helper(user_id, args.slack_id)
+            return self.delete_helper(user_id, args.slack_id, channel)
 
         elif args.which == "edit":
             # stub
@@ -119,7 +122,7 @@ class UserCommand:
                 msg += "bio: {}".format(args.bio)
             return msg
 
-    def delete_helper(self, user_id, slack_id):
+    def delete_helper(self, user_id, slack_id, channel):
         """
         Delete user from database.
 
@@ -128,15 +131,18 @@ class UserCommand:
 
         :param user_id: Slack ID of user who is calling the command
         :param slack_id: Slack ID of user who is being deleted
+        :param channel: ID of Slack channel that called command
         :return: returns permission error message if not admin,
                  returns deletion message if user is deleted.
         """
         message = "Deleted user with Slack ID: " + slack_id
-        db = DynamoDB()
-        facade = DBFacade(db)
-        command_user = facade.retrieve_user(user_id)
-        if command_user.get_permissions_level() == 3:
-            facade.delete_user(slack_id)
-            return message
-        else:
-            return self.permission_error
+        lookup_error = "User not found!"
+        try:
+            user_command = self.facade.retrieve_user(user_id)
+            if user_command.get_permissions_level() == Permissions.admin:
+                self.facade.delete_user(slack_id)
+                self.bot.send_to_channel(message, channel)
+            else:
+                self.bot.send_to_channel(self.permission_error, channel)
+        except LookupError:
+                self.bot.send_to_channel(lookup_error, channel)
