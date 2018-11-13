@@ -1,11 +1,12 @@
 # User Command Reference
 
-Commands that manipulate user data.
+Commands that manipulate user data. Remember that parameters with whitespace
+must be enclosed in quotation marks.
 
 ## Options
 
 ```sh
-@rocket user {edit, view, help, delete} ...
+@rocket user {edit, view, help, delete}
 ```
 
 ### Edit
@@ -18,13 +19,14 @@ Commands that manipulate user data.
 
 Allows user to edit their Launch Pad profile. Admins and team leads can edit
 another user's Launch Pad profile by using `[--member SLACKID]` option.
+`SLACK_ID` is the `@`-name, for easy slack autocomplete.
 
 ```sh
 # Normal use
 @rocket user edit --name "Steven Universe" --email "su@gmail.com"
 
 # Admin/Team lead use
-@rocket user edit --member "U061F7AUR" --name "LOL"
+@rocket user edit --member @s_universe --name "Steven Universe"
 ```
 
 ### View
@@ -33,7 +35,8 @@ another user's Launch Pad profile by using `[--member SLACKID]` option.
 @rocket user view SLACKID
 ```
 
-Display information about a user.
+Display information about a user. `SLACK_ID` is the `@`-name, for easy slack
+autocomplete.
 
 ### Help
 
@@ -50,3 +53,4 @@ Display options for the user commands.
 ```
 
 Permanently delete a member's Launch Pad Profile. Can only be used by admins.
+`MEMBER_ID` is the `@`-name, for easy slack autocomplete.

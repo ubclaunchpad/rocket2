@@ -173,3 +173,11 @@ epub_exclude_files = ['search.html']
 
 
 # -- Extension configuration -------------------------------------------------
+def skip(app, what, name, obj, autoskip, options):
+    """Make sure we don't skip __init__ functions."""
+    return False if name == '__init__' else autoskip
+
+
+def setup(app):
+    """Set up sphinx."""
+    app.connect('autodoc-skip-member', skip)

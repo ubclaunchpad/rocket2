@@ -3,19 +3,21 @@
 There are a few scripts in the `scripts/` directory that aid in the development
 of this project.
 
-## build_check.sh
+## build\_check.sh
 
 ```sh
 scripts/build_check.sh
 ```
 
-This is just the list of commands run to check the code for violations of python
+This is just the list of commands run to check the code for violations of Python
 style. It also runs the tests, and is the script that is run in our Travis CI.
 Make sure to run before submitting a pull request!
 
 This script also checks to see if the user is running DynamoDB locally, and if
 so, would include tests for it; if not, the tests that use DynamoDB will be
 deselected.
+
+See [git hooks](#makefile-for-git-hooks).
 
 ## update.sh
 
@@ -24,7 +26,8 @@ scripts/update.sh
 ```
 
 This should be run whenever any change to `Pipfile` or `Pipfile.lock` occurs on
-the remote branch. This is equivalent to the user running:
+your local copy of a branch. It updates any changed dependencies into your
+virtual environment. This is equivalent to the user running:
 
 ```sh
 pipenv sync --dev
@@ -33,7 +36,9 @@ pipenv sync --dev
 Which, coincidentally, require the same number of characters to be typed. The
 script should ideally be run after any instance of `git pull`.
 
-## download_dynamodb_and_run.sh
+See [git hooks](#makefile-for-git-hooks).
+
+## download\_dynamodb\_and\_run.sh
 
 ```sh
 scripts/download_dynamodb_and_run.sh
@@ -46,7 +51,7 @@ the process. It also sets up the environment in which you should run it in using
 Please do not use this script; it is meant to be run by Travis CI. Unless you
 enjoy having to download and run multiple DynamoDB processes.
 
-## setup_localaws.sh
+## setup\_localaws.sh
 
 ```sh
 scripts/setup_localaws.sh
@@ -57,22 +62,22 @@ instance of DynamoDB. Only should be run once by users (though running it
 multiple times would not hurt too too much). It requires `aws` to be installed
 through `pipenv`.
 
-## docker_build.sh
+## docker\_build.sh
 
 ```sh
 scripts/docker_build.sh
 ```
 
-This script build a docker image `rocket2-dev-img`, according to the
+This script builds a docker image `rocket2-dev-img`, according to the
 `Dockerfile`. Equivalent to:
 
 ```sh
 docker build -t rocket2-dev-img .
 ```
 
-Make sure you have docker installed on your system before-hand.
+Make sure you have docker installed on your system beforehand.
 
-## docker_run_local.sh
+## docker\_run\_local.sh
 
 ```sh
 scripts/docker_run_local.sh
