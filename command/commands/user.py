@@ -27,6 +27,7 @@ class UserCommand:
            " 'permanently delete member's Launch Pad profile'"
     permission_error = "You do not have the sufficient " \
                        "permission level for this command!"
+    lookup_error = "User not found!"
 
     def __init__(self, DBfacade, bot):
         """Initialize user command."""
@@ -82,26 +83,23 @@ class UserCommand:
             # Going for the nuclear option
             args = self.parser.parse_args(command_arg)
         except SystemExit:
-            return self.help
+            return self.bot.send_to_channel(self.help, channel)
 
         if args.which is None:
-            return self.help
+            return self.bot.send_to_channel(self.help, channel)
 
         elif args.which == "view":
             # stub
             if args.slack_id is not None:
-                return args.slack_id
+                self.view_helper(user_id, args.slack_id, channel)
             else:
-                return user_id
+                self.view_helper(user_id, None, channel)
 
         elif args.which == "help":
-            # stub
-            return self.help
+            self.bot.send_to_channel(self.help, channel)
 
         elif args.which == "delete":
-            # stub
-            # return "deleting " + args.slack_id
-            return self.delete_helper(user_id, args.slack_id, channel)
+            self.delete_helper(user_id, args.slack_id, channel)
 
         elif args.which == "edit":
             # stub
@@ -136,7 +134,6 @@ class UserCommand:
                  returns deletion message if user is deleted.
         """
         message = "Deleted user with Slack ID: " + slack_id
-        lookup_error = "User not found!"
         try:
             user_command = self.facade.retrieve_user(user_id)
             if user_command.get_permissions_level() == Permissions.admin:
@@ -145,4 +142,27 @@ class UserCommand:
             else:
                 self.bot.send_to_channel(self.permission_error, channel)
         except LookupError:
-                self.bot.send_to_channel(lookup_error, channel)
+                self.bot.send_to_channel(self.lookup_error, channel)
+
+    def view_helper(self, user_id, slack_id, channel):
+        """
+        View user info from database.
+
+        If slack_id is None, return information of user_id,
+        else return information of slack_id
+
+        :param user_id: Slack ID of user who is calling command
+        :param slack_id: Slack ID of user whose info is being retrieved
+        :param channel: ID of Slack channel that command is called from
+        :return: returns error message if user not found in database,
+                 else returns information about the user
+        """
+        try:
+            if slack_id is None:
+                user = self.facade.retrieve_user(user_id)
+            else:
+                user = self.facade.retrieve_user(slack_id)
+        except LookupError:
+            return self.bot.send_to_channel(self.lookup_error, channel)
+
+        self.bot.send_to_channel(str(user), channel)

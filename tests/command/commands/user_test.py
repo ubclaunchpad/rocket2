@@ -28,8 +28,9 @@ def test_handle_nosubs():
     mock_facade = mock.MagicMock(DBFacade)
     mock_bot = mock.MagicMock(Bot)
     testcommand = UserCommand(mock_facade, mock_bot)
-    assert testcommand.handle('user', "U0G9QF9C6",
-                              "C0LAN2Q65") == UserCommand.help
+    testcommand.handle('user', "U0G9QF9C6", "C0LAN2Q65")
+    mock_bot.send_to_channel.\
+        assert_called_once_with(UserCommand.help, "C0LAN2Q65")
 
 
 def test_handle_bad_args():
@@ -37,8 +38,9 @@ def test_handle_bad_args():
     mock_facade = mock.MagicMock(DBFacade)
     mock_bot = mock.MagicMock(Bot)
     testcommand = UserCommand(mock_facade, mock_bot)
-    assert testcommand.handle('user geese',
-                              "U0G9QF9C6", "C0LAN2Q65") == UserCommand.help
+    testcommand.handle('user geese', "U0G9QF9C6", "C0LAN2Q65")
+    mock_bot.send_to_channel.\
+        assert_called_once_with(UserCommand.help, "C0LAN2Q65")
 
 
 def test_handle_bad_optional_args():
@@ -46,19 +48,48 @@ def test_handle_bad_optional_args():
     mock_facade = mock.MagicMock(DBFacade)
     mock_bot = mock.MagicMock(Bot)
     testcommand = UserCommand(mock_facade, mock_bot)
-    assert testcommand.handle('user edit --biology stuff',
-                              "U0G9QF9C6", "C0LAN2Q65") == UserCommand.help
+    testcommand.handle('user edit --biology stuff', "U0G9QF9C6", "C0LAN2Q65")
+    mock_bot.send_to_channel.\
+        assert_called_once_with(UserCommand.help, "C0LAN2Q65")
 
 
 def test_handle_view():
     """Test user command view parser and handle method."""
     mock_facade = mock.MagicMock(DBFacade)
     user_id = "U0G9QF9C6"
+    user = User(user_id)
     mock_bot = mock.MagicMock(Bot)
+    mock_facade.retrieve_user.return_value = user
     testcommand = UserCommand(mock_facade, mock_bot)
-    assert testcommand.handle('user view --slack_id asd', user_id,
-                              "C0LAN2Q65") == "asd"
-    assert testcommand.handle('user view', user_id, "C0LAN2Q65") == "U0G9QF9C6"
+    testcommand.handle('user view', user_id, "C0LAN2Q65")
+    mock_facade.retrieve_user.assert_called_once_with("U0G9QF9C6")
+    mock_bot.send_to_channel.assert_called_once_with(str(user), "C0LAN2Q65")
+
+
+def test_handle_view_other_user():
+    """Test user command view handle with slack_id parameter."""
+    mock_facade = mock.MagicMock(DBFacade)
+    user_id = "U0G9QF9C6"
+    user = User("ABCDE8FA9")
+    mock_bot = mock.MagicMock(Bot)
+    mock_facade.retrieve_user.return_value = user
+    testcommand = UserCommand(mock_facade, mock_bot)
+    testcommand.handle('user view --slack_id ABCDE8FA9', user_id, "C0LAN2Q65")
+    mock_facade.retrieve_user.assert_called_once_with("ABCDE8FA9")
+    mock_bot.send_to_channel.assert_called_once_with(str(user), "C0LAN2Q65")
+
+
+def test_handle_view_lookup_error():
+    """Test user command view handle with user not in database."""
+    mock_facade = mock.MagicMock(DBFacade)
+    user_id = "U0G9QF9C6"
+    mock_bot = mock.MagicMock(Bot)
+    mock_facade.retrieve_user.side_effect = LookupError
+    testcommand = UserCommand(mock_facade, mock_bot)
+    testcommand.handle('user view --slack_id ABCDE8FA9', user_id, "C0LAN2Q65")
+    mock_facade.retrieve_user.assert_called_once_with("ABCDE8FA9")
+    mock_bot.send_to_channel.\
+        assert_called_once_with(UserCommand.lookup_error, "C0LAN2Q65")
 
 
 def test_handle_help():
@@ -66,8 +97,9 @@ def test_handle_help():
     mock_facade = mock.MagicMock(DBFacade)
     mock_bot = mock.MagicMock(Bot)
     testcommand = UserCommand(mock_facade, mock_bot)
-    assert testcommand.handle('user help', "U0G9QF9C6",
-                              "C0LAN2Q65") == UserCommand.help
+    testcommand.handle('user help', "U0G9QF9C6", "C0LAN2Q65")
+    mock_bot.send_to_channel.\
+        assert_called_once_with(UserCommand.help, "C0LAN2Q65")
 
 
 def test_handle_delete():
@@ -83,6 +115,38 @@ def test_handle_delete():
     mock_facade.retrieve_user.assert_called_once_with("ABCDEFG2F")
     mock_facade.delete_user.assert_called_once_with("U0G9QF9C6")
     mock_bot.send_to_channel.assert_called_once_with(message, "C0LAN2Q65")
+
+
+def test_handle_delete_not_admin():
+    """Test user command delete where user is not admin."""
+    mock_bot = mock.MagicMock(Bot)
+    mock_facade = mock.MagicMock(DBFacade)
+    testcommand = UserCommand(mock_facade, mock_bot)
+    user = User("ABCDEFG2F")
+    user.set_permissions_level(Permissions.member)
+    mock_facade.retrieve_user.return_value = user
+    testcommand.handle("user delete U0G9QF9C6", "ABCDEFG2F", "C0LAN2Q65")
+    mock_facade.retrieve_user.assert_called_once_with("ABCDEFG2F")
+    message = "You do not have the sufficient " \
+              "permission level for this command!"
+    mock_bot.send_to_channel.assert_called_once_with(message, "C0LAN2Q65")
+    mock_facade.delete_user.assert_not_called()
+
+
+def test_handle_delete_lookup_error():
+    """Test user command delete parser."""
+    mock_bot = mock.MagicMock(Bot)
+    mock_facade = mock.MagicMock(DBFacade)
+    testcommand = UserCommand(mock_facade, mock_bot)
+    user = User("ABCDEFG2F")
+    user.set_permissions_level(Permissions.admin)
+    mock_facade.retrieve_user.return_value = user
+    mock_facade.delete_user.side_effect = LookupError
+    testcommand.handle("user delete U0G9QF9C6", "ABCDEFG2F", "C0LAN2Q65")
+    mock_facade.retrieve_user.assert_called_once_with("ABCDEFG2F")
+    mock_facade.delete_user.assert_called_once_with("U0G9QF9C6")
+    mock_bot.send_to_channel.\
+        assert_called_once_with(UserCommand.lookup_error, "C0LAN2Q65")
 
 
 def test_handle_edit_name():
