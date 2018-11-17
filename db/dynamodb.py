@@ -18,8 +18,7 @@ class DynamoDB:
     def __init__(self):
         """Initialize facade using DynamoDB settings (for now)."""
         # TODO change this to production and not localhost
-        self.ddb = boto3.resource("dynamodb", region_name="",
-                                  endpoint_url="http://localhost:8000")
+        self.ddb = boto3.resource("dynamodb")
 
         if not self.check_valid_table('users'):
             self.__create_user_tables()
