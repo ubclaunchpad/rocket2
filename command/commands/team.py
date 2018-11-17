@@ -7,31 +7,37 @@ class TeamCommand:
     """Represent Team Command Parser."""
 
     command_name = "team"
-    help = """# Team Command Reference
-    `@rocket team`
-    All parameters with whitespace must be enclosed by quotation marks.
-    ## Options to specify input
-    * `list`
-        * outputs the Github team names and display names of all teams
-    * `view` GITHUB_TEAM_NAME
-        * view information and members of a team
-    * `help`
-        * outputs options for team commands
-    ## TEAM LEAD or ADMIN only
-    * `create` GITHUB_TEAM_NAME [`--name` DISPLAY_NAME] [`--platform` PLATFORM]
-        * create a new team with a Github team name and optional parameters
-        * the user will be automatically added to the new team
-    The following can only be used by a team lead in the team or an admin:
-    * `edit` GITHUB_TEAM_NAME
-        * [`--name` DISPLAY_NAME]
-        * [`--platform` PLATFORM]
-            * edit properties of specified team
-    * `add` GITHUB_TEAM_NAME @Slack User
-        * add the specified user to the team
-    * `remove` GITHUB_TEAM_NAME @Slack User
-        * remove the specified user from the team
-    * `delete` GITHUB_TEAM_NAME
-        * permanently delete the specified team"""
+    help = "# Team Command Reference\n\n"\
+           "`@rocket team`\n\n"\
+           "All Parameters with whitespace"\
+           " must be enclosed by quotation marks.\n\n"\
+           "## Options to specify input\n\n"\
+           "* `list`\n"\
+           "    * outputs the Github team names"\
+           " and display names of all teams\n\n"\
+           "* `view` GITHUB_TEAM_NAME\n"\
+           "    * view information and members of a team\n\n"\
+           "* `help`\n"\
+           "    * outputs options for team commands\n\n"\
+           "## TEAM LEAD or ADMIN only\n\n"\
+           "* `create` GITHUB_TEAM_NAME"\
+           " *[`--name` DISPLAY_NAME]"\
+           " *[`--platform` PLATFORM]\n"\
+           "    * create a new team with a Github team name"\
+           " and optional parameters\n"\
+           "    * the user will be automatically added to the new team\n\n"\
+           "The following can only be used by"\
+           " a team lead in the team or an admin:\n\n"\
+           "* `edit` GITHUB_TEAM_NAME"\
+           " [`--name` DISPLAY_NAME]"\
+           " [`--platform` PLATFORM]\n"\
+           "    * edit properties of specified team\n\n"\
+           "* `add` GITHUB_TEAM_NAME SLACK_ID\n"\
+           "    * add the specified user to the team\n\n"\
+           "* `remove` GITHUB_TEAM_NAME SLACK_ID\n"\
+           "    * remove the specified user from the team\n\n"\
+           "* `delete` GITHUB_TEAM_NAME\n"\
+           "    * permanently delete the specified team\n"
 
     def __init__(self):
         """Initialize team command parser."""

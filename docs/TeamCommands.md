@@ -28,10 +28,10 @@ The following can only be used by a team lead in the team or an admin:
   * [`--platform` PLATFORM]
     * edit properties of specified team
 
-* `add` GITHUB_TEAM_NAME @Slack User
+* `add` GITHUB_TEAM_NAME SLACK_ID
   * add the specified user to the team
 
-* `remove` GITHUB_TEAM_NAME @Slack User
+* `remove` GITHUB_TEAM_NAME SLACK_ID
   * remove the specified user from the team
 
 * `delete` GITHUB_TEAM_NAME
