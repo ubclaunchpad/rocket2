@@ -1,5 +1,6 @@
 """Test the data model for a team."""
 from model.team import Team
+from tests.util import create_test_team
 
 
 def test_team_equality():
@@ -9,6 +10,14 @@ def test_team_equality():
     team3 = Team("brussel-trouts", "Brussel Trouts")
     assert team == team2
     assert team != team3
+
+
+def test_valid_team():
+    """Test the Team static class method is_valid()."""
+    team = Team("brussel-sprouts", "Brussel Sprouts")
+    assert not Team.is_valid(team)
+    team = create_test_team("brussel-sprouts", "Brussel Sprouts")
+    assert Team.is_valid(team)
 
 
 def test_get_github_team_name():
