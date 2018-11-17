@@ -1,5 +1,6 @@
 """DynamoDB."""
 import boto3
+import os
 from boto3.dynamodb.conditions import Attr
 from model.user import User
 from model.team import Team
@@ -16,10 +17,34 @@ class DynamoDB:
     """
 
     def __init__(self):
-        """Initialize facade using DynamoDB settings (for now)."""
+        """Initialize facade using DynamoDB settings.
+
+        To avoid local tests failure when the dyanmodb server is used, a testing
+        environment variable is set.
+        When testing environmental variable is true, the local dynamodb is run.
+        When testing environmental variable is true, the server dynamodb is run.
+
+        boto3.resource() takes in a service_name, region_name, and endpoint_url
+        (only for local dynamodb).
+        service_name: The name of a service, "dynamodb" in this case.
+        region_name:  The name of the region associated with the client.
+        A list of different regions can be obtained online.
+        endpoint_url: The complete URL to use for the constructed client.
+
+        Boto3 server require environmental variables for credentials:
+        AWS_ACCESS_KEY_ID: The access key for your AWS account.
+        AWS_SECRET_ACCESS_KEY: The secret key for the AWS account
+        AWS_SESSION_TOKEN: The session key for your AWS account.
+        This is only needed when you are using temporary credentials.
+        """
         # TODO change this to production and not localhost
-        self.ddb = boto3.resource("dynamodb", region_name="",
+        testing = bool(os.environ.get("TESTING"), True)
+
+        if testing:
+            self.ddb = boto3.resource("dynamodb", region_name="",
                                   endpoint_url="http://localhost:8000")
+        else:
+            self.ddb = boto3.resource('dynamodb', region_name='us-west-1')
 
         if not self.check_valid_table('users'):
             self.__create_user_tables()
