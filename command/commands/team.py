@@ -21,9 +21,9 @@ class TeamCommand:
            "    * outputs options for team commands\n\n"\
            "## TEAM LEAD or ADMIN only\n\n"\
            "* create GITHUB_TEAM_NAME"\
-           " *[--name DISPLAY_NAME]"\
-           " *[--platform PLATFORM]"\
-           " *[--channel]\n"\
+           " [--name DISPLAY_NAME]"\
+           " [--platform PLATFORM]"\
+           " [--channel]\n"\
            "    * create a new team with a Github team name"\
            " and optional parameters\n"\
            "    * the user will be automatically added to the new team\n"\
