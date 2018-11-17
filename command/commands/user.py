@@ -1,8 +1,6 @@
 """Command parsing for user events."""
 import argparse
 import shlex
-from db.facade import DBFacade
-from db.dynamodb import DynamoDB
 from model.permissions import Permissions
 
 
@@ -28,13 +26,14 @@ class UserCommand:
     permission_error = "You do not have the sufficient " \
                        "permission level for this command!"
     lookup_error = "User not found!"
+    delete_text = "Deleted user with Slack ID: "
 
-    def __init__(self, DBfacade, bot):
+    def __init__(self, db_facade, bot):
         """Initialize user command."""
         self.parser = argparse.ArgumentParser(prog="user")
         self.parser.add_argument("user")
         self.init_subparsers()
-        self.facade = DBfacade
+        self.facade = db_facade
         self.bot = bot
 
     def init_subparsers(self):
@@ -89,11 +88,7 @@ class UserCommand:
             return self.bot.send_to_channel(self.help, channel)
 
         elif args.which == "view":
-            # stub
-            if args.slack_id is not None:
                 self.view_helper(user_id, args.slack_id, channel)
-            else:
-                self.view_helper(user_id, None, channel)
 
         elif args.which == "help":
             self.bot.send_to_channel(self.help, channel)
@@ -133,12 +128,11 @@ class UserCommand:
         :return: returns permission error message if not admin,
                  returns deletion message if user is deleted.
         """
-        message = "Deleted user with Slack ID: " + slack_id
         try:
             user_command = self.facade.retrieve_user(user_id)
             if user_command.get_permissions_level() == Permissions.admin:
                 self.facade.delete_user(slack_id)
-                self.bot.send_to_channel(message, channel)
+                self.bot.send_to_channel(self.delete_text + slack_id, channel)
             else:
                 self.bot.send_to_channel(self.permission_error, channel)
         except LookupError:

@@ -5,12 +5,12 @@ from command.commands.user import UserCommand
 class Core:
     """Encapsulate methods for handling events."""
 
-    def __init__(self, DBfacade, bot):
+    def __init__(self, db_facade, bot):
         """Initialize the dictionary of command handlers."""
         self.__commands = {}
-        self._facade = DBfacade
+        self.__facade = db_facade
         self.__bot = bot
-        self.__commands["user"] = UserCommand(self._facade, self.__bot)
+        self.__commands["user"] = UserCommand(self.__facade, self.__bot)
 
     def handle_app_mention(self, event_data):
         """Handle the events associated with mentions of @rocket."""
