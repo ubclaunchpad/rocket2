@@ -50,6 +50,8 @@ def test_handle_create():
     inputstring += " --platform web"
     outputstring += "platform: web, "
     assert testcommand.handle(inputstring) == outputstring
+    inputstring += " --channel"
+    outputstring += "add channel"
 
 
 def test_handle_add():

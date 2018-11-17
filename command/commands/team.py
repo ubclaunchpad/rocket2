@@ -73,6 +73,7 @@ class TeamCommand:
         parser_create.add_argument("team_name", type=str, action='store')
         parser_create.add_argument("--name", type=str, action='store')
         parser_create.add_argument("--platform", type=str, action='store')
+        parser_create.add_argument('--channel', action='store_true')
 
         """Parser for add command."""
         parser_add = subparsers.add_parser("add")
@@ -128,6 +129,8 @@ class TeamCommand:
                 msg += "name: {}, ".format(args.name)
             if args.platform is not None:
                 msg += "platform: {}, ".format(args.platform)
+            if args.channel:
+                msg += "add channel"
             return msg
 
         elif args.which == "add":
