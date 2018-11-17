@@ -15,7 +15,7 @@ def test_user_equality():
 
 def test_valid_user():
     """Test the User static class method is_valid()."""
-    user = User("brussel-sprouts")
+    user = User("")
     assert not User.is_valid(user)
     user = create_test_user("brussel-sprouts")
     assert User.is_valid(user)

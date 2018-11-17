@@ -16,7 +16,7 @@ def test_string_rep():
 def test_store_invalid_user():
     """Test handling of invalid user."""
     ddb = DynamoDB()
-    user = User('abc_123')
+    user = User('')
     success = ddb.store_user(user)
     assert not success
 
@@ -25,9 +25,24 @@ def test_store_invalid_user():
 def test_store_invalid_team():
     """Test handling of invalid team."""
     ddb = DynamoDB()
-    team = Team('brussel-sprouts', 'Brussel Sprouts')
+    team = Team('', 'Brussel Sprouts')
     success = ddb.store_team(team)
     assert not success
+
+
+@pytest.mark.db
+def test_store_same_users():
+    """Test how database handles overwriting same user (same slack_id)."""
+    ddb = DynamoDB()
+    user = create_test_user('abc_123')
+    user2 = create_test_user('abc_123')
+    user2.set_name('Sprouts')
+    ddb.store_user(user)
+    ddb.store_user(user2)
+
+    assert ddb.retrieve_user('abc_123') == user2
+
+    ddb.delete_user('abc_123')
 
 
 @pytest.mark.db
@@ -77,7 +92,7 @@ def test_query_user():
 
 @pytest.mark.db
 def test_retrieve_invalid_team():
-    """Test to see if we can retrieve invalid team."""
+    """Test to see if we can retrieve a non-existent team."""
     ddb = DynamoDB()
     try:
         team = ddb.retrieve_team('rocket2.0')
