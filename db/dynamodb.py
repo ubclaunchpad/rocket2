@@ -39,7 +39,7 @@ class DynamoDB:
         AWS_SESSION_TOKEN: The session key for your AWS account.
         This is only needed when you are using temporary credentials.
         """
-        testing = bool(os.environ.get("TESTING"), True)
+        testing = bool(os.environ.get("TESTING", True))
 
         if testing:
             self.ddb = boto3.resource("dynamodb",
