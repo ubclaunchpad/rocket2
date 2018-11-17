@@ -2,6 +2,7 @@
 from db.dynamodb import DynamoDB
 from tests.util import create_test_user, create_test_team
 from model.user import User
+from model.team import Team
 import pytest
 
 
@@ -17,6 +18,15 @@ def test_store_invalid_user():
     ddb = DynamoDB()
     user = User('abc_123')
     success = ddb.store_user(user)
+    assert not success
+
+
+@pytest.mark.db
+def test_store_invalid_team():
+    """Test handling of invalid team."""
+    ddb = DynamoDB()
+    team = Team('brussel-sprouts', 'Brussel Sprouts')
+    success = ddb.store_team(team)
     assert not success
 
 
@@ -52,7 +62,7 @@ def test_query_user():
     """Test to see if we can store and query the same user."""
     ddb = DynamoDB()
     user = create_test_user('abc_123')
-    ddb.store_user(user)
+    assert ddb.store_user(user)
     users = ddb.query_user([('permission_level', 'admin')])
     strict_users = ddb.query_user([('permission_level', 'admin'),
                                    ('slack_id', 'abc_123')])
@@ -70,7 +80,7 @@ def test_store_retrieve_team():
     """Test to see if we can store and retrieve the same team."""
     ddb = DynamoDB()
     team = create_test_team('rocket2.0', 'Rocket 2.0')
-    ddb.store_team(team)
+    assert ddb.store_team(team)
     another_team = ddb.retrieve_team('rocket2.0')
 
     assert team == another_team

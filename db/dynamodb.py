@@ -110,16 +110,21 @@ class DynamoDB:
         Store team into teams table.
 
         :param team: A team model to store
+        :return: Returns true if stored succesfully; false otherwise
         """
-        teams_table = self.ddb.Table('teams')
-        teams_table.put_item(
-            Item={
-                'github_team_name': team.get_github_team_name(),
-                'display_name': team.get_display_name(),
-                'platform': team.get_platform(),
-                'members': team.get_members()
-            }
-        )
+        # Check that there are no blank fields in the team
+        if Team.is_valid(team):
+            teams_table = self.ddb.Table('teams')
+            teams_table.put_item(
+                Item={
+                    'github_team_name': team.get_github_team_name(),
+                    'display_name': team.get_display_name(),
+                    'platform': team.get_platform(),
+                    'members': team.get_members()
+                }
+            )
+            return True
+        return False
 
     def retrieve_user(self, slack_id):
         """
@@ -230,7 +235,13 @@ class DynamoDB:
         the parameters. Every item in parameters is a tuple, where the first
         element is the user attribute, and the second is the value.
 
-        Example: [('permission_level', 'admin')]
+        Example: [('platform', 'slack')]
+
+        Special attribute: member
+        The member attribute describes a set, so this function would check to
+        see if an entry **contains** a certain member slack_id. You can specify
+        multiple slack_id, but they must be in different parameters (one
+        slack_id per tuple).
 
         :param parameters:
         :return: returns a list of user models that fit the query parameters.
