@@ -18,7 +18,6 @@ def check():
     return "🚀"
 
 
-
 SLACK_SIGNING_SECRET = os.environ["SLACK_SIGNING_SECRET"]
 slack_events_adapter = SlackEventAdapter(SLACK_SIGNING_SECRET,
                                          "/slack/events", app)
