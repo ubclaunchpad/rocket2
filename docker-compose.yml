@@ -1,5 +1,5 @@
 # see https://github.com/dmitrym0/simple-lets-encrypt-docker-compose-sample/blob/master/docker-compose.yml
-version: '3'
+version: '2'
 services:
     nginx-proxy:
         image: jwilder/nginx-proxy
