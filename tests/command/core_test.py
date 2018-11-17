@@ -1,10 +1,14 @@
 """Test the core event handler."""
 from unittest import mock
 from command.core import Core
+from bot.bot import Bot
+from db.facade import DBFacade
 
 
 def test_handle_invalid_mention():
     """Test the instance of handle_app_mention being called inappropriately."""
+    mock_facade = mock.MagicMock(DBFacade)
+    mock_bot = mock.MagicMock(Bot)
     event = {
         "token": "XXYYZZ",
         "team_id": "TXXXXXXXX",
@@ -22,12 +26,14 @@ def test_handle_invalid_mention():
         "event_id": "Ev08MFMKH6",
         "event_time": 1234567890
     }
-    core = Core()
+    core = Core(mock_bot, mock_facade)
     assert core.handle_app_mention(event) == 0
 
 
 def test_handle_invalid_command():
     """Test that invalid commands are being handled appropriately."""
+    mock_facade = mock.MagicMock(DBFacade)
+    mock_bot = mock.MagicMock(Bot)
     event = {
         "token": "XXYYZZ",
         "team_id": "TXXXXXXXX",
@@ -45,13 +51,15 @@ def test_handle_invalid_command():
         "event_id": "Ev08MFMKH6",
         "event_time": 123456789
     }
-    core = Core()
+    core = Core(mock_bot, mock_facade)
     assert core.handle_app_mention(event) == -1
 
 
 @mock.patch('command.core.UserCommand')
 def test_handle_user_command(MockUserCommand):
     """Test that UserCommand.handle is called appropriately."""
+    mock_facade = mock.MagicMock(DBFacade)
+    mock_bot = mock.MagicMock(Bot)
     event = {
         "token": "XXYYZZ",
         "team_id": "TXXXXXXXX",
@@ -69,7 +77,8 @@ def test_handle_user_command(MockUserCommand):
         "event_id": "Ev08MFMKH6",
         "event_time": 1234567890
     }
-    core = Core()
+    core = Core(mock_bot, mock_facade)
     assert core.handle_app_mention(event) == 1
     MockUserCommand.\
-        return_value.handle.assert_called_once_with("user name", "U061F7AUR")
+        return_value.handle.\
+        assert_called_once_with("user name", "U061F7AUR", "C0LAN2Q65")
