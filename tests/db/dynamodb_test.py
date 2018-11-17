@@ -105,17 +105,48 @@ def test_query_team():
     """Test to see if we can store and query the same team."""
     ddb = DynamoDB()
     team = create_test_team('rocket2.0', 'Rocket 2.0')
+    team2 = create_test_team('lame-o', 'Lame-O Team')
+    team2.add_member('apple')
     ddb.store_team(team)
+    ddb.store_team(team2)
+
     another_team = ddb.query_team([('display_name', 'Rocket 2.0')])
     same_team = ddb.query_team([('platform', 'slack')])
     multiple_queries = ddb.query_team([('display_name', 'Rocket 2.0'),
                                        ('platform', 'slack')])
-    member_team = ddb.query_team([('members', 'abc_123')])
+    member_team = ddb.query_team([('members', 'abc_123'),
+                                  ('members', 'apple')])
     all_team = ddb.query_team([])
 
     assert team == another_team[0]
     assert team == all_team[0]
     assert team == same_team[0]
     assert team == multiple_queries[0]
-    assert team == member_team[0]
+    assert team2 == member_team[0]
+
     ddb.delete_team('rocket2.0')
+    ddb.delete_team('lame-o')
+
+
+@pytest.mark.db
+def test_delete_user():
+    """Test to see if we can successfully delete a user."""
+    ddb = DynamoDB()
+    user = create_test_user('abc_123')
+    ddb.store_user(user)
+
+    assert len(ddb.query_user([])) == 1
+    ddb.delete_user('abc_123')
+    assert len(ddb.query_user([])) == 0
+
+
+@pytest.mark.db
+def test_delete_team():
+    """Test to see if we can successfully delete a team."""
+    ddb = DynamoDB()
+    team = create_test_team('rocket-2.0', 'Rocket 2.0')
+    ddb.store_team(team)
+
+    assert len(ddb.query_team([])) == 1
+    ddb.delete_team('rocket-2.0')
+    assert len(ddb.query_team([])) == 0
