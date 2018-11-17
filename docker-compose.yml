@@ -22,5 +22,5 @@ services:
     rocket2:
         build:
             context: .
-            dockerfile: Dockerfile.app
+            dockerfile: Dockerfile
         restart: on-failure
