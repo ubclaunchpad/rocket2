@@ -19,10 +19,12 @@ class DynamoDB:
     def __init__(self):
         """Initialize facade using DynamoDB settings.
 
-        To avoid local tests failure when the dyanmodb server is used, a testing
-        environment variable is set.
-        When testing environmental variable is true, the local dynamodb is run.
-        When testing environmental variable is true, the server dynamodb is run.
+        To avoid local tests failure when the dyanmodb server is used,
+        a testing environment variable is set.
+        When testing environmental variable is true,
+        the local dynamodb is run.
+        When testing environmental variable is true,
+        the server dynamodb is run.
 
         boto3.resource() takes in a service_name, region_name, and endpoint_url
         (only for local dynamodb).
@@ -37,12 +39,12 @@ class DynamoDB:
         AWS_SESSION_TOKEN: The session key for your AWS account.
         This is only needed when you are using temporary credentials.
         """
-        # TODO change this to production and not localhost
         testing = bool(os.environ.get("TESTING"), True)
 
         if testing:
-            self.ddb = boto3.resource("dynamodb", region_name="",
-                                  endpoint_url="http://localhost:8000")
+            self.ddb = boto3.resource("dynamodb",
+                                      region_name="",
+                                      endpoint_url="http://localhost:8000")
         else:
             self.ddb = boto3.resource('dynamodb', region_name='us-west-1')
 
