@@ -2,7 +2,7 @@
 from flask import Flask
 from slackeventsapi import SlackEventAdapter
 from command.core import Core
-import logging
+import os
 
 app = Flask(__name__)
 core = Core()
@@ -17,7 +17,9 @@ def check():
     return "🚀"
 
 
-slack_events_adapter = SlackEventAdapter(None,
+
+SLACK_SIGNING_SECRET = os.environ["SLACK_SIGNING_SECRET"]
+slack_events_adapter = SlackEventAdapter(SLACK_SIGNING_SECRET,
                                          "/slack/events", app)
 
 

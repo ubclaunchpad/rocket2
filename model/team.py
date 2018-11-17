@@ -14,6 +14,11 @@ class Team:
         self.__platform = ""
         self.__members = set()
 
+    @staticmethod
+    def is_valid(team):
+        """Return true if this team has no missing fields."""
+        return all(map(lambda f: len(f) > 0, team.__dict__.values()))
+
     def __eq__(self, other):
         """Return true if this team has the same attributes as the other."""
         return str(self.__dict__) == str(other.__dict__)

@@ -9,8 +9,8 @@ mdl .
 # if we can use a remote server instead).
 # XXX: Find a better way to check if dynamodb is running locally
 if nmap localhost | egrep "8000.*http-alt"; then
-    pipenv run pytest tests/
+    pipenv run pytest tests/ --cov=./ --cov-branch
 else
     printf "Warning: DynamoDB not detected. Running without the tests.\n"
-    pipenv run pytest tests/ -m "not db"
+    pipenv run pytest tests/ -m "not db" --cov=./ --cov-branch
 fi
