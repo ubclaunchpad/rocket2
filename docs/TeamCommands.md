@@ -36,7 +36,7 @@ Display options for team commands.
 ### Create (Team Lead and Admin only)
 
 ```sh
-@rocket team create GITHUB_TEAM_NAME [--name DISPLAY_NAME]
+@rocket team create GITHUB_TEAM_NAME [--name DISPLAY_NAME] [--platform PLATFORM]
 ```
 
 > **Note:** This command does not create the team on Github.
