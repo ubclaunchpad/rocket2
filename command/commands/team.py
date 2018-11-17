@@ -8,35 +8,37 @@ class TeamCommand:
 
     command_name = "team"
     help = "# Team Command Reference\n\n"\
-           "`@rocket team`\n\n"\
+           "@rocket team\n\n"\
            "All Parameters with whitespace"\
            " must be enclosed by quotation marks.\n\n"\
            "## Options to specify input\n\n"\
-           "* `list`\n"\
+           "* list\n"\
            "    * outputs the Github team names"\
            " and display names of all teams\n\n"\
-           "* `view` GITHUB_TEAM_NAME\n"\
+           "* view GITHUB_TEAM_NAME\n"\
            "    * view information and members of a team\n\n"\
-           "* `help`\n"\
+           "* help\n"\
            "    * outputs options for team commands\n\n"\
            "## TEAM LEAD or ADMIN only\n\n"\
-           "* `create` GITHUB_TEAM_NAME"\
-           " *[`--name` DISPLAY_NAME]"\
-           " *[`--platform` PLATFORM]\n"\
+           "* create GITHUB_TEAM_NAME"\
+           " *[--name DISPLAY_NAME]"\
+           " *[--platform PLATFORM]"\
+           " *[--channel]\n"\
            "    * create a new team with a Github team name"\
            " and optional parameters\n"\
-           "    * the user will be automatically added to the new team\n\n"\
+           "    * the user will be automatically added to the new team\n"\
+           "    * if --channel flag included, add all members in channel\n\n"\
            "The following can only be used by"\
            " a team lead in the team or an admin:\n\n"\
-           "* `edit` GITHUB_TEAM_NAME"\
-           " [`--name` DISPLAY_NAME]"\
-           " [`--platform` PLATFORM]\n"\
+           "* edit GITHUB_TEAM_NAME"\
+           " [--name DISPLAY_NAME]"\
+           " [--platform PLATFORM]\n"\
            "    * edit properties of specified team\n\n"\
-           "* `add` GITHUB_TEAM_NAME SLACK_ID\n"\
+           "* add GITHUB_TEAM_NAME SLACK_ID\n"\
            "    * add the specified user to the team\n\n"\
-           "* `remove` GITHUB_TEAM_NAME SLACK_ID\n"\
+           "* remove GITHUB_TEAM_NAME SLACK_ID\n"\
            "    * remove the specified user from the team\n\n"\
-           "* `delete` GITHUB_TEAM_NAME\n"\
+           "* delete GITHUB_TEAM_NAME\n"\
            "    * permanently delete the specified team\n"
 
     def __init__(self):
