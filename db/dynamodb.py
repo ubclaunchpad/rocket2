@@ -168,8 +168,9 @@ class DynamoDB:
         """
         Retrieve team from teams table.
 
-        :param team_name:
-        :return:
+        :param: team_name: used as key for retrieving team objects.
+        :raise: raises a LookupError if team id is not found.
+        :return: the team object if team_name is found.
         """
         team_table = self.ddb.Table('teams')
         response = team_table.get_item(
@@ -178,8 +179,10 @@ class DynamoDB:
                 'github_team_name': team_name
             }
         )
-
-        return self.team_from_dict(response['Item'])
+        if 'Item' in response.keys():
+            return self.team_from_dict(response['Item'])
+        else:
+            raise LookupError('Team "{}" not found'.format(team_name))
 
     @staticmethod
     def team_from_dict(d):

@@ -76,6 +76,18 @@ def test_query_user():
 
 
 @pytest.mark.db
+def test_retrieve_invalid_team():
+    """Test to see if we can retrieve invalid team."""
+    ddb = DynamoDB()
+    try:
+        team = ddb.retrieve_team('rocket2.0')
+
+        assert False
+    except LookupError as e:
+        assert str(e) == 'Team "{}" not found'.format('rocket2.0')
+
+
+@pytest.mark.db
 def test_store_retrieve_team():
     """Test to see if we can store and retrieve the same team."""
     ddb = DynamoDB()
