@@ -1,9 +1,19 @@
+# IDE files
 .idea/
 .vscode/
+*.code-workspace
 
+# Python build files
 *.pyc
 __pycache__/
-.env
+
+# Testing files
 DynamoDB/
-inertia.toml
 .coverage
+.env
+
+# Deployment files
+inertia.toml
+
+# Docs generation files
+_build/

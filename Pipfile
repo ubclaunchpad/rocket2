@@ -18,6 +18,9 @@ pytest-cov = "*"
 pydocstyle = "*"
 ipython = "*"
 awscli = "*"
+sphinx = "*"
+sphinx-rtd-theme = "*"
+m2r = "*"
 
 [requires]
 python_version = "3.7"
