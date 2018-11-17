@@ -1,12 +1,18 @@
 """Flask server instance."""
 from flask import Flask
 from slackeventsapi import SlackEventAdapter
+from slackclient import SlackClient
 from command.core import Core
+from db.facade import DBFacade
+from db.dynamodb import DynamoDB
+from bot.bot import Bot
 import os
 import logging
 
 app = Flask(__name__)
-core = Core()
+db_facade = DBFacade(DynamoDB())
+bot = Bot(SlackClient())
+core = Core(db_facade, bot)
 logging.basicConfig(format='%(asctime)s - %(levelname)s @' +
                     '%(module)s-%(funcName)s : %(message)s',
                     level=logging.INFO)
