@@ -7,14 +7,15 @@ import logging
 
 app = Flask(__name__)
 core = Core()
-logging.basicConfig(format='%(asctime)s - %(levelname)s : %(message)s',
+logging.basicConfig(format='%(asctime)s - %(levelname)s @' +
+                    '%(module)s-%(funcName)s : %(message)s',
                     level=logging.INFO)
 
 
 @app.route('/')
 def check():
     """Display a Rocket status image."""
-    logging.info('ROCKET2 IS RUNNING')
+    logging.info('Served check()')
     return "🚀"
 
 
