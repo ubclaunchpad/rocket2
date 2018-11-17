@@ -3,6 +3,7 @@ from flask import Flask
 from slackeventsapi import SlackEventAdapter
 from command.core import Core
 import os
+import logging
 
 app = Flask(__name__)
 core = Core()
