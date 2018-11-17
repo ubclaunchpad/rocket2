@@ -7,7 +7,13 @@ from model.permissions import Permissions
 
 
 class DynamoDB:
-    """Handles calls to database through API."""
+    """
+    Handles calls to database through API.
+
+    Please do not use this class, and instead use :class:`db.facade.DBFacade`.
+    This class only works on DynamoDB, and should not be used outside of the
+    facade class.
+    """
 
     def __init__(self):
         """Initialize facade using DynamoDB settings (for now)."""
@@ -16,17 +22,25 @@ class DynamoDB:
                                   endpoint_url="http://localhost:8000")
 
         if not self.check_valid_table('users'):
-            self.create_user_tables()
+            self.__create_user_tables()
 
         if not self.check_valid_table('teams'):
-            self.create_team_tables()
+            self.__create_team_tables()
 
     def __str__(self):
         """Return a string representing this class."""
         return "DynamoDB"
 
-    def create_user_tables(self):
-        """Create the user table, for testing."""
+    def __create_user_tables(self):
+        """
+        Create the user table.
+
+        **Note**: This function should **not** be called externally, and should
+        only be called on initialization.
+
+        Users are only required to have a ``slack_id``. Since this is a NoSQL
+        database, no other attributes are required.
+        """
         self.ddb.create_table(
             TableName='users',
             AttributeDefinitions=[
@@ -47,8 +61,16 @@ class DynamoDB:
             }
         )
 
-    def create_team_tables(self):
-        """Create the team table, for testing."""
+    def __create_team_tables(self):
+        """
+        Create the team table.
+
+        **Note**: This function should **not** be called externally, and should
+        only be called on initialization.
+
+        Teams are only required to have a ``github_team_name``. Since this is a
+        NoSQL database, no other attributes are required.
+        """
         self.ddb.create_table(
             TableName='teams',
             AttributeDefinitions=[
@@ -71,7 +93,7 @@ class DynamoDB:
 
     def check_valid_table(self, table_name):
         """
-        Check if table with table_name exists.
+        Check if table with ``table_name`` exists.
 
         :param table_name: table identifier
         :return: boolean value, true if table exists, false otherwise
@@ -206,7 +228,7 @@ class DynamoDB:
         the parameters. Every item in parameters is a tuple, where the first
         element is the user attribute, and the second is the value.
 
-        Example: [('permission_level', 'admin')]
+        Example: ``[('permission_level', 'admin')]``
 
         If parameters is an empty list, returns all the users.
 
@@ -238,7 +260,7 @@ class DynamoDB:
         the parameters. Every item in parameters is a tuple, where the first
         element is the user attribute, and the second is the value.
 
-        Example: [('platform', 'slack')]
+        Example: ``[('platform', 'slack')]``
 
         Special attribute: member
         The member attribute describes a set, so this function would check to
@@ -247,7 +269,7 @@ class DynamoDB:
         slack_id per tuple).
 
         :param parameters:
-        :return: returns a list of user models that fit the query parameters.
+        :return: returns a list of team models that fit the query parameters.
         """
         teams = self.ddb.Table('teams')
         if len(parameters) > 0:

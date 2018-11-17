@@ -6,11 +6,19 @@ class DBFacade:
     A database facade that gives an overall API for any databases.
 
     Currently, we plan on having DynamoDB, but other databases, such as MongoDB
-    or Postgres are also being considered.
+    or Postgres are also being considered. Please use this class instead of
+    ``db/dynamodb.py``, because we might change the databases, but the facade
+    would stay the same.
     """
 
     def __init__(self, db):
-        """Initialize facade using DynamoDB settings (for now)."""
+        """
+        Initialize facade using a given class.
+
+        Currently, we can only initialize with :class:`db.dynamodb.DynamoDB`.
+
+        :param db: Database class for API calls
+        """
         self.ddb = db
 
     def __str__(self):
@@ -37,10 +45,11 @@ class DBFacade:
         """
         Query for specific users by parameter.
 
-        Query using a list of parameters (tuples), where the first element of
-        the tuple is the item attribute, second being the item value.
+        Returns list of users that have **all** of the attributes specified in
+        the parameters. Every item in parameters is a tuple, where the first
+        element is the user attribute, and the second is the value.
 
-        Example: [('permission_level', 'admin')]
+        Example: ``[('permission_level', 'admin')]``
 
         :param parameters: list of parameters (tuples)
         :return: returns a list of user models that fit the query parameters.
@@ -67,10 +76,11 @@ class DBFacade:
         """
         Query for specific teams by parameter.
 
-        Query using a list of parameters (tuples), where the first element of
-        the tuple is the item attribute, second being the item value.
+        Returns list of teams that have **all** of the attributes specified in
+        the parameters. Every item in parameters is a tuple, where the first
+        element is the user attribute, and the second is the value.
 
-        Example: [('platform', 'slack')]
+        Example: ``[('platform', 'slack')]``
 
         :param parameters: list of parameters (tuples)
         :return: returns a list of team models that fit the query parameters.

@@ -1,38 +1,100 @@
 # Team Command Reference
 
-`@rocket team`
+Commands that manipulate team data. Remember that parameters with whitespace
+must be enclosed by quotation marks.
 
-All parameters with whitespace must be enclosed by quotation marks.
+## Options
 
-## Options to specify input
+```sh
+@rocket team {list, view, help, create, edit, add, remove, delete}
+```
 
-* `list`
-  * outputs the Github team names and display names of all teams
+### List
 
-* `view` GITHUB_TEAM_NAME
-  * view information and members of a team
+```sh
+@rocket team list
+```
 
-* `help`
-  * outputs options for team commands
+Display a list of Github team names and display names of all teams.
 
-## TEAM LEAD or ADMIN only
+### View
 
-* `create` GITHUB_TEAM_NAME [`--name` DISPLAY_NAME]
-  * create a new team with a Github team name and optional display name
-  * if user is not an admin, they will be automatically added to the new team
+```sh
+@rocket team view GITHUB_TEAM_NAME
+```
 
-The following can only be used by a team lead in the team or an admin:
+Display information and members of a specific team.
 
-* `edit` GITHUB_TEAM_NAME
-  * [`--name` DISPLAY_NAME]
-  * [`--platform` PLATFORM]
-    * edit properties of specified team
+### Help
 
-* `add` GITHUB_TEAM_NAME SLACK_ID
-  * add the specified user to the team
+```sh
+@rocket team help
+```
 
-* `remove` GITHUB_TEAM_NAME SLACK_ID
-  * remove the specified user from the team
+Display options for team commands.
 
-* `delete` GITHUB_TEAM_NAME
-  * permanently delete the specified team
+### Create (Team Lead and Admin only)
+
+```sh
+@rocket team create GITHUB_TEAM_NAME [--name DISPLAY_NAME]
+```
+
+> **Note:** This command does not create the team on Github.
+
+Create a new team with a Github team name and optional display name. If the user
+who ran the command is not an admin, they will be automatically added to the new
+team.
+
+The Github team name cannot contain spaces.
+
+```sh
+@rocket team create "struddle-bouts" --name "Struddle Bouts"
+```
+
+### Edit (Team Lead\* and Admin only)
+
+```sh
+@rocket team edit GITHUB_TEAM_NAME [--name DISPLAY_NAME] [--platform PLATFORM]
+```
+
+Edit the properties of a specific team. Team Leads can only edit the teams that
+they are a part of, but admins can edit any teams.
+
+### Add (Team Lead\* and Admin only)
+
+```sh
+@rocket team add GITHUB_TEAM_NAME SLACK_ID
+```
+
+> **Note:** This command does not add a member on Github.
+
+Add a user to the team. Team Leads can only add users into teams that they are a
+part of, but admins can add users to any team. `SLACK_ID` is the `@`-name, for
+easy slack autocomplete.
+
+```sh
+@rocket team add struddle-bouts @s_universe
+```
+
+### Remove (Team Lead\* and Admin only)
+
+```sh
+@rocket team remove GITHUB_TEAM_NAME SLACK_ID
+```
+
+> **Note:** This command does not remove a member of the team from Github.
+
+Remove a user from a team. Team Leads can only remove users from teams that they
+are a part of, but admins can remove users from any team. `SLACK_ID` is the
+`@`-name, for easy slack autocomplete.
+
+### Delete (Team Lead\* and Admin only)
+
+```sh
+@rocket team delete GITHUB_TEAM_NAME
+```
+
+> **Note:** This command does not remove the team from Github.
+
+Permanently delete a team. Team Leads can only delete teams that they are a part
+of, but admins can delete any team.

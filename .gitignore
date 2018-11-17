@@ -6,4 +6,8 @@ __pycache__/
 .env
 DynamoDB/
 inertia.toml
+
 .coverage
+
+# Docs generation
+_build/
