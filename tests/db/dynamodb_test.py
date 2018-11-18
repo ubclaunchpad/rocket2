@@ -103,6 +103,39 @@ def test_retrieve_invalid_team():
 
 
 @pytest.mark.db
+def test_update_user():
+    """Test to see if we can update a user."""
+    ddb = DynamoDB()
+    u = User('abc_123')
+    ddb.store_user(u)
+
+    u = ddb.retrieve_user('abc_123')
+    u.set_name('Steven Universe')
+    ddb.store_user(u)
+
+    assert ddb.retrieve_user('abc_123').get_name() == 'Steven Universe'
+
+    ddb.delete_user('abc_123')
+
+
+@pytest.mark.db
+def test_update_team():
+    """Test to see if we can update a team."""
+    ddb = DynamoDB()
+    t = Team('brussel-sprouts', 'Brussel Sprouts')
+    ddb.store_team(t)
+
+    t = ddb.retrieve_team('brussel-sprouts')
+    t.add_member('abc_123')
+    t.add_member('123_abc')
+    ddb.store_team(t)
+
+    assert len(ddb.retrieve_team('brussel-sprouts').get_members()) == 2
+
+    ddb.delete_team('brussel-sprouts')
+
+
+@pytest.mark.db
 def test_store_retrieve_team():
     """Test to see if we can store and retrieve the same team."""
     ddb = DynamoDB()
