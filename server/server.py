@@ -3,14 +3,19 @@ from flask import Flask
 from slackeventsapi import SlackEventAdapter
 from command.core import Core
 import os
+import logging
 
 app = Flask(__name__)
 core = Core()
+logging.basicConfig(format='%(asctime)s - %(levelname)s @' +
+                    '%(module)s-%(funcName)s : %(message)s',
+                    level=logging.INFO)
 
 
 @app.route('/')
 def check():
     """Display a Rocket status image."""
+    logging.info('Served check()')
     return "🚀"
 
 
