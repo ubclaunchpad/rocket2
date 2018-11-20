@@ -19,10 +19,17 @@ class User:
 
     @staticmethod
     def is_valid(user):
-        """Return true if this user has no missing fields."""
-        return all(map(lambda f: isinstance(f, Permissions) or
-                       len(f) > 0,
-                       user.__dict__.values()))
+        """
+        Return true if this user has no missing required fields.
+
+        Required fields for database to accept:
+        - ``__slack_id``
+        - ``__permissions_level``
+
+        :param user: user to check
+        :return: return true if this user has no missing required fields
+        """
+        return len(user.get_slack_id()) > 0
 
     def __eq__(self, other):
         """Return true if this user has the same attributes as the other."""
