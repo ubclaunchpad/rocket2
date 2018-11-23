@@ -1,5 +1,6 @@
 """DynamoDB."""
 import boto3
+import logging
 import os
 from boto3.dynamodb.conditions import Attr
 from model.user import User
@@ -40,13 +41,18 @@ class DynamoDB:
         This is only needed when you are using temporary credentials.
         """
         testing = bool(os.environ.get("TESTING", True))
+        region_name = os.environ.get("REGION", '')
+        if region_name == '':
+            region_name = 'us-east-1'
 
         if testing:
+            logging.info('Local Dynamodb is running')
             self.ddb = boto3.resource("dynamodb",
                                       region_name="",
                                       endpoint_url="http://localhost:8000")
         else:
-            self.ddb = boto3.resource('dynamodb', region_name='us-west-1')
+            logging.info('Server Dynamodb is running')
+            self.ddb = boto3.resource('dynamodb', region_name=region_name)
 
         if not self.check_valid_table('users'):
             self.__create_user_tables()
