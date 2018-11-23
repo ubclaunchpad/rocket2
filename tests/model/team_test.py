@@ -14,7 +14,7 @@ def test_team_equality():
 
 def test_valid_team():
     """Test the Team static class method is_valid()."""
-    team = Team("brussel-sprouts", "Brussel Sprouts")
+    team = Team("", "Brussel Sprouts")
     assert not Team.is_valid(team)
     team = create_test_team("brussel-sprouts", "Brussel Sprouts")
     assert Team.is_valid(team)
