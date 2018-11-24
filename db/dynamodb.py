@@ -41,9 +41,7 @@ class DynamoDB:
         This is only needed when you are using temporary credentials.
         """
         testing = bool(os.environ.get("TESTING", True))
-        region_name = os.environ.get("REGION", '')
-        if region_name == '':
-            region_name = 'us-east-1'
+        region_name = os.environ.get("REGION", 'us-east-1')
 
         if testing:
             logging.info('Local Dynamodb is running')
