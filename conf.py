@@ -18,7 +18,7 @@ sys.path.insert(0, os.path.abspath('.'))
 
 # -- Project information -----------------------------------------------------
 
-project = 'Rocket 2.0'
+project = 'Rocket 2'
 copyright = '2018, UBC Launch Pad'
 author = 'UBC Launch Pad'
 
@@ -100,7 +100,7 @@ html_static_path = ['docs/_static']
 # -- Options for HTMLHelp output ---------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'Rocket20doc'
+htmlhelp_basename = 'Rocket2doc'
 
 
 # -- Options for LaTeX output ------------------------------------------------
@@ -127,7 +127,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'Rocket20.tex', 'Rocket 2.0 Documentation',
+    (master_doc, 'Rocket2.tex', 'Rocket 2 Documentation',
      'UBC Launch Pad', 'manual'),
 ]
 
@@ -137,7 +137,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'rocket20', 'Rocket 2.0 Documentation',
+    (master_doc, 'rocket2', 'Rocket 2 Documentation',
      [author], 1)
 ]
 
@@ -148,8 +148,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'Rocket20', 'Rocket 2.0 Documentation',
-     author, 'Rocket20', 'One line description of project.',
+    (master_doc, 'Rocket2', 'Rocket 2 Documentation',
+     author, 'Rocket2', 'One line description of project.',
      'Miscellaneous'),
 ]
 

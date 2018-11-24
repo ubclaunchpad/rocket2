@@ -141,20 +141,24 @@ class DynamoDB:
         """
         # Check that there are no blank fields in the user
         if User.is_valid(user):
+            def place_if_filled(name, field):
+                """Populate ``udict`` if ``field`` isn't empty."""
+                if field:
+                    udict[name] = field
+
             user_table = self.ddb.Table('users')
-            user_table.put_item(
-                Item={
-                    'slack_id': user.get_slack_id(),
-                    'email': user.get_email(),
-                    'name': user.get_name(),
-                    'github': user.get_github_username(),
-                    'major': user.get_major(),
-                    'position': user.get_position(),
-                    'bio': user.get_biography(),
-                    'image_url': user.get_image_url(),
-                    'permission_level': user.get_permissions_level().name
-                }
-            )
+            udict = {}
+            udict['slack_id'] = user.get_slack_id()
+            udict['permission_level'] = user.get_permissions_level().name
+            place_if_filled('email', user.get_email())
+            place_if_filled('name', user.get_name())
+            place_if_filled('github', user.get_github_username())
+            place_if_filled('major', user.get_major())
+            place_if_filled('position', user.get_position())
+            place_if_filled('bio', user.get_biography())
+            place_if_filled('image_url', user.get_image_url())
+
+            user_table.put_item(Item=udict)
             return True
         return False
 
@@ -167,15 +171,18 @@ class DynamoDB:
         """
         # Check that there are no blank fields in the team
         if Team.is_valid(team):
+            def place_if_filled(name, field):
+                """Populate ``tdict`` if ``field`` isn't empty."""
+                if field:
+                    tdict[name] = field
+
             teams_table = self.ddb.Table('teams')
-            teams_table.put_item(
-                Item={
-                    'github_team_name': team.get_github_team_name(),
-                    'display_name': team.get_display_name(),
-                    'platform': team.get_platform(),
-                    'members': team.get_members()
-                }
-            )
+            tdict = {}
+            tdict['github_team_name'] = team.get_github_team_name()
+            place_if_filled('display_name', team.get_display_name())
+            place_if_filled('platform', team.get_platform())
+            place_if_filled('members', team.get_members())
+            teams_table.put_item(Item=tdict)
             return True
         return False
 
@@ -207,14 +214,15 @@ class DynamoDB:
         :return: returns converted user model.
         """
         user = User(d['slack_id'])
-        user.set_email(d['email'])
-        user.set_name(d['name'])
-        user.set_github_username(d['github'])
-        user.set_major(d['major'])
-        user.set_position(d['position'])
-        user.set_biography(d['bio'])
-        user.set_image_url(d['image_url'])
-        user.set_permissions_level(Permissions[d['permission_level']])
+        user.set_email(d.get('email', ''))
+        user.set_name(d.get('name', ''))
+        user.set_github_username(d.get('github', ''))
+        user.set_major(d.get('major', ''))
+        user.set_position(d.get('position', ''))
+        user.set_biography(d.get('bio', ''))
+        user.set_image_url(d.get('image_url', ''))
+        user.set_permissions_level(Permissions[d.get('permission_level',
+                                                     'members')])
         return user
 
     def retrieve_team(self, team_name):
@@ -244,9 +252,9 @@ class DynamoDB:
 
         :return: returns converted team model.
         """
-        team = Team(d['github_team_name'], d['display_name'])
-        team.set_platform(d['platform'])
-        members = set(d['members'])
+        team = Team(d['github_team_name'], d.get('display_name', ''))
+        team.set_platform(d.get('platform', ''))
+        members = set(d.get('members', []))
         for member in members:
             team.add_member(member)
         return team

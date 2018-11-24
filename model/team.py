@@ -16,8 +16,16 @@ class Team:
 
     @staticmethod
     def is_valid(team):
-        """Return true if this team has no missing fields."""
-        return all(map(lambda f: len(f) > 0, team.__dict__.values()))
+        """
+        Return true if this team has no missing required fields.
+
+        Required fields for database to accept:
+        - ``__github_team_name``
+
+        :param team: team to check
+        :return: returns true if this team has no missing required fields
+        """
+        return len(team.get_github_team_name()) > 0
 
     def __eq__(self, other):
         """Return true if this team has the same attributes as the other."""
