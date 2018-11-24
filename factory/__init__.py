@@ -8,7 +8,7 @@ import os
 
 def make_core():
     """
-    Initializes and returns a :class:`command.core.Core` object.
+    Initialize and returns a :class:`command.core.Core` object.
 
     Requires that environmental variable ``SLACK_API_TOKEN`` to be set. Please
     set it to be the slack API token.
