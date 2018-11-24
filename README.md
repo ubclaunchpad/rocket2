@@ -1,11 +1,11 @@
-# 🚀 Rocket 2.0
+# 🚀 Rocket 2
 
-[![Build Status](https://travis-ci.org/ubclaunchpad/rocket2.0.svg?branch=master)](https://travis-ci.org/ubclaunchpad/rocket2.0)
-[![codecov](https://codecov.io/gh/ubclaunchpad/rocket2.0/branch/master/graph/badge.svg)](https://codecov.io/gh/ubclaunchpad/rocket2.0)
+[![Build Status](https://travis-ci.org/ubclaunchpad/rocket2.svg?branch=master)](https://travis-ci.org/ubclaunchpad/rocket2)
+[![codecov](https://codecov.io/gh/ubclaunchpad/rocket2/branch/master/graph/badge.svg)](https://codecov.io/gh/ubclaunchpad/rocket2)
 [![Deployed with Inertia](https://img.shields.io/badge/deploying%20with-inertia-blue.svg)](https://github.com/ubclaunchpad/inertia)
 [![Documentation Status](https://readthedocs.org/projects/rocket20/badge/?version=latest)](https://rocket20.readthedocs.io/en/latest/?badge=latest)
 
-Rocket 2.0 is a from-the-ground-up rebuild of [Rocket](https://github.com/ubclaunchpad/rocket),
+Rocket 2 is a from-the-ground-up rebuild of [Rocket](https://github.com/ubclaunchpad/rocket),
 UBC Launch Pad's in-house management Slack bot.
 
 ## Developer Installation
@@ -13,8 +13,8 @@ UBC Launch Pad's in-house management Slack bot.
 We use [pipenv](https://pipenv.readthedocs.io/en/latest/) for dependency management.
 
 ```bash
-git clone https://github.com/ubclaunchpad/rocket2.0.git
-cd rocket2.0/
+git clone https://github.com/ubclaunchpad/rocket2.git
+cd rocket2/
 pip install pipenv
 pipenv install --dev
 ```
@@ -36,7 +36,7 @@ pipenv shell
 
 and then commands like `pycodestyle` and `pytest` can be run like normal.
 
-Additionally, we use [Travis CI](https://travis-ci.org/ubclaunchpad/rocket2.0) as
+Additionally, we use [Travis CI](https://travis-ci.org/ubclaunchpad/rocket2) as
 a CI system. To run the same checks locally, we provide `scripts/build_check.sh`;
 this can be run with:
 

@@ -1,10 +1,10 @@
 # Contributing
 
-This document contains important details for anyone contributing to Rocket 2.0.
+This document contains important details for anyone contributing to Rocket 2.
 
 ## Opening an Issue
 
-If you see a bug or have a feature request, please [open an issue](https://github.com/ubclaunchpad/rocket2.0/issues)!
+If you see a bug or have a feature request, please [open an issue](https://github.com/ubclaunchpad/rocket2/issues)!
 That being said, do make sure to do a quick search first - there may
 already be an issue that covers it.
 
