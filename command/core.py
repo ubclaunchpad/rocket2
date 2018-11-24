@@ -42,3 +42,4 @@ class Core:
             return True
         except SlackAPIError:
             return False
+
