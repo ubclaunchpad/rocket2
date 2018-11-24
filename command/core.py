@@ -35,11 +35,10 @@ class Core:
         """Handle the event of a new user joining the workspace."""
         new_user_id = event_data["event"]["user"]["id"]
         new_user = User(new_user_id)
-        stored = self.__facade.store_user(new_user)
-        if stored:
-            welcome = 'Welcome to Lauchpad!'
-            try:
-                self.__bot.send_dm(welcome, new_user_id)
-                return True
-            except SlackAPIError:
-                return False
+        self.__facade.store_user(new_user)
+        welcome = 'Welcome to Lauchpad!'
+        try:
+            self.__bot.send_dm(welcome, new_user_id)
+            return True
+        except SlackAPIError:
+            return False
