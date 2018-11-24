@@ -27,7 +27,7 @@ services:
             VIRTUAL_HOST: "${VIRTUAL_HOST}"
             LETSENCRYPT_HOST: "${LETSENCRYPT_HOST}"
             LETSENCRYPT_EMAIL: "${LETSENCRYPT_EMAIL}"
-            SLACK_SIGNING_SECRET: "${SLACK_SIGNING_SECRET}
+            SLACK_SIGNING_SECRET: "${SLACK_SIGNING_SECRET}"
             REGION: "${REGION:-us-east-1}"
             TESTING: False
         restart: on-failure
