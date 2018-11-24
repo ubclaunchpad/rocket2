@@ -707,6 +707,14 @@
             "markers": "python_version >= '3.4'",
             "version": "==1.24.1"
         },
+        "v": {
+            "hashes": [
+                "sha256:605a936bb41413ea696d92acc74dcf1a1eadde03e73b13655591c2b9074b9dd8",
+                "sha256:c2d77319519fc8b48bafd0677a9117d2717d266fa8a7512ad2158a6a40b31c01"
+            ],
+            "index": "pypi",
+            "version": "==4.0.0"
+        },
         "wcwidth": {
             "hashes": [
                 "sha256:3df37372226d6e63e1b1e1eda15c594bca98a22d33a23832a90998faa96bc65e",

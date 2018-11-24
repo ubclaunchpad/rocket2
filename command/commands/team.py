@@ -7,7 +7,39 @@ class TeamCommand:
     """Represent Team Command Parser."""
 
     command_name = "team"
-    help = ""
+    help = "# Team Command Reference\n\n"\
+           "@rocket team\n\n"\
+           "All Parameters with whitespace"\
+           " must be enclosed by quotation marks.\n\n"\
+           "## Options to specify input\n\n"\
+           "* list\n"\
+           "    * outputs the Github team names"\
+           " and display names of all teams\n\n"\
+           "* view GITHUB_TEAM_NAME\n"\
+           "    * view information and members of a team\n\n"\
+           "* help\n"\
+           "    * outputs options for team commands\n\n"\
+           "## TEAM LEAD or ADMIN only\n\n"\
+           "* create GITHUB_TEAM_NAME"\
+           " [--name DISPLAY_NAME]"\
+           " [--platform PLATFORM]"\
+           " [--channel]\n"\
+           "    * create a new team with a Github team name"\
+           " and optional parameters\n"\
+           "    * the user will be automatically added to the new team\n"\
+           "    * if --channel flag included, add all members in channel\n\n"\
+           "The following can only be used by"\
+           " a team lead in the team or an admin:\n\n"\
+           "* edit GITHUB_TEAM_NAME"\
+           " [--name DISPLAY_NAME]"\
+           " [--platform PLATFORM]\n"\
+           "    * edit properties of specified team\n\n"\
+           "* add GITHUB_TEAM_NAME SLACK_ID\n"\
+           "    * add the specified user to the team\n\n"\
+           "* remove GITHUB_TEAM_NAME SLACK_ID\n"\
+           "    * remove the specified user from the team\n\n"\
+           "* delete GITHUB_TEAM_NAME\n"\
+           "    * permanently delete the specified team\n"
 
     def __init__(self):
         """Initialize team command parser."""
@@ -42,6 +74,8 @@ class TeamCommand:
         parser_create.set_defaults(which="create")
         parser_create.add_argument("team_name", type=str, action='store')
         parser_create.add_argument("--name", type=str, action='store')
+        parser_create.add_argument("--platform", type=str, action='store')
+        parser_create.add_argument('--channel', action='store_true')
 
         """Parser for add command."""
         parser_add = subparsers.add_parser("add")
@@ -92,9 +126,14 @@ class TeamCommand:
 
         elif args.which == "create":
             # stub
-            if args.name is None:
-                return "id " + args.team_name
-            return "team " + args.name + ", id " + args.team_name
+            msg = "new team: {}, ".format(args.team_name)
+            if args.name is not None:
+                msg += "name: {}, ".format(args.name)
+            if args.platform is not None:
+                msg += "platform: {}, ".format(args.platform)
+            if args.channel:
+                msg += "add channel"
+            return msg
 
         elif args.which == "add":
             # stub

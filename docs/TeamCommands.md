@@ -37,18 +37,20 @@ Display options for team commands.
 
 ```sh
 @rocket team create GITHUB_TEAM_NAME [--name DISPLAY_NAME]
+                                     [--platform PLATFORM]
+                                     [--channel]
 ```
 
 > **Note:** This command does not create the team on Github.
 
-Create a new team with a Github team name and optional display name. If the user
-who ran the command is not an admin, they will be automatically added to the new
-team.
+Create a new team with a Github team name and optional display name. The user
+who runs the command will be automatically added to the new team. If the
+`--channel` flag is used, all members in the current channel will be added.
 
 The Github team name cannot contain spaces.
 
 ```sh
-@rocket team create "struddle-bouts" --name "Struddle Bouts"
+@rocket team create "struddle-bouts" --name "Struddle Bouts" --channel
 ```
 
 ### Edit (Team Lead\* and Admin only)
