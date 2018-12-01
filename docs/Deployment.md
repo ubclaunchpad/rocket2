@@ -27,7 +27,7 @@ We use Docker in Rocket2 to make deployment to the server easier.
 Docker is composed of 3 parts: Container, Services, and Stack.
 `Dockerfile` defines the container. Inside `Dockerfile` is the environment that
 would be set up. Inside the container for Rocket2, we have a copy of our app,
-and all the dependencies and the virtual enviroment installed.
+and all the dependencies and the virtual environment installed.
 
 `docker-compose.yml` defines the services that allow multiple containers to run together.
 
