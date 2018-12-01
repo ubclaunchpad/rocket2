@@ -8,7 +8,7 @@ Unfortunately we got over excited and wrote A LOT of tests. Running them all
 every time is a bit painful, that's where `@pytest.mark` comes in. `pytest.mark`
 allows you to label your tests to run them in groups.
 
-### Run all tests
+### Run only the tests that use the database
 
 `pytest`
 
@@ -16,7 +16,7 @@ allows you to label your tests to run them in groups.
 
 `pytest -m db`
 
-### Run all tests except db tests
+### Run all tests except database tests
 
 `pytest -m "not db"`
 
@@ -30,10 +30,10 @@ get everything working.
 ### Run local DynamoDB
 
 We need to set the `TESTING` to indicate which DynamoDB (local or server) is
-ran. `TESTING` is default to false. When `TESTING=true`, we indicate we want to
-run the local DynamoDB.
+ran. `TESTING` is default to false. When `TESTING=false`, we indicate we want to
+run the server DynamoDB.
 
-`TESTING=true pytest`
+`TESTING=false pytest`
 
 ### Run server DynamoDB
 

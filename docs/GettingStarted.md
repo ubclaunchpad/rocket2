@@ -71,6 +71,5 @@ returned.
 facade.query_user(['email', 'fakeemail@gmail.com'] # returns []
 
 # To query an user without parameters, all the users will be returned
-second_user = User('secondU')
-facade.query_user(['']) # returns [steven_universe, second_user]
+facade.query_user([]) # returns [steven_universe, second_user]
 ```

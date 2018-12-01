@@ -29,5 +29,5 @@ services:
             LETSENCRYPT_EMAIL: "${LETSENCRYPT_EMAIL}"
             SLACK_SIGNING_SECRET: "${SLACK_SIGNING_SECRET}"
             REGION: "${REGION:-us-east-1}"
-            TESTING: False
+            TESTING: True
         restart: on-failure
