@@ -22,6 +22,7 @@
     :hidden:
 
     docs/GettingStarted.md
+    docs/Testing.md
 
 .. toctree::
     :caption: Plugin Reference
