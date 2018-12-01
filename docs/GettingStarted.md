@@ -31,7 +31,9 @@ steven_universe.get_permissions_level() # returns Permissions_member
 
 ### database (db)
 
-Instead of using `dynamodb.py` to handle our User model, we'll use `facade.py`.
+Instead of using `dynamodb.py` to handle our User model, we will use `facade.py`
+so we avoid becoming dependent on a single database. In the future, this allows
+us to easily switch to using other databases.
 
 ```python
 # To store an user into the database.
@@ -40,14 +42,14 @@ facade.store_user(steven_universe)
 # To retrieve an user from the database.
 facade.retrieve_user('StevenU') # returns steven_universe user model
 
-# If we try to retrieve a non-existant user, a LookupError will be thrown.
+# If we try to retrieve a non-existent: user, a LookupError will be thrown.
 facade.retrieve_user('fakeU') # returns 'User fakeU not found'
 
 # To query an user based on a parameter, a list of matching Users will be
 returned.
 facade.query_user(['name', 'Steven Universe'] # returns [steven_universe]
 
-# To query an user based on a non-existant parameter, an empty list will be
+# To query an user based on a non-existent parameter, an empty list will be
 returned.
 facade.query_user(['email', 'fakeemail@gmail.com'] # returns []
 
