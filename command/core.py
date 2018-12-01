@@ -2,6 +2,7 @@
 from command.commands.user import UserCommand
 from model.user import User
 from bot.bot import SlackAPIError
+import logging
 
 
 class Core:
@@ -20,16 +21,14 @@ class Core:
         user = event_data["event"]["user"]
         channel = event_data["event"]["channel"]
         s = message.split(' ', 2)
-        if s[0] != "@rocket":
-            return 0
-        else:
-            command_type = s[1]
-            command = command_type + ' ' + s[2]
-            try:
-                self.__commands[command_type].handle(command, user, channel)
-                return 1
-            except KeyError:
-                return -1
+        command_type = s[1]
+        logging.info('{}:{}'.format(user, message))
+        command = command_type + ' ' + s[2]
+        try:
+            self.__commands[command_type].handle(command, user, channel)
+            return 1
+        except KeyError:
+            return -1
 
     def handle_member_join(self, event_data):
         """Handle the event of a new user joining the workspace."""
