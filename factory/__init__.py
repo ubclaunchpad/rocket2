@@ -3,6 +3,7 @@ from db.facade import DBFacade
 from db.dynamodb import DynamoDB
 from command.core import Core
 from slackclient import SlackClient
+from bot.bot import Bot
 import os
 
 
@@ -17,5 +18,5 @@ def make_core():
     """
     slack_token = os.environ['SLACK_API_TOKEN']
     facade = DBFacade(DynamoDB())
-    slack_client = SlackClient(slack_token)
-    return Core(facade, slack_client)
+    bot = Bot(SlackClient(slack_token))
+    return Core(facade, bot)

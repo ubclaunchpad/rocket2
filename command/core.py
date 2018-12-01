@@ -21,14 +21,14 @@ class Core:
         user = event_data["event"]["user"]
         channel = event_data["event"]["channel"]
         s = message.split(' ', 2)
-        if s[0] != "@Rocket":
+        if s[0] != "@rocket":
             logging.error("app mention event triggered incorrectly")
         else:
             command_type = s[1]
             command = command_type + ' ' + s[2]
             try:
                 self.__commands[command_type].handle(command, user, channel)
-                logging.info(("@Rocket mention - "
+                logging.info(("@rocket mention - "
                               "successfully handled request: ") + message)
             except KeyError:
                 error_dm = "Please enter a valid command."
