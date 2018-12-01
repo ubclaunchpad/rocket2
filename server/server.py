@@ -1,12 +1,12 @@
 """Flask server instance."""
 from flask import Flask
 from slackeventsapi import SlackEventAdapter
-from command.core import Core
+from factory import make_core
 import os
 import logging
 
 app = Flask(__name__)
-core = Core()
+core = make_core()
 logging.basicConfig(format='%(asctime)s - %(levelname)s @' +
                     '%(module)s-%(funcName)s : %(message)s',
                     level=logging.INFO)

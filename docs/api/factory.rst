@@ -1,0 +1,5 @@
+Factories
+=========
+
+.. automodule:: factory
+    :members:
