@@ -2,6 +2,13 @@
 
 ## Create an User Model for DynamoDB database
 
+A quick guide run through how Rocket2 takes in a command to generate a model
+that will be stored onto the database.
+
+So you just joined Launchpad and want to add yourself to Rocket2. You go on
+slack and starts to talk to the Rocket2 bot, but what should you say?
+To get started, here's a command you can enter:
+
 ### command
 
 A slack user calls Rocket2 to edit their information.
@@ -12,10 +19,15 @@ A slack user calls Rocket2 to edit their information.
 @rocket user edit --name "Steven Universe" --email "su@gmail.com"
 ```
 
+Yay! You have done what you were told to do, but wait! As a curious software
+developer, you're curious about what makes Rocket2 tick. How exactly is your
+information saved onto Rocket2? Well, for every member added to Rocket2, a user
+model gets created.
+
 ### model
 
-An User model is constructed from the information the user input.
-Unfilled parameters will remain empty.
+An User model is constructed from the information the user input. Unfilled
+parameters will remain empty.
 
 ```python
 # To construct a User model.
@@ -28,6 +40,11 @@ User.is_valid(steven_universe) # returns true
 # To get a user's permission level.
 steven_universe.get_permissions_level() # returns Permissions_member
 ```
+
+Launchpad is growing every year, so there are a lot of user, hence a lot of user
+models. We have to be able to keep track and organize everyone, so that's where
+database comes in. We create a table for every type of model, so in this case
+we'll create a user table to store all users.
 
 ### database (db)
 
