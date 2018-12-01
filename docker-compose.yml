@@ -30,4 +30,5 @@ services:
             SLACK_SIGNING_SECRET: "${SLACK_SIGNING_SECRET}"
             REGION: "${REGION:-us-east-1}"
             TESTING: False
+            SLACK_API_TOKEN: "${SLACK_API_TOKEN}"
         restart: on-failure
