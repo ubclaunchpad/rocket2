@@ -8,6 +8,12 @@
     LICENSE.md
 
 .. toctree::
+    :caption: Tutorials
+    :hidden:
+
+    docs/ServingTheServer.md
+
+.. toctree::
     :caption: How Everything Works
     :hidden:
 
