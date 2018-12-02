@@ -20,6 +20,10 @@ class Core:
         message = event_data["event"]["text"]
         user = event_data["event"]["user"]
         channel = event_data["event"]["channel"]
+
+        if not message.startswith('<@U') and not message.startswith('@'):
+            return 0
+
         s = message.split(' ', 2)
         if s[0] != "@rocket":
             logging.error("app mention event triggered incorrectly")
