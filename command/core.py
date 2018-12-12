@@ -35,7 +35,7 @@ class Core:
                 self.__bot.send_dm(error_dm, user)
                 logging.info("@Rocket mention - invalid request: " + message)
 
-    def handle_member_join(self, event_data):
+    def handle_team_join(self, event_data):
         """Handle the event of a new user joining the workspace."""
         new_user_id = event_data["event"]["user"]["id"]
         new_user = User(new_user_id)
