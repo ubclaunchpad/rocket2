@@ -37,25 +37,6 @@ class User:
 
         return {'fallback': fallback, 'fields': fields}
 
-    def get_md_table(self):
-        """Return markdown table for user."""
-        form = """```
-SLACK ID            {sid}
-NAME                {name}
-EMAIL               {email}
-GITHUB USERNAME     {gh}
-MAJOR               {major}
-POSITION            {pos}
-BIOGRAPHY           {bio}
-IMAGE URL           {img}
-PERMISSIONS LEVEL   {perm}
-```"""
-        return form.format(sid=self.__slack_id, name=self.__name,
-                           email=self.__email, gh=self.__github_username,
-                           major=self.__major, pos=self.__position,
-                           bio=self.__biography, img=self.__image_url,
-                           perm=self.__permissions_level)
-
     @staticmethod
     def is_valid(user):
         """
