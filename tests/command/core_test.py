@@ -165,7 +165,7 @@ def test_handle_team_join_success(mock_logging):
     welcome = 'Welcome to Lauchpad!'
     id = "W012A3CDE"
     mock_bot.send_dm.assert_called_once_with(welcome, id)
-    expected_log_message = ("user W012A3CDE added to database - "
+    expected_log_message = ("W012A3CDE added to database - "
                             "user notified")
     mock_logging.info.assert_called_once_with(expected_log_message)
 
@@ -233,6 +233,6 @@ def test_handle_team_join_slack_error(mock_logging):
     welcome = 'Welcome to Lauchpad!'
     id = "W012A3CDE"
     mock_bot.send_dm.assert_called_once_with(welcome, id)
-    expected_log_message = ("user W012A3CDE added to database - "
+    expected_log_message = ("W012A3CDE added to database - "
                             "user not notified")
     mock_logging.error.assert_called_once_with(expected_log_message)
