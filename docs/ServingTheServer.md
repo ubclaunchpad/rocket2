@@ -51,7 +51,7 @@ directly below the "Signing Secret".
 Your `SLACK_API_TOKEN` can be found [here][creds-api]. Be sure to copy the
 access token under "Bot User OAuth Access Token".
 
-## 5: Running the App!
+## 5: Running the App
 
 You are now ready to start the app! To start it, run `pipenv run launch`. This
 will automatically include your `.env` file. Be sure to already have DynamoDB up
