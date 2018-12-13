@@ -48,6 +48,7 @@ class TestBot(TestCase):
         self.mock_sc.api_call.assert_called_with(
             'chat.postMessage',
             text="Hahahaha",
+            attachments=[],
             channel="#random"
         )
 
@@ -64,5 +65,6 @@ class TestBot(TestCase):
             self.mock_sc.api_call.assert_called_with(
                 'chat.postMessage',
                 text="Hahahaha",
+                attachments=[],
                 channel="#random"
             )
