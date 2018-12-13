@@ -28,14 +28,13 @@ by slack), you must forward your 5000 port to a public domain name. Luckily for
 us, `ngrok` can do such things. Sign up and download and run `ngrok`
 [here][download-ngrok].
 
-Our app runs on port 5000. Run `ngrok http 5000` and take note of the forwarding
-URL (this means copy it).
+Our app runs on port 5000. Run `ngrok http 5000` and copy the forwarding URL.
 
 ## 4: Configure Your Environment
 
-We use environmental variables to make everything go smoothly. Therefore, you
-must as well. Create a file `.env` in the base directory (where the `README.md`
-is), with the following:
+We use environment variables to make everything go smoothly. Therefore, you must
+as well. Create a file `.env` in the base directory (where the `README.md` is),
+with the following:
 
 ```bash
 SLACK_SIGNING_SECRET=""
@@ -60,7 +59,7 @@ and running as well.
 ## 6: Configure Slack
 
 Back to slack. Go [here][slack-events] and click "Enable Events". You will be
-asked to submit a request URL. Remember that URL that you memerized? Paste the
+asked to submit a request URL. Remember that URL that you memorized? Paste the
 URL. It should look like this:
 
 ```
@@ -77,8 +76,8 @@ that too.
 
 This is the final and most important part: finally testing if it works or not.
 Go to your slack workspace and add your slack bot to the channel if you have yet
-to do so (just type `@<slackbot name>` and slack will ask if you want to invite
-the bot into the channel. say yes).
+to do so (just type `@<bot name>` and slack will ask if you want to invite the
+bot into the channel. say yes).
 
 To test, type the command:
 
