@@ -43,6 +43,6 @@ class Core:
         welcome = 'Welcome to Lauchpad!'
         try:
             self.__bot.send_dm(welcome, new_user_id)
-            return True
+            logging.info("user " + new_user_id + " added to database - user notified")
         except SlackAPIError:
-            return False
+            logging.error("user " + new_user_id + " added to database - user not notified")
