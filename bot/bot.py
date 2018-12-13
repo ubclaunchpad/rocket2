@@ -19,11 +19,12 @@ class Bot:
             # TODO log error
             raise SlackAPIError(response['error'])
 
-    def send_to_channel(self, message, channel_name):
+    def send_to_channel(self, message, channel_name, attachments=[]):
         """Send message to channel with name channel_name."""
         response = self.sc.api_call(
             "chat.postMessage",
             channel=channel_name,
+            attachments=attachments,
             text=message
         )
         if 'ok' not in response:

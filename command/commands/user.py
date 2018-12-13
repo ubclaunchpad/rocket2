@@ -196,6 +196,6 @@ class UserCommand:
             else:
                 user = self.facade.retrieve_user(slack_id)
 
-            self.bot.send_to_channel(user.get_md_table(), channel)
+            self.bot.send_to_channel('', channel, [user.get_attachment()])
         except LookupError:
             self.bot.send_to_channel(self.lookup_error, channel)

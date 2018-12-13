@@ -131,7 +131,7 @@ with a few missing fields.
 
 [make-slack-app]: https://api.slack.com/apps
 [make-bot]: https://api.slack.com/apps/AEGCC4G4Q/bots?
-[dynamodb]: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DynamoDBLocal.DownloadingAndRunning.html
+[dynamodb-download]: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DynamoDBLocal.DownloadingAndRunning.html
 [download-ngrok]: https://ngrok.com/
 [creds-general]: https://api.slack.com/apps/AEGCC4G4Q/general?
 [creds-api]: https://api.slack.com/apps/AEGCC4G4Q/oauth?
