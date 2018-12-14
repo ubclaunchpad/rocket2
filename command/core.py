@@ -17,7 +17,7 @@ class Core:
 
     def msg_split(self, msg):
         """
-        Splits a message into 3 components.
+        Split a message into 3 components.
 
         The 3 components, in order, are:
 
@@ -39,7 +39,7 @@ class Core:
 
         :return: A list of 3 strings
         """
-        return message.split(' ', 2)
+        return msg.split(' ', 2)
 
     def handle_app_mention(self, event_data):
         """Handle the events associated with mentions of @rocket."""
