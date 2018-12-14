@@ -15,6 +15,32 @@ class Core:
         self.__bot = bot
         self.__commands["user"] = UserCommand(self.__facade, self.__bot)
 
+    def msg_split(self, msg):
+        """
+        Splits a message into 3 components.
+
+        The 3 components, in order, are:
+
+        - Mentioned bot slack ID
+        - Module of command
+        - Submodule and the rest of command
+
+        So the string ``<@ABC123> user view`` will be parsed into
+
+        .. code-block:: python
+
+            ['<@ABC123>', 'user', 'view']
+
+        And the string ``<@ABC123> user view @me`` will be parsed into
+
+        .. code-block:: python
+
+            ['<@ABC123>', 'user', 'view @me']
+
+        :return: A list of 3 strings
+        """
+        return message.split(' ', 2)
+
     def handle_app_mention(self, event_data):
         """Handle the events associated with mentions of @rocket."""
         message = event_data["event"]["text"]
@@ -24,7 +50,7 @@ class Core:
         if not message.startswith('<@U') and not message.startswith('@'):
             return 0
 
-        s = message.split(' ', 2)
+        s = self.msg_split(message)
         command_type = s[1]
         logging.info('{}:{}'.format(user, message))
         command = command_type + ' ' + s[2]
