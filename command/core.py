@@ -47,27 +47,29 @@ class Core:
         user = event_data["event"]["user"]
         channel = event_data["event"]["channel"]
 
-        if not message.startswith('<@U') and not message.startswith('@'):
-            return 0
-
         s = self.msg_split(message)
-        command_type = s[1]
-        logging.info('{}:{}'.format(user, message))
-        command = command_type + ' ' + s[2]
-        try:
-            self.__commands[command_type].handle(command, user, channel)
-            return 1
-        except KeyError:
-            return -1
+        if s[0] != "@rocket":
+            logging.error("app mention event triggered incorrectly")
+        else:
+            command_type = s[1]
+            command = command_type + ' ' + s[2]
+            try:
+                self.__commands[command_type].handle(command, user, channel)
+                logging.info(("@Rocket mention - "
+                              "successfully handled request: ") + message)
+            except KeyError:
+                error_dm = "Please enter a valid command."
+                self.__bot.send_dm(error_dm, user)
+                logging.info("@Rocket mention - invalid request: " + message)
 
-    def handle_member_join(self, event_data):
+    def handle_team_join(self, event_data):
         """Handle the event of a new user joining the workspace."""
-        new_user_id = event_data["event"]["user"]["id"]
-        new_user = User(new_user_id)
+        new_id = event_data["event"]["user"]["id"]
+        new_user = User(new_id)
         self.__facade.store_user(new_user)
         welcome = 'Welcome to Lauchpad!'
         try:
-            self.__bot.send_dm(welcome, new_user_id)
-            return True
+            self.__bot.send_dm(welcome, new_id)
+            logging.info(new_id + " added to database - user notified")
         except SlackAPIError:
-            return False
+            logging.error(new_id + " added to database - user not notified")
