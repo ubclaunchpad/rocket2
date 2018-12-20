@@ -55,12 +55,12 @@ class Core:
             command = command_type + ' ' + s[2]
             try:
                 self.__commands[command_type].handle(command, user, channel)
-                logging.info(("@Rocket mention - "
+                logging.info(("@rocket mention - "
                               "successfully handled request: ") + message)
             except KeyError:
                 error_dm = "Please enter a valid command."
                 self.__bot.send_dm(error_dm, user)
-                logging.info("@Rocket mention - invalid request: " + message)
+                logging.info("@rocket mention - invalid request: " + message)
 
     def handle_team_join(self, event_data):
         """Handle the event of a new user joining the workspace."""

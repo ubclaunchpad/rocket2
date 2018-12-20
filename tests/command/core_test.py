@@ -48,7 +48,7 @@ def test_handle_invalid_command(mock_logging, mock_usercommand):
         "event": {
             "type": "app_mention",
             "user": "U061F7AUR",
-            "text": "@Rocket fake command",
+            "text": "@rocket fake command",
             "ts": "1515449522.000016",
             "channel": "C0LAN2Q65",
             "event_ts": "1515449522000016"
@@ -64,7 +64,7 @@ def test_handle_invalid_command(mock_logging, mock_usercommand):
     user = event["event"]["user"]
     mock_bot.send_dm.assert_called_once_with(error_dm, user)
     event_text = event["event"]["text"]
-    expected_log_message = ("@Rocket mention - "
+    expected_log_message = ("@rocket mention - "
                             "invalid request: ") + event_text
     mock_logging.info.assert_called_once_with(expected_log_message)
 
@@ -82,7 +82,7 @@ def test_handle_user_command(mock_logging, mock_usercommand):
         "event": {
             "type": "app_mention",
             "user": "U061F7AUR",
-            "text": "@Rocket user name",
+            "text": "@rocket user name",
             "ts": "1515449522.000016",
             "channel": "C0LAN2Q65",
             "event_ts": "1515449522000016"
@@ -98,7 +98,7 @@ def test_handle_user_command(mock_logging, mock_usercommand):
         return_value.handle.\
         assert_called_once_with("user name", "U061F7AUR", "C0LAN2Q65")
     event_text = event["event"]["text"]
-    expected_log_message = ("@Rocket mention - "
+    expected_log_message = ("@rocket mention - "
                             "successfully handled request: ") + event_text
     mock_logging.info.assert_called_once_with(expected_log_message)
 
