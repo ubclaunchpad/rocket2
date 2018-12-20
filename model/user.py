@@ -19,6 +19,7 @@ class User:
 
     def get_attachment(self):
         """Return slack-formatted attachment (dictionary) for user."""
+        # TODO refactor this function out for model purity
         text_pairs = [
             ('Slack ID', self.__slack_id),
             ('Name', self.__name),
