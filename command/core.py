@@ -2,6 +2,7 @@
 from command.commands.user import UserCommand
 from model.user import User
 from bot.bot import SlackAPIError
+import logging
 
 
 class Core:
@@ -20,25 +21,28 @@ class Core:
         user = event_data["event"]["user"]
         channel = event_data["event"]["channel"]
         s = message.split(' ', 2)
-        if s[0] != "@rocket":
-            return 0
+        if s[0] != "@Rocket":
+            logging.error("app mention event triggered incorrectly")
         else:
             command_type = s[1]
             command = command_type + ' ' + s[2]
             try:
                 self.__commands[command_type].handle(command, user, channel)
-                return 1
+                logging.info(("@Rocket mention - "
+                              "successfully handled request: ") + message)
             except KeyError:
-                return -1
+                error_dm = "Please enter a valid command."
+                self.__bot.send_dm(error_dm, user)
+                logging.info("@Rocket mention - invalid request: " + message)
 
-    def handle_member_join(self, event_data):
+    def handle_team_join(self, event_data):
         """Handle the event of a new user joining the workspace."""
-        new_user_id = event_data["event"]["user"]["id"]
-        new_user = User(new_user_id)
+        new_id = event_data["event"]["user"]["id"]
+        new_user = User(new_id)
         self.__facade.store_user(new_user)
         welcome = 'Welcome to Lauchpad!'
         try:
-            self.__bot.send_dm(welcome, new_user_id)
-            return True
+            self.__bot.send_dm(welcome, new_id)
+            logging.info(new_id + " added to database - user notified")
         except SlackAPIError:
-            return False
+            logging.error(new_id + " added to database - user not notified")
