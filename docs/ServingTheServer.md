@@ -4,6 +4,9 @@ So, you want to see some progress, preferably on slack, and not just in the
 forms of unit testing? At this point, fear is actually a reasonable response.
 With this guide, you can be talking to your locally-hosted slack bot in no time!
 
+> **Warning**: This only works smoothly with a Unix machine (macOS or Linux
+> variants). Windows users may be in for more pain than expected.
+
 ## 1: Registering Your Slack Bot
 
 First things first, you must first create a slack workspace (an existing one
