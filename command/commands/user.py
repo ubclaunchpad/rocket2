@@ -79,7 +79,6 @@ class UserCommand:
         args = None
 
         try:
-            # Going for the nuclear option
             args = self.parser.parse_args(command_arg)
         except SystemExit:
             return self.bot.send_to_channel(self.help, channel)
@@ -97,23 +96,58 @@ class UserCommand:
             self.delete_helper(user_id, args.slack_id, channel)
 
         elif args.which == "edit":
-            # stub
-            msg = "user edited: "
-            if args.member is not None:
-                msg += "member: {}, ".format(args.member)
-            if args.name is not None:
-                msg += "name: {}, ".format(args.name)
-            if args.email is not None:
-                msg += "email: {}, ".format(args.email)
-            if args.pos is not None:
-                msg += "position: {}, ".format(args.pos)
-            if args.github is not None:
-                msg += "github: {}, ".format(args.github)
-            if args.major is not None:
-                msg += "major: {}, ".format(args.major)
-            if args.bio is not None:
-                msg += "bio: {}".format(args.bio)
-            return msg
+            param_list = [args.member, args.name, args.email,
+                          args.pos, args.github, args.major, args.bio]
+            self.edit_helper(user_id, param_list, channel)
+
+    def edit_helper(self, user_id, param_list, channel):
+        """
+        Edit user from database.
+
+        If param_list[0] is not None, edits user with
+        ID param_list[0], else edits user with user_id
+
+        :param user_id: Slack ID of user who is calling the command
+        :param param_list: List of user parameters that are to be edited
+        :param channel: ID of Slack channel that called command
+        :return: returns error message if not admin and command
+                   edits another user, returns edit message if user is edited
+        """
+        edited_user = None
+        if param_list[0] is not None:
+            try:
+                admin_user = self.facade.retrieve_user(user_id)
+                if admin_user.get_permissions_level() != Permissions.admin:
+                    return self.bot.send_to_channel(self.permission_error,
+                                                    channel)
+                else:
+                    edited_id = param_list[0]
+                    edited_user = self.facade.retrieve_user(edited_id)
+                    self.facade.delete_user(edited_id)
+            except LookupError:
+                return self.bot.send_to_channel(self.lookup_error, channel)
+        else:
+            try:
+                edited_user = self.facade.retrieve_user(user_id)
+                self.facade.delete_user(user_id)
+            except LookupError:
+                return self.bot.send_to_channel(self.lookup_error, channel)
+
+        if param_list[1] is not None:
+            edited_user.set_name(param_list[1])
+        if param_list[2] is not None:
+            edited_user.set_email(param_list[2])
+        if param_list[3] is not None:
+            edited_user.set_position(param_list[3])
+        if param_list[4] is not None:
+            edited_user.set_github_username(param_list[4])
+        if param_list[5] is not None:
+            edited_user.set_major(param_list[5])
+        if param_list[6] is not None:
+            edited_user.set_biography(param_list[6])
+
+        self.facade.store_user(edited_user)
+        self.bot.send_to_channel("User edited: " + str(edited_user), channel)
 
     def delete_helper(self, user_id, slack_id, channel):
         """
