@@ -14,6 +14,15 @@
     docs/Scripts.md
     docs/Database.md
     docs/Requirements.md
+    docs/Deployment.md
+    docs/Qna.md
+
+.. toctree::
+    :caption: Tutorials
+    :hidden:
+
+    docs/GettingStarted.md
+    docs/Testing.md
 
 .. toctree::
     :caption: Plugin Reference
