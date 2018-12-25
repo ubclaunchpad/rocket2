@@ -126,7 +126,6 @@ class TestUserCommand(TestCase):
         self.testcommand.handle("user edit --name rob", "U0G9QF9C6",
                                 "C0LAN2Q65")
         self.mock_facade.retrieve_user.assert_called_once_with("U0G9QF9C6")
-        self.mock_facade.delete_user.assert_called_once_with("U0G9QF9C6")
         user.set_name("rob")
         self.mock_facade.store_user.assert_called_once_with(user)
         self.mock_bot.send_to_channel.\
@@ -169,7 +168,7 @@ class TestUserCommand(TestCase):
         self.mock_facade.retrieve_user.assert_called_once_with("U0G9QF9C6")
         self.mock_bot.send_to_channel. \
             assert_called_once_with(UserCommand.permission_error, "C0LAN2Q65")
-        self.mock_facade.delete_user.assert_not_called()
+        self.mock_facade.store_user.assert_not_called()
 
     def test_handle_edit_lookup_error_editor(self):
         """Test user command where user editor is not in database."""
@@ -185,7 +184,7 @@ class TestUserCommand(TestCase):
         self.mock_facade.retrieve_user.assert_called_once_with("U0G9QF9C6")
         self.mock_bot.send_to_channel. \
             assert_called_once_with(UserCommand.lookup_error, "C0LAN2Q65")
-        self.mock_facade.delete_user.assert_not_called()
+        self.mock_facade.store_user.assert_not_called()
 
     def test_handle_edit_lookup_error(self):
         """Test user command where user is not in database."""
@@ -197,4 +196,4 @@ class TestUserCommand(TestCase):
         self.mock_facade.retrieve_user.assert_called_once_with("U0G9QF9C6")
         self.mock_bot.send_to_channel. \
             assert_called_once_with(UserCommand.lookup_error, "C0LAN2Q65")
-        self.mock_facade.delete_user.assert_not_called()
+        self.mock_facade.store_user.assert_not_called()
