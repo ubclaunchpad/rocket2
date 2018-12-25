@@ -96,8 +96,15 @@ class UserCommand:
             self.delete_helper(user_id, args.slack_id, channel)
 
         elif args.which == "edit":
-            param_list = [args.member, args.name, args.email,
-                          args.pos, args.github, args.major, args.bio]
+            param_list = {
+                "member": args.member,
+                "name": args.name,
+                "email": args.email,
+                "pos": args.pos,
+                "github": args.github,
+                "major": args.major,
+                "bio": args.bio,
+            }
             self.edit_helper(user_id, param_list, channel)
 
     def edit_helper(self, user_id, param_list, channel):
@@ -114,37 +121,35 @@ class UserCommand:
                    edits another user, returns edit message if user is edited
         """
         edited_user = None
-        if param_list[0] is not None:
+        if param_list["member"] is not None:
             try:
                 admin_user = self.facade.retrieve_user(user_id)
                 if admin_user.get_permissions_level() != Permissions.admin:
                     return self.bot.send_to_channel(self.permission_error,
                                                     channel)
                 else:
-                    edited_id = param_list[0]
+                    edited_id = param_list["member"]
                     edited_user = self.facade.retrieve_user(edited_id)
-                    self.facade.delete_user(edited_id)
             except LookupError:
                 return self.bot.send_to_channel(self.lookup_error, channel)
         else:
             try:
                 edited_user = self.facade.retrieve_user(user_id)
-                self.facade.delete_user(user_id)
             except LookupError:
                 return self.bot.send_to_channel(self.lookup_error, channel)
 
-        if param_list[1] is not None:
-            edited_user.set_name(param_list[1])
-        if param_list[2] is not None:
-            edited_user.set_email(param_list[2])
-        if param_list[3] is not None:
-            edited_user.set_position(param_list[3])
-        if param_list[4] is not None:
-            edited_user.set_github_username(param_list[4])
-        if param_list[5] is not None:
-            edited_user.set_major(param_list[5])
-        if param_list[6] is not None:
-            edited_user.set_biography(param_list[6])
+        if param_list["name"] is not None:
+            edited_user.set_name(param_list["name"])
+        if param_list["email"] is not None:
+            edited_user.set_email(param_list["email"])
+        if param_list["pos"] is not None:
+            edited_user.set_position(param_list["pos"])
+        if param_list["github"] is not None:
+            edited_user.set_github_username(param_list["github"])
+        if param_list["major"] is not None:
+            edited_user.set_major(param_list["major"])
+        if param_list["bio"] is not None:
+            edited_user.set_biography(param_list["bio"])
 
         self.facade.store_user(edited_user)
         self.bot.send_to_channel("User edited: " + str(edited_user), channel)
