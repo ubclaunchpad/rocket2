@@ -1,7 +1,7 @@
 """Calls the appropriate handler depending on the event data."""
 from command.commands.user import UserCommand
 from model.user import User
-from bot.bot import SlackAPIError
+from interface.bot import SlackAPIError
 import logging
 
 
