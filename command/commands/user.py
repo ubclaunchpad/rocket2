@@ -138,17 +138,17 @@ class UserCommand:
             except LookupError:
                 return self.bot.send_to_channel(self.lookup_error, channel)
 
-        if param_list["name"] is not None:
+        if param_list["name"]:
             edited_user.set_name(param_list["name"])
-        if param_list["email"] is not None:
+        if param_list["email"]:
             edited_user.set_email(param_list["email"])
-        if param_list["pos"] is not None:
+        if param_list["pos"]:
             edited_user.set_position(param_list["pos"])
-        if param_list["github"] is not None:
+        if param_list["github"]:
             edited_user.set_github_username(param_list["github"])
-        if param_list["major"] is not None:
+        if param_list["major"]:
             edited_user.set_major(param_list["major"])
-        if param_list["bio"] is not None:
+        if param_list["bio"]:
             edited_user.set_biography(param_list["bio"])
 
         self.facade.store_user(edited_user)
