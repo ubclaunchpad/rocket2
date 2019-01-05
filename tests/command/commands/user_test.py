@@ -102,10 +102,8 @@ class TestUserCommand(TestCase):
         self.testcommand.handle("user delete U0G9QF9C6",
                                 "ABCDEFG2F", "C0LAN2Q65")
         self.mock_facade.retrieve_user.assert_called_once_with("ABCDEFG2F")
-        message = "You do not have the sufficient " \
-                  "permission level for this command!"
         self.mock_bot.send_to_channel.\
-            assert_called_once_with(message, "C0LAN2Q65")
+            assert_called_once_with(UserCommand.permission_error, "C0LAN2Q65")
         self.mock_facade.delete_user.assert_not_called()
 
     def test_handle_delete_lookup_error(self):
@@ -123,19 +121,79 @@ class TestUserCommand(TestCase):
 
     def test_handle_edit_name(self):
         """Test user command edit parser with one field."""
-        assert self.testcommand.handle("user edit --name rob", "U0G9QF9C6",
-                                       "C0LAN2Q65") == \
-            "user edited: name: rob, "
+        user = User("U0G9QF9C6")
+        self.mock_facade.retrieve_user.return_value = user
+        self.testcommand.handle("user edit --name rob", "U0G9QF9C6",
+                                "C0LAN2Q65")
+        self.mock_facade.retrieve_user.assert_called_once_with("U0G9QF9C6")
+        user.set_name("rob")
+        self.mock_facade.store_user.assert_called_once_with(user)
+        self.mock_bot.send_to_channel.\
+            assert_called_once_with("User edited: " + str(user), "C0LAN2Q65")
 
-    def test_handle_edit(self):
+    def test_handle_edit_other_user(self):
         """Test user command edit parser with all fields."""
-        result = "user edited: member: id, name: rob, email: rob@rob.com, " \
-                 "position: dev, github: rob@.github.com, major: Computer " \
-                 "Science, bio: Im a human"
-        assert self.testcommand.handle(
-                                  "user edit --name rob --member id "
-                                  "--email rob@rob.com --pos "
-                                  "dev --github rob@.github.com "
-                                  "--major 'Computer Science' "
-                                  "--bio 'Im a human'",
-                                  "U0G9QF9C6", "C0LAN2Q65") == result
+        user = User("ABCDE89JK")
+        user.set_permissions_level(Permissions.admin)
+        self.mock_facade.retrieve_user.return_value = user
+        self.testcommand.handle("user edit --member U0G9QF9C6 "
+                                "--name rob "
+                                "--email rob@rob.com --pos dev --github"
+                                " rob@.github.com --major 'Computer Science'"
+                                " --bio 'Im a human'",
+                                "U0G9QF9C6", "C0LAN2Q65")
+        self.mock_facade.retrieve_user.assert_any_call("U0G9QF9C6")
+        self.mock_facade.retrieve_user.assert_any_call("U0G9QF9C6")
+        user.set_name("rob")
+        user.set_email("rob@rob.com")
+        user.set_position("dev")
+        user.set_github_username("rob@.github.com")
+        user.set_major("Computer Science")
+        user.set_biography("Im a human")
+        self.mock_facade.store_user.assert_called_once_with(user)
+        self.mock_bot.send_to_channel.\
+            assert_called_once_with("User edited: " + str(user), "C0LAN2Q65")
+
+    def test_handle_edit_not_admin(self):
+        """Test user command with editor user that is not admin."""
+        user_editor = User("U0G9QF9C6")
+        user_editor.set_permissions_level(Permissions.member)
+        self.mock_facade.retrieve_user.return_value = user_editor
+        self.testcommand.handle("user edit --member ABCDE89JK "
+                                "--name rob "
+                                "--email rob@rob.com --pos dev --github"
+                                " rob@.github.com --major 'Computer Science'"
+                                " --bio 'Im a human'",
+                                "U0G9QF9C6", "C0LAN2Q65")
+        self.mock_facade.retrieve_user.assert_called_once_with("U0G9QF9C6")
+        self.mock_bot.send_to_channel. \
+            assert_called_once_with(UserCommand.permission_error, "C0LAN2Q65")
+        self.mock_facade.store_user.assert_not_called()
+
+    def test_handle_edit_lookup_error_editor(self):
+        """Test user command where user editor is not in database."""
+        user_editor = User("U0G9QF9C6")
+        self.mock_facade.retrieve_user.return_value = user_editor
+        self.mock_facade.retrieve_user.side_effect = LookupError
+        self.testcommand.handle("user edit --member ABCDE89JK "
+                                "--name rob "
+                                "--email rob@rob.com --pos dev --github"
+                                " rob@.github.com --major 'Computer Science'"
+                                " --bio 'Im a human'",
+                                "U0G9QF9C6", "C0LAN2Q65")
+        self.mock_facade.retrieve_user.assert_called_once_with("U0G9QF9C6")
+        self.mock_bot.send_to_channel. \
+            assert_called_once_with(UserCommand.lookup_error, "C0LAN2Q65")
+        self.mock_facade.store_user.assert_not_called()
+
+    def test_handle_edit_lookup_error(self):
+        """Test user command where user is not in database."""
+        user = User("U0G9QF9C6")
+        self.mock_facade.retrieve_user.return_value = user
+        self.mock_facade.retrieve_user.side_effect = LookupError
+        self.testcommand.handle("user edit --name rob", "U0G9QF9C6",
+                                "C0LAN2Q65")
+        self.mock_facade.retrieve_user.assert_called_once_with("U0G9QF9C6")
+        self.mock_bot.send_to_channel. \
+            assert_called_once_with(UserCommand.lookup_error, "C0LAN2Q65")
+        self.mock_facade.store_user.assert_not_called()
