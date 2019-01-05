@@ -87,7 +87,7 @@ class UserCommand:
             return self.bot.send_to_channel(self.help, channel)
 
         elif args.which == "view":
-                self.view_helper(user_id, args.slack_id, channel)
+            self.view_helper(user_id, args.slack_id, channel)
 
         elif args.which == "help":
             self.bot.send_to_channel(self.help, channel)
@@ -195,7 +195,7 @@ class UserCommand:
                 user = self.facade.retrieve_user(user_id)
             else:
                 user = self.facade.retrieve_user(slack_id)
-        except LookupError:
-            return self.bot.send_to_channel(self.lookup_error, channel)
 
-        self.bot.send_to_channel(str(user), channel)
+            self.bot.send_to_channel('', channel, [user.get_attachment()])
+        except LookupError:
+            self.bot.send_to_channel(self.lookup_error, channel)

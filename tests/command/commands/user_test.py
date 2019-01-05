@@ -51,7 +51,7 @@ class TestUserCommand(TestCase):
         self.testcommand.handle('user view', user_id, "C0LAN2Q65")
         self.mock_facade.retrieve_user.assert_called_once_with("U0G9QF9C6")
         self.mock_bot.send_to_channel.\
-            assert_called_once_with(str(user), "C0LAN2Q65")
+            assert_called_once_with('', "C0LAN2Q65", [user.get_attachment()])
 
     def test_handle_view_other_user(self):
         """Test user command view handle with slack_id parameter."""
@@ -63,7 +63,7 @@ class TestUserCommand(TestCase):
         self.mock_facade.retrieve_user.\
             assert_called_once_with("ABCDE8FA9")
         self.mock_bot.send_to_channel.\
-            assert_called_once_with(str(user), "C0LAN2Q65")
+            assert_called_once_with('', "C0LAN2Q65", [user.get_attachment()])
 
     def test_handle_view_lookup_error(self):
         """Test user command view handle with user not in database."""

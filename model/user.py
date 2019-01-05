@@ -17,6 +17,27 @@ class User:
         self.__image_url = ""
         self.__permissions_level = Permissions.member
 
+    def get_attachment(self):
+        """Return slack-formatted attachment (dictionary) for user."""
+        # TODO: Refactor into another file to preserve purity
+        text_pairs = [
+            ('Slack ID', self.__slack_id),
+            ('Name', self.__name),
+            ('Email', self.__email),
+            ('Github Username', self.__github_username),
+            ('Major', self.__major),
+            ('Position', self.__position),
+            ('Biography', self.__biography),
+            ('Image URL', self.__image_url),
+            ('Permissions Level', str(self.__permissions_level))
+        ]
+
+        fields = [{'title': t, 'value': v if v else 'n/a', 'short': True}
+                  for t, v in text_pairs]
+        fallback = str('\n'.join(map(str, text_pairs)))
+
+        return {'fallback': fallback, 'fields': fields}
+
     @staticmethod
     def is_valid(user):
         """

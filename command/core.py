@@ -15,25 +15,52 @@ class Core:
         self.__bot = bot
         self.__commands["user"] = UserCommand(self.__facade, self.__bot)
 
+    def msg_split(self, msg):
+        """
+        Split a message into 3 components.
+
+        The 3 components, in order, are:
+
+        - Mentioned bot slack ID
+        - Module of command
+        - Submodule and the rest of command
+
+        So the string ``<@ABC123> user view`` will be parsed into
+
+        .. code-block:: python
+
+            ['<@ABC123>', 'user', 'view']
+
+        And the string ``<@ABC123> user view @me`` will be parsed into
+
+        .. code-block:: python
+
+            ['<@ABC123>', 'user', 'view @me']
+
+        :return: A list of 3 strings
+        """
+        return msg.split(' ', 2)
+
     def handle_app_mention(self, event_data):
         """Handle the events associated with mentions of @rocket."""
         message = event_data["event"]["text"]
         user = event_data["event"]["user"]
         channel = event_data["event"]["channel"]
-        s = message.split(' ', 2)
-        if s[0] != "@Rocket":
+
+        s = self.msg_split(message)
+        if s[0] != "@rocket":
             logging.error("app mention event triggered incorrectly")
         else:
             command_type = s[1]
             command = command_type + ' ' + s[2]
             try:
                 self.__commands[command_type].handle(command, user, channel)
-                logging.info(("@Rocket mention - "
+                logging.info(("@rocket mention - "
                               "successfully handled request: ") + message)
             except KeyError:
                 error_dm = "Please enter a valid command."
                 self.__bot.send_dm(error_dm, user)
-                logging.info("@Rocket mention - invalid request: " + message)
+                logging.info("@rocket mention - invalid request: " + message)
 
     def handle_team_join(self, event_data):
         """Handle the event of a new user joining the workspace."""
