@@ -28,7 +28,9 @@ class TestUserCommand(TestCase):
     def test_handle_nosubs(self):
         """Test user with no sub-parsers."""
         self.assertEqual(self.testcommand.handle('user', "U0G9QF9C6"),
+<<<<<<< HEAD
                          (UserCommand.help, 200))
+>>>>>>> WIP fixes and change to slash cmds
 
     def test_handle_bad_args(self):
         """Test user with invalid arguments."""

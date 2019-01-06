@@ -1,4 +1,9 @@
 """Flask server instance."""
+<<<<<<< HEAD
+=======
+from flask import Flask, request
+from slackeventsapi import SlackEventAdapter
+>>>>>>> WIP fixes and change to slash cmds
 from factory import make_core
 from flask import Flask, request
 from logging.config import dictConfig
