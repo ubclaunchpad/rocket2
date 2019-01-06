@@ -8,7 +8,7 @@ from slackclient import SlackClient
 
 @mock.patch('command.core.logging')
 def test_handle_invalid_mention(mock_logging):
-    """Test the instance of handle_app_mention being called inappropriately."""
+    """Test the instance of handle_app_command being called inappropriately."""
     mock_facade = mock.MagicMock(DBFacade)
     mock_bot = mock.MagicMock(Bot)
     event = {
@@ -28,8 +28,8 @@ def test_handle_invalid_mention(mock_logging):
         "event_id": "Ev08MFMKH6",
         "event_time": 1234567890
     }
-    core = Core(mock_bot, mock_facade)
-    core.handle_app_mention(event)
+    core = Core(mock_facade, mock_bot)
+    core.handle_app_command('hello world', 'U061F7AUR')
     expected_log_message = "app mention event triggered incorrectly"
     mock_logging.error.assert_called_once_with(expected_log_message)
 
@@ -59,7 +59,7 @@ def test_handle_invalid_command(mock_logging, mock_usercommand):
         "event_time": 123456789
     }
     core = Core(mock_facade, mock_bot)
-    core.handle_app_mention(event)
+    core.handle_app_command(event)
     error_dm = "Please enter a valid command."
     user = event["event"]["user"]
     mock_bot.send_dm.assert_called_once_with(error_dm, user)
@@ -93,7 +93,7 @@ def test_handle_user_command(mock_logging, mock_usercommand):
         "event_time": 1234567890
     }
     core = Core(mock_facade, mock_bot)
-    core.handle_app_mention(event)
+    core.handle_app_command(event)
     mock_usercommand.\
         return_value.handle.\
         assert_called_once_with("user name", "U061F7AUR", "C0LAN2Q65")
