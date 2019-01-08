@@ -16,7 +16,8 @@ After that, you must create a new slack app. Follow the link
 [here][make-slack-app] to create a new slack app. Make sure to have it installed
 onto your slack workspace of choice.
 
-Now, you need to create a bot user. [Create it here][make-bot].
+Now, you need to create a bot user. Go to your app's "Bot User" Feature and add
+a bot user.
 
 ## 2: Download and Start Up DynamoDB
 
@@ -46,12 +47,12 @@ REGION="us-east-1"
 TESTING="True"
 ```
 
-Your `SLACK_SIGNING_SECRET` can be found [here][creds-general]. Scroll down
-until you get to the section "App Credentials" and the credentials will be
+Your `SLACK_SIGNING_SECRET` can be found in the "Basic Information" tab. Scroll
+down until you get to the section "App Credentials" and the credentials will be
 directly below the "Signing Secret".
 
-Your `SLACK_API_TOKEN` can be found [here][creds-api]. Be sure to copy the
-access token under "Bot User OAuth Access Token".
+Your `SLACK_API_TOKEN` can be found in the "OAuth & Permissions" tab. Be sure to
+copy the access token under "Bot User OAuth Access Token".
 
 ## 5: Running the App
 
@@ -61,9 +62,9 @@ and running as well.
 
 ## 6: Configure Slack
 
-Back to slack. Go [here][slack-events] and click "Enable Events". You will be
-asked to submit a request URL. Remember that URL that you memorized? Paste the
-URL. It should look like this:
+Back to slack. Go to "Event Subscriptions" tab and click "Enable Events". You
+will be asked to submit a request URL. Remember that URL that you memorized?
+Paste the URL. It should look like this:
 
 ```
 https://46c81c5b.ngrok.io/slack/events
@@ -132,9 +133,5 @@ displays what you already know: your own slack id and permissions level, along
 with a few missing fields.
 
 [make-slack-app]: https://api.slack.com/apps
-[make-bot]: https://api.slack.com/apps/AEGCC4G4Q/bots?
 [dynamodb-download]: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DynamoDBLocal.DownloadingAndRunning.html
 [download-ngrok]: https://ngrok.com/
-[creds-general]: https://api.slack.com/apps/AEGCC4G4Q/general?
-[creds-api]: https://api.slack.com/apps/AEGCC4G4Q/oauth?
-[slack-events]: https://api.slack.com/apps/AEGCC4G4Q/event-subscriptions?
