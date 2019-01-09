@@ -3,7 +3,7 @@ from db.facade import DBFacade
 from db.dynamodb import DynamoDB
 from command.core import Core
 from slackclient import SlackClient
-from bot.bot import Bot
+from interface.slack import Bot
 import os
 
 
