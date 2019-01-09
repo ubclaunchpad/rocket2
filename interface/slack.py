@@ -1,8 +1,8 @@
-"""Utility class for interacting with Slack API."""
+"""Utility classes for interacting with Slack API."""
 
 
 class Bot:
-    """Utility class for interacting with Slack API."""
+    """Utility class for calling different Slack APIs."""
 
     def __init__(self, sc):
         """Initialize Bot by creating a SlackClient Object."""
