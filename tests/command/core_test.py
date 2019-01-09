@@ -1,7 +1,7 @@
 """Test the core event handler."""
 from unittest import mock
 from command.core import Core
-from bot.bot import Bot, SlackAPIError
+from interface.slack import Bot, SlackAPIError
 from db.facade import DBFacade
 from slackclient import SlackClient
 
