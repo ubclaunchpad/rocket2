@@ -1,1 +1,1 @@
-"""Bot Test Init."""
+"""Interface Test Init."""
