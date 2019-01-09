@@ -1,5 +1,5 @@
 """Test Bot Class."""
-from bot.bot import Bot, SlackAPIError
+from interface.slack import Bot, SlackAPIError
 from slackclient import SlackClient
 from unittest import mock, TestCase
 

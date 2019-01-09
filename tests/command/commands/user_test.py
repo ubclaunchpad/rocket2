@@ -4,7 +4,7 @@ from unittest import mock, TestCase
 from model.user import User
 from db.facade import DBFacade
 from model.permissions import Permissions
-from bot.bot import Bot
+from interface.slack import Bot
 
 
 class TestUserCommand(TestCase):
