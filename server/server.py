@@ -37,7 +37,7 @@ def check():
 
 @app.route('/slack/commands', methods=['POST'])
 def handle_commands():
-    """Handles rocket slash commands."""
+    """Handle rocket slash commands."""
     txt = request.form['text']
     uid = request.form['user_id']
     return core.handle_app_command(txt, uid)
