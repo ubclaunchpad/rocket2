@@ -92,17 +92,15 @@ class UserCommand:
         except SystemExit:
             return self.help, 200
 
-        if args.which is None:
+        if args.which is None or args.which == "help":
             return self.help, 200
 
         elif args.which == "view":
             return self.view_helper(user_id, args.slack_id)
 
         elif args.which == "add":
+            # XXX: Remove in production
             return self.add_helper(user_id)
-
-        elif args.which == "help":
-            return self.help, 200
 
         elif args.which == "delete":
             return self.delete_helper(user_id, args.slack_id)
@@ -184,7 +182,7 @@ class UserCommand:
             else:
                 return self.permission_error, 200
         except LookupError:
-                return self.lookup_error, 200
+            return self.lookup_error, 200
 
     def view_helper(self, user_id, slack_id):
         """
@@ -209,5 +207,11 @@ class UserCommand:
             return self.lookup_error, 200
 
     def add_helper(self, user_id):
+        """
+        Add the user to the database via user id.
+
+        :param user_id: Slack ID of user to be added
+        :return: "User added!", 200
+        """
         self.facade.store_user(User(user_id))
         return 'User added!', 200
