@@ -106,26 +106,32 @@ class TeamCommand:
         """Return command options for team events."""
         return self.help
 
-    def handle(self, command):
+    def handle(self, command, user_id):
         """Handle command by splitting into substrings and giving to parser."""
         logging.debug("Handling TeamCommand")
         command_arg = shlex.split(command)
-        args = self.parser.parse_args(command_arg)
+        args = None
+
+        try:
+            args = self.parser.parse_args(command_arg)
+        except SystemExit:
+            return self.help, 200
+
         if args.which == "list":
             # stub
-            return "listing all teams"
+            return "listing all teams", 200
 
         elif args.which == "view":
             # stub
-            return "viewing " + args.team_name
+            return "viewing " + args.team_name, 200
 
         elif args.which == "help":
             # stub
-            return self.get_help()
+            return self.get_help(), 200
 
         elif args.which == "delete":
             # stub
-            return args.team_name + " was deleted"
+            return args.team_name + " was deleted", 200
 
         elif args.which == "create":
             # stub
@@ -136,15 +142,15 @@ class TeamCommand:
                 msg += "platform: {}, ".format(args.platform)
             if args.channel:
                 msg += "add channel"
-            return msg
+            return msg, 200
 
         elif args.which == "add":
             # stub
-            return "added " + args.slack_id + " to " + args.team_name
+            return "added " + args.slack_id + " to " + args.team_name, 200
 
         elif args.which == "remove":
             # stub
-            return "removed " + args.slack_id + " from " + args.team_name
+            return "removed " + args.slack_id + " from " + args.team_name, 200
 
         elif args.which == "edit":
             # stub
@@ -153,4 +159,4 @@ class TeamCommand:
                 msg += "name: {}, ".format(args.name)
             if args.platform is not None:
                 msg += "platform: {}, ".format(args.platform)
-            return msg
+            return msg, 200
