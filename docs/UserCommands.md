@@ -6,13 +6,13 @@ must be enclosed in quotation marks.
 ## Options
 
 ```sh
-@rocket user {edit, view, help, delete}
+/rocket user {edit, view, help, delete}
 ```
 
 ### Edit
 
 ```sh
-@rocket user edit [--name NAME] [--email EMAIL] [--pos POSITION]
+/rocket user edit [--name NAME] [--email EMAIL] [--pos POSITION]
                   [--github GITHUB_HANDLE] [--major MAJOR]
                   [--bio BIOGRAPHY]
 ```
@@ -23,16 +23,16 @@ another user's Launch Pad profile by using `[--member SLACKID]` option.
 
 ```sh
 # Normal use
-@rocket user edit --name "Steven Universe" --email "su@gmail.com"
+/rocket user edit --name "Steven Universe" --email "su@gmail.com"
 
 # Admin/Team lead use
-@rocket user edit --member @s_universe --name "Steven Universe"
+/rocket user edit --member @s_universe --name "Steven Universe"
 ```
 
 ### View
 
 ```sh
-@rocket user view SLACKID
+/rocket user view SLACKID
 ```
 
 Display information about a user. `SLACK_ID` is the `@`-name, for easy slack
@@ -41,7 +41,7 @@ autocomplete.
 ### Help
 
 ```sh
-@rocket user help
+/rocket user help
 ```
 
 Display options for the user commands.
@@ -49,7 +49,7 @@ Display options for the user commands.
 ### Delete (Admin only)
 
 ```sh
-@rocket user delete MEMBER_ID
+/rocket user delete MEMBER_ID
 ```
 
 Permanently delete a member's Launch Pad Profile. Can only be used by admins.
