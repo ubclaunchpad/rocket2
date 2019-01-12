@@ -66,6 +66,19 @@ def test_set_github_username():
     assert user.get_github_username() == "username"
 
 
+def test_set_github_id():
+    """Test the User class method set_github_id."""
+    user = User("U0G9QF9C6")
+    user.set_github_id("githubid")
+    assert user.get_github_id() == "githubid"
+
+
+def test_get_github_id():
+    """Test the User class method get_github_id."""
+    user = User("U0G9QF9C6")
+    assert user.get_github_id() == ""
+
+
 def test_get_major():
     """Test the User class method get_major()."""
     user = User("U0G9QF9C6")
@@ -126,7 +139,8 @@ def test_print():
     user.set_permissions_level(Permissions.admin)
     assert str(user) == "{'_User__slack_id': 'U0G9QF9C6', '_User__name': ''," \
                         " '_User__email': 'email@email.com'," \
-                        " '_User__github_username': '', '_User__major': ''," \
+                        " '_User__github_username': '', '_User__github_id': '', " \
+                        "'_User__major': ''," \
                         " '_User__position': '', '_User__biography':" \
                         " 'bio test', '_User__image_url': ''," \
                         " '_User__permissions_level':" \

@@ -11,6 +11,7 @@ class User:
         self.__name = ""
         self.__email = ""
         self.__github_username = ""
+        self.__github_id = ""
         self.__major = ""
         self.__position = ""
         self.__biography = ""
@@ -25,6 +26,7 @@ class User:
             ('Name', self.__name),
             ('Email', self.__email),
             ('Github Username', self.__github_username),
+            ('Github ID', self.__github_id),
             ('Major', self.__major),
             ('Position', self.__position),
             ('Biography', self.__biography),
@@ -85,8 +87,21 @@ class User:
         return self.__github_username
 
     def set_github_username(self, github_username):
-        """Set this user's Github username to the given argument."""
+        """
+        Set this user's Github username to the given argument.
+
+        Also sends request to get matching Github ID and sets it for user.
+        """
         self.__github_username = github_username
+        # stub, fetch github_id, and set it
+
+    def get_github_id(self):
+        """Return this user's Github ID."""
+        return self.__github_id
+
+    def set_github_id(self, guid):
+        """Set this user's Github ID."""
+        self.__github_id = guid
 
     def get_major(self):
         """Return this user's major."""
