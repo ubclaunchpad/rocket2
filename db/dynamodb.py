@@ -111,7 +111,7 @@ class DynamoDB:
         **Note**: This function should **not** be called externally, and should
         only be called on initialization.
 
-        Teams are only required to have a ``github_team_name``. Since this is a
+        Teams are only required to have a ``gtid``. Since this is a
         NoSQL database, no other attributes are required.
         """
         logging.info("Creating table '{}'".format(self.teams_table))
@@ -119,13 +119,13 @@ class DynamoDB:
             TableName=self.teams_table,
             AttributeDefinitions=[
                 {
-                    'AttributeName': 'github_team_name',
+                    'AttributeName': 'gtid',
                     'AttributeType': 'S'
                 },
             ],
             KeySchema=[
                 {
-                    'AttributeName': 'github_team_name',
+                    'AttributeName': 'gtid',
                     'KeyType': 'HASH'
                 },
             ],
@@ -195,6 +195,7 @@ class DynamoDB:
 
             teams_table = self.ddb.Table(self.teams_table)
             tdict = {
+                'gtid': team.get_gtid(),
                 'github_team_name': team.get_github_team_name()
             }
             place_if_filled('display_name', team.get_display_name())
