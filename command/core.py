@@ -21,7 +21,7 @@ class Core:
         if s[0] in self.__commands:
             return self.__commands[s[0]].handle(cmd_txt, user)
         else:
-            logging.error("app mention event triggered incorrectly")
+            logging.error("app command triggered incorrectly")
             return 'Please enter a valid command', 200
 
     def handle_team_join(self, event_data):

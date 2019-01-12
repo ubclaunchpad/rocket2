@@ -11,26 +11,9 @@ def test_handle_invalid_mention(mock_logging):
     """Test the instance of handle_app_command being called inappropriately."""
     mock_facade = mock.MagicMock(DBFacade)
     mock_bot = mock.MagicMock(Bot)
-    event = {
-        "token": "XXYYZZ",
-        "team_id": "TXXXXXXXX",
-        "api_app_id": "AXXXXXXXXX",
-        "event": {
-            "type": "app_mention",
-            "user": "U061F7AUR",
-            "text": "hello world",
-            "ts": "1515449522.000016",
-            "channel": "C0LAN2Q65",
-            "event_ts": "1515449522000016"
-        },
-        "type": "app_mention",
-        "authed_users": ["UXXXXXXX1", "UXXXXXXX2"],
-        "event_id": "Ev08MFMKH6",
-        "event_time": 1234567890
-    }
     core = Core(mock_facade, mock_bot)
     core.handle_app_command('hello world', 'U061F7AUR')
-    expected_log_message = "app mention event triggered incorrectly"
+    expected_log_message = "app command triggered incorrectly"
     mock_logging.error.assert_called_once_with(expected_log_message)
 
 
@@ -41,32 +24,10 @@ def test_handle_invalid_command(mock_logging, mock_usercommand):
     mock_facade = mock.MagicMock(DBFacade)
     mock_bot = mock.MagicMock(Bot)
     mock_usercommand.handle.side_effect = KeyError
-    event = {
-        "token": "XXYYZZ",
-        "team_id": "TXXXXXXXX",
-        "api_app_id": "AXXXXXXXXX",
-        "event": {
-            "type": "app_mention",
-            "user": "U061F7AUR",
-            "text": "@rocket fake command",
-            "ts": "1515449522.000016",
-            "channel": "C0LAN2Q65",
-            "event_ts": "1515449522000016"
-        },
-        "type": "app_mention",
-        "authed_users": ["UXXXXXXX1", "UXXXXXXX2"],
-        "event_id": "Ev08MFMKH6",
-        "event_time": 123456789
-    }
+    user = 'U061F7AUR'
     core = Core(mock_facade, mock_bot)
-    core.handle_app_command(event)
-    error_dm = "Please enter a valid command."
-    user = event["event"]["user"]
-    mock_bot.send_dm.assert_called_once_with(error_dm, user)
-    event_text = event["event"]["text"]
-    expected_log_message = ("@rocket mention - "
-                            "invalid request: ") + event_text
-    mock_logging.info.assert_called_once_with(expected_log_message)
+    core.handle_app_command('fake command', user)
+    error_txt = "Please enter a valid command."
 
 
 @mock.patch('command.core.UserCommand')
@@ -75,32 +36,11 @@ def test_handle_user_command(mock_logging, mock_usercommand):
     """Test that UserCommand.handle is called appropriately."""
     mock_facade = mock.MagicMock(DBFacade)
     mock_bot = mock.MagicMock(Bot)
-    event = {
-        "token": "XXYYZZ",
-        "team_id": "TXXXXXXXX",
-        "api_app_id": "AXXXXXXXXX",
-        "event": {
-            "type": "app_mention",
-            "user": "U061F7AUR",
-            "text": "@rocket user name",
-            "ts": "1515449522.000016",
-            "channel": "C0LAN2Q65",
-            "event_ts": "1515449522000016"
-        },
-        "type": "app_mention",
-        "authed_users": ["UXXXXXXX1", "UXXXXXXX2"],
-        "event_id": "Ev08MFMKH6",
-        "event_time": 1234567890
-    }
     core = Core(mock_facade, mock_bot)
-    core.handle_app_command(event)
+    core.handle_app_command('user name', 'U061F7AUR')
     mock_usercommand.\
         return_value.handle.\
-        assert_called_once_with("user name", "U061F7AUR", "C0LAN2Q65")
-    event_text = event["event"]["text"]
-    expected_log_message = ("@rocket mention - "
-                            "successfully handled request: ") + event_text
-    mock_logging.info.assert_called_once_with(expected_log_message)
+        assert_called_once_with("user name", "U061F7AUR")
 
 
 @mock.patch('command.core.logging')
