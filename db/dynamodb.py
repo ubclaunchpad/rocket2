@@ -43,16 +43,17 @@ class DynamoDB:
         logging.info("Initializing DynamoDb")
         self.users_table = "users"
         self.teams_table = "teams"
+
         testing = os.environ.get("TESTING")
         region_name = os.environ.get("REGION", 'us-east-1')
 
         if testing:
-            logging.info("Local DynamoDb running")
+            logging.info("Connecting to local DynamoDb")
             self.ddb = boto3.resource("dynamodb",
                                       region_name="",
                                       endpoint_url="http://localhost:8000")
         else:
-            logging.info("Remote DynamoDb running")
+            logging.info("Connection to remote DynamoDb")
             self.ddb = boto3.resource('dynamodb', region_name=region_name)
 
         if not self.check_valid_table(self.users_table):
@@ -75,6 +76,7 @@ class DynamoDB:
         Users are only required to have a ``slack_id``. Since this is a NoSQL
         database, no other attributes are required.
         """
+        logging.info("Creating table '{}'".format(self.users_table))
         self.ddb.create_table(
             TableName=self.users_table,
             AttributeDefinitions=[
@@ -105,6 +107,7 @@ class DynamoDB:
         Teams are only required to have a ``github_team_name``. Since this is a
         NoSQL database, no other attributes are required.
         """
+        logging.info("Creating table '{}'".format(self.teams_table))
         self.ddb.create_table(
             TableName=self.teams_table,
             AttributeDefinitions=[
@@ -162,6 +165,8 @@ class DynamoDB:
             place_if_filled('bio', user.get_biography())
             place_if_filled('image_url', user.get_image_url())
 
+            logging.info("Storing user {} in table {}".
+                         format(user.get_slack_id(), self.users_table))
             user_table.put_item(Item=udict)
             return True
         return False
@@ -187,6 +192,9 @@ class DynamoDB:
             place_if_filled('display_name', team.get_display_name())
             place_if_filled('platform', team.get_platform())
             place_if_filled('members', team.get_members())
+
+            logging.info("Storing team {} in table {}".
+                         format(team.get_github_team_name(), self.teams_table))
             teams_table.put_item(Item=tdict)
             return True
         return False
@@ -344,6 +352,8 @@ class DynamoDB:
 
         :param slack_id: the slack_id of the user to be removed
         """
+        logging.info("Deleting user {} from table {}".
+                     format(slack_id, self.users_table))
         user_table = self.ddb.Table(self.users_table)
         user_table.delete_item(
             Key={
@@ -357,6 +367,8 @@ class DynamoDB:
 
         :param team_name: the team_name of the team to be removed
         """
+        logging.info("Deleting team {} from table {}".
+                     format(team_name, self.teams_table))
         team_table = self.ddb.Table(self.teams_table)
         team_table.delete_item(
             Key={
