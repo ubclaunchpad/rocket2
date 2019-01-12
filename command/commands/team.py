@@ -1,5 +1,6 @@
 """Command parsing for team events."""
 import argparse
+import logging
 import shlex
 
 
@@ -43,6 +44,7 @@ class TeamCommand:
 
     def __init__(self):
         """Initialize team command parser."""
+        logging.info("Initializing TeamCommand instance")
         self.parser = argparse.ArgumentParser(prog="team")
         self.parser.add_argument("team")
         self.init_subparsers()
@@ -106,6 +108,7 @@ class TeamCommand:
 
     def handle(self, command):
         """Handle command by splitting into substrings and giving to parser."""
+        logging.debug("Handling TeamCommand")
         command_arg = shlex.split(command)
         args = self.parser.parse_args(command_arg)
         if args.which == "list":

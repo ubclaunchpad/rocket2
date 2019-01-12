@@ -1,5 +1,6 @@
 """Command parsing for user events."""
 import argparse
+import logging
 import shlex
 from model.permissions import Permissions
 
@@ -30,6 +31,7 @@ class UserCommand:
 
     def __init__(self, db_facade, bot):
         """Initialize user command."""
+        logging.info("Initializing UserCommand instance")
         self.parser = argparse.ArgumentParser(prog="user")
         self.parser.add_argument("user")
         self.init_subparsers()
@@ -75,6 +77,7 @@ class UserCommand:
 
     def handle(self, command, user_id, channel):
         """Handle command by splitting into substrings and giving to parser."""
+        logging.debug("Handling UserCommand")
         command_arg = shlex.split(command)
         args = None
 

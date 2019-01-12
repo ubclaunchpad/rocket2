@@ -43,10 +43,12 @@ slack_events_adapter = SlackEventAdapter(SLACK_SIGNING_SECRET,
 @slack_events_adapter.on("app_mention")
 def handle_app_mention(event):
     """Handle a mention to @rocket."""
+    logging.info("Handled 'app_mention' event")
     core.handle_app_mention(event)
 
 
 @slack_events_adapter.on("team_join")
 def handle_team_join(event):
     """Handle instances when user joins the Launchpad slack workspace."""
+    logging.info("Handled 'team_join' event")
     core.handle_team_join(event)
