@@ -40,22 +40,25 @@ class DynamoDB:
         AWS_SESSION_TOKEN: The session key for your AWS account.
         This is only needed when you are using temporary credentials.
         """
+        logging.info("Initializing DynamoDb")
+        self.users_table = "users"
+        self.teams_table = "teams"
         testing = os.environ.get("TESTING")
         region_name = os.environ.get("REGION", 'us-east-1')
 
         if testing:
-            logging.info('Local Dynamodb is running')
+            logging.info("Local DynamoDb running")
             self.ddb = boto3.resource("dynamodb",
                                       region_name="",
                                       endpoint_url="http://localhost:8000")
         else:
-            logging.info('Server Dynamodb is running')
+            logging.info("Remote DynamoDb running")
             self.ddb = boto3.resource('dynamodb', region_name=region_name)
 
-        if not self.check_valid_table('users'):
+        if not self.check_valid_table(self.users_table):
             self.__create_user_tables()
 
-        if not self.check_valid_table('teams'):
+        if not self.check_valid_table(self.teams_table):
             self.__create_team_tables()
 
     def __str__(self):
@@ -73,7 +76,7 @@ class DynamoDB:
         database, no other attributes are required.
         """
         self.ddb.create_table(
-            TableName='users',
+            TableName=self.users_table,
             AttributeDefinitions=[
                 {
                     'AttributeName': 'slack_id',
@@ -103,7 +106,7 @@ class DynamoDB:
         NoSQL database, no other attributes are required.
         """
         self.ddb.create_table(
-            TableName='teams',
+            TableName=self.teams_table,
             AttributeDefinitions=[
                 {
                     'AttributeName': 'github_team_name',
@@ -146,10 +149,11 @@ class DynamoDB:
                 if field:
                     udict[name] = field
 
-            user_table = self.ddb.Table('users')
-            udict = {}
-            udict['slack_id'] = user.get_slack_id()
-            udict['permission_level'] = user.get_permissions_level().name
+            user_table = self.ddb.Table(self.users_table)
+            udict = {
+                'slack_id': user.get_slack_id(),
+                'permission_level': user.get_permissions_level().name
+            }
             place_if_filled('email', user.get_email())
             place_if_filled('name', user.get_name())
             place_if_filled('github', user.get_github_username())
@@ -176,9 +180,10 @@ class DynamoDB:
                 if field:
                     tdict[name] = field
 
-            teams_table = self.ddb.Table('teams')
-            tdict = {}
-            tdict['github_team_name'] = team.get_github_team_name()
+            teams_table = self.ddb.Table(self.teams_table)
+            tdict = {
+                'github_team_name': team.get_github_team_name()
+            }
             place_if_filled('display_name', team.get_display_name())
             place_if_filled('platform', team.get_platform())
             place_if_filled('members', team.get_members())
@@ -193,7 +198,7 @@ class DynamoDB:
         :raises: raises LookupError if slack id is not found.
         :return: returns a user model if slack id is found.
         """
-        user_table = self.ddb.Table('users')
+        user_table = self.ddb.Table(self.users_table)
         response = user_table.get_item(
             TableName='users',
             Key={
@@ -233,7 +238,7 @@ class DynamoDB:
         :raise: raises a LookupError if team id is not found.
         :return: the team object if team_name is found.
         """
-        team_table = self.ddb.Table('teams')
+        team_table = self.ddb.Table(self.teams_table)
         response = team_table.get_item(
             TableName='teams',
             Key={
@@ -274,7 +279,7 @@ class DynamoDB:
         :param parameters: list of parameters (tuples)
         :return: returns a list of user models that fit the query parameters.
         """
-        users = self.ddb.Table('users')
+        users = self.ddb.Table(self.users_table)
         if len(parameters) > 0:
             # There are 1 or more parameters that we should care about
             filter_expr = Attr(parameters[0][0]).eq(parameters[0][1])
@@ -310,7 +315,7 @@ class DynamoDB:
         :param parameters:
         :return: returns a list of team models that fit the query parameters.
         """
-        teams = self.ddb.Table('teams')
+        teams = self.ddb.Table(self.teams_table)
         if len(parameters) > 0:
             # There are 1 or more parameters that we should care about
             if parameters[0][0] == 'members':
@@ -339,7 +344,7 @@ class DynamoDB:
 
         :param slack_id: the slack_id of the user to be removed
         """
-        user_table = self.ddb.Table('users')
+        user_table = self.ddb.Table(self.users_table)
         user_table.delete_item(
             Key={
                 'slack_id': slack_id
@@ -352,7 +357,7 @@ class DynamoDB:
 
         :param team_name: the team_name of the team to be removed
         """
-        team_table = self.ddb.Table('teams')
+        team_table = self.ddb.Table(self.teams_table)
         team_table.delete_item(
             Key={
                 'github_team_name': team_name
