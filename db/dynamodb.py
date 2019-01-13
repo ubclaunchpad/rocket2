@@ -248,7 +248,7 @@ class DynamoDB:
                                                      'members')])
         return user
 
-    def retrieve_team(self, team_name):
+    def retrieve_team(self, team_id):
         """
         Retrieve team from teams table.
 
@@ -257,11 +257,17 @@ class DynamoDB:
         :return: the team object if team_name is found.
         """
         team_table = self.ddb.Table(self.teams_table)
-        query = self.query_team([('github_team_name', team_name)])
-        if len(query) >= 1:
-            return query[0]
+        response = team_table.get_item(
+            TableName=self.teams_table,
+            Key={
+                'gtid': team_id
+            }
+        )
+
+        if 'Item' in response.keys():
+            return self.team_from_dict(response['Item'])
         else:
-            raise LookupError('Team "{}" not found'.format(team_name))
+            raise LookupError('Team "{}" not found'.format(team_id))
 
     @staticmethod
     def team_from_dict(d):
@@ -371,6 +377,8 @@ class DynamoDB:
     def delete_team(self, team_id):
         """
         Remove a team from the teams table.
+
+        To obtain the team github id, you have to retrieve the team first.
 
         :param team_id: the team_id of the team to be removed
         """
