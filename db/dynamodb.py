@@ -257,14 +257,9 @@ class DynamoDB:
         :return: the team object if team_name is found.
         """
         team_table = self.ddb.Table(self.teams_table)
-        response = team_table.get_item(
-            TableName=self.teams_table,
-            Key={
-                'github_team_name': team_name
-            }
-        )
-        if 'Item' in response.keys():
-            return self.team_from_dict(response['Item'])
+        query = self.query_team([('github_team_name', team_name)])
+        if len(query) >= 1:
+            return query[0]
         else:
             raise LookupError('Team "{}" not found'.format(team_name))
 
@@ -275,7 +270,9 @@ class DynamoDB:
 
         :return: returns converted team model.
         """
-        team = Team(d['github_team_name'], d.get('display_name', ''))
+        team = Team(d['gtid'],
+                    d['github_team_name'],
+                    d.get('display_name', ''))
         team.set_platform(d.get('platform', ''))
         members = set(d.get('members', []))
         for member in members:
@@ -371,17 +368,17 @@ class DynamoDB:
             }
         )
 
-    def delete_team(self, team_name):
+    def delete_team(self, team_id):
         """
         Remove a team from the teams table.
 
-        :param team_name: the team_name of the team to be removed
+        :param team_id: the team_id of the team to be removed
         """
         logging.info("Deleting team {} from table {}".
-                     format(team_name, self.teams_table))
+                     format(team_id, self.teams_table))
         team_table = self.ddb.Table(self.teams_table)
         team_table.delete_item(
             Key={
-                'github_team_name': team_name
+                'gtid': team_id
             }
         )

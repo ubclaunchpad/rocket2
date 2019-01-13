@@ -38,7 +38,7 @@ def test_store_invalid_user(ddb_connection):
 def test_store_invalid_team(ddb_connection):
     """Test handling of invalid team."""
     ddb = ddb_connection
-    team = Team('', 'Brussel Sprouts')
+    team = Team('1', '', 'Brussel Sprouts')
     success = ddb.store_team(team)
     assert not success
 
@@ -135,7 +135,7 @@ def test_update_user(ddb_connection):
 def test_update_team(ddb_connection):
     """Test to see if we can update a team."""
     ddb = ddb_connection
-    t = Team('brussel-sprouts', 'Brussel Sprouts')
+    t = Team('1', 'brussel-sprouts', 'Brussel Sprouts')
     ddb.store_team(t)
 
     t = ddb.retrieve_team('brussel-sprouts')
@@ -145,28 +145,28 @@ def test_update_team(ddb_connection):
 
     assert len(ddb.retrieve_team('brussel-sprouts').get_members()) == 2
 
-    ddb.delete_team('brussel-sprouts')
+    ddb.delete_team('1')
 
 
 @pytest.mark.db
 def test_store_retrieve_team(ddb_connection):
     """Test to see if we can store and retrieve the same team."""
     ddb = ddb_connection
-    team = create_test_team('rocket2.0', 'Rocket 2.0')
+    team = create_test_team('1', 'rocket2.0', 'Rocket 2.0')
     assert ddb.store_team(team)
     another_team = ddb.retrieve_team('rocket2.0')
 
     assert team == another_team
 
-    ddb.delete_team('rocket2.0')
+    ddb.delete_team('1')
 
 
 @pytest.mark.db
 def test_query_team(ddb_connection):
     """Test to see if we can store and query the same team."""
     ddb = ddb_connection
-    team = create_test_team('rocket2.0', 'Rocket 2.0')
-    team2 = create_test_team('lame-o', 'Lame-O Team')
+    team = create_test_team('1', 'rocket2.0', 'Rocket 2.0')
+    team2 = create_test_team('2', 'lame-o', 'Lame-O Team')
     team2.add_member('apple')
     ddb.store_team(team)
     ddb.store_team(team2)
@@ -185,8 +185,8 @@ def test_query_team(ddb_connection):
     assert team == multiple_queries[0]
     assert team2 == member_team[0]
 
-    ddb.delete_team('rocket2.0')
-    ddb.delete_team('lame-o')
+    ddb.delete_team('1')
+    ddb.delete_team('2')
 
 
 @pytest.mark.db
@@ -205,9 +205,10 @@ def test_delete_user(ddb_connection):
 def test_delete_team(ddb_connection):
     """Test to see if we can successfully delete a team."""
     ddb = ddb_connection
-    team = create_test_team('rocket-2.0', 'Rocket 2.0')
+    ddb = DynamoDB()
+    team = create_test_team('1', 'rocket-2.0', 'Rocket 2.0')
     ddb.store_team(team)
 
     assert len(ddb.query_team([])) == 1
-    ddb.delete_team('rocket-2.0')
+    ddb.delete_team('1')
     assert len(ddb.query_team([])) == 0
