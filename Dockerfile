@@ -12,4 +12,6 @@ RUN pipenv install
 
 EXPOSE 5000
 
+ENV FLASK_APP=server/server.py
+
 CMD ["pipenv", "run", "launch"]
