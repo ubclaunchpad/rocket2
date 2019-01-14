@@ -4,23 +4,23 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-pytest = "*"
 boto3 = "*"
-slackclient = "*"
 Flask = "*"
 gunicorn = "*"
+pytest = "*"
+slackclient = "*"
 slackeventsapi = "*"
 
 [dev-packages]
-pycodestyle = "*"
-codecov = "*"
-pytest-cov = "*"
-pydocstyle = "*"
-ipython = "*"
 awscli = "*"
+codecov = "*"
+m2r = "*"
+ipython = "*"
+pycodestyle = "*"
+pydocstyle = "*"
+pytest-cov = "*"
 sphinx = "*"
 sphinx-rtd-theme = "*"
-m2r = "*"
 
 [requires]
 python_version = "3.7"
