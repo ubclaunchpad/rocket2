@@ -15,7 +15,10 @@ def make_core(config):
 
     :return: a new ``Core`` object, freshly initialized
     """
-    slack_api_token = toml.load(config['slack']['creds_path'])['api_token']
+    if not config['testing']:
+        slack_api_token = toml.load(config['slack']['creds_path'])['api_token']
+    else:
+        slack_api_token = ""
     facade = DBFacade(DynamoDB(config))
     bot = Bot(SlackClient(slack_api_token))
     return Core(facade, bot)

@@ -49,6 +49,8 @@ class DynamoDB:
             logging.info("Connecting to local DynamoDb")
             self.ddb = boto3.resource(service_name="dynamodb",
                                       region_name="",
+                                      aws_access_key_id="",
+                                      aws_secret_access_key="",
                                       endpoint_url="http://localhost:8000")
         else:
             logging.info("Connecting to remote DynamoDb")
@@ -214,7 +216,7 @@ class DynamoDB:
         """
         user_table = self.ddb.Table(self.users_table)
         response = user_table.get_item(
-            TableName='users',
+            TableName=self.users_table,
             Key={
                 'slack_id': slack_id
             }
@@ -255,7 +257,7 @@ class DynamoDB:
         """
         team_table = self.ddb.Table(self.teams_table)
         response = team_table.get_item(
-            TableName='teams',
+            TableName=self.teams_table,
             Key={
                 'github_team_name': team_name
             }
