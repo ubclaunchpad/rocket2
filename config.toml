@@ -1,0 +1,10 @@
+testing = false
+
+[slack]
+creds_path = "credentials/slack.toml"
+
+[aws]
+creds_path = "credentials/aws.toml"
+users_table = "users"
+teams_table = "teams"
+region = "us-east-1"
