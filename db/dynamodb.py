@@ -44,11 +44,6 @@ class DynamoDB:
         self.users_table = config['aws']['users_table']
         self.teams_table = config['aws']['teams_table']
         testing = config['testing']
-        region_name = config['aws']['region']
-
-        credentials = toml.load(config['aws']['creds_path'])
-        access_key_id = credentials['access_key_id']
-        secret_access_key = credentials['secret_access_key']
 
         if testing:
             logging.info("Connecting to local DynamoDb")
@@ -57,6 +52,10 @@ class DynamoDB:
                                       endpoint_url="http://localhost:8000")
         else:
             logging.info("Connecting to remote DynamoDb")
+            region_name = config['aws']['region']
+            credentials = toml.load(config['aws']['creds_path'])
+            access_key_id = credentials['access_key_id']
+            secret_access_key = credentials['secret_access_key']
             self.ddb = boto3.resource(service_name='dynamodb',
                                       region_name=region_name,
                                       aws_access_key_id=access_key_id,
