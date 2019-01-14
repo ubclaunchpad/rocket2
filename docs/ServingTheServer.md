@@ -71,10 +71,19 @@ https://46c81c5b.ngrok.io/slack/events
 ```
 
 Notice that I have added `/slack/events` to the end of the URL. You should do
-that too.
+that too. In the "Subscribe to Workspace Events" header, click "Add Workspace
+Event" and select `team_join` in the dropdown menu.
 
 > **Important**: Please use `https` and refrain from placing an extra `/` at the
 > end of the URL. It messed me up.
+
+Go to "Slash Commands" tab and click "Create New Command". Create a rocket
+slash command. In the callback URL, paste in your ngrok base URL, followed by
+`/slack/commands`.
+
+```
+https://46c81c5b.ngrok.io/slack/commands
+```
 
 ## 7: Actually Testing it
 
@@ -86,7 +95,7 @@ bot into the channel. say yes).
 To test, type the command:
 
 ```
-@<slackbot name> user help
+/rocket user help
 ```
 
 If you see a list of options, the slack bot works!
@@ -125,12 +134,11 @@ the user's handle is. Slack automatically converts that handle into an ID.
 ### Viewing the User
 
 ```
-@<slackbot name> user view
+/rocket user view
 ```
 
-The output of this command should be a nice ASCII table(ish) looking thing that
-displays what you already know: your own slack id and permissions level, along
-with a few missing fields.
+The output of this command should be a stylish table displaying your slack id
+and permissions level.
 
 [make-slack-app]: https://api.slack.com/apps
 [dynamodb-download]: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DynamoDBLocal.DownloadingAndRunning.html

@@ -1,5 +1,5 @@
 """Flask server instance."""
-from flask import Flask
+from flask import Flask, request
 from slackeventsapi import SlackEventAdapter
 from factory import make_core
 import os
@@ -33,6 +33,14 @@ def check():
     """Display a Rocket status image."""
     logging.info('Served check()')
     return "🚀"
+
+
+@app.route('/slack/commands', methods=['POST'])
+def handle_commands():
+    """Handle rocket slash commands."""
+    txt = request.form['text']
+    uid = request.form['user_id']
+    return core.handle_app_command(txt, uid)
 
 
 SLACK_SIGNING_SECRET = os.environ["SLACK_SIGNING_SECRET"]

@@ -2,7 +2,9 @@
 import argparse
 import logging
 import shlex
+from flask import jsonify
 from model.permissions import Permissions
+from model.user import User
 
 
 class UserCommand:
@@ -29,14 +31,13 @@ class UserCommand:
     lookup_error = "User not found!"
     delete_text = "Deleted user with Slack ID: "
 
-    def __init__(self, db_facade, bot):
+    def __init__(self, db_facade):
         """Initialize user command."""
         logging.info("Initializing UserCommand instance")
         self.parser = argparse.ArgumentParser(prog="user")
         self.parser.add_argument("user")
         self.init_subparsers()
         self.facade = db_facade
-        self.bot = bot
 
     def init_subparsers(self):
         """Initialize subparsers for user command."""
@@ -46,6 +47,11 @@ class UserCommand:
         parser_view = subparsers.add_parser("view")
         parser_view.set_defaults(which="view")
         parser_view.add_argument("--slack_id", type=str, action='store')
+
+        """Parser for add command."""
+        # DEBUG
+        parser_add = subparsers.add_parser("add")
+        parser_add.set_defaults(which="add")
 
         """Parser for help command."""
         parser_help = subparsers.add_parser("help")
@@ -75,7 +81,7 @@ class UserCommand:
         """Return command options for user events."""
         return self.help
 
-    def handle(self, command, user_id, channel):
+    def handle(self, command, user_id):
         """Handle command by splitting into substrings and giving to parser."""
         logging.debug("Handling UserCommand")
         command_arg = shlex.split(command)
@@ -84,19 +90,20 @@ class UserCommand:
         try:
             args = self.parser.parse_args(command_arg)
         except SystemExit:
-            return self.bot.send_to_channel(self.help, channel)
+            return self.help, 200
 
-        if args.which is None:
-            return self.bot.send_to_channel(self.help, channel)
+        if args.which is None or args.which == "help":
+            return self.help, 200
 
         elif args.which == "view":
-            self.view_helper(user_id, args.slack_id, channel)
+            return self.view_helper(user_id, args.slack_id)
 
-        elif args.which == "help":
-            self.bot.send_to_channel(self.help, channel)
+        elif args.which == "add":
+            # XXX: Remove in production
+            return self.add_helper(user_id)
 
         elif args.which == "delete":
-            self.delete_helper(user_id, args.slack_id, channel)
+            return self.delete_helper(user_id, args.slack_id)
 
         elif args.which == "edit":
             param_list = {
@@ -108,9 +115,9 @@ class UserCommand:
                 "major": args.major,
                 "bio": args.bio,
             }
-            self.edit_helper(user_id, param_list, channel)
+            return self.edit_helper(user_id, param_list)
 
-    def edit_helper(self, user_id, param_list, channel):
+    def edit_helper(self, user_id, param_list):
         """
         Edit user from database.
 
@@ -119,7 +126,6 @@ class UserCommand:
 
         :param user_id: Slack ID of user who is calling the command
         :param param_list: List of user parameters that are to be edited
-        :param channel: ID of Slack channel that called command
         :return: returns error message if not admin and command
                    edits another user, returns edit message if user is edited
         """
@@ -128,18 +134,17 @@ class UserCommand:
             try:
                 admin_user = self.facade.retrieve_user(user_id)
                 if admin_user.get_permissions_level() != Permissions.admin:
-                    return self.bot.send_to_channel(self.permission_error,
-                                                    channel)
+                    return self.permission_error, 200
                 else:
                     edited_id = param_list["member"]
                     edited_user = self.facade.retrieve_user(edited_id)
             except LookupError:
-                return self.bot.send_to_channel(self.lookup_error, channel)
+                return self.lookup_error, 200
         else:
             try:
                 edited_user = self.facade.retrieve_user(user_id)
             except LookupError:
-                return self.bot.send_to_channel(self.lookup_error, channel)
+                return self.lookup_error, 200
 
         if param_list["name"]:
             edited_user.set_name(param_list["name"])
@@ -155,9 +160,9 @@ class UserCommand:
             edited_user.set_biography(param_list["bio"])
 
         self.facade.store_user(edited_user)
-        self.bot.send_to_channel("User edited: " + str(edited_user), channel)
+        return "User edited: " + str(edited_user), 200
 
-    def delete_helper(self, user_id, slack_id, channel):
+    def delete_helper(self, user_id, slack_id):
         """
         Delete user from database.
 
@@ -166,7 +171,6 @@ class UserCommand:
 
         :param user_id: Slack ID of user who is calling the command
         :param slack_id: Slack ID of user who is being deleted
-        :param channel: ID of Slack channel that called command
         :return: returns permission error message if not admin,
                  returns deletion message if user is deleted.
         """
@@ -174,13 +178,13 @@ class UserCommand:
             user_command = self.facade.retrieve_user(user_id)
             if user_command.get_permissions_level() == Permissions.admin:
                 self.facade.delete_user(slack_id)
-                self.bot.send_to_channel(self.delete_text + slack_id, channel)
+                return self.delete_text + slack_id, 200
             else:
-                self.bot.send_to_channel(self.permission_error, channel)
+                return self.permission_error, 200
         except LookupError:
-                self.bot.send_to_channel(self.lookup_error, channel)
+            return self.lookup_error, 200
 
-    def view_helper(self, user_id, slack_id, channel):
+    def view_helper(self, user_id, slack_id):
         """
         View user info from database.
 
@@ -189,7 +193,6 @@ class UserCommand:
 
         :param user_id: Slack ID of user who is calling command
         :param slack_id: Slack ID of user whose info is being retrieved
-        :param channel: ID of Slack channel that command is called from
         :return: returns error message if user not found in database,
                  else returns information about the user
         """
@@ -199,6 +202,16 @@ class UserCommand:
             else:
                 user = self.facade.retrieve_user(slack_id)
 
-            self.bot.send_to_channel('', channel, [user.get_attachment()])
+            return jsonify({'attachments': [user.get_attachment()]}), 200
         except LookupError:
-            self.bot.send_to_channel(self.lookup_error, channel)
+            return self.lookup_error, 200
+
+    def add_helper(self, user_id):
+        """
+        Add the user to the database via user id.
+
+        :param user_id: Slack ID of user to be added
+        :return: "User added!", 200
+        """
+        self.facade.store_user(User(user_id))
+        return 'User added!', 200
