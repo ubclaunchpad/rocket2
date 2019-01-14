@@ -29,8 +29,11 @@ try:
     app = Flask(__name__)
     config = toml.load('config.toml')
     core = make_core(config)
-    slack_signing_secret = toml.load(
-        config['slack']['creds_path'])['signing_secret']
+    if not config['testing']:
+        slack_signing_secret = toml.load(
+            config['slack']['creds_path'])['signing_secret']
+    else:
+        slack_signing_secret = ""
     slack_events_adapter = SlackEventAdapter(slack_signing_secret,
                                              "/slack/events", app)
 except Exception as e:
