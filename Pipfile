@@ -10,6 +10,7 @@ gunicorn = "*"
 pytest = "*"
 slackclient = "*"
 slackeventsapi = "*"
+toml = "*"
 
 [dev-packages]
 awscli = "*"
