@@ -72,7 +72,7 @@ class Team:
         self.__members.add(gid)
 
     def discard_member(self, gid):
-        """Discard the member of the team with the Github ID in the argument."""
+        """Discard the member of the team with Github ID in the argument."""
         self.__members.discard(gid)
 
     def get_members(self):
