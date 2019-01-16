@@ -10,6 +10,7 @@ slackclient = "*"
 Flask = "*"
 gunicorn = "*"
 slackeventsapi = "*"
+pygithub = "*"
 
 [dev-packages]
 pycodestyle = "*"
