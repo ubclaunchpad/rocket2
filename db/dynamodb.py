@@ -1,7 +1,7 @@
 """DynamoDB."""
 import boto3
 import logging
-import os
+import toml
 from boto3.dynamodb.conditions import Attr
 from model.user import User
 from model.team import Team
@@ -17,10 +17,10 @@ class DynamoDB:
     facade class.
     """
 
-    def __init__(self):
+    def __init__(self, config):
         """Initialize facade using DynamoDB settings.
 
-        To avoid local tests failure when the dyanmodb server is used,
+        To avoid local tests failure when the DynamoDb server is used,
         a testing environment variable is set.
         When testing environmental variable is true,
         the local dynamodb is run.
@@ -41,20 +41,27 @@ class DynamoDB:
         This is only needed when you are using temporary credentials.
         """
         logging.info("Initializing DynamoDb")
-        self.users_table = "users"
-        self.teams_table = "teams"
-
-        testing = os.environ.get("TESTING")
-        region_name = os.environ.get("REGION", 'us-east-1')
+        self.users_table = config['aws']['users_table']
+        self.teams_table = config['aws']['teams_table']
+        testing = config['testing']
 
         if testing:
             logging.info("Connecting to local DynamoDb")
-            self.ddb = boto3.resource("dynamodb",
+            self.ddb = boto3.resource(service_name="dynamodb",
                                       region_name="",
+                                      aws_access_key_id="",
+                                      aws_secret_access_key="",
                                       endpoint_url="http://localhost:8000")
         else:
-            logging.info("Connection to remote DynamoDb")
-            self.ddb = boto3.resource('dynamodb', region_name=region_name)
+            logging.info("Connecting to remote DynamoDb")
+            region_name = config['aws']['region']
+            credentials = toml.load(config['aws']['creds_path'])
+            access_key_id = credentials['access_key_id']
+            secret_access_key = credentials['secret_access_key']
+            self.ddb = boto3.resource(service_name='dynamodb',
+                                      region_name=region_name,
+                                      aws_access_key_id=access_key_id,
+                                      aws_secret_access_key=secret_access_key)
 
         if not self.check_valid_table(self.users_table):
             self.__create_user_tables()
@@ -209,7 +216,7 @@ class DynamoDB:
         """
         user_table = self.ddb.Table(self.users_table)
         response = user_table.get_item(
-            TableName='users',
+            TableName=self.users_table,
             Key={
                 'slack_id': slack_id
             }
@@ -250,7 +257,7 @@ class DynamoDB:
         """
         team_table = self.ddb.Table(self.teams_table)
         response = team_table.get_item(
-            TableName='teams',
+            TableName=self.teams_table,
             Key={
                 'github_team_name': team_name
             }
