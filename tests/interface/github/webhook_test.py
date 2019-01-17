@@ -332,7 +332,7 @@ def test_handle_org_event_rm_member_success(mock_logging):
 
 @mock.patch('interface.github.webhook.logging')
 def test_handle_org_event_rm_member_missing(mock_logging):
-    """Test that members removed from the org are deleted from rocket's db."""
+    """Test that members not in rocket db are handled correctly."""
     mock_facade = mock.MagicMock(DBFacade)
     mock_facade.query_user.return_value = []
     payload = \
