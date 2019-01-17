@@ -1,0 +1,1 @@
+"""GitHub Interface Test Init."""
