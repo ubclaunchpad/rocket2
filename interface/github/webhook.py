@@ -43,11 +43,11 @@ class WebhookHandler:
                               "to {}").format(github_name, github_id))
         elif action == "member_removed":
             member_list = self.__facade.\
-                query_user(['github_id', 'github_id'])
+                query_user(['github_id', github_id])
             try:
                 member = member_list[0]
                 slack_id = member.get_slack_id()
                 self.__facade.delete_user(slack_id)
                 logging.info("deleted user {}".format(slack_id))
-            except KeyError:
-                logging.error("could not find user {}".format(slack_id))
+            except IndexError:
+                logging.error("could not find user {}".format(github_id))
