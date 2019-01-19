@@ -205,7 +205,6 @@ def test_delete_user(ddb_connection):
 def test_delete_team(ddb_connection):
     """Test to see if we can successfully delete a team."""
     ddb = ddb_connection
-    ddb = DynamoDB()
     team = create_test_team('1', 'rocket-2.0', 'Rocket 2.0')
     ddb.store_team(team)
 
