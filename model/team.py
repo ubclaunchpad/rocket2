@@ -67,21 +67,21 @@ class Team:
         """Return this team's working platform."""
         return self.__platform
 
-    def add_member(self, gid):
+    def add_member(self, guid):
         """Add a new member's Github ID to the team's set of members' IDs."""
-        self.__members.add(gid)
+        self.__members.add(guid)
 
-    def discard_member(self, gid):
+    def discard_member(self, guid):
         """Discard the member of the team with Github ID in the argument."""
-        self.__members.discard(gid)
+        self.__members.discard(guid)
 
     def get_members(self):
         """Return the set of all members' Github IDs."""
         return self.__members
 
-    def is_member(self, gid):
+    def is_member(self, guid):
         """Identify if any member has the ID specified in the argument."""
-        return gid in self.__members
+        return guid in self.__members
 
     def __str__(self):
         """Print information on the team class."""
