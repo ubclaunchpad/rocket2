@@ -4,13 +4,13 @@
 class Team:
     """Represent a team with related fields and methods."""
 
-    def __init__(self, gtid, github_team_name, display_name):
+    def __init__(self, gh_team_id, github_team_name, display_name):
         """
         Initialize the team.
 
         Parameters are a valid Github team ID, team name and display name.
         """
-        self.__gtid = gtid
+        self.__gh_team_id = gh_team_id
         self.__github_team_name = github_team_name
         self.__display_name = display_name
         self.__platform = ""
@@ -23,13 +23,13 @@ class Team:
 
         Required fields for database to accept:
         - ``__github_team_name``
-        - ``__gtid``
+        - ``__gh_team_id``
 
         :param team: team to check
         :return: returns true if this team has no missing required fields
         """
         return len(team.get_github_team_name()) > 0 and\
-            len(team.get_gtid()) > 0
+            len(team.get_gh_team_id()) > 0
 
     def __eq__(self, other):
         """Return true if this team has the same attributes as the other."""
@@ -39,13 +39,13 @@ class Team:
         """Return the opposite of what is returned in self.__eq__(other)."""
         return not (self == other)
 
-    def get_gtid(self):
+    def get_gh_team_id(self):
         """Return this team's unique Github team ID."""
-        return self.__gtid
+        return self.__gh_team_id
 
-    def set_gtid(self, gtid):
+    def set_gh_team_id(self, gh_team_id):
         """Set this team's unique Github team ID."""
-        self.__gtid = gtid
+        self.__gh_team_id = gh_team_id
 
     def get_github_team_name(self):
         """Return this team's unique Github team name."""

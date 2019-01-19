@@ -20,17 +20,17 @@ def test_valid_team():
     assert Team.is_valid(team)
 
 
-def test_get_gtid():
-    """Test the Team class method get_gtid()."""
+def test_get_gh_team_id():
+    """Test the Team class method get_gh_team_id()."""
     team = Team('1', 'brussel-sprouts', 'Brussel Sprouts')
-    assert team.get_gtid() == '1'
+    assert team.get_gh_team_id() == '1'
 
 
-def test_set_gtid():
-    """Test the Team class method set_gtid()."""
+def test_set_gh_team_id():
+    """Test the Team class method set_gh_team_id()."""
     team = Team('1', 'brussel-sprouts', 'Brussel Sprouts')
-    team.set_gtid('2')
-    assert team.get_gtid() == '2'
+    team.set_gh_team_id('2')
+    assert team.get_gh_team_id() == '2'
 
 
 def test_get_github_team_name():
@@ -103,7 +103,7 @@ def test_print():
     new_slack_id = "U0G9QF9C6"
     team.add_member(new_slack_id)
     team.set_platform("web")
-    assert str(team) == "{'_Team__gtid': '1'," \
+    assert str(team) == "{'_Team__gh_team_id': '1'," \
                         " '_Team__github_team_name': 'brussel-sprouts'," \
                         " '_Team__display_name': 'Brussel Sprouts'," \
                         " '_Team__platform': 'web'," \

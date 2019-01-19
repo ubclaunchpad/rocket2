@@ -29,7 +29,7 @@ and are also listed here:
 
 Attribute Name | Description
 ---|---
-`gtid` | `String`; The team's Github ID
+`gh_team_id` | `String`; The team's Github ID
 `github_team_name` | `String`; The team's Github name
 `display_name` | `String`; The teams's display
 `platform` | `String`; The team's working platform

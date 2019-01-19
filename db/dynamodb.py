@@ -111,7 +111,7 @@ class DynamoDB:
         **Note**: This function should **not** be called externally, and should
         only be called on initialization.
 
-        Teams are only required to have a ``gtid``. Since this is a
+        Teams are only required to have a ``gh_team_id``. Since this is a
         NoSQL database, no other attributes are required.
         """
         logging.info("Creating table '{}'".format(self.teams_table))
@@ -119,13 +119,13 @@ class DynamoDB:
             TableName=self.teams_table,
             AttributeDefinitions=[
                 {
-                    'AttributeName': 'gtid',
+                    'AttributeName': 'gh_team_id',
                     'AttributeType': 'S'
                 },
             ],
             KeySchema=[
                 {
-                    'AttributeName': 'gtid',
+                    'AttributeName': 'gh_team_id',
                     'KeyType': 'HASH'
                 },
             ],
@@ -195,7 +195,7 @@ class DynamoDB:
 
             teams_table = self.ddb.Table(self.teams_table)
             tdict = {
-                'gtid': team.get_gtid(),
+                'gh_team_id': team.get_gh_team_id(),
                 'github_team_name': team.get_github_team_name()
             }
             place_if_filled('display_name', team.get_display_name())
@@ -260,7 +260,7 @@ class DynamoDB:
         response = team_table.get_item(
             TableName=self.teams_table,
             Key={
-                'gtid': team_id
+                'gh_team_id': team_id
             }
         )
 
@@ -276,7 +276,7 @@ class DynamoDB:
 
         :return: returns converted team model.
         """
-        team = Team(d['gtid'],
+        team = Team(d['gh_team_id'],
                     d['github_team_name'],
                     d.get('display_name', ''))
         team.set_platform(d.get('platform', ''))
@@ -387,6 +387,6 @@ class DynamoDB:
         team_table = self.ddb.Table(self.teams_table)
         team_table.delete_item(
             Key={
-                'gtid': team_id
+                'gh_team_id': team_id
             }
         )
