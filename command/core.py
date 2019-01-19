@@ -29,7 +29,7 @@ class Core:
         new_id = event_data["event"]["user"]["id"]
         new_user = User(new_id)
         self.__facade.store_user(new_user)
-        welcome = 'Welcome to Lauchpad!'
+        welcome = 'Welcome to Launchpad!'
         try:
             self.__bot.send_dm(welcome, new_id)
             logging.info(new_id + " added to database - user notified")

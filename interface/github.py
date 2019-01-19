@@ -1,17 +1,15 @@
 """Utility classes for interacting with Github API via PyGithub."""
-from github import Github
-from github import GithubException
+from github import Github, GithubException
 
 
 class GitBot:
     """Utility class for interacting with Github API."""
 
-    def __init__(self, access_token, org):
+    def __init__(self, github, org):
         """Initialize bot by creating Github object and get organization."""
         try:
-            self.github = Github(access_token)
+            self.github = github
             self.org = self.github.get_organization(org)
-            self.org.login()
         except GithubException as e:
             raise GithubAPIException(e.data)
 
