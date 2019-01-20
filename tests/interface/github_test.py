@@ -51,7 +51,7 @@ class TestGitBot(TestCase):
         self.mock_github.\
             get_organization.side_effect = GithubException("status", "data")
         try:
-            test_bot = GitBot(self.mock_github, "Launchpad")
+            test_bot = GitBot(self.mock_github, "Launch Pad")
             assert False
         except GithubAPIException as e:
             pass

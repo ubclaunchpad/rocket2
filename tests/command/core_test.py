@@ -102,7 +102,7 @@ def test_handle_team_join_success(mock_logging):
     }
     core = Core(mock_facade, mock_bot)
     core.handle_team_join(event)
-    welcome = 'Welcome to Launchpad!'
+    welcome = 'Welcome to Launch Pad!'
     id = "W012A3CDE"
     mock_bot.send_dm.assert_called_once_with(welcome, id)
     expected_log_message = ("W012A3CDE added to database - "
@@ -170,7 +170,7 @@ def test_handle_team_join_slack_error(mock_logging):
     }
     core = Core(mock_facade, mock_bot)
     core.handle_team_join(event)
-    welcome = 'Welcome to Launchpad!'
+    welcome = 'Welcome to Launch Pad!'
     id = "W012A3CDE"
     mock_bot.send_dm.assert_called_once_with(welcome, id)
     expected_log_message = ("W012A3CDE added to database - "
