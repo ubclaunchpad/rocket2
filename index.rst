@@ -13,7 +13,7 @@
 
     docs/GettingStarted.md
     docs/Testing.md
-    docs/ServingTheServer.md
+    docs/LocalDevelopmentGuide.md
 
 .. toctree::
     :caption: How Everything Works
