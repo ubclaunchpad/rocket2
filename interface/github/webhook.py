@@ -14,40 +14,30 @@ class WebhookHandler:
         """
         Handle when a user is added, removed, or invited to an organization.
 
-        If the member was added, the member's GitHub id is used as the primary
-        key in rocket's db.
-
         If the member is removed, they are removed as a user from rocket's db
         if they have not been removed already.
 
-        If the member is invited, do nothing.
+        If the member is added or invited, do nothing.
         """
         payload_dict = json.loads(payload)
         action = payload_dict["action"]
         github_user = payload_dict["membership"]["user"]
         github_id = github_user["id"]
-        if action == "member_added":
-            github_name = github_user["login"]
-            member_list = self.__facade.\
-                query_user(['github_name', github_name])
-            if len(member_list) < 1:
-                logging.error(("GitHub user {} "
-                               "could not be found").format(github_name))
-            elif len(member_list) > 1:
-                logging.error(("More than one user with "
-                               "GitHub name {} found").format(github_name))
-            else:
-                member = member_list[0]
-                member.set_github_id(github_id)
-                logging.info(("GitHub user {}'s GitHub Id set "
-                              "to {}").format(github_name, github_id))
-        elif action == "member_removed":
+        github_username = github_user["login"]
+        if action == "member_removed":
             member_list = self.__facade.\
                 query_user(['github_id', github_id])
-            try:
-                member = member_list[0]
-                slack_id = member.get_slack_id()
-                self.__facade.delete_user(slack_id)
-                logging.info("deleted user {}".format(slack_id))
-            except IndexError:
+            if len(member_list) > 0:
+                for member in member_list:
+                    slack_id = member.get_slack_id()
+                    self.__facade.delete_user(slack_id)
+                    logging.info("deleted slack user {}".format(slack_id))
+            else:
                 logging.error("could not find user {}".format(github_id))
+        elif action == "member_added":
+            logging.info("user {} added to organization".format(github_username))
+        elif action == "member_invited":
+            logging.info("user {} invited to organization".format(github_username))
+        else:
+            logging.error(("organization webhook triggered,"
+                           "invalid action specified"))
