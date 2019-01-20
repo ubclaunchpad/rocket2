@@ -3,10 +3,6 @@ from factory import make_core
 from flask import Flask, request
 from logging.config import dictConfig
 from slackeventsapi import SlackEventAdapter
-from factory import make_core
-from flask import Flask, request
-from logging.config import dictConfig
-from slackeventsapi import SlackEventAdapter
 import logging
 import sys
 import toml
