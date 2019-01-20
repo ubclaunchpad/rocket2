@@ -32,12 +32,12 @@ whatever you like - and install it to the appropriate workspace.
 
 ### Add a Bot User
 
-In "Add features and functionality," add a bot user. Since this is just for testing,
+In "Add features and functionality", add a bot user. Since this is just for testing,
 you can name the bot user whatever you like.
 
 ### Add Event Subscriptions
 
-In "Add features and functionality," add event subscriptions. In particular, under
+In "Add features and functionality", add event subscriptions. In particular, under
 Request URL, submit the ngrok HTTPS URL with `/slack/events` appended to the end.
 Note that ngrok will generate a new HTTPS URL every time it runs, so you will have
 to repeat this step every time you launch ngrok. You will then have to enable
