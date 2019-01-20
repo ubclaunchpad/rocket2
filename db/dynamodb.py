@@ -167,7 +167,7 @@ class DynamoDB:
             place_if_filled('email', user.get_email())
             place_if_filled('name', user.get_name())
             place_if_filled('github', user.get_github_username())
-            place_if_filled('guid', user.get_github_id())
+            place_if_filled('gh_user_id', user.get_github_id())
             place_if_filled('major', user.get_major())
             place_if_filled('position', user.get_position())
             place_if_filled('bio', user.get_biography())
@@ -196,14 +196,14 @@ class DynamoDB:
             teams_table = self.ddb.Table(self.teams_table)
             tdict = {
                 'gh_team_id': team.get_gh_team_id(),
-                'github_team_name': team.get_github_team_name()
+                'gh_team_name': team.get_gh_team_name()
             }
             place_if_filled('display_name', team.get_display_name())
             place_if_filled('platform', team.get_platform())
             place_if_filled('members', team.get_members())
 
             logging.info("Storing team {} in table {}".
-                         format(team.get_github_team_name(), self.teams_table))
+                         format(team.get_gh_team_name(), self.teams_table))
             teams_table.put_item(Item=tdict)
             return True
         return False
@@ -239,7 +239,7 @@ class DynamoDB:
         user.set_email(d.get('email', ''))
         user.set_name(d.get('name', ''))
         user.set_github_username(d.get('github', ''))
-        user.set_github_id(d.get('guid', ''))
+        user.set_github_id(d.get('gh_user_id', ''))
         user.set_major(d.get('major', ''))
         user.set_position(d.get('position', ''))
         user.set_biography(d.get('bio', ''))
@@ -277,7 +277,7 @@ class DynamoDB:
         :return: returns converted team model.
         """
         team = Team(d['gh_team_id'],
-                    d['github_team_name'],
+                    d['gh_team_name'],
                     d.get('display_name', ''))
         team.set_platform(d.get('platform', ''))
         members = set(d.get('members', []))

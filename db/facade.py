@@ -77,7 +77,7 @@ class DBFacade:
 
         :param team: A team model to store
         """
-        logging.info("Storing team {}".format(team.get_github_team_name()))
+        logging.info("Storing team {}".format(team.get_gh_team_name()))
         self.ddb.store_team(team)
 
     def retrieve_team(self, team_name):

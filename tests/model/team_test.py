@@ -33,10 +33,10 @@ def test_set_gh_team_id():
     assert team.get_gh_team_id() == '2'
 
 
-def test_get_github_team_name():
-    """Test the Team class method set_github_team_name()."""
+def test_get_gh_team_name():
+    """Test the Team class method set_gh_team_name()."""
     team = Team("1", "brussel-sprouts", "Brussel Sprouts")
-    assert team.get_github_team_name() == "brussel-sprouts"
+    assert team.get_gh_team_name() == "brussel-sprouts"
 
 
 def test_get_display_name():
@@ -104,7 +104,7 @@ def test_print():
     team.add_member(new_slack_id)
     team.set_platform("web")
     assert str(team) == "{'_Team__gh_team_id': '1'," \
-                        " '_Team__github_team_name': 'brussel-sprouts'," \
+                        " '_Team__gh_team_name': 'brussel-sprouts'," \
                         " '_Team__display_name': 'Brussel Sprouts'," \
                         " '_Team__platform': 'web'," \
                         " '_Team__members': {'U0G9QF9C6'}}"

@@ -99,9 +99,9 @@ class User:
         """Return this user's Github ID."""
         return self.__github_id
 
-    def set_github_id(self, guid):
+    def set_github_id(self, gh_user_id):
         """Set this user's Github ID."""
-        self.__github_id = guid
+        self.__github_id = gh_user_id
 
     def get_major(self):
         """Return this user's major."""
