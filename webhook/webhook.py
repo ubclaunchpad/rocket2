@@ -35,9 +35,11 @@ class WebhookHandler:
             else:
                 logging.error("could not find user {}".format(github_id))
         elif action == "member_added":
-            logging.info("user {} added to organization".format(github_username))
+            logging.info("user {} added to organization".
+                         format(github_username))
         elif action == "member_invited":
-            logging.info("user {} invited to organization".format(github_username))
+            logging.info("user {} invited to organization".
+                         format(github_username))
         else:
             logging.error(("organization webhook triggered,"
-                           "invalid action specified"))
+                           " invalid action specified"))

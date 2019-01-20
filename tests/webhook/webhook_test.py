@@ -9,6 +9,7 @@ from db.facade import DBFacade
 
 @pytest.fixture
 def org_default_payload_string():
+    """Provide the basic structure for an organization payload."""
     default_payload =\
         """
             {
@@ -77,23 +78,37 @@ def org_default_payload_string():
         """
     return default_payload
 
+
 @pytest.fixture
 def org_add_payload(org_default_payload_string):
+    """Provide an organization payload for adding a member."""
     add_payload = json.loads(org_default_payload_string)
     add_payload["action"] = "member_added"
     return json.dumps(add_payload)
 
+
 @pytest.fixture
 def org_rm_payload(org_default_payload_string):
+    """Provide an organization payload for removing a member."""
     rm_payload = json.loads(org_default_payload_string)
     rm_payload["action"] = "member_removed"
     return json.dumps(rm_payload)
 
+
 @pytest.fixture
 def org_inv_payload(org_default_payload_string):
+    """Provide an organization payload for inviting a member."""
     inv_payload = json.loads(org_default_payload_string)
     inv_payload["action"] = "member_invited"
     return json.dumps(inv_payload)
+
+
+@pytest.fixture
+def org_empty_payload(org_default_payload_string):
+    """Provide an organization payload with no action."""
+    empty_payload = json.loads(org_default_payload_string)
+    empty_payload["action"] = ""
+    return json.dumps(empty_payload)
 
 
 @mock.patch('webhook.webhook.logging')
@@ -104,6 +119,7 @@ def test_handle_org_event_add_member(mock_logging, org_add_payload):
     webhook_handler.handle_organization_event(org_add_payload)
     mock_logging.info.assert_called_once_with(("user hacktocat added "
                                                "to organization"))
+
 
 @mock.patch('webhook.webhook.logging')
 def test_handle_org_event_rm_single_member(mock_logging, org_rm_payload):
@@ -132,8 +148,8 @@ def test_handle_org_event_rm_member_missing(mock_logging, org_rm_payload):
 
 
 @mock.patch('webhook.webhook.logging')
-def test_handle_org_event_rm_multiple_members(mock_logging, org_rm_payload):
-    """Test that multiple members can be deleted if they share a github name."""
+def test_handle_org_event_rm_mult_members(mock_logging, org_rm_payload):
+    """Test that multiple members with the same github name can be deleted."""
     mock_facade = mock.MagicMock(DBFacade)
     user1 = User("SLACKUSER1")
     user2 = User("SLACKUSER2")
@@ -145,7 +161,7 @@ def test_handle_org_event_rm_multiple_members(mock_logging, org_rm_payload):
         .assert_called_once_with(['github_id', 39652351])
     assert mock_facade.delete_user.call_count is 3
     assert mock_logging.info.call_count is 3
-    
+
 
 @mock.patch('webhook.webhook.logging')
 def test_handle_org_event_inv_member(mock_logging, org_inv_payload):
@@ -155,3 +171,14 @@ def test_handle_org_event_inv_member(mock_logging, org_inv_payload):
     webhook_handler.handle_organization_event(org_inv_payload)
     mock_logging.info.assert_called_once_with(("user hacktocat invited "
                                                "to organization"))
+
+
+@mock.patch('webhook.webhook.logging')
+def test_handle_org_event_empty_action(mock_logging, org_empty_payload):
+    """Test that instances where there is no/invalid action are logged."""
+    mock_facade = mock.MagicMock(DBFacade)
+    webhook_handler = WebhookHandler(mock_facade)
+    webhook_handler.handle_organization_event(org_empty_payload)
+    mock_logging.error.assert_called_once_with(("organization webhook "
+                                                "triggered, invalid "
+                                                "action specified"))
