@@ -2,7 +2,7 @@
 from github import Github, GithubException
 
 
-class GitBot:
+class GithubInterface:
     """Utility class for interacting with Github API."""
 
     def __init__(self, github, org):
