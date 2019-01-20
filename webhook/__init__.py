@@ -1,1 +1,1 @@
-"""Github Interface Init."""
+"""Webhook Init."""

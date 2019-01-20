@@ -3,7 +3,7 @@ import json
 import pytest
 from unittest import mock
 from model.user import User
-from interface.github.webhook import WebhookHandler
+from webhook.webhook import WebhookHandler
 from db.facade import DBFacade
 
 
@@ -96,7 +96,7 @@ def org_inv_payload(org_default_payload_string):
     return json.dumps(inv_payload)
 
 
-@mock.patch('interface.github.webhook.logging')
+@mock.patch('webhook.webhook.logging')
 def test_handle_org_event_add_member(mock_logging, org_add_payload):
     """Test that instances when members are added to the org are logged."""
     mock_facade = mock.MagicMock(DBFacade)
@@ -105,7 +105,7 @@ def test_handle_org_event_add_member(mock_logging, org_add_payload):
     mock_logging.info.assert_called_once_with(("user hacktocat added "
                                                "to organization"))
 
-@mock.patch('interface.github.webhook.logging')
+@mock.patch('webhook.webhook.logging')
 def test_handle_org_event_rm_single_member(mock_logging, org_rm_payload):
     """Test that members removed from the org are deleted from rocket's db."""
     mock_facade = mock.MagicMock(DBFacade)
@@ -119,7 +119,7 @@ def test_handle_org_event_rm_single_member(mock_logging, org_rm_payload):
     mock_logging.info.assert_called_once_with("deleted slack user SLACKID")
 
 
-@mock.patch('interface.github.webhook.logging')
+@mock.patch('webhook.webhook.logging')
 def test_handle_org_event_rm_member_missing(mock_logging, org_rm_payload):
     """Test that members not in rocket db are handled correctly."""
     mock_facade = mock.MagicMock(DBFacade)
@@ -131,7 +131,7 @@ def test_handle_org_event_rm_member_missing(mock_logging, org_rm_payload):
     mock_logging.error.assert_called_once_with("could not find user 39652351")
 
 
-@mock.patch('interface.github.webhook.logging')
+@mock.patch('webhook.webhook.logging')
 def test_handle_org_event_rm_multiple_members(mock_logging, org_rm_payload):
     """Test that multiple members can be deleted if they share a github name."""
     mock_facade = mock.MagicMock(DBFacade)
@@ -147,7 +147,7 @@ def test_handle_org_event_rm_multiple_members(mock_logging, org_rm_payload):
     assert mock_logging.info.call_count is 3
     
 
-@mock.patch('interface.github.webhook.logging')
+@mock.patch('webhook.webhook.logging')
 def test_handle_org_event_inv_member(mock_logging, org_inv_payload):
     """Test that instances when members are added to the org are logged."""
     mock_facade = mock.MagicMock(DBFacade)
