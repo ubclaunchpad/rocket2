@@ -4,19 +4,21 @@ from db.dynamodb import DynamoDB
 from command.core import Core
 from slackclient import SlackClient
 from interface.slack import Bot
-import os
+import toml
+
+import logging
 
 
-def make_core():
+def make_core(config):
     """
     Initialize and returns a :class:`command.core.Core` object.
 
-    Requires that environmental variable ``SLACK_API_TOKEN`` to be set. Please
-    set it to be the slack API token.
-
     :return: a new ``Core`` object, freshly initialized
     """
-    slack_token = os.environ['SLACK_API_TOKEN']
-    facade = DBFacade(DynamoDB())
-    bot = Bot(SlackClient(slack_token))
+    if not config['testing']:
+        slack_api_token = toml.load(config['slack']['creds_path'])['api_token']
+    else:
+        slack_api_token = ""
+    facade = DBFacade(DynamoDB(config))
+    bot = Bot(SlackClient(slack_api_token))
     return Core(facade, bot)

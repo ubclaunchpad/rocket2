@@ -1,10 +1,11 @@
 """Flask server instance."""
-from flask import Flask, request
-from slackeventsapi import SlackEventAdapter
 from factory import make_core
-import os
-import logging
+from flask import Flask, request
 from logging.config import dictConfig
+from slackeventsapi import SlackEventAdapter
+import logging
+import sys
+import toml
 
 dictConfig({
     'version': 1,
@@ -24,8 +25,22 @@ dictConfig({
     }
 })
 
-app = Flask(__name__)
-core = make_core()
+try:
+    app = Flask(__name__)
+    config = toml.load('config.toml')
+    core = make_core(config)
+    if not config['testing']:
+        slack_signing_secret = toml.load(
+            config['slack']['creds_path'])['signing_secret']
+    else:
+        slack_signing_secret = ""
+    slack_events_adapter = SlackEventAdapter(slack_signing_secret,
+                                             "/slack/events", app)
+except Exception as e:
+    # A bit of a hack to catch exceptions
+    # that Gunicorn/uWSGI would swallow otherwise
+    logging.error(e)
+    sys.exit(1)
 
 
 @app.route('/')
@@ -41,11 +56,6 @@ def handle_commands():
     txt = request.form['text']
     uid = request.form['user_id']
     return core.handle_app_command(txt, uid)
-
-
-SLACK_SIGNING_SECRET = os.environ["SLACK_SIGNING_SECRET"]
-slack_events_adapter = SlackEventAdapter(SLACK_SIGNING_SECRET,
-                                         "/slack/events", app)
 
 
 @slack_events_adapter.on("app_mention")
