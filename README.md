@@ -45,8 +45,8 @@ this can be run with:
 ```
 
 The above tests would be run with the assumption that other applications, such
-as the local database, is also running. To run tests that explicitly do **not**
-involve the running of any database, run pytest with the following arguments:
+as a local instance of DynamoDB, is also running. To run tests that explicitly do
+**not** involve the running of any database, run pytest with the following arguments:
 
 ```bash
 pytest -m "not db"
@@ -60,10 +60,15 @@ cd scripts/
 make install
 ```
 
-### Testing the Database Locally
+Note that testing alongside a real Slack workspace, DynamoDB, and so on requires
+quite a bit more setup. For a full guide to developer installation, see our
+[local development guide](https://rocket2.readthedocs.io/en/latest/docs/LocalDevelopmentGuide.html).
 
-Some tests must also be run on the DynamoDB database. We recommend that you
-download it and keep it running in the background while executing tests.
+### Running DynamoDB Locally
+
+Some tests assume the existence of a local DynamoDB database. These are
+primarily for automated testing, like on Travis CI, but if you would like to run
+them yourself or are developing new tests, you can run as follows:
 
 ```bash
 wget https://s3-us-west-2.amazonaws.com/dynamodb-local/dynamodb_local_latest.tar.gz
@@ -76,4 +81,5 @@ scripts/setup_localaws.sh
 # Run DynamoDB through Java
 cd DynamoDB/
 java -Djava.library.path=./DynamoDBLocal_lib -jar DynamoDBLocal.jar -sharedDb
+# Open a new terminal to continue interacting
 ```
