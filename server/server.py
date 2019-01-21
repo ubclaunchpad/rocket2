@@ -3,16 +3,12 @@ from factory import make_core
 from flask import Flask, request
 from logging.config import dictConfig
 from slackeventsapi import SlackEventAdapter
-from factory import make_core
-from flask import Flask, request
-from logging.config import dictConfig
-from slackeventsapi import SlackEventAdapter
 import logging
 import sys
 import toml
 
 dictConfig({
-    'version': 1,
+    'version': 1,.
     'formatters': {
         'default': {
             'format': '%(asctime)s - %(levelname)s @ ' +
