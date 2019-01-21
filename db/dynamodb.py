@@ -111,7 +111,7 @@ class DynamoDB:
         **Note**: This function should **not** be called externally, and should
         only be called on initialization.
 
-        Teams are only required to have a ``gh_team_id``. Since this is a
+        Teams are only required to have a ``github_team_id``. Since this is a
         NoSQL database, no other attributes are required.
         """
         logging.info("Creating table '{}'".format(self.teams_table))
@@ -119,13 +119,13 @@ class DynamoDB:
             TableName=self.teams_table,
             AttributeDefinitions=[
                 {
-                    'AttributeName': 'gh_team_id',
+                    'AttributeName': 'github_team_id',
                     'AttributeType': 'S'
                 },
             ],
             KeySchema=[
                 {
-                    'AttributeName': 'gh_team_id',
+                    'AttributeName': 'github_team_id',
                     'KeyType': 'HASH'
                 },
             ],
@@ -167,7 +167,7 @@ class DynamoDB:
             place_if_filled('email', user.get_email())
             place_if_filled('name', user.get_name())
             place_if_filled('github', user.get_github_username())
-            place_if_filled('gh_user_id', user.get_github_id())
+            place_if_filled('github_user_id', user.get_github_id())
             place_if_filled('major', user.get_major())
             place_if_filled('position', user.get_position())
             place_if_filled('bio', user.get_biography())
@@ -195,15 +195,15 @@ class DynamoDB:
 
             teams_table = self.ddb.Table(self.teams_table)
             tdict = {
-                'gh_team_id': team.get_gh_team_id(),
-                'gh_team_name': team.get_gh_team_name()
+                'github_team_id': team.get_github_team_id(),
+                'github_team_name': team.get_github_team_name()
             }
             place_if_filled('display_name', team.get_display_name())
             place_if_filled('platform', team.get_platform())
             place_if_filled('members', team.get_members())
 
             logging.info("Storing team {} in table {}".
-                         format(team.get_gh_team_name(), self.teams_table))
+                         format(team.get_github_team_name(), self.teams_table))
             teams_table.put_item(Item=tdict)
             return True
         return False
@@ -239,7 +239,7 @@ class DynamoDB:
         user.set_email(d.get('email', ''))
         user.set_name(d.get('name', ''))
         user.set_github_username(d.get('github', ''))
-        user.set_github_id(d.get('gh_user_id', ''))
+        user.set_github_id(d.get('github_user_id', ''))
         user.set_major(d.get('major', ''))
         user.set_position(d.get('position', ''))
         user.set_biography(d.get('bio', ''))
@@ -260,7 +260,7 @@ class DynamoDB:
         response = team_table.get_item(
             TableName=self.teams_table,
             Key={
-                'gh_team_id': team_id
+                'github_team_id': team_id
             }
         )
 
@@ -276,8 +276,8 @@ class DynamoDB:
 
         :return: returns converted team model.
         """
-        team = Team(d['gh_team_id'],
-                    d['gh_team_name'],
+        team = Team(d['github_team_id'],
+                    d['github_team_name'],
                     d.get('display_name', ''))
         team.set_platform(d.get('platform', ''))
         members = set(d.get('members', []))
@@ -387,6 +387,6 @@ class DynamoDB:
         team_table = self.ddb.Table(self.teams_table)
         team_table.delete_item(
             Key={
-                'gh_team_id': team_id
+                'github_team_id': team_id
             }
         )
