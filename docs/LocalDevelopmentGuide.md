@@ -25,7 +25,7 @@ For testing, it's useful to have your own Slack workspace set up. If you do not
 already have one, go [here][create-workspace] to create one, and follow the steps
 to set it up.
 
-## 3: Configure a Slack App
+## 3: Create a Slack App
 
 Follow the link [here][make-slack-app] to create a new Slack app - you can name it
 whatever you like - and install it to the appropriate workspace.
@@ -34,22 +34,6 @@ whatever you like - and install it to the appropriate workspace.
 
 In "Add features and functionality", add a bot user. Since this is just for testing,
 you can name the bot user whatever you like.
-
-### Add Event Subscriptions
-
-In "Add features and functionality", add event subscriptions. In particular, under
-Request URL, submit the ngrok HTTPS URL with `/slack/events` appended to the end.
-Note that ngrok will generate a new HTTPS URL every time it runs, so you will have
-to repeat this step every time you launch ngrok. You will then have to enable
-workspace and/or bot events that we want Rocket to listen for, like the `team_join`
-workspace event - ask the team for the most up-to-date list of these.
-
-### Add Slash Command
-
-In "Add features and functionality", add a slash command. In particular, under
-Request URL, submit the ngrok HTTPS URL with `/slack/commands` appended to the
-end. For the actual command, anything will work, though the final app will use
-`/rocket`.
 
 ### Install Slack App
 
@@ -150,7 +134,28 @@ This is in fact the same command Docker runs, but if you run outside Docker,
 you may run into errors due to unexpected changes in your local development
 environment.
 
-## 7: Testing
+## 7: Configure Slack App Features
+
+In addition to a bot user, there are a couple other features that need to be
+enabled in the Slack app once the local instance of Rocket is running.
+
+### Add Event Subscriptions
+
+In "Add features and functionality", add event subscriptions. In particular, under
+Request URL, submit the ngrok HTTPS URL with `/slack/events` appended to the end.
+Note that ngrok will generate a new HTTPS URL every time it runs, so you will have
+to repeat this step every time you launch ngrok. You will then have to enable
+workspace and/or bot events that we want Rocket to listen for, like the `team_join`
+workspace event - ask the team for the most up-to-date list of these.
+
+### Add Slash Command
+
+In "Add features and functionality", add a slash command. In particular, under
+Request URL, submit the ngrok HTTPS URL with `/slack/commands` appended to the
+end. For the actual command, anything will work, though the final app will use
+`/rocket`.
+
+## 8: Testing
 
 This is the final and most important part: testing if it actually works or not.
 Go to your Slack workspace and add Rocket (or whatever you named your Slack bot)
