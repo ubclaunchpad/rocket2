@@ -24,6 +24,7 @@ class WebhookHandler:
         github_user = payload_dict["membership"]["user"]
         github_id = github_user["id"]
         github_username = github_user["login"]
+        organization = payload_dict["organization"]["login"]
         if action == "member_removed":
             member_list = self.__facade.\
                 query_user(['github_id', github_id])
@@ -35,11 +36,11 @@ class WebhookHandler:
             else:
                 logging.error("could not find user {}".format(github_id))
         elif action == "member_added":
-            logging.info("user {} added to organization".
-                         format(github_username))
+            logging.info("user {} added to {}".
+                         format(github_username, organization))
         elif action == "member_invited":
-            logging.info("user {} invited to organization".
-                         format(github_username))
+            logging.info("user {} invited to {}".
+                         format(github_username, organization))
         else:
             logging.error(("organization webhook triggered,"
-                           " invalid action specified"))
+                           " invalid action specified: " + payload))

@@ -118,7 +118,7 @@ def test_handle_org_event_add_member(mock_logging, org_add_payload):
     webhook_handler = WebhookHandler(mock_facade)
     webhook_handler.handle_organization_event(org_add_payload)
     mock_logging.info.assert_called_once_with(("user hacktocat added "
-                                               "to organization"))
+                                               "to Octocoders"))
 
 
 @mock.patch('webhook.webhook.logging')
@@ -170,7 +170,7 @@ def test_handle_org_event_inv_member(mock_logging, org_inv_payload):
     webhook_handler = WebhookHandler(mock_facade)
     webhook_handler.handle_organization_event(org_inv_payload)
     mock_logging.info.assert_called_once_with(("user hacktocat invited "
-                                               "to organization"))
+                                               "to Octocoders"))
 
 
 @mock.patch('webhook.webhook.logging')
@@ -181,4 +181,5 @@ def test_handle_org_event_empty_action(mock_logging, org_empty_payload):
     webhook_handler.handle_organization_event(org_empty_payload)
     mock_logging.error.assert_called_once_with(("organization webhook "
                                                 "triggered, invalid "
-                                                "action specified"))
+                                                "action specified: {}"
+                                                .format(org_empty_payload)))
