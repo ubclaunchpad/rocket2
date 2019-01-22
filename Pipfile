@@ -11,6 +11,8 @@ pytest = "*"
 slackclient = "*"
 slackeventsapi = "*"
 toml = "*"
+structlog = "*"
+colorama = "*"
 
 [dev-packages]
 awscli = "*"
