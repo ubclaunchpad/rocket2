@@ -13,41 +13,26 @@ dictConfig({
     'version': 1,
     'disable_existing_loggers': False,
     'formatters': {
-        "plain": {
-            'format': '{Time: %(asctime)s, Level: %(levelname)s ' +
-                      'module:%(module)s, function: %(funcName)s():%(lineno)s, message: %(message)s}',
-            "()": structlog.stdlib.ProcessorFormatter,
-            "processor": structlog.dev.ConsoleRenderer(colors=True),
-            'datefmt': '%Y-%m-%d %H:%M:%S',
-            "keep_exc_info": True,
-            "keep_stack_info": True
-        },
         'default': {
-            'format': '{Time: %(asctime)s, Level: %(levelname)s ' +
-                      'module:%(module)s, function: %(funcName)s():%(lineno)s, message: %(message)s}',
+            'format': '{Time: %(asctime)s, Level: [%(levelname)s], ' +
+                      'module: %(module)s, function: %(funcName)s():%(lineno)s, message: %(message)s}',
             "()": structlog.stdlib.ProcessorFormatter,
             "processor": structlog.dev.ConsoleRenderer(colors=True),
             'datefmt': '%Y-%m-%d %H:%M:%S',
         },
         "colored": {
-            'format': '{Time: %(asctime)s, Level: [%(levelname)s] ' +
-            'module:%(module)s, function: %(funcName)s():%(lineno)s, message: %(message)s}',
+            'format': '{Time: %(asctime)s, Level: [%(levelname)s], ' +
+            'module: %(module)s, function: %(funcName)s():%(lineno)s, message: %(message)s}',
             "()": structlog.stdlib.ProcessorFormatter,
             "processor": structlog.dev.ConsoleRenderer(colors=True),
             'datefmt': '%Y-%m-%d %H:%M:%S',
         }},
     'handlers': {
         'wsgi': {
-        'class': 'logging.StreamHandler',
-        'stream': 'ext://flask.logging.wsgi_errors_stream',
-        'formatter': 'colored'
-        },
-        "file": {
-            "level": "DEBUG",
-            "class": "logging.handlers.WatchedFileHandler",
-            "filename": "logs.log",
-            "formatter": "plain",
-        },
+            'class': 'logging.StreamHandler',
+            'stream': 'ext://flask.logging.wsgi_errors_stream',
+            'formatter': 'colored'
+        }
     },
     'root': {
         'level': 'INFO',
