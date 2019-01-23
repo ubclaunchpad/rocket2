@@ -12,6 +12,7 @@ Attribute Name | Description
 `slack_id` | `String`; The user's slack id
 `email` | `String`; The user's email address
 `github` | `String`; The user's Github handler
+`github_user_id` | `String`; The user's Github user ID
 `major` | `String`; The subject major the user is in
 `position` | `String`; The user's position in _Launch Pad_
 `bio` | `String`; A short (auto)biography (about the user)
@@ -28,7 +29,8 @@ and are also listed here:
 
 Attribute Name | Description
 ---|---
-`github_team_name` | `String`; The team's github name
+`github_team_id` | `String`; The team's Github ID
+`github_team_name` | `String`; The team's Github name
 `display_name` | `String`; The teams's display
 `platform` | `String`; The team's working platform
-`members` | `String Set`; The team's set of members
+`members` | `String Set`; The team's set of members' Github IDs

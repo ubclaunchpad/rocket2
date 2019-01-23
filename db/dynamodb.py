@@ -111,7 +111,7 @@ class DynamoDB:
         **Note**: This function should **not** be called externally, and should
         only be called on initialization.
 
-        Teams are only required to have a ``github_team_name``. Since this is a
+        Teams are only required to have a ``github_team_id``. Since this is a
         NoSQL database, no other attributes are required.
         """
         logging.info("Creating table '{}'".format(self.teams_table))
@@ -119,13 +119,13 @@ class DynamoDB:
             TableName=self.teams_table,
             AttributeDefinitions=[
                 {
-                    'AttributeName': 'github_team_name',
+                    'AttributeName': 'github_team_id',
                     'AttributeType': 'S'
                 },
             ],
             KeySchema=[
                 {
-                    'AttributeName': 'github_team_name',
+                    'AttributeName': 'github_team_id',
                     'KeyType': 'HASH'
                 },
             ],
@@ -167,7 +167,7 @@ class DynamoDB:
             place_if_filled('email', user.get_email())
             place_if_filled('name', user.get_name())
             place_if_filled('github', user.get_github_username())
-            place_if_filled('guid', user.get_github_id())
+            place_if_filled('github_user_id', user.get_github_id())
             place_if_filled('major', user.get_major())
             place_if_filled('position', user.get_position())
             place_if_filled('bio', user.get_biography())
@@ -195,6 +195,7 @@ class DynamoDB:
 
             teams_table = self.ddb.Table(self.teams_table)
             tdict = {
+                'github_team_id': team.get_github_team_id(),
                 'github_team_name': team.get_github_team_name()
             }
             place_if_filled('display_name', team.get_display_name())
@@ -238,7 +239,7 @@ class DynamoDB:
         user.set_email(d.get('email', ''))
         user.set_name(d.get('name', ''))
         user.set_github_username(d.get('github', ''))
-        user.set_github_id(d.get('guid', ''))
+        user.set_github_id(d.get('github_user_id', ''))
         user.set_major(d.get('major', ''))
         user.set_position(d.get('position', ''))
         user.set_biography(d.get('bio', ''))
@@ -247,7 +248,7 @@ class DynamoDB:
                                                      'members')])
         return user
 
-    def retrieve_team(self, team_name):
+    def retrieve_team(self, team_id):
         """
         Retrieve team from teams table.
 
@@ -259,13 +260,14 @@ class DynamoDB:
         response = team_table.get_item(
             TableName=self.teams_table,
             Key={
-                'github_team_name': team_name
+                'github_team_id': team_id
             }
         )
+
         if 'Item' in response.keys():
             return self.team_from_dict(response['Item'])
         else:
-            raise LookupError('Team "{}" not found'.format(team_name))
+            raise LookupError('Team "{}" not found'.format(team_id))
 
     @staticmethod
     def team_from_dict(d):
@@ -274,7 +276,9 @@ class DynamoDB:
 
         :return: returns converted team model.
         """
-        team = Team(d['github_team_name'], d.get('display_name', ''))
+        team = Team(d['github_team_id'],
+                    d['github_team_name'],
+                    d.get('display_name', ''))
         team.set_platform(d.get('platform', ''))
         members = set(d.get('members', []))
         for member in members:
@@ -370,17 +374,19 @@ class DynamoDB:
             }
         )
 
-    def delete_team(self, team_name):
+    def delete_team(self, team_id):
         """
         Remove a team from the teams table.
 
-        :param team_name: the team_name of the team to be removed
+        To obtain the team github id, you have to retrieve the team first.
+
+        :param team_id: the team_id of the team to be removed
         """
         logging.info("Deleting team {} from table {}".
-                     format(team_name, self.teams_table))
+                     format(team_id, self.teams_table))
         team_table = self.ddb.Table(self.teams_table)
         team_table.delete_item(
             Key={
-                'github_team_name': team_name
+                'github_team_id': team_id
             }
         )
