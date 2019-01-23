@@ -8,88 +8,53 @@ import sys
 import toml
 import structlog
 
-# dictConfig({
-#     'version': 1,
-#     'formatters': {
-#         'default': {
-#             'format': '%(asctime)s - %(levelname)s @ ' +
-#                       '%(module)s-%(funcName)s : %(message)s'
-#         }},
-#     'handlers': {'wsgi': {
-#         'class': 'logging.StreamHandler',
-#         'stream': 'ext://flask.logging.wsgi_errors_stream',
-#         'formatter': 'default'
-#     }},
-#     'root': {
-#         'level': 'INFO',
-#         'handlers': ['wsgi']
-#     }
-# })
 
-timestamper = structlog.processors.TimeStamper(fmt="%Y-%m-%d %H:%M:%S")
-pre_chain = [
-    # Add the log level and a timestamp to the event_dict if the log entry
-    # is not from structlog.
-    structlog.stdlib.add_log_level,
-    timestamper,
-]
-
-logging.config.dictConfig({
-    "version": 1,
-    "disable_existing_loggers": False,
-    "formatters": {
+dictConfig({
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
         "plain": {
+            'format': '{Time: %(asctime)s, Level: %(levelname)s ' +
+                      'module:%(module)s, function: %(funcName)s():%(lineno)s, message: %(message)s}',
             "()": structlog.stdlib.ProcessorFormatter,
-            "processor": structlog.dev.ConsoleRenderer(colors=False),
-            "foreign_pre_chain": pre_chain,
+            "processor": structlog.dev.ConsoleRenderer(colors=True),
+            'datefmt': '%Y-%m-%d %H:%M:%S',
+            "keep_exc_info": True,
+            "keep_stack_info": True
+        },
+        'default': {
+            'format': '{Time: %(asctime)s, Level: %(levelname)s ' +
+                      'module:%(module)s, function: %(funcName)s():%(lineno)s, message: %(message)s}',
+            "()": structlog.stdlib.ProcessorFormatter,
+            "processor": structlog.dev.ConsoleRenderer(colors=True),
+            'datefmt': '%Y-%m-%d %H:%M:%S',
         },
         "colored": {
+            'format': '{Time: %(asctime)s, Level: [%(levelname)s] ' +
+            'module:%(module)s, function: %(funcName)s():%(lineno)s, message: %(message)s}',
             "()": structlog.stdlib.ProcessorFormatter,
             "processor": structlog.dev.ConsoleRenderer(colors=True),
-            "foreign_pre_chain": pre_chain,
-        },
-        "default": {
-            "()": structlog.stdlib.ProcessorFormatter,
-            "processor": structlog.dev.ConsoleRenderer(colors=True),
-            "foreign_pre_chain": pre_chain,
-        }
-    },
-    "handlers": {
-        "default": {
-            "level": "DEBUG",
-            "class": "logging.StreamHandler",
-            "formatter": "colored",
+            'datefmt': '%Y-%m-%d %H:%M:%S',
+        }},
+    'handlers': {
+        'wsgi': {
+        'class': 'logging.StreamHandler',
+        'stream': 'ext://flask.logging.wsgi_errors_stream',
+        'formatter': 'colored'
         },
         "file": {
             "level": "DEBUG",
             "class": "logging.handlers.WatchedFileHandler",
-            "filename": "test.log",
+            "filename": "logs.log",
             "formatter": "plain",
         },
     },
-    "loggers": {
-        "": {
-            "handlers": ["default", "file"],
-            "level": "INFO",
-            "propagate": True,
-        },
+    'root': {
+        'level': 'INFO',
+        'propogate': True,
+        'handlers': ['wsgi', 'file']
     }
 })
-
-structlog.configure(
-    processors=[
-        structlog.stdlib.add_log_level,
-        structlog.stdlib.PositionalArgumentsFormatter(),
-        timestamper,
-        structlog.processors.StackInfoRenderer(),
-        structlog.processors.format_exc_info,
-        structlog.stdlib.ProcessorFormatter.wrap_for_formatter,
-    ],
-    context_class=dict,
-    logger_factory=structlog.stdlib.LoggerFactory(),
-    wrapper_class=structlog.stdlib.BoundLogger,
-    cache_logger_on_first_use=True,
-)
 
 try:
     app = Flask(__name__)
