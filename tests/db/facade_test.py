@@ -40,7 +40,7 @@ def test_query_user(ddb):
 def test_store_team(ddb):
     """Test storing team calls correct functions."""
     dbf = DBFacade(ddb)
-    test_team = create_test_team('brussel-sprouts', 'Brussel Sprouts')
+    test_team = create_test_team('1', 'brussel-sprouts', 'Brussel Sprouts')
     dbf.store_team(test_team)
     ddb.store_team.assert_called_with(test_team)
 
