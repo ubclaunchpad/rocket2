@@ -52,7 +52,7 @@ dictConfig({
     'root': {
         'level': 'INFO',
         'propogate': True,
-        'handlers': ['wsgi', 'file']
+        'handlers': ['wsgi']
     }
 })
 
