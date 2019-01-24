@@ -6,7 +6,21 @@ from model.permissions import Permissions
 
 def create_test_user(slack_id):
     """
-    Create a test user with slack id, and with all other attributes the same.
+    Create a test user with slack id, and with all other attributes set.
+
+    ==========  =============================
+    Property    Preset
+    ==========  =============================
+    Slack ID    ``slack_id``
+    Bio         I like puppies and kittens!
+    Email       admin@ubc.ca
+    Name        Iemann Atmin
+    Github      kibbles
+    Image URL   https://google.ca
+    Major       Computer Science
+    Permission  Admin
+    Position    Adrenaline Junkie
+    ==========  =============================
 
     :param slack_id: The slack id string
     :return: returns a filled-in user model (no empty strings)
@@ -27,7 +41,19 @@ def create_test_team(tid, team_name, display_name):
     """
     Create a test team with team name, and with all other attributes the same.
 
-    :param team_name: The github team name string
+    ==========  =============================
+    Property    Preset
+    ==========  =============================
+    Github      ``tid``
+    Name slug   ``team_name``
+    Display     ``display_name``
+    Platform    slack
+    Members     ['abc_123']
+    ==========  =============================
+
+    :param tid: The github ID associated with the team
+    :param team_name: The github team name slug
+    :param display_name: The github team name
     :return: returns a filled-in user model (no empty strings)
     """
     t = Team(tid, team_name, display_name)

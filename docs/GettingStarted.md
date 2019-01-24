@@ -16,7 +16,7 @@ A slack user calls Rocket2 to edit their information.
 ```sh
 # SLACK_ID will be the current user's slack id.
 # For this example, let's assume the slack id to be `StevenU`
-@rocket user edit --name "Steven Universe" --email "su@gmail.com"
+/rocket user edit --name "Steven Universe" --email "su@gmail.com"
 ```
 
 Yay! You have done what you were told to do, but wait! As a curious software
@@ -30,7 +30,7 @@ An User model is constructed from the information the user input. Unfilled
 parameters will remain empty.
 
 ```python
-# To construct a User model.
+# To construct a User model with Slack ID 'StevenU'
 steven_universe = User('StevenU')
 steven_universe.set_email('su@gmail.com')
 

@@ -121,8 +121,9 @@ class UserCommand:
         """
         Edit user from database.
 
-        If param_list[0] is not None, edits user with
-        ID param_list[0], else edits user with user_id
+        If ``param_list['member']`` is not ``None``, this function edits using
+        the ID from ``param_list['member']`` (must be an admin to do so).
+        Otherwise, edits the user that called the function.
 
         :param user_id: Slack ID of user who is calling the command
         :param param_list: List of user parameters that are to be edited
@@ -166,13 +167,14 @@ class UserCommand:
         """
         Delete user from database.
 
-        Delete user with slack_id from database if user with user_id has
-        admin permission level.
+        Delete user with ``slack_id`` from database if user with ``user_id``
+        has admin permission level. **Note**: deleting yourself is entirely
+        possible.
 
         :param user_id: Slack ID of user who is calling the command
         :param slack_id: Slack ID of user who is being deleted
-        :return: returns permission error message if not admin,
-                 returns deletion message if user is deleted.
+        :return: permission error message if not admin, or a successful
+                 deletion message if user is deleted.
         """
         try:
             user_command = self.facade.retrieve_user(user_id)
@@ -188,13 +190,13 @@ class UserCommand:
         """
         View user info from database.
 
-        If slack_id is None, return information of user_id,
-        else return information of slack_id
+        If slack_id is None, return information of ``user_id``, else return
+        information of ``slack_id``.
 
         :param user_id: Slack ID of user who is calling command
         :param slack_id: Slack ID of user whose info is being retrieved
-        :return: returns error message if user not found in database,
-                 else returns information about the user
+        :return: error message if user not found in database, else information
+                 about the user
         """
         try:
             if slack_id is None:
@@ -211,7 +213,7 @@ class UserCommand:
         Add the user to the database via user id.
 
         :param user_id: Slack ID of user to be added
-        :return: "User added!", 200
+        :return: ``"User added!", 200``
         """
         self.facade.store_user(User(user_id))
         return 'User added!', 200
