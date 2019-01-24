@@ -15,14 +15,16 @@ dictConfig({
     'formatters': {
         'default': {
             'format': '{Time: %(asctime)s, Level: [%(levelname)s], ' +
-                      'module: %(module)s, function: %(funcName)s():%(lineno)s, message: %(message)s}',
+                      'module: %(module)s, function: %(funcName)s()' +
+                      ':%(lineno)s, message: %(message)s}',
             "()": structlog.stdlib.ProcessorFormatter,
             "processor": structlog.dev.ConsoleRenderer(colors=True),
             'datefmt': '%Y-%m-%d %H:%M:%S',
         },
         "colored": {
             'format': '{Time: %(asctime)s, Level: [%(levelname)s], ' +
-            'module: %(module)s, function: %(funcName)s():%(lineno)s, message: %(message)s}',
+            'module: %(module)s, function: %(funcName)s():%(lineno)s, ' +
+            'message: %(message)s}',
             "()": structlog.stdlib.ProcessorFormatter,
             "processor": structlog.dev.ConsoleRenderer(colors=True),
             'datefmt': '%Y-%m-%d %H:%M:%S',
