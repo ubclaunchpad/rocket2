@@ -30,18 +30,18 @@ to set it up.
 Follow the link [here][make-slack-app] to create a new Slack app - you can name it
 whatever you like - and install it to the appropriate workspace.
 
-### Add a Bot User
+### 3.1: Add a Bot User
 
 In "Add features and functionality", add a bot user. Since this is just for testing,
 you can name the bot user whatever you like.
 
-### Install Slack App
+### 3.2: Install Slack App
 
 In "Install your app to your workspace," click the button to install to your
 workspace. This will take you to a permissions page for the workspace - make sure
 this is for the correct workspace, and allow the app to connect.
 
-### Determine Credentials
+### 3.3: Determine Credentials
 
 Make note of the app's signing secret, found in Settings -> Basic Information ->
 App Credentials, and the bot user OAuth access token, found in Features ->
@@ -76,7 +76,7 @@ with other users testing on the same AWS account. You can also change the
 AWS region, if necessary, though the default value of `us-west-2` should be
 good for most purposes.
 
-### Set Up Slack Credentials
+### 5.1: Set Up Slack Credentials
 
 Create the file `credentials/slack.toml` and input the following:
 
@@ -90,7 +90,7 @@ section 3, and replace the `...` value for `api_token` with the bot user
 OAuth token from section 3. In both cases, maintain the quotation marks around
 the values.
 
-### Set Up AWS Credentials
+### 5.2: Set Up AWS Credentials
 
 Create the file `credentials/aws.toml` and input the following:
 
@@ -125,7 +125,7 @@ Also note that, for your convenience, we have provided two scripts,
 `scripts/docker_build.sh` and `scripts/docker_run_local.sh`, that run these
 exact commands.
 
-### Optional: Running without Docker
+### 6.1: [Optional] Running without Docker
 
 We highly recommend building and running on Docker, but building every time
 you make a tiny change can be inconvenient. If you would like to run without
@@ -139,7 +139,7 @@ environment.
 In addition to a bot user, there are a couple other features that need to be
 enabled in the Slack app once the local instance of Rocket is running.
 
-### Add Event Subscriptions
+### 7.1: Add Event Subscriptions
 
 In "Add features and functionality", add event subscriptions. In particular, under
 Request URL, submit the ngrok HTTPS URL with `/slack/events` appended to the end.
@@ -148,7 +148,7 @@ to repeat this step every time you launch ngrok. You will then have to enable
 workspace and/or bot events that we want Rocket to listen for, like the `team_join`
 workspace event - ask the team for the most up-to-date list of these.
 
-### Add Slash Command
+### 7.2: Add Slash Command
 
 In "Add features and functionality", add a slash command. In particular, under
 Request URL, submit the ngrok HTTPS URL with `/slack/commands` appended to the
@@ -170,7 +170,7 @@ To test if Rocket is running, type the command:
 
 If you see a list of options, Rocket is working!
 
-### Setting Up Admin Permissions
+### 8.1: Setting Up Admin Permissions
 
 We currently haven't finished the command to add a user to the database or
 make them an admin, so we have to do it manually.
@@ -211,7 +211,7 @@ Make sure there's a column for `slack_id` and `permission_level`,
 where `slack_id` is a `String` with the appropriate value and
 `permission_level` is a `String` with the value `admin`.
 
-### Viewing a User
+### 8.2: Viewing a User
 
 ```
 /rocket user view
