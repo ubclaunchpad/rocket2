@@ -5,6 +5,7 @@ import shlex
 from flask import jsonify
 from model.permissions import Permissions
 from model.user import User
+from command.core import Core
 
 
 class UserCommand:
@@ -155,6 +156,10 @@ class UserCommand:
             edited_user.set_position(param_list["pos"])
         if param_list["github"]:
             edited_user.set_github_username(param_list["github"])
+            try:
+                Core.__github.org_add_username(param_list["github"])
+            except Exception as e:
+                logging.error("Error while editing user organization!\n" + e)
         if param_list["major"]:
             edited_user.set_major(param_list["major"])
         if param_list["bio"]:
