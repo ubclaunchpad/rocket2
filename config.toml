@@ -8,3 +8,6 @@ creds_path = "credentials/aws.toml"
 users_table = "users"
 teams_table = "teams"
 region = "us-west-2"
+
+[github]
+creds_path = "credentials/github.toml"
