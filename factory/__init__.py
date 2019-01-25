@@ -4,7 +4,10 @@ from db.dynamodb import DynamoDB
 from command.core import Core
 from slackclient import SlackClient
 from interface.slack import Bot
+<<<<<<< HEAD
 from webhook.webhook import WebhookHandler
+=======
+>>>>>>> Made it so a user's attempt to change their github username adds the new username to rocket github organization (needs testing)
 from github import Github, GithubException
 import toml
 from interface.github import GithubInterface
