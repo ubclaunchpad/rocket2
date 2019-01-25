@@ -8,13 +8,13 @@ import logging
 class Core:
     """Encapsulate methods for handling events."""
 
-    def __init__(self, db_facade, bot, githubInstance):
+    def __init__(self, db_facade, bot, ghInterface):
         """Initialize the dictionary of command handlers."""
         self.__commands = {}
         self.__facade = db_facade
         self.__bot = bot
+        self.__github = ghInterface
         self.__commands["user"] = UserCommand(self.__facade)
-        self-__github = githubInstance
 
     def handle_app_command(self, cmd_txt, user):
         """Handle a command call to rocket."""
