@@ -1,11 +1,12 @@
 """Flask server instance."""
-from factory import make_core
+from factory import make_core, make_webhook_handler
 from flask import Flask, request
 from logging.config import dictConfig
 from slackeventsapi import SlackEventAdapter
 import logging
 import sys
 import toml
+import json
 
 dictConfig({
     'version': 1,
@@ -29,6 +30,7 @@ try:
     app = Flask(__name__)
     config = toml.load('config.toml')
     core = make_core(config)
+    webhook_handler = make_webhook_handler(config)
     if not config['testing']:
         slack_signing_secret = toml.load(
             config['slack']['creds_path'])['signing_secret']
@@ -56,6 +58,14 @@ def handle_commands():
     txt = request.form['text']
     uid = request.form['user_id']
     return core.handle_app_command(txt, uid)
+
+
+@app.route('/webhook/organization', methods=['POST'])
+def handle_organization_webhook():
+    """Handle GitHub organization webhooks."""
+    logging.info("organization webhook triggered")
+    logging.debug("organization payload: ".format(str(request.get_json())))
+    return webhook_handler.handle_organization_event(request.get_json())
 
 
 @slack_events_adapter.on("app_mention")
