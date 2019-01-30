@@ -6,21 +6,39 @@ from slackeventsapi import SlackEventAdapter
 import logging
 import sys
 import toml
+import structlog
+
 
 dictConfig({
     'version': 1,
+    'disable_existing_loggers': False,
     'formatters': {
         'default': {
-            'format': '%(asctime)s - %(levelname)s @ ' +
-                      '%(module)s-%(funcName)s : %(message)s'
+            'format': '{Time: %(asctime)s, Level: [%(levelname)s], ' +
+                      'module: %(module)s, function: %(funcName)s()' +
+                      ':%(lineno)s, message: %(message)s}',
+            "()": structlog.stdlib.ProcessorFormatter,
+            "processor": structlog.dev.ConsoleRenderer(colors=True),
+            'datefmt': '%Y-%m-%d %H:%M:%S',
+        },
+        "colored": {
+            'format': '{Time: %(asctime)s, Level: [%(levelname)s], ' +
+            'module: %(module)s, function: %(funcName)s():%(lineno)s, ' +
+            'message: %(message)s}',
+            "()": structlog.stdlib.ProcessorFormatter,
+            "processor": structlog.dev.ConsoleRenderer(colors=True),
+            'datefmt': '%Y-%m-%d %H:%M:%S',
         }},
-    'handlers': {'wsgi': {
-        'class': 'logging.StreamHandler',
-        'stream': 'ext://flask.logging.wsgi_errors_stream',
-        'formatter': 'default'
-    }},
+    'handlers': {
+        'wsgi': {
+            'class': 'logging.StreamHandler',
+            'stream': 'ext://flask.logging.wsgi_errors_stream',
+            'formatter': 'colored'
+        }
+    },
     'root': {
         'level': 'INFO',
+        'propogate': True,
         'handlers': ['wsgi']
     }
 })
