@@ -1,5 +1,4 @@
 """Contain all the logic for handling webhooks in a class."""
-import json
 import logging
 
 

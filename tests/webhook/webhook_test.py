@@ -1,5 +1,4 @@
 """Test the webhook handler."""
-import json
 import pytest
 from unittest import mock
 from model.user import User

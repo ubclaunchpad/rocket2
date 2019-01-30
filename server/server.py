@@ -6,7 +6,6 @@ from slackeventsapi import SlackEventAdapter
 import logging
 import sys
 import toml
-import json
 
 dictConfig({
     'version': 1,
