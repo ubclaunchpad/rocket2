@@ -12,6 +12,8 @@ slackclient = "*"
 slackeventsapi = "*"
 pygithub = "*"
 toml = "*"
+structlog = "*"
+colorama = "*"
 
 [dev-packages]
 awscli = "*"
