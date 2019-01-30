@@ -168,8 +168,9 @@ class UserCommand:
         Delete user from database.
 
         Delete user with ``slack_id`` from database if user with ``user_id``
-        has admin permission level. **Note**: deleting yourself is entirely
-        possible.
+        has admin permission level.
+
+        **Note**: user can delete themselves.
 
         :param user_id: Slack ID of user who is calling the command
         :param slack_id: Slack ID of user who is being deleted

@@ -1,7 +1,7 @@
 """Test the facade for the database."""
 from unittest import mock
 from db.facade import DBFacade
-from tests.util import create_test_user, create_test_team
+from tests.util import create_test_admin, create_test_team
 
 
 @mock.patch('db.dynamodb.DynamoDB', autospec=True)
@@ -14,7 +14,7 @@ def test_string_rep(ddb):
 def test_store_user(ddb):
     """Test storing user calls correct functions."""
     dbf = DBFacade(ddb)
-    test_user = create_test_user('abc_123')
+    test_user = create_test_admin('abc_123')
     dbf.store_user(test_user)
     ddb.store_user.assert_called_with(test_user)
 

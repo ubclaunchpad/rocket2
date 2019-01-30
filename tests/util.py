@@ -4,9 +4,9 @@ from model.team import Team
 from model.permissions import Permissions
 
 
-def create_test_user(slack_id):
+def create_test_admin(slack_id):
     """
-    Create a test user with slack id, and with all other attributes set.
+    Create a test admin user with slack id, and with all other attributes set.
 
     ==========  =============================
     Property    Preset
@@ -16,7 +16,7 @@ def create_test_user(slack_id):
     Email       admin@ubc.ca
     Name        Iemann Atmin
     Github      kibbles
-    Image URL   https://google.ca
+    Image URL   https://via.placeholder.com/150
     Major       Computer Science
     Permission  Admin
     Position    Adrenaline Junkie
@@ -30,7 +30,7 @@ def create_test_user(slack_id):
     u.set_email('admin@ubc.ca')
     u.set_name('Iemann Atmin')
     u.set_github_username('kibbles')
-    u.set_image_url('https://google.ca')
+    u.set_image_url('https:///via.placeholder.com/150')
     u.set_major('Computer Science')
     u.set_permissions_level(Permissions.admin)
     u.set_position('Adrenaline Junkie')
