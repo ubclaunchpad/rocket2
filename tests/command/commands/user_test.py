@@ -6,7 +6,11 @@ from model.user import User
 from db.facade import DBFacade
 from model.permissions import Permissions
 from interface.slack import Bot
+<<<<<<< HEAD
 from interface.github import GithubInterface, GithubAPIException
+=======
+from interface.github import GithubInterface
+>>>>>>> Added tests for editing a user's github username!
 
 
 class TestUserCommand(TestCase):
