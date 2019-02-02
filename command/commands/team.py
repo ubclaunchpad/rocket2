@@ -9,7 +9,7 @@ class TeamCommand:
 
     command_name = "team"
     help = "# Team Command Reference\n\n"\
-           "@rocket team\n\n"\
+           "/rocket team\n\n"\
            "All Parameters with whitespace"\
            " must be enclosed by quotation marks.\n\n"\
            "## Options to specify input\n\n"\
