@@ -6,6 +6,7 @@ from model.user import User
 from db.facade import DBFacade
 from model.permissions import Permissions
 from interface.slack import Bot
+from interface.github import GithubInterface
 
 
 class TestUserCommand(TestCase):
@@ -15,7 +16,8 @@ class TestUserCommand(TestCase):
         """Set up the test case environment."""
         self.app = Flask(__name__)
         self.mock_facade = mock.MagicMock(DBFacade)
-        self.testcommand = UserCommand(self.mock_facade)
+        self.mock_github = mock.MagicMock(GithubInterface)
+        self.testcommand = UserCommand(self.mock_facade, self.mock_github)
 
     def test_get_command_name(self):
         """Test user command get_name method."""
@@ -132,6 +134,17 @@ class TestUserCommand(TestCase):
         self.mock_facade.retrieve_user.assert_called_once_with("U0G9QF9C6")
         user.set_name("rob")
         self.mock_facade.store_user.assert_called_once_with(user)
+
+    def test_handle_edit_github(self):
+        """Test that editing github username sends request to interface."""
+        user = User("U0G9QF9C6")
+        self.mock_facade.retrieve_user.return_value = user
+        self.assertEqual(self.testcommand.handle("user edit --github rob",
+                                                 "U0G9QF9C6"),
+                         ("User edited: " + str(user), 200))
+        self.mock_facade.retrieve_user.assert_called_once_with("U0G9QF9C6")
+        self.mock_facade.store_user.assert_called_once_with(user)
+        self.mock_github.org_add_member.assert_called_once_with("rob")
 
     def test_handle_edit_other_user(self):
         """Test user command edit parser with all fields."""
