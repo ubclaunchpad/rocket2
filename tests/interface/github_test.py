@@ -14,7 +14,7 @@ class TestGithubInterface(TestCase):
         self.mock_github = mock.MagicMock(Github)
         self.mock_org = mock.MagicMock(Organization.Organization)
         self.mock_github.get_organization.return_value = self.mock_org
-        self.test_bot = GithubInterface(self.mock_github, "Launch Pad")
+        self.test_bot = GithubInterface(self.mock_github, "ubclaunchpad")
 
     def test_org_add_member(self):
         """Test GithubInterface method org_add_member."""
@@ -51,7 +51,7 @@ class TestGithubInterface(TestCase):
         self.mock_github.\
             get_organization.side_effect = GithubException("status", "data")
         try:
-            test_bot = GithubInterface(self.mock_github, "Launch Pad")
+            test_bot = GithubInterface(self.mock_github, "ubclaunchpad")
             assert False
         except GithubAPIException as e:
             pass
