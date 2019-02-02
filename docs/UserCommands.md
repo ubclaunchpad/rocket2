@@ -32,11 +32,12 @@ another user's Launch Pad profile by using `[--member SLACKID]` option.
 ### View
 
 ```sh
-/rocket user view SLACKID
+/rocket user view [SLACKID]
 ```
 
 Display information about a user. `SLACK_ID` is the `@`-name, for easy slack
-autocomplete.
+autocomplete. If `SLACK_ID` is not specified, this command displays information
+about the one who ran the command instead.
 
 ### Help
 
