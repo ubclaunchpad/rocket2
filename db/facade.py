@@ -40,6 +40,8 @@ class DBFacade:
         """
         Retrieve user from users table.
 
+        :param slack_id: retrieve based on this slack id
+        :raise: LookupError if slack id is not found.
         :return: returns a user model if slack id is found.
         """
         logging.info("Retrieving user {}".format(slack_id))
@@ -84,6 +86,8 @@ class DBFacade:
         """
         Retrieve team from teams table.
 
+        :param team_name: used as key for retrieving team objects.
+        :raise: LookupError if team id is not found.
         :return: returns a team model if slack id is found.
         """
         logging.info("Retrieving team {}".format(team_name))

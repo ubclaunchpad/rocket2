@@ -1,5 +1,5 @@
 """Test the dynamodb interface (requires dynamodb running)."""
-from tests.util import create_test_user, create_test_team
+from tests.util import create_test_admin, create_test_team
 from model.user import User
 from model.team import Team
 import pytest
@@ -47,8 +47,8 @@ def test_store_invalid_team(ddb_connection):
 def test_store_same_users(ddb_connection):
     """Test how database handles overwriting same user (same slack_id)."""
     ddb = ddb_connection
-    user = create_test_user('abc_123')
-    user2 = create_test_user('abc_123')
+    user = create_test_admin('abc_123')
+    user2 = create_test_admin('abc_123')
     user2.set_name('Sprouts')
     ddb.store_user(user)
     ddb.store_user(user2)
@@ -62,7 +62,7 @@ def test_store_same_users(ddb_connection):
 def test_store_retrieve_user(ddb_connection):
     """Test to see if we can store and retrieve the same user."""
     ddb = ddb_connection
-    user = create_test_user('abc_123')
+    user = create_test_admin('abc_123')
 
     success = ddb.store_user(user)
     another_user = ddb.retrieve_user('abc_123')
@@ -89,7 +89,7 @@ def test_retrieve_invalid_user(ddb_connection):
 def test_query_user(ddb_connection):
     """Test to see if we can store and query the same user."""
     ddb = ddb_connection
-    user = create_test_user('abc_123')
+    user = create_test_admin('abc_123')
     assert ddb.store_user(user)
     users = ddb.query_user([('permission_level', 'admin')])
     strict_users = ddb.query_user([('permission_level', 'admin'),
@@ -193,7 +193,7 @@ def test_query_team(ddb_connection):
 def test_delete_user(ddb_connection):
     """Test to see if we can successfully delete a user."""
     ddb = ddb_connection
-    user = create_test_user('abc_123')
+    user = create_test_admin('abc_123')
     ddb.store_user(user)
 
     assert len(ddb.query_user([])) == 1

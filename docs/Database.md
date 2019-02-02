@@ -15,7 +15,7 @@ Attribute Name | Description
 `github_user_id` | `String`; The user's Github user ID
 `major` | `String`; The subject major the user is in
 `position` | `String`; The user's position in _Launch Pad_
-`bio` | `String`; A short (auto)biography (about the user)
+`bio` | `String`; A short (auto)biography
 `image_url` | `String`; The user's avatar image URL
 `permission_level` | `String`; The user's permission level
 

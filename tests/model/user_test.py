@@ -1,7 +1,7 @@
 """Test the data model for a user."""
 from model.permissions import Permissions
 from model.user import User
-from tests.util import create_test_user
+from tests.util import create_test_admin
 
 
 def test_user_equality():
@@ -17,7 +17,7 @@ def test_valid_user():
     """Test the User static class method is_valid()."""
     user = User("")
     assert not User.is_valid(user)
-    user = create_test_user("brussel-sprouts")
+    user = create_test_admin("brussel-sprouts")
     assert User.is_valid(user)
 
 

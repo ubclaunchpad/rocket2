@@ -212,7 +212,8 @@ class DynamoDB:
         """
         Retrieve user from users table.
 
-        :raises: raises LookupError if slack id is not found.
+        :param slack_id: retrieve based on this slack id
+        :raise: LookupError if slack id is not found.
         :return: returns a user model if slack id is found.
         """
         user_table = self.ddb.Table(self.users_table)
@@ -252,8 +253,8 @@ class DynamoDB:
         """
         Retrieve team from teams table.
 
-        :param: team_name: used as key for retrieving team objects.
-        :raise: raises a LookupError if team id is not found.
+        :param team_name: used as key for retrieving team objects.
+        :raise: LookupError if team id is not found.
         :return: the team object if team_name is found.
         """
         team_table = self.ddb.Table(self.teams_table)
