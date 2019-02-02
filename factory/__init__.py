@@ -14,7 +14,7 @@ from interface.github import GithubInterface
 import logging
 
 
-def make_core(config):
+def make_core(config, gh=None):
     """
     Initialize and returns a :class:`command.core.Core` object.
 
@@ -28,9 +28,9 @@ def make_core(config):
             config['github']['creds_path'])['api_token']
         github_organization += toml.load(
             config['github']['creds_path'])['organization']
+        gh = GithubInterface(Github(github_api_token), github_organization)
     facade = DBFacade(DynamoDB(config))
     bot = Bot(SlackClient(slack_api_token))
-    gh = GithubInterface(Github(github_api_token), github_organization)
     return Core(facade, bot, gh)
 
 def make_webhook_handler(config):
