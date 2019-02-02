@@ -157,9 +157,9 @@ class UserCommand:
         if param_list["github"]:
             edited_user.set_github_username(param_list["github"])
             try:
-                self.github.org_add_username(param_list["github"])
+                self.github.org_add_member(param_list["github"])
             except Exception as e:
-                logging.error("Error while editing user organization!\n" + e)
+                logging.error("Error while editing user organization!\n")
         if param_list["major"]:
             edited_user.set_major(param_list["major"])
         if param_list["bio"]:
