@@ -5,7 +5,6 @@ import shlex
 from flask import jsonify
 from model.permissions import Permissions
 from model.user import User
-from command.core import Core
 
 
 class UserCommand:
@@ -32,13 +31,14 @@ class UserCommand:
     lookup_error = "User not found!"
     delete_text = "Deleted user with Slack ID: "
 
-    def __init__(self, db_facade):
+    def __init__(self, db_facade, githubInterface):
         """Initialize user command."""
         logging.info("Initializing UserCommand instance")
         self.parser = argparse.ArgumentParser(prog="user")
         self.parser.add_argument("user")
         self.init_subparsers()
         self.facade = db_facade
+        self.github = githubInterface
 
     def init_subparsers(self):
         """Initialize subparsers for user command."""
@@ -157,7 +157,7 @@ class UserCommand:
         if param_list["github"]:
             edited_user.set_github_username(param_list["github"])
             try:
-                Core.__github.org_add_username(param_list["github"])
+                github.org_add_username(param_list["github"])
             except Exception as e:
                 logging.error("Error while editing user organization!\n" + e)
         if param_list["major"]:

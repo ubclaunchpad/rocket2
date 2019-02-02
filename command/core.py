@@ -14,7 +14,7 @@ class Core:
         self.__facade = db_facade
         self.__bot = bot
         self.__github = ghInterface
-        self.__commands["user"] = UserCommand(self.__facade)
+        self.__commands["user"] = UserCommand(self.__facade, self.__github)
 
     def handle_app_command(self, cmd_txt, user):
         """Handle a command call to rocket."""
