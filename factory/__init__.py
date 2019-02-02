@@ -4,6 +4,7 @@ from db.dynamodb import DynamoDB
 from command.core import Core
 from slackclient import SlackClient
 from interface.slack import Bot
+from webhook.webhook import WebhookHandler
 import toml
 
 import logging
@@ -22,3 +23,13 @@ def make_core(config):
     facade = DBFacade(DynamoDB(config))
     bot = Bot(SlackClient(slack_api_token))
     return Core(facade, bot)
+
+
+def make_webhook_handler(config):
+    """
+    Initialize and returns a :class:`webhook.webhook.WebhookHandler` object.
+
+    :return: a new ``WebhookHandler`` object, freshly initialized
+    """
+    facade = DBFacade(DynamoDB(config))
+    return WebhookHandler(facade)
