@@ -30,6 +30,7 @@ def make_core(config, gh=None):
     bot = Bot(SlackClient(slack_api_token))
     return Core(facade, bot, gh)
 
+
 def make_webhook_handler(config):
     """
     Initialize and returns a :class:`webhook.webhook.WebhookHandler` object.
