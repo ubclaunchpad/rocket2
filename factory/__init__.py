@@ -19,11 +19,11 @@ def make_core(config, gh=None):
     """
     slack_api_token, github_api_token, github_organization = "", "", ""
     if not config['testing']:
-        slack_api_token += toml.load(
+        slack_api_token = toml.load(
             config['slack']['creds_path'])['api_token']
-        github_api_token += toml.load(
+        github_api_token = toml.load(
             config['github']['creds_path'])['api_token']
-        github_organization += toml.load(
+        github_organization = toml.load(
             config['github']['creds_path'])['organization']
         gh = GithubInterface(Github(github_api_token), github_organization)
     facade = DBFacade(DynamoDB(config))
