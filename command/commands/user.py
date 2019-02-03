@@ -160,7 +160,7 @@ class UserCommand:
             try:
                 self.github.org_add_member(param_list["github"])
             except GithubAPIException as e:
-                logging.error("Error while editing user's github organization!\n")
+                logging.error("Error editing github organization!\n")
         if param_list["major"]:
             edited_user.set_major(param_list["major"])
         if param_list["bio"]:

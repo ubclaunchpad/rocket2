@@ -23,8 +23,7 @@ def make_core(config, gh=None):
             config['slack']['creds_path'])['api_token']
         github_api_token = toml.load(
             config['github']['creds_path'])['api_token']
-        github_organization = toml.load(
-            config['github']['creds_path'])['organization']
+        github_organization = config['github']['organization']
         gh = GithubInterface(Github(github_api_token), github_organization)
     facade = DBFacade(DynamoDB(config))
     bot = Bot(SlackClient(slack_api_token))
