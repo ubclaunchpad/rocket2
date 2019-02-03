@@ -6,6 +6,7 @@ import pytest
 from unittest import mock
 from interface.github import GithubInterface
 
+
 @pytest.mark.db
 def test_make_core():
     """Test the make_core function."""
