@@ -11,3 +11,4 @@ region = "us-west-2"
 
 [github]
 creds_path = "credentials/github.toml"
+organization = "ubclaunchpad"
