@@ -17,6 +17,16 @@ class Core:
 
     def handle_app_command(self, cmd_txt, user):
         """Handle a command call to rocket."""
+        def regularize_char(c):
+            if c == "‘" or c == "’":
+                return "'"
+            if c == '“' or c == '”':
+                return '"'
+            return c
+
+        # Slightly hacky way to deal with Apple platform
+        # smart punctuation messing with argparse.
+        cmd_txt = ''.join(map(regularize_char, cmd_txt))
         s = cmd_txt.split(' ', 1)
         if s[0] in self.__commands:
             return self.__commands[s[0]].handle(cmd_txt, user)
