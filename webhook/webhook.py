@@ -18,7 +18,7 @@ class WebhookHandler:
 
         If the member is added or invited, do nothing.
         """
-        action = payload['action']
+        action = payload["action"]
         github_user = payload["membership"]["user"]
         github_id = github_user["id"]
         github_username = github_user["login"]
@@ -51,3 +51,84 @@ class WebhookHandler:
                            " invalid action specified: {}".
                            format(str(payload))))
             return "invalid organization webhook triggered", 405
+
+    def handle_team_event(self, payload):
+        """
+        Handle team events of the organization.
+
+        This event is fired when a team is created, deleted, edited, or
+        added or removed from a repository.
+
+        If a team is created, add or overwrite a team in rocket's db.
+
+        If a team is deleted, delete the team from rocket's db if it exists.
+
+        If a team is edited, overwrite the team's fields or create the
+        team if necessary.
+
+        If the team is added or removed from a repository, do nothing for now.
+        """
+        action = payload["action"]
+        github_team = payload["team"]
+        github_id = github_team["id"]
+        github_team_name = github_team["name"]
+        if action == "created":
+            logging.debug("team added event triggered: {}".
+                          format(str(payload)))
+            try:
+                team = self.__facade.retrieve_team(github_id)
+                logging.warning("team {} with id {} already exists.".
+                                format(github_team_name, github_id))
+                team.set_github_team_name(github_team_name)
+            except LookupError:
+                logging.info("team {} with id {} added to organization.".
+                             format(github_team_name, github_id))
+                team = Team(github_id, github_team_name, "")
+            self.__facade.store_team(team)
+            logging.info("team {} with id {} added to rocket db.".
+                         format(github_team_name, github_id))
+            return "created team with github id {}".format(github_id), 200
+        elif action == "deleted":
+            logging.debug("team deleted event triggered: {}".
+                          format(str(payload)))
+            try:
+                self.__facade.retrieve_team(github_id)
+                self.__facade.delete_team(github_id)
+                logging.info("team {} with github id {} removed from db".
+                             format(github_team_name, github_id))
+                return "deleted team with github id {}".format(github_id), 200
+            except LookupError:
+                logging.error("team with github id {} found.".
+                              format(github_id))
+                return "team with github id {} not found"\
+                       .format(github_id), 404
+        elif action == "edited":
+            logging.debug("team edited event triggered: {}".
+                          format(str(payload)))
+            try:
+                team = self.__facade.retrieve_team(github_id)
+                team.set_github_team_name(github_team_name)
+                logging.info("changed team's name with id {} from {} to {}".
+                             format(github_id, github_team_name,
+                                    team.github_team_name))
+                self.__facade.store_team(team)
+                logging.info("updated team with id {} in rocket db."
+                             .format(github_id))
+                return "updated team with id {}".format(github_id), 200
+            except LookupError:
+                logging.error("team with github id {} not found.".
+                              format(github_id))
+                return "team with github id {} not found"\
+                       .format(github_id), 404
+        elif action == "added_to_repository":
+            repository_name = payload["repository"]["name"]
+            logging.info("team with id {} added to repository {}"
+                         .format(github_id, repository_name))
+            return "team with id {} added to repository {}"\
+                   .format(github_id, repository_name), 200
+        elif action == "removed_from_repository":
+            repository_name = payload["repository"]["name"]
+            logging.info("team with id {} from repository {}"
+                         .format(github_id, repository_name))
+            return "team with id {} removed repository {}"\
+                   .format(github_id, repository_name), 200
