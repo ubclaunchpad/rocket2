@@ -33,7 +33,7 @@ class Team:
 
     def __eq__(self, other):
         """Return true if this team has the same attributes as the other."""
-        return str(self.__dict__) == str(other.__dict__)
+        return str(self) == str(other)
 
     def __ne__(self, other):
         """Return the opposite of what is returned in self.__eq__(other)."""
