@@ -6,8 +6,18 @@ must be enclosed in quotation marks.
 ## Options
 
 ```sh
-/rocket user {edit, view, help, delete}
+/rocket user {add,edit, view, help, delete}
 ```
+
+### Add
+
+```sh
+/rocket user add [-f|--force]
+```
+
+Add the current user into the database. This command by default does not
+overwrite users that have already been entered into the database. By using the
+`-f` flag, you force `rocket2` to overwrite the entry in the database, if any.
 
 ### Edit
 
