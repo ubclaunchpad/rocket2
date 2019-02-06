@@ -5,6 +5,7 @@ import shlex
 from flask import jsonify
 from model.permissions import Permissions
 from model.user import User
+from interface.github import GithubAPIException
 
 
 class UserCommand:
@@ -31,13 +32,14 @@ class UserCommand:
     lookup_error = "User not found!"
     delete_text = "Deleted user with Slack ID: "
 
-    def __init__(self, db_facade):
+    def __init__(self, db_facade, github_interface):
         """Initialize user command."""
         logging.info("Initializing UserCommand instance")
         self.parser = argparse.ArgumentParser(prog="user")
         self.parser.add_argument("user")
         self.init_subparsers()
         self.facade = db_facade
+        self.github = github_interface
 
     def init_subparsers(self):
         """Initialize subparsers for user command."""
@@ -131,6 +133,7 @@ class UserCommand:
                    edits another user, returns edit message if user is edited
         """
         edited_user = None
+        msg = ""
         if param_list["member"] is not None:
             try:
                 admin_user = self.facade.retrieve_user(user_id)
@@ -154,14 +157,20 @@ class UserCommand:
         if param_list["pos"]:
             edited_user.set_position(param_list["pos"])
         if param_list["github"]:
-            edited_user.set_github_username(param_list["github"])
+            try:
+                self.github.org_add_member(param_list["github"])
+                edited_user.set_github_username(param_list["github"])
+            except GithubAPIException as e:
+                msg = "\nError adding user {} to GitHub organization".format(
+                    param_list['github'])
+                logging.error(msg)
         if param_list["major"]:
             edited_user.set_major(param_list["major"])
         if param_list["bio"]:
             edited_user.set_biography(param_list["bio"])
 
         self.facade.store_user(edited_user)
-        return "User edited: " + str(edited_user), 200
+        return "User edited: " + str(edited_user) + msg, 200
 
     def delete_helper(self, user_id, slack_id):
         """
