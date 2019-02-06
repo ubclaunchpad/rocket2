@@ -132,3 +132,7 @@ class WebhookHandler:
                          .format(github_id, repository_name))
             return "team with id {} removed repository {}"\
                    .format(github_id, repository_name), 200
+        else:
+            logging.error("invalid payload received: {}".
+                          format(str(payload)))
+            return "invalid payload", 405
