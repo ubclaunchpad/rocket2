@@ -60,7 +60,9 @@ class TestUserCommand(TestCase):
         self.mock_facade.retrieve_user.return_value = user
 
         # Since the user exists, we don't call store_user()
-        self.testcommand.handle('user add', user_id)
+        err_msg = 'User already exists; to overwrite user, add `-f`'
+        resp = self.testcommand.handle('user add', user_id)
+        self.assertTupleEqual(resp, (err_msg, 200))
         self.mock_facade.retrieve_user.assert_called_once_with(user_id)
         self.mock_facade.store_user.assert_not_called()
 

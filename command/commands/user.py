@@ -231,7 +231,7 @@ class UserCommand:
         if not use_force:
             try:
                 self.facade.retrieve_user(user_id)
-                return
+                return 'User already exists; to overwrite user, add `-f`', 200
             except LookupError:
                 pass
 
