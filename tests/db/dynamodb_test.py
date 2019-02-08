@@ -12,7 +12,8 @@ def ddb_connection():
     test_config = {
         'aws': {
             'users_table': 'users_test',
-            'teams_table': 'teams_test'
+            'teams_table': 'teams_test',
+            'projects_table': 'projects_test'
         },
         'testing': True
     }
