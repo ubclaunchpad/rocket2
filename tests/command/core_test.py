@@ -34,6 +34,7 @@ def test_handle_invalid_command(mock_logging, mock_usercommand):
     core.handle_app_command('fake command', user)
     error_txt = "Please enter a valid command."
 
+
 @mock.patch('command.core.logging')
 def test_handle_help(mock_logging,):
     """Test that a '/rocket help' brings up help"""
@@ -51,6 +52,7 @@ def test_handle_help(mock_logging,):
         "attachments": [{"text": ["*[USER]*\n\nCommands for editing",
                                   "users."], "mrkdwn_in": ["text"]}]})
     assert reply == expect
+
 
 @mock.patch('command.core.UserCommand')
 @mock.patch('command.core.logging')
