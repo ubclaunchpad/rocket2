@@ -81,8 +81,16 @@ def handle_commands():
 def handle_organization_webhook():
     """Handle GitHub organization webhooks."""
     logging.info("organization webhook triggered")
-    logging.debug("organization payload: ".format(str(request.get_json())))
+    logging.debug("organization payload: {}".format(str(request.get_json())))
     return webhook_handler.handle_organization_event(request.get_json())
+
+
+@app.route('/webhook/team', methods=['POST'])
+def handle_team_webhook():
+    """Handle GitHub team webhooks."""
+    logging.info("team webhook triggered")
+    logging.debug("team payload: {}".format(str(request.get_json())))
+    return webhook_handler.handle_team_event(request.get_json())
 
 
 @slack_events_adapter.on("app_mention")
