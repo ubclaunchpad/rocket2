@@ -43,6 +43,42 @@ class TestUserCommand(TestCase):
                                                  "U0G9QF9C6"),
                          (UserCommand.help, 200))
 
+    def test_handle_add(self):
+        """Test user command add method."""
+        user_id = "U0G9QF9C6"
+        user = User(user_id)
+        lookup_error = LookupError('User "{}" not found'.format(user_id))
+        self.mock_facade.retrieve_user.side_effect = lookup_error
+        self.assertTupleEqual(self.testcommand.handle('user add', user_id),
+                              ('User added!', 200))
+        self.mock_facade.store_user.assert_called_once_with(user)
+
+    def test_handle_add_no_overwriting(self):
+        """Test user command add method when user exists in db."""
+        user_id = "U0G9QF9C6"
+        user = User(user_id)
+        self.mock_facade.retrieve_user.return_value = user
+
+        # Since the user exists, we don't call store_user()
+        err_msg = 'User already exists; to overwrite user, add `-f`'
+        resp = self.testcommand.handle('user add', user_id)
+        self.assertTupleEqual(resp, (err_msg, 200))
+        self.mock_facade.retrieve_user.assert_called_once_with(user_id)
+        self.mock_facade.store_user.assert_not_called()
+
+    def test_handle_add_overwriting(self):
+        """Test user command add method when user exists in db."""
+        user_id = "U0G9QF9C6"
+        user2_id = "U0G9QF9C69"
+        user = User(user_id)
+        user2 = User(user2_id)
+
+        self.testcommand.handle('user add -f', user_id)
+        self.mock_facade.store_user.assert_called_with(user)
+        self.testcommand.handle('user add --force', user2_id)
+        self.mock_facade.store_user.assert_called_with(user2)
+        self.mock_facade.retrieve_user.assert_not_called()
+
     def test_handle_view(self):
         """Test user command view parser and handle method."""
         user_id = "U0G9QF9C6"

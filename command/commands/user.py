@@ -51,9 +51,9 @@ class UserCommand:
         parser_view.add_argument("--slack_id", type=str, action='store')
 
         """Parser for add command."""
-        # DEBUG
         parser_add = subparsers.add_parser("add")
         parser_add.set_defaults(which="add")
+        parser_add.add_argument("-f", "--force", action="store_true")
 
         """Parser for help command."""
         parser_help = subparsers.add_parser("help")
@@ -102,7 +102,7 @@ class UserCommand:
 
         elif args.which == "add":
             # XXX: Remove in production
-            return self.add_helper(user_id)
+            return self.add_helper(user_id, args.force)
 
         elif args.which == "delete":
             return self.delete_helper(user_id, args.slack_id)
@@ -218,12 +218,22 @@ class UserCommand:
         except LookupError:
             return self.lookup_error, 200
 
-    def add_helper(self, user_id):
+    def add_helper(self, user_id, use_force):
         """
         Add the user to the database via user id.
 
         :param user_id: Slack ID of user to be added
+        :param use_force: If this is set, we store the user even if they are
+        already added in the database
         :return: ``"User added!", 200``
         """
+        # Try to look up and avoid overwriting if we are not using force
+        if not use_force:
+            try:
+                self.facade.retrieve_user(user_id)
+                return 'User already exists; to overwrite user, add `-f`', 200
+            except LookupError:
+                pass
+
         self.facade.store_user(User(user_id))
         return 'User added!', 200
