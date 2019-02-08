@@ -302,6 +302,14 @@ def team_rm_from_repository_payload(team_default_payload):
     return removed_from_repository_payload
 
 
+@pytest.fixture
+def team_empty_payload(team_default_payload):
+    """Provide an empty team payload."""
+    empty_payload = team_default_payload
+    empty_payload["action"] = ""
+    return empty_payload
+
+
 @mock.patch('webhook.webhook.logging')
 def test_handle_org_event_add_member(mock_logging, org_add_payload):
     """Test that instances when members are added to the org are logged."""
@@ -470,3 +478,12 @@ def test_handle_team_event_rm_from_repo(team_rm_from_repository_payload):
         webhook_handler.handle_team_event(team_rm_from_repository_payload)
     assert rsp == "team with id 2723476 removed repository Hello-World"
     assert code == 200
+
+
+def test_handle_team_event_empty_payload(team_empty_payload):
+    """Test that empty/invalid payloads can be handled."""
+    mock_facade = mock.MagicMock(DBFacade)
+    webhook_handler = WebhookHandler(mock_facade)
+    rsp, code = webhook_handler.handle_team_event(team_empty_payload)
+    assert rsp == "invalid payload"
+    assert code == 405
