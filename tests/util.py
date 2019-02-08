@@ -77,7 +77,9 @@ def create_test_project(github_team_id, github_urls):
     Short Descrip.  Slack bot, team management, and onboarding system for...
     Long Descrip.   Slack bot, team management, and onboarding system for...
     Tags            python, docker, pipenv, waterboarding
-    Website         ¯\_(ツ)_/¯
+    Website         https://github.com/ubclaunchpad/rocket2
+    Appstore URL    ¯\\_(ツ)_/¯
+    Playstore URL   ¯\\_(ツ)_/¯
     ==========      =============================
 
     :param github_team_id: The Github team ID
@@ -96,3 +98,5 @@ def create_test_project(github_team_id, github_urls):
     p.set_website_url('https://github.com/ubclaunchpad/rocket2')
     p.set_appstore_url('¯\\_(ツ)_/¯')
     p.set_playstore_url('¯\\_(ツ)_/¯')
+
+    return p

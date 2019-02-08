@@ -1,5 +1,5 @@
 """Test the dynamodb interface (requires dynamodb running)."""
-from tests.util import create_test_admin, create_test_team
+from tests.util import *
 from model.user import User
 from model.team import Team
 from model.project import Project
@@ -83,19 +83,38 @@ def test_store_retrieve_user(ddb):
 @pytest.mark.db
 def test_store_retrieve_project(ddb):
     """Test to see if we can store and retrieve the same user."""
-    pass
+    project = create_test_project('123456',
+                                  ['https://github.com/ubclaunchpad/rocket2'])
+
+    success = ddb.store_project(project)
+    another_project = ddb.retrieve_project(project.get_project_id())
+
+    assert success
+    assert project == another_project
+
+    ddb.delete_project(project.get_project_id())
 
 
 @pytest.mark.db
 def test_retrieve_invalid_user(ddb):
     """Test to see if we can retrieve a non-existant user."""
-    ddb = ddb
     try:
         user = ddb.retrieve_user('abc_123')
 
         assert False
     except LookupError as e:
-        assert str(e) == 'User "{}" not found'.format('abc_123')
+        assert str(e) == 'User "abc_123" not found'
+
+
+@pytest.mark.db
+def test_retrieve_invalid_project(ddb):
+    """Test to see if we can retrieve a non-existant user."""
+    try:
+        project = ddb.retrieve_project('abc_123')
+
+        assert False
+    except LookupError as e:
+        assert str(e) == 'Project "abc_123" not found'
 
 
 @pytest.mark.db
@@ -113,6 +132,24 @@ def test_query_user(ddb):
     assert user == strict_users[0]
 
     ddb.delete_user('abc_123')
+
+
+@pytest.mark.db
+def test_query_project(ddb):
+    """Test to see if we can store and query the same project."""
+    project = create_test_project('123456', ['abcd'])
+    assert ddb.store_project(project)
+    projects = ddb.query_project([('tags', 'python')])
+    strict_projects = ddb.query_project([('tags', 'python'),
+                                         ('tags', 'docker'),
+                                         ('display_name', 'Rocket2')])
+    all_projects = ddb.query_project([])
+
+    assert project == projects[0]
+    assert project == strict_projects[0]
+    assert project == all_projects[0]
+
+    ddb.delete_project(project.get_project_id())
 
 
 @pytest.mark.db

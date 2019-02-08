@@ -51,6 +51,8 @@ class Project:
         p.set_appstore_url(d.get('appstore_url', ''))
         p.set_playstore_url(d.get('playstore_url', ''))
 
+        return p
+
     @staticmethod
     def to_dict(p):
         """
@@ -68,7 +70,7 @@ class Project:
                 udict[name] = field
 
         udict = {
-            'project_id': p.get_slack_id(),
+            'project_id': p.get_project_id(),
             'github_urls': p.get_github_urls()
         }
         place_if_filled('github_team_id', p.get_github_team_id())
@@ -83,7 +85,7 @@ class Project:
         return udict
 
     @staticmethod
-    def is_valid(project):
+    def is_valid(p):
         """
         Return true if this project has no missing fields.
 
@@ -94,8 +96,8 @@ class Project:
         :param project: project to check
         :return: true if this project has no missing fields
         """
-        return len(project.__project_id) > 0 and\
-            len(project.__github_urls) > 0
+        return len(p.get_project_id()) > 0 and\
+            len(p.get_github_urls()) > 0
 
     def __eq__(self, other):
         """Return true if this project is equal to the other project."""

@@ -370,6 +370,7 @@ class DynamoDB:
         Store project into projects table.
 
         :param project: A project model to store
+        :return: True if project is valid, False otherwise
         """
         # Check that there are no required blank fields in the project
         if Project.is_valid(project):
@@ -397,6 +398,8 @@ class DynamoDB:
                 'project_id': project_id
             }
         )
+
+        print(response)
 
         if 'Item' in response.keys():
             return Project.from_dict(response['Item'])
