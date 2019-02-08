@@ -295,7 +295,7 @@ def team_added_to_repository_payload(team_default_payload):
 
 
 @pytest.fixture
-def team_removed_from_repository_payload(team_default_payload):
+def team_rm_from_repository_payload(team_default_payload):
     """Provide a team payload for removing a team from a repository."""
     removed_from_repository_payload = team_default_payload
     removed_from_repository_payload["action"] = "removed_from_repository"
@@ -386,3 +386,87 @@ def test_handle_org_event_empty_action(mock_logging, org_empty_payload):
                                                 .format(org_empty_payload)))
     assert rsp == "invalid organization webhook triggered"
     assert code == 405
+
+
+@mock.patch('webhook.webhook.logging')
+def test_handle_team_event_created_team(mock_logging, team_created_payload):
+    """Test that teams can be created if they are not in the db."""
+    mock_facade = mock.MagicMock(DBFacade)
+    mock_facade.retrieve_team.side_effect = LookupError
+    webhook_handler = WebhookHandler(mock_facade)
+    rsp, code = webhook_handler.handle_team_event(team_created_payload)
+    mock_logging.debug.assert_called_with(("team github with id 2723476 "
+                                           "added to organization."))
+    mock_facade.store_team.assert_called_once()
+    assert rsp == "created team with github id 2723476"
+    assert code == 200
+
+
+@mock.patch('webhook.webhook.logging')
+def test_handle_team_event_create_update(mock_logging, team_created_payload):
+    """Test that teams can be updated if they are in the db."""
+    mock_facade = mock.MagicMock(DBFacade)
+    webhook_handler = WebhookHandler(mock_facade)
+    rsp, code = webhook_handler.handle_team_event(team_created_payload)
+    mock_logging.warning.assert_called_with(("team github with id 2723476 "
+                                             "already exists."))
+    mock_facade.store_team.assert_called_once()
+    assert rsp == "created team with github id 2723476"
+    assert code == 200
+
+
+def test_handle_team_event_delete_team(team_deleted_payload):
+    """Test that teams can be deleted if they are in the db."""
+    mock_facade = mock.MagicMock(DBFacade)
+    webhook_handler = WebhookHandler(mock_facade)
+    rsp, code = webhook_handler.handle_team_event(team_deleted_payload)
+    mock_facade.delete_team.assert_called_once_with(2723476)
+    assert rsp == "deleted team with github id 2723476"
+    assert code == 200
+
+
+def test_handle_team_event_deleted_miss(team_deleted_payload):
+    """Test that attempts to delete a missing team are handled."""
+    mock_facade = mock.MagicMock(DBFacade)
+    mock_facade.retrieve_team.side_effect = LookupError
+    webhook_handler = WebhookHandler(mock_facade)
+    rsp, code = webhook_handler.handle_team_event(team_deleted_payload)
+    assert rsp == "team with github id 2723476 not found"
+    assert code == 404
+
+
+def test_handle_team_event_edit_team(team_edited_payload):
+    """Test that teams can be edited if they are in the db."""
+    mock_facade = mock.MagicMock(DBFacade)
+    webhook_handler = WebhookHandler(mock_facade)
+    rsp, code = webhook_handler.handle_team_event(team_edited_payload)
+    assert rsp == "updated team with id 2723476"
+    assert code == 200
+
+
+def test_handle_team_event_edit_miss(team_edited_payload):
+    """Test that attempts to edit a missing team are handled."""
+    mock_facade = mock.MagicMock(DBFacade)
+    mock_facade.retrieve_team.side_effect = LookupError
+    webhook_handler = WebhookHandler(mock_facade)
+    rsp, code = webhook_handler.handle_team_event(team_edited_payload)
+
+
+def test_handle_team_event_add_to_repo(team_added_to_repository_payload):
+    """Test that rocket knows when team is added to a repo."""
+    mock_facade = mock.MagicMock(DBFacade)
+    webhook_handler = WebhookHandler(mock_facade)
+    rsp, code = \
+        webhook_handler.handle_team_event(team_added_to_repository_payload)
+    assert rsp == "team with id 2723476 added to repository Hello-World"
+    assert code == 200
+
+
+def test_handle_team_event_rm_from_repo(team_rm_from_repository_payload):
+    """Test that rocket knows when team is removed from a repo."""
+    mock_facade = mock.MagicMock(DBFacade)
+    webhook_handler = WebhookHandler(mock_facade)
+    rsp, code = \
+        webhook_handler.handle_team_event(team_rm_from_repository_payload)
+    assert rsp == "team with id 2723476 removed repository Hello-World"
+    assert code == 200

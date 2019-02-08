@@ -1,5 +1,6 @@
 """Contain all the logic for handling webhooks in a class."""
 import logging
+from model.team import Team
 
 
 class WebhookHandler:
@@ -81,8 +82,8 @@ class WebhookHandler:
                                 format(github_team_name, github_id))
                 team.set_github_team_name(github_team_name)
             except LookupError:
-                logging.info("team {} with id {} added to organization.".
-                             format(github_team_name, github_id))
+                logging.debug("team {} with id {} added to organization.".
+                              format(github_team_name, github_id))
                 team = Team(github_id, github_team_name, "")
             self.__facade.store_team(team)
             logging.info("team {} with id {} added to rocket db.".
@@ -98,7 +99,7 @@ class WebhookHandler:
                              format(github_team_name, github_id))
                 return "deleted team with github id {}".format(github_id), 200
             except LookupError:
-                logging.error("team with github id {} found.".
+                logging.error("team with github id {} not found.".
                               format(github_id))
                 return "team with github id {} not found"\
                        .format(github_id), 404
