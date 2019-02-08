@@ -5,6 +5,8 @@ from interface.slack import Bot, SlackAPIError
 from interface.github import GithubInterface
 from db.facade import DBFacade
 from slackclient import SlackClient
+from command.commands.user import UserCommand
+import json
 
 
 @mock.patch('command.core.logging')
@@ -32,6 +34,23 @@ def test_handle_invalid_command(mock_logging, mock_usercommand):
     core.handle_app_command('fake command', user)
     error_txt = "Please enter a valid command."
 
+@mock.patch('command.core.logging')
+def test_handle_help(mock_logging,):
+    """Test that a '/rocket help' brings up help"""
+    mock_usercommand = mock.MagicMock(UserCommand)
+    mock_usercommand.get_name.return_value = "user"
+    mock_facade = mock.MagicMock(DBFacade)
+    mock_bot = mock.MagicMock(Bot)
+    mock_gh = mock.MagicMock(GithubInterface)
+    core = Core(mock_facade, mock_bot, mock_gh)
+    reply, code = core.handle_app_command("help", "U061F7AUR")
+    expect = json.dumps({
+        "text": "Displaying all available commands. To read about"
+                "a specific command, use `/rocket COMMAND help`\n",
+        "mrkdwn": "true",
+        "attachments": [{"text": ["*[USER]*\n\nCommands for editing",
+                                  "users."], "mrkdwn_in": ["text"]}]})
+    assert reply == expect
 
 @mock.patch('command.core.UserCommand')
 @mock.patch('command.core.logging')

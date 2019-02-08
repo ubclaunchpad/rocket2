@@ -3,6 +3,7 @@ from command.commands.user import UserCommand
 from model.user import User
 from interface.slack import SlackAPIError
 import logging
+import json
 
 
 class Core:
@@ -29,6 +30,9 @@ class Core:
         # smart punctuation messing with argparse.
         cmd_txt = ''.join(map(regularize_char, cmd_txt))
         s = cmd_txt.split(' ', 1)
+        if s[0] == "help" or s[0] is None:
+            logging.info("Help command was called")
+            return self.get_help(), 200
         if s[0] in self.__commands:
             return self.__commands[s[0]].handle(cmd_txt, user)
         else:
@@ -46,3 +50,22 @@ class Core:
             logging.info(new_id + " added to database - user notified")
         except SlackAPIError:
             logging.error(new_id + " added to database - user not notified")
+
+    def get_help(self):
+        message = {"text": "Displaying all available commands. To read about"
+                           " a specific command, use `/rocket COMMAND help`\n",
+                   "mrkdwn": "true"}
+        attachments = []
+        for cmd in self.__commands:
+            cmd_name = self.__commands[cmd].get_name()
+            cmd_text = "*[" + cmd_name.upper() + "]*\n\n" + \
+                "Commands for editing", cmd_name + "s."
+            # use below when cmd_usage is fixed in #202
+            # cmd_usage = self.__commands[cmd].get_help()
+            # cmd_text = "*[" + cmd_name + "]*\n\n" + \
+            #           "```" + cmd_usage + "```"
+            # perhaps get_help could have a parameter to only return usage?
+            attachment = {"text": cmd_text, "mrkdwn_in": ["text"]}
+            attachments.append(attachment)
+        message["attachments"] = attachments
+        return json.dumps(message)
