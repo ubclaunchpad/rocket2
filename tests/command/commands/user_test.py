@@ -6,8 +6,6 @@ from model.user import User
 from db.facade import DBFacade
 from model.permissions import Permissions
 from interface.slack import Bot
-<<<<<<< HEAD
-<<<<<<< HEAD
 from interface.github import GithubInterface, GithubAPIException
 
 
