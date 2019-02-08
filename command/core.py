@@ -52,6 +52,7 @@ class Core:
             logging.error(new_id + " added to database - user not notified")
 
     def get_help(self):
+        """Get help messages and return a formatted string for messaging."""
         message = {"text": "Displaying all available commands. To read about"
                            " a specific command, use `/rocket COMMAND help`\n",
                    "mrkdwn": "true"}

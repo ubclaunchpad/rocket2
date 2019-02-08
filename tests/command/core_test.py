@@ -37,7 +37,7 @@ def test_handle_invalid_command(mock_logging, mock_usercommand):
 
 @mock.patch('command.core.logging')
 def test_handle_help(mock_logging,):
-    """Test that a '/rocket help' brings up help"""
+    """Test that a '/rocket help' brings up help."""
     mock_usercommand = mock.MagicMock(UserCommand)
     mock_usercommand.get_name.return_value = "user"
     mock_facade = mock.MagicMock(DBFacade)
@@ -47,7 +47,7 @@ def test_handle_help(mock_logging,):
     reply, code = core.handle_app_command("help", "U061F7AUR")
     expect = json.dumps({
         "text": "Displaying all available commands. To read about"
-                "a specific command, use `/rocket COMMAND help`\n",
+                " a specific command, use `/rocket COMMAND help`\n",
         "mrkdwn": "true",
         "attachments": [{"text": ["*[USER]*\n\nCommands for editing",
                                   "users."], "mrkdwn_in": ["text"]}]})
