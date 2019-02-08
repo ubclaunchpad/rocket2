@@ -115,9 +115,9 @@ class DynamoDB:
         **Note**: This function should **not** be called externally, and should
         only be called on initialization, if at all.
 
-        Projects are only required to have a ``project_id``, technically. But we
-        also require that there be at least 1 URL in the ``github_urls`` field.
-        This is not programmically enforced.
+        Projects are only required to have a ``project_id``, technically. But
+        we also require that there be at least 1 URL in the ``github_urls``
+        field.  This is not programmically enforced.
         """
         logging.info("Creating table '{}'".format(self.projects_table))
         self.ddb.create_table(
@@ -448,7 +448,8 @@ class DynamoDB:
             }
             place_if_filled('github_team_id', project.get_github_team_id())
             place_if_filled('display_name', project.get_display_name())
-            place_if_filled('short_description', project.get_short_description())
+            place_if_filled('short_description',
+                            project.get_short_description())
             place_if_filled('long_description', project.get_long_description())
             place_if_filled('tags', project.get_tags())
             place_if_filled('website_url', project.get_website_url())
@@ -479,11 +480,11 @@ class DynamoDB:
         the parameters. Every item in parameters is a tuple, where the first
         element is the project attribute, and the second is the value.
 
-        Example: ``[('tags', 'c++')]`` would get all projects with ``c++`` (case
-        sensitive) in their tags.
+        Example: ``[('tags', 'c++')]`` would get all projects with ``c++``
+        (case sensitive) in their tags.
 
         :param parameters: list of parameters (tuples)
-        :return: returns a list of project models that fit the query parameters.
+        :return: returns a list of project models that fit the query parameters
         """
         pass
 

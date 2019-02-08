@@ -147,11 +147,11 @@ class DBFacade:
         the parameters. Every item in parameters is a tuple, where the first
         element is the project attribute, and the second is the value.
 
-        Example: ``[('tags', 'c++')]`` would get all projects with ``c++`` (case
-        sensitive) in their tags.
+        Example: ``[('tags', 'c++')]`` would get all projects with ``c++``
+        (case sensitive) in their tags.
 
         :param parameters: list of parameters (tuples)
-        :return: returns a list of project models that fit the query parameters.
+        :return: returns a list of project models that fit the query parameters
         """
         logging.info("Querying projects matching parameters: {}"
                      .format(parameters))
