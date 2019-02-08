@@ -1,6 +1,7 @@
 """Some important (and often-used) utility functions."""
 from model.user import User
 from model.team import Team
+from model.project import Project
 from model.permissions import Permissions
 
 
@@ -23,7 +24,7 @@ def create_test_admin(slack_id):
     ==========  =============================
 
     :param slack_id: The slack id string
-    :return: returns a filled-in user model (no empty strings)
+    :return: a filled-in user model (no empty strings)
     """
     u = User(slack_id)
     u.set_biography('I like puppies and kittens!')
@@ -54,9 +55,44 @@ def create_test_team(tid, team_name, display_name):
     :param tid: The github ID associated with the team
     :param team_name: The github team name slug
     :param display_name: The github team name
-    :return: returns a filled-in user model (no empty strings)
+    :return: a filled-in team model (no empty strings)
     """
     t = Team(tid, team_name, display_name)
     t.set_platform('slack')
     t.add_member('abc_123')
     return t
+
+
+def create_test_project(github_team_id, github_urls):
+    """
+    Create a test project with project ID, URLs, and all other attributes set.
+
+    ==========      =============================
+    Property        Preset
+    ==========      =============================
+    ID              ``SHA1(github_urls[0], time.time())``
+    Team ID         ``github_team_id``
+    Github URLs     ``github_urls``
+    Display Name    Rocket2
+    Short Descrip.  Slack bot, team management, and onboarding system for...
+    Long Descrip.   Slack bot, team management, and onboarding system for...
+    Tags            python, docker, pipenv, waterboarding
+    Website         ¯\_(ツ)_/¯
+    ==========      =============================
+
+    :param github_team_id: The Github team ID
+    :param github_urls: The URLs to all connected projects
+    :return: a filled-in project model (no empty strings)
+    """
+    p = Project(github_team_id, github_urls)
+    p.set_display_name('Rocket2')
+    p.set_short_description(
+        'Slack bot, team management, and onboarding system for UBC Launch Pad'
+    )
+    p.set_long_description('''
+        Slack bot, team management, and onboarding system for UBC Launch Pad
+    ''')
+    p.set_tags(['python', 'docker', 'pipenv', 'waterboarding'])
+    p.set_website_url('https://github.com/ubclaunchpad/rocket2')
+    p.set_appstore_url('¯\\_(ツ)_/¯')
+    p.set_playstore_url('¯\\_(ツ)_/¯')

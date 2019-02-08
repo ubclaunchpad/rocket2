@@ -25,12 +25,62 @@ class Project:
 
         self.__display_name = ''
         self.__short_description = ''
-        self.__long_desscription = ''
+        self.__long_description = ''
         self.__tags = []
         self.__website_url = ''
         self.__medium_url = ''
         self.__appstore_url = ''
         self.__playstore_url = ''
+
+    @staticmethod
+    def from_dict(d):
+        """
+        Return a project from a dict object.
+
+        :param d: the dictionary (usually from DynamoDB)
+        :return: a Project object
+        """
+        p = Project(d['github_team_id'], d['github_urls'])
+        p.set_project_id(d['project_id'])
+        p.set_display_name(d.get('display_name', ''))
+        p.set_short_description(d.get('short_description', ''))
+        p.set_long_description(d.get('long_description', ''))
+        p.set_tags(d.get('tags', []))
+        p.set_website_url(d.get('website_url', ''))
+        p.set_medium_url(d.get('medium_url', ''))
+        p.set_appstore_url(d.get('appstore_url', ''))
+        p.set_playstore_url(d.get('playstore_url', ''))
+
+    @staticmethod
+    def to_dict(p):
+        """
+        Return a dict object representing a project.
+
+        The difference with the in-built ``self.__dict__`` is that this is more
+        compatible with storing into NoSQL databases like DynamoDB.
+
+        :param p: the Project object
+        :return: a dictionary representing a project
+        """
+        def place_if_filled(name, field):
+            """Populate ``udict`` if ``field`` isn't empty."""
+            if field:
+                udict[name] = field
+
+        udict = {
+            'project_id': p.get_slack_id(),
+            'github_urls': p.get_github_urls()
+        }
+        place_if_filled('github_team_id', p.get_github_team_id())
+        place_if_filled('display_name', p.get_display_name())
+        place_if_filled('short_description', p.get_short_description())
+        place_if_filled('long_description', p.get_long_description())
+        place_if_filled('tags', p.get_tags())
+        place_if_filled('website_url', p.get_website_url())
+        place_if_filled('appstore_url', p.get_appstore_url())
+        place_if_filled('playstore_url', p.get_playstore_url())
+
+        return udict
 
     @staticmethod
     def is_valid(project):
@@ -81,7 +131,7 @@ class Project:
 
     def get_long_description(self):
         """Return a long description of the project."""
-        return self.__long_desscription
+        return self.__long_description
 
     def get_tags(self):
         """Return a list of tags used by Github."""
@@ -125,7 +175,7 @@ class Project:
 
     def set_long_description(self, long_description):
         """Set a long description of the project."""
-        self.__long_desscription = long_description
+        self.__long_description = long_description
 
     def set_tags(self, tags):
         """Set a list of tags used by Github."""

@@ -2,11 +2,12 @@
 from tests.util import create_test_admin, create_test_team
 from model.user import User
 from model.team import Team
+from model.project import Project
 import pytest
 
 
 @pytest.fixture
-def ddb_connection():
+def ddb():
     """Create a new DynamoDb instance."""
     from db.dynamodb import DynamoDB
     test_config = {
@@ -21,33 +22,39 @@ def ddb_connection():
 
 
 @pytest.mark.db
-def test_string_rep(ddb_connection):
+def test_string_rep(ddb):
     """Test string representation of the DynamoDB class."""
-    assert str(ddb_connection) == "DynamoDB"
+    assert str(ddb) == "DynamoDB"
 
 
 @pytest.mark.db
-def test_store_invalid_user(ddb_connection):
+def test_store_invalid_user(ddb):
     """Test handling of invalid user."""
-    ddb = ddb_connection
     user = User('')
     success = ddb.store_user(user)
     assert not success
 
 
 @pytest.mark.db
-def test_store_invalid_team(ddb_connection):
+def test_store_invalid_team(ddb):
     """Test handling of invalid team."""
-    ddb = ddb_connection
     team = Team('1', '', 'Brussel Sprouts')
     success = ddb.store_team(team)
     assert not success
 
 
 @pytest.mark.db
-def test_store_same_users(ddb_connection):
+def test_store_invalid_project(ddb):
+    """Test handling of invalid project."""
+    project = Project('12456', [''])
+    project.set_github_urls([])
+    success = ddb.store_project(project)
+    assert not success
+
+
+@pytest.mark.db
+def test_store_same_users(ddb):
     """Test how database handles overwriting same user (same slack_id)."""
-    ddb = ddb_connection
     user = create_test_admin('abc_123')
     user2 = create_test_admin('abc_123')
     user2.set_name('Sprouts')
@@ -60,9 +67,8 @@ def test_store_same_users(ddb_connection):
 
 
 @pytest.mark.db
-def test_store_retrieve_user(ddb_connection):
+def test_store_retrieve_user(ddb):
     """Test to see if we can store and retrieve the same user."""
-    ddb = ddb_connection
     user = create_test_admin('abc_123')
 
     success = ddb.store_user(user)
@@ -75,9 +81,15 @@ def test_store_retrieve_user(ddb_connection):
 
 
 @pytest.mark.db
-def test_retrieve_invalid_user(ddb_connection):
+def test_store_retrieve_project(ddb):
+    """Test to see if we can store and retrieve the same user."""
+    pass
+
+
+@pytest.mark.db
+def test_retrieve_invalid_user(ddb):
     """Test to see if we can retrieve a non-existant user."""
-    ddb = ddb_connection
+    ddb = ddb
     try:
         user = ddb.retrieve_user('abc_123')
 
@@ -87,9 +99,8 @@ def test_retrieve_invalid_user(ddb_connection):
 
 
 @pytest.mark.db
-def test_query_user(ddb_connection):
+def test_query_user(ddb):
     """Test to see if we can store and query the same user."""
-    ddb = ddb_connection
     user = create_test_admin('abc_123')
     assert ddb.store_user(user)
     users = ddb.query_user([('permission_level', 'admin')])
@@ -105,9 +116,9 @@ def test_query_user(ddb_connection):
 
 
 @pytest.mark.db
-def test_retrieve_invalid_team(ddb_connection):
+def test_retrieve_invalid_team(ddb):
     """Test to see if we can retrieve a non-existent team."""
-    ddb = ddb_connection
+    ddb = ddb
     try:
         team = ddb.retrieve_team('1')
 
@@ -117,9 +128,8 @@ def test_retrieve_invalid_team(ddb_connection):
 
 
 @pytest.mark.db
-def test_update_user(ddb_connection):
+def test_update_user(ddb):
     """Test to see if we can update a user."""
-    ddb = ddb_connection
     u = User('abc_123')
     ddb.store_user(u)
 
@@ -133,9 +143,8 @@ def test_update_user(ddb_connection):
 
 
 @pytest.mark.db
-def test_update_team(ddb_connection):
+def test_update_team(ddb):
     """Test to see if we can update a team."""
-    ddb = ddb_connection
     t = Team('1', 'brussel-sprouts', 'Brussel Sprouts')
     ddb.store_team(t)
 
@@ -150,9 +159,8 @@ def test_update_team(ddb_connection):
 
 
 @pytest.mark.db
-def test_store_retrieve_team(ddb_connection):
+def test_store_retrieve_team(ddb):
     """Test to see if we can store and retrieve the same team."""
-    ddb = ddb_connection
     team = create_test_team('1', 'rocket2.0', 'Rocket 2.0')
     assert ddb.store_team(team)
     another_team = ddb.retrieve_team('1')
@@ -163,9 +171,8 @@ def test_store_retrieve_team(ddb_connection):
 
 
 @pytest.mark.db
-def test_query_team(ddb_connection):
+def test_query_team(ddb):
     """Test to see if we can store and query the same team."""
-    ddb = ddb_connection
     team = create_test_team('1', 'rocket2.0', 'Rocket 2.0')
     team2 = create_test_team('2', 'lame-o', 'Lame-O Team')
     team2.add_member('apple')
@@ -191,9 +198,8 @@ def test_query_team(ddb_connection):
 
 
 @pytest.mark.db
-def test_delete_user(ddb_connection):
+def test_delete_user(ddb):
     """Test to see if we can successfully delete a user."""
-    ddb = ddb_connection
     user = create_test_admin('abc_123')
     ddb.store_user(user)
 
@@ -203,9 +209,8 @@ def test_delete_user(ddb_connection):
 
 
 @pytest.mark.db
-def test_delete_team(ddb_connection):
+def test_delete_team(ddb):
     """Test to see if we can successfully delete a team."""
-    ddb = ddb_connection
     team = create_test_team('1', 'rocket-2.0', 'Rocket 2.0')
     ddb.store_team(team)
 
