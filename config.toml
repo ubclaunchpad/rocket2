@@ -7,7 +7,7 @@ creds_path = "credentials/slack.toml"
 creds_path = "credentials/aws.toml"
 users_table = "users"
 teams_table = "teams"
-teams_table = "projects"
+projects_table = "projects"
 region = "us-west-2"
 
 [github]
