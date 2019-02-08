@@ -12,6 +12,9 @@ class Project:
 
         Project ID is just the current epoch time and the first github project
         URL mashed together using SHA1.
+
+        :param github_team_id: the Github team ID associated with the project
+        :param github_urls: a set/list of URLs pointing to repositories
         """
         hfunc = hashlib.sha1()
         hfunc.update(bytes(github_urls[0], 'utf-8'))

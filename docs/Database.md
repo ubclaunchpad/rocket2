@@ -34,3 +34,23 @@ Attribute Name | Description
 `display_name` | `String`; The teams's display
 `platform` | `String`; The team's working platform
 `members` | `String Set`; The team's set of members' Github IDs
+
+## `projects` Table
+
+The `projects` table stores all projects where `project_id` is the primary
+index. All other attributes are specified in the `model/project.py` file, and
+are also listed here:
+
+Attribute Name | Description
+---|---
+`project_id` | `String`; The project's unique SHA1 ID, salted with a timestamp
+`github_team_id` | `String`; The team's Github ID associated with the project
+`github_urls` | `String Set`; A set of URLs pointing to project repositories
+`display_name` | `String`; A name for the project
+`short_description` | `String`; A short description that outlines the project
+`long_desscription` | `String`; A longer and more in-depth description
+`tags` | `String Set`; A set of tags taken from the Github repositories
+`website_url` | `String`; A URL to the project's website
+`medium_url` | `String`; A URL to the project's medium page
+`appstore_url` | `String`; A URL to the project's Apple Appstore page
+`playstore_url` | `String`; A URL to the project's Google Playstore page

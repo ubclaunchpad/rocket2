@@ -5,6 +5,7 @@ import toml
 from boto3.dynamodb.conditions import Attr
 from model.user import User
 from model.team import Team
+from model.project import Project
 from model.permissions import Permissions
 
 
@@ -43,6 +44,7 @@ class DynamoDB:
         logging.info("Initializing DynamoDb")
         self.users_table = config['aws']['users_table']
         self.teams_table = config['aws']['teams_table']
+        self.projects_table = config['aws']['projects_table']
         testing = config['testing']
 
         if testing:
@@ -63,11 +65,13 @@ class DynamoDB:
                                       aws_access_key_id=access_key_id,
                                       aws_secret_access_key=secret_access_key)
 
+        # Check for missing tables
         if not self.check_valid_table(self.users_table):
             self.__create_user_tables()
-
         if not self.check_valid_table(self.teams_table):
             self.__create_team_tables()
+        if not self.check_valid_table(self.projects_table):
+            self.__create_project_tables()
 
     def __str__(self):
         """Return a string representing this class."""
@@ -95,6 +99,38 @@ class DynamoDB:
             KeySchema=[
                 {
                     'AttributeName': 'slack_id',
+                    'KeyType': 'HASH'
+                },
+            ],
+            ProvisionedThroughput={
+                'ReadCapacityUnits': 1,
+                'WriteCapacityUnits': 1
+            }
+        )
+
+    def __create_project_tables(self):
+        """
+        Create the project table.
+
+        **Note**: This function should **not** be called externally, and should
+        only be called on initialization, if at all.
+
+        Projects are only required to have a ``project_id``, technically. But we
+        also require that there be at least 1 URL in the ``github_urls`` field.
+        This is not programmically enforced.
+        """
+        logging.info("Creating table '{}'".format(self.projects_table))
+        self.ddb.create_table(
+            TableName=self.projects_table,
+            AttributeDefinitions=[
+                {
+                    'AttributeName': 'project_id',
+                    'AttributeType': 'S'
+                },
+            ],
+            KeySchema=[
+                {
+                    'AttributeName': 'project_id',
                     'KeyType': 'HASH'
                 },
             ],
@@ -391,3 +427,70 @@ class DynamoDB:
                 'github_team_id': team_id
             }
         )
+
+    def store_project(self, project):
+        """
+        Store project into projects table.
+
+        :param project: A project model to store
+        """
+        # Check that there are no blank fields in the project
+        if Project.is_valid(project):
+            def place_if_filled(name, field):
+                """Populate ``udict`` if ``field`` isn't empty."""
+                if field:
+                    udict[name] = field
+
+            project_table = self.ddb.Table(self.projects_table)
+            udict = {
+                'project_id': project.get_slack_id(),
+                'github_urls': project.get_github_urls()
+            }
+            place_if_filled('github_team_id', project.get_github_team_id())
+            place_if_filled('display_name', project.get_display_name())
+            place_if_filled('short_description', project.get_short_description())
+            place_if_filled('long_description', project.get_long_description())
+            place_if_filled('tags', project.get_tags())
+            place_if_filled('website_url', project.get_website_url())
+            place_if_filled('appstore_url', project.get_appstore_url())
+            place_if_filled('playstore_url', project.get_playstore_url())
+
+            logging.info("Storing project {} in table {}".
+                         format(project.get_project_id(), self.projects_table))
+            project_table.put_item(Item=udict)
+            return True
+        return False
+
+    def retrieve_project(self, project_id):
+        """
+        Retrieve project from projects table.
+
+        :param project_id: used as key for retrieving project objects.
+        :raise: LookupError if project id is not found.
+        :return: returns a project model if slack id is found.
+        """
+        pass
+
+    def query_project(self, parameters):
+        """
+        Query for specific projects by parameter.
+
+        Returns list of teams that have **all** of the attributes specified in
+        the parameters. Every item in parameters is a tuple, where the first
+        element is the project attribute, and the second is the value.
+
+        Example: ``[('tags', 'c++')]`` would get all projects with ``c++`` (case
+        sensitive) in their tags.
+
+        :param parameters: list of parameters (tuples)
+        :return: returns a list of project models that fit the query parameters.
+        """
+        pass
+
+    def delete_project(self, project_id):
+        """
+        Remove a project from the projects table.
+
+        :param project_id: the project ID of the project to be removed
+        """
+        pass
