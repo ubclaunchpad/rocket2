@@ -258,7 +258,7 @@ class TestUserCommand(TestCase):
         self.mock_facade.retrieve_user.side_effect = rets.get
         self.assertTupleEqual(self.testcommand.handle(
             "user edit --member arst "
-            "--perm admin",
+            "--permission admin",
             "a1"),
                               ("User edited: " + str(editee), 200))
 
@@ -267,10 +267,10 @@ class TestUserCommand(TestCase):
         editor = User("a1")
         self.mock_facade.retrieve_user.return_value = editor
         self.assertTupleEqual(self.testcommand.handle(
-            "user edit --perm admin", "a1"),
+            "user edit --permission admin", "a1"),
                               ("User edited: " + str(editor) +
-                               "\nCannot change user permission: user isn't" +
-                               " admin; this incident will be reported.", 200))
+                               "\nCannot change own permission: user isn't" +
+                               " admin.", 200))
 
     def test_handle_edit_lookup_error_editor(self):
         """Test user command where user editor is not in database."""

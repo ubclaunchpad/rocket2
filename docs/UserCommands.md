@@ -40,10 +40,10 @@ another user's Launch Pad profile by using `[--member SLACKID]` option.
 /rocket user edit --member @s_universe --name "Steven Universe"
 ```
 
-Admins can easily create other admins or team leads.
+Admins can easily promote other admins or team leads.
 
 ```sh
-/rocket user edit --member @s_universe --perm admin
+/rocket user edit --member @s_universe --permission admin
 ```
 
 ### View

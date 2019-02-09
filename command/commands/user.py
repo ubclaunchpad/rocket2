@@ -75,7 +75,7 @@ class UserCommand:
         parser_edit.add_argument("--major", type=str, action='store')
         parser_edit.add_argument("--bio", type=str, action='store')
         parser_edit.add_argument("--member", type=str, action='store')
-        parser_edit.add_argument("--perm", type=lambda x: Permissions[x],
+        parser_edit.add_argument("--permission", type=lambda x: Permissions[x],
                                  action='store', choices=list(Permissions))
 
     def get_name(self):
@@ -123,7 +123,7 @@ class UserCommand:
                 "github": args.github,
                 "major": args.major,
                 "bio": args.bio,
-                "perm": args.perm,
+                "perm": args.permission,
             }
             return self.edit_helper(user_id, param_list)
 
@@ -181,8 +181,7 @@ class UserCommand:
         if param_list["perm"] and is_admin:
             edited_user.set_permissions_level(param_list["perm"])
         elif param_list["perm"] and not is_admin:
-            msg += "\nCannot change user permission: user isn't admin;" +\
-                " this incident will be reported."
+            msg += "\nCannot change own permission: user isn't admin."
             logging.warn("User {} tried to elevate permissions level."
                          .format(user_id))
 
