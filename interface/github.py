@@ -1,5 +1,5 @@
 """Utility classes for interacting with Github API via PyGithub."""
-from github import Github, GithubException
+from github import GithubObject, GithubException
 
 
 class GithubInterface:
@@ -42,6 +42,66 @@ class GithubInterface:
         try:
             user = self.github.get_user(username)
             return self.org.has_in_members(user)
+        except GithubException as e:
+            raise GithubAPIException(e.data)
+
+    def org_get_team(self, id):
+        """Given Github team ID, return team from organization."""
+        try:
+            team = self.org.get_team(id)
+            return team
+        except GithubException as e:
+            raise GithubAPIException(e.data)
+
+    def org_create_team(self, name):
+        """
+        Create team with given name and add to organization.
+
+        :param name: name of team
+        :return: Github team ID
+        """
+        try:
+            team = self.org.\
+                create_team(name, GithubObject.NotSet, "closed", "push")
+            return team.id
+        except GithubException as e:
+            raise GithubAPIException(e.data)
+
+    def org_delete_team(self, id):
+        """Get team with given ID and delete it from organization."""
+        try:
+            team = self.org_get_team(id)
+            team.delete()
+        except GithubException as e:
+            raise GithubAPIException(e.data)
+
+    def org_edit_team(self, key, name, description=None):
+        """
+        Get team with given ID and edit name and description.
+
+        :param key: team's Github ID
+        :param name: new team name
+        :param description: new team description
+        :return: None
+        """
+        try:
+            team = self.org_get_team(key)
+            if description is not None:
+                team.edit(name, description)
+            else:
+                team.edit(name)
+        except GithubException as e:
+            raise GithubAPIException(e.data)
+
+    def org_get_teams(self):
+        """Return array of teams associated with organization."""
+        try:
+            teams = self.org.get_teams()
+            team_array = []
+            for team in teams:
+                # convert PaginatedList to List
+                team_array.append(team)
+            return team_array
         except GithubException as e:
             raise GithubAPIException(e.data)
 
