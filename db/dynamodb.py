@@ -80,14 +80,14 @@ class DynamoDB:
 
     def __create_table(self, table_name, primary_key, key_type='S'):
         """
-        Creates a table.
+        Create a table.
 
         **Note**: This function should **not** be called externally, and should
         only be called on initialization.
 
         :param table_name: name of the table to create
         :param primary_key: name of the primary key for the table
-        :param key_type: type of primary key (S, 
+        :param key_type: type of primary key (S, N, B)
         """
         logging.info("Creating table '{}'".format(table_name))
         self.ddb.create_table(
@@ -216,7 +216,7 @@ class DynamoDB:
         users = self.ddb.Table(self.users_table)
         if len(parameters) > 0:
             # There are 1 or more parameters that we should care about
-            filter_expr = reduce(lambda a,x: a & x,
+            filter_expr = reduce(lambda a, x: a & x,
                                  map(lambda x: Attr(x[0]).eq(x[1]),
                                      parameters))
 
@@ -257,7 +257,7 @@ class DynamoDB:
                 else:
                     return Attr(x[0]).eq(x[1])
 
-            filter_expr = reduce(lambda a,x: a & x, map(f, parameters))
+            filter_expr = reduce(lambda a, x: a & x, map(f, parameters))
             response = teams.scan(
                 FilterExpression=filter_expr
             )
@@ -361,7 +361,7 @@ class DynamoDB:
                 else:
                     return Attr(x[0]).eq(x[1])
 
-            filter_expr = reduce(lambda a,x: a & x, map(f, parameters))
+            filter_expr = reduce(lambda a, x: a & x, map(f, parameters))
             response = projects.scan(
                 FilterExpression=filter_expr
             )
