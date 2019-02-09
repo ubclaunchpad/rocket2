@@ -56,7 +56,6 @@ def test_handle_help(mock_logging):
                          {"text": "*user:* for dealing with users",
                           "mrkdwn_in": ["text"]}]}).data)
         resp = json.loads(resp.data)
-    print(resp)
     assert resp == expect
 
 
@@ -69,8 +68,8 @@ def test_handle_user_command(mock_logging, mock_usercommand):
     mock_gh = mock.MagicMock(GithubInterface)
     core = Core(mock_facade, mock_bot, mock_gh)
     core.handle_app_command('user name', 'U061F7AUR')
-    mock_usercommand. \
-        return_value.handle. \
+    mock_usercommand.\
+        return_value.handle.\
         assert_called_once_with("user name", "U061F7AUR")
 
 
