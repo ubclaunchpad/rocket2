@@ -36,7 +36,7 @@ def test_handle_invalid_command(mock_logging, mock_usercommand):
 
 
 @mock.patch('command.core.logging')
-def test_handle_help(mock_logging, ):
+def test_handle_help(mock_logging):
     """Test that a '/rocket help' brings up help."""
     mock_usercommand = mock.MagicMock(UserCommand)
     mock_usercommand.get_name.return_value = "user"
