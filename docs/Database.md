@@ -48,7 +48,7 @@ Attribute Name | Description
 `github_urls` | `String Set`; A set of URLs pointing to project repositories
 `display_name` | `String`; A name for the project
 `short_description` | `String`; A short description that outlines the project
-`long_desscription` | `String`; A longer and more in-depth description
+`long_description` | `String`; A longer and more in-depth description
 `tags` | `String Set`; A set of tags taken from the Github repositories
 `website_url` | `String`; A URL to the project's website
 `medium_url` | `String`; A URL to the project's medium page

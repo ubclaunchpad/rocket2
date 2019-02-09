@@ -10,8 +10,8 @@ class Project:
         """
         Initialize the team project.
 
-        Project ID is just the current epoch time and the first github project
-        URL mashed together using SHA1.
+        Project ID is a SHA1 generated from the first Github project URL and
+        epoch time.
 
         :param github_team_id: the Github team ID associated with the project
         :param github_urls: a set/list of URLs pointing to repositories
