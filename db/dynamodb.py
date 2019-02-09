@@ -67,101 +67,39 @@ class DynamoDB:
 
         # Check for missing tables
         if not self.check_valid_table(self.users_table):
-            self.__create_user_tables()
+            self.__create_table(self.users_table, 'slack_id')
         if not self.check_valid_table(self.teams_table):
-            self.__create_team_tables()
+            self.__create_table(self.teams_table, 'github_team_id')
         if not self.check_valid_table(self.projects_table):
-            self.__create_project_tables()
+            self.__create_table(self.projects_table, 'project_id')
 
     def __str__(self):
         """Return a string representing this class."""
         return "DynamoDB"
 
-    def __create_user_tables(self):
+    def __create_table(self, table_name, primary_key, key_type='S'):
         """
-        Create the user table.
+        Creates a table.
 
         **Note**: This function should **not** be called externally, and should
         only be called on initialization.
 
-        Users are only required to have a ``slack_id``. Since this is a NoSQL
-        database, no other attributes are required.
+        :param table_name: name of the table to create
+        :param primary_key: name of the primary key for the table
+        :param key_type: type of primary key (S, 
         """
-        logging.info("Creating table '{}'".format(self.users_table))
+        logging.info("Creating table '{}'".format(table_name))
         self.ddb.create_table(
-            TableName=self.users_table,
+            TableName=table_name,
             AttributeDefinitions=[
                 {
-                    'AttributeName': 'slack_id',
-                    'AttributeType': 'S'
+                    'AttributeName': primary_key,
+                    'AttributeType': key_type
                 },
             ],
             KeySchema=[
                 {
-                    'AttributeName': 'slack_id',
-                    'KeyType': 'HASH'
-                },
-            ],
-            ProvisionedThroughput={
-                'ReadCapacityUnits': 1,
-                'WriteCapacityUnits': 1
-            }
-        )
-
-    def __create_project_tables(self):
-        """
-        Create the project table.
-
-        **Note**: This function should **not** be called externally, and should
-        only be called on initialization, if at all.
-
-        Projects are only required to have a ``project_id``, technically. But
-        we also require that there be at least 1 URL in the ``github_urls``
-        field.  This is not programmically enforced.
-        """
-        logging.info("Creating table '{}'".format(self.projects_table))
-        self.ddb.create_table(
-            TableName=self.projects_table,
-            AttributeDefinitions=[
-                {
-                    'AttributeName': 'project_id',
-                    'AttributeType': 'S'
-                },
-            ],
-            KeySchema=[
-                {
-                    'AttributeName': 'project_id',
-                    'KeyType': 'HASH'
-                },
-            ],
-            ProvisionedThroughput={
-                'ReadCapacityUnits': 1,
-                'WriteCapacityUnits': 1
-            }
-        )
-
-    def __create_team_tables(self):
-        """
-        Create the team table.
-
-        **Note**: This function should **not** be called externally, and should
-        only be called on initialization.
-
-        Teams are only required to have a ``github_team_id``. Since this is a
-        NoSQL database, no other attributes are required.
-        """
-        logging.info("Creating table '{}'".format(self.teams_table))
-        self.ddb.create_table(
-            TableName=self.teams_table,
-            AttributeDefinitions=[
-                {
-                    'AttributeName': 'github_team_id',
-                    'AttributeType': 'S'
-                },
-            ],
-            KeySchema=[
-                {
-                    'AttributeName': 'github_team_id',
+                    'AttributeName': primary_key,
                     'KeyType': 'HASH'
                 },
             ],
