@@ -6,7 +6,7 @@ from interface.github import GithubInterface
 from db.facade import DBFacade
 from slackclient import SlackClient
 from command.commands.user import UserCommand
-import json
+from flask import jsonify, json, Flask
 
 
 @mock.patch('command.core.logging')
@@ -38,21 +38,26 @@ def test_handle_invalid_command(mock_logging, mock_usercommand):
 @mock.patch('command.core.logging')
 def test_handle_help(mock_logging):
     """Test that a '/rocket help' brings up help."""
+    app = Flask(__name__)
     mock_usercommand = mock.MagicMock(UserCommand)
     mock_usercommand.get_name.return_value = "user"
     mock_facade = mock.MagicMock(DBFacade)
     mock_bot = mock.MagicMock(Bot)
     mock_gh = mock.MagicMock(GithubInterface)
     core = Core(mock_facade, mock_bot, mock_gh)
-    reply, code = core.handle_app_command("help", "U061F7AUR")
-    expect = json.dumps({"text": "Displaying all available commands. "
-                                 "To read about a specific command, "
-                                 "use \n`/rocket [command] help`\n",
-                         "mrkdwn": "true",
-                         "attachments": [
-                             {"text": "*user:* for dealing with users",
-                              "mrkdwn_in": ["text"]}]})
-    assert reply == expect
+    with app.app_context():
+        resp, code = core.handle_app_command("help", "U061F7AUR")
+        expect = json.loads(
+            jsonify({"text": "Displaying all available commands. "
+                             "To read about a specific command, "
+                             "use \n`/rocket [command] help`\n",
+                     "mrkdwn": "true",
+                     "attachments": [
+                         {"text": "*user:* for dealing with users",
+                          "mrkdwn_in": ["text"]}]}).data)
+        resp = json.loads(resp.data)
+    print(resp)
+    assert resp == expect
 
 
 @mock.patch('command.core.UserCommand')

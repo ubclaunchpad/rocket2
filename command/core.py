@@ -3,7 +3,7 @@ from command.commands.user import UserCommand
 from model.user import User
 from interface.slack import SlackAPIError
 import logging
-import json
+from flask import jsonify
 
 
 class Core:
@@ -64,4 +64,4 @@ class Core:
             attachment = {"text": cmd_text, "mrkdwn_in": ["text"]}
             attachments.append(attachment)
         message["attachments"] = attachments
-        return json.dumps(message)
+        return jsonify(message)
