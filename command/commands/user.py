@@ -31,6 +31,7 @@ class UserCommand:
                        "permission level for this command!"
     lookup_error = "User not found!"
     delete_text = "Deleted user with Slack ID: "
+    desc = "for dealing with " + command_name + "s"
 
     def __init__(self, db_facade, github_interface):
         """Initialize user command."""
@@ -82,6 +83,10 @@ class UserCommand:
     def get_help(self):
         """Return command options for user events."""
         return self.help
+
+    def get_desc(self):
+        """Return the description of this command."""
+        return self.desc
 
     def handle(self, command, user_id):
         """Handle command by splitting into substrings and giving to parser."""

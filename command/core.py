@@ -3,6 +3,7 @@ from command.commands.user import UserCommand
 from model.user import User
 from interface.slack import SlackAPIError
 import logging
+from flask import jsonify
 
 
 class Core:
@@ -29,6 +30,9 @@ class Core:
         # smart punctuation messing with argparse.
         cmd_txt = ''.join(map(regularize_char, cmd_txt))
         s = cmd_txt.split(' ', 1)
+        if s[0] == "help" or s[0] is None:
+            logging.info("Help command was called")
+            return self.get_help(), 200
         if s[0] in self.__commands:
             return self.__commands[s[0]].handle(cmd_txt, user)
         else:
@@ -46,3 +50,18 @@ class Core:
             logging.info(new_id + " added to database - user notified")
         except SlackAPIError:
             logging.error(new_id + " added to database - user not notified")
+
+    def get_help(self):
+        """Get help messages and return a formatted string for messaging."""
+        message = {"text": "Displaying all available commands. "
+                           "To read about a specific command, use "
+                           "\n`/rocket [command] help`\n",
+                   "mrkdwn": "true"}
+        attachments = []
+        for cmd in self.__commands.values():
+            cmd_name = cmd.get_name()
+            cmd_text = "*" + cmd_name + ":* " + cmd.get_desc()
+            attachment = {"text": cmd_text, "mrkdwn_in": ["text"]}
+            attachments.append(attachment)
+        message["attachments"] = attachments
+        return jsonify(message)
