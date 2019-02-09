@@ -54,9 +54,16 @@ class GithubInterface:
             raise GithubAPIException(e.data)
 
     def org_create_team(self, name):
-        """Create team with given name and add to organization."""
+        """
+        Create team with given name and add to organization.
+
+        :param name: name of team
+        :return: Github team ID
+        """
         try:
-            self.org.create_team(name, GithubObject.NotSet, "closed", "push")
+            team = self.org.\
+                create_team(name, GithubObject.NotSet, "closed", "push")
+            return team.id
         except GithubException as e:
             raise GithubAPIException(e.data)
 
@@ -68,30 +75,28 @@ class GithubInterface:
         except GithubException as e:
             raise GithubAPIException(e.data)
 
-    def org_edit_team(self, id, name = None, description = None):
+    def org_edit_team(self, key, name, description=None):
         """
         Get team with given ID and edit name and description.
 
-        :param id: team's Github ID
+        :param key: team's Github ID
         :param name: new team name
         :param description: new team description
         :return: None
         """
         try:
-            team = self.org_get_team(id)
-            if name is not None and description is not None:
+            team = self.org_get_team(key)
+            if description is not None:
                 team.edit(name, description)
-            elif name is not None:
-                team.edit(name)
             else:
-                team.edit(team.name, description)
+                team.edit(name)
         except GithubException as e:
             raise GithubAPIException(e.data)
 
     def org_get_teams(self):
         """Return array of teams associated with organization."""
         try:
-            teams = self.org.get_teams
+            teams = self.org.get_teams()
             team_array = []
             for team in teams:
                 # convert PaginatedList to List
