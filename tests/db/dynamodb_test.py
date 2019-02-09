@@ -254,3 +254,14 @@ def test_delete_team(ddb):
     assert len(ddb.query_team([])) == 1
     ddb.delete_team('1')
     assert len(ddb.query_team([])) == 0
+
+
+@pytest.mark.db
+def test_delete_project(ddb):
+    """Test to see if we can successfully delete a team."""
+    project = create_test_project('abc_123', ['a'])
+    ddb.store_project(project)
+
+    assert len(ddb.query_project([])) == 1
+    ddb.delete_project(project.get_project_id())
+    assert len(ddb.query_project([])) == 0

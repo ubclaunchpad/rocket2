@@ -64,7 +64,7 @@ def create_test_team(tid, team_name, display_name):
 
 
 def create_test_project(github_team_id, github_urls):
-    """
+    r"""
     Create a test project with project ID, URLs, and all other attributes set.
 
     ==========      =============================
@@ -78,8 +78,8 @@ def create_test_project(github_team_id, github_urls):
     Long Descrip.   Slack bot, team management, and onboarding system for...
     Tags            python, docker, pipenv, waterboarding
     Website         https://github.com/ubclaunchpad/rocket2
-    Appstore URL    ¯\\_(ツ)_/¯
-    Playstore URL   ¯\\_(ツ)_/¯
+    Appstore URL    ¯\_(ツ)_/¯
+    Playstore URL   ¯\_(ツ)_/¯
     ==========      =============================
 
     :param github_team_id: The Github team ID
