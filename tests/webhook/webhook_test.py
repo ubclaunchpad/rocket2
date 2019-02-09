@@ -20,7 +20,7 @@ def org_default_payload():
                 "organization_url": "",
                 "user": {
                     "login": "hacktocat",
-                    "id": 39652351,
+                    "id": "39652351",
                     "node_id": "MDQ6VXNlcjM5NjUyMzUx",
                     "avatar_url": "",
                     "gravatar_id": "",
@@ -41,7 +41,7 @@ def org_default_payload():
             },
             "organization": {
                 "login": "Octocoders",
-                "id": 38302899,
+                "id": "38302899",
                 "node_id": "MDEyOk9yZ2FuaXphdGlvbjM4MzAyODk5",
                 "url": "",
                 "repos_url": "",
@@ -55,7 +55,7 @@ def org_default_payload():
             },
             "sender": {
                 "login": "Codertocat",
-                "id": 21031067,
+                "id": "21031067",
                 "node_id": "MDQ6VXNlcjIxMDMxMDY3",
                 "avatar_url": "",
                 "gravatar_id": "",
@@ -331,9 +331,9 @@ def test_handle_org_event_rm_single_member(mock_logging, org_rm_payload):
     mock_facade.query.return_value = [return_user]
     webhook_handler = WebhookHandler(mock_facade)
     rsp, code = webhook_handler.handle_organization_event(org_rm_payload)
-    mock_facade.query\
-        .assert_called_once_with(User, [('github_id', 39652351)])
-    mock_facade.delete.assert_called_once_with(User, "SLACKID")
+    mock_facade.query_user\
+        .assert_called_once_with([('github_id', "39652351")])
+    mock_facade.delete_user.assert_called_once_with("SLACKID")
     mock_logging.info.assert_called_once_with("deleted slack user SLACKID")
     assert rsp == "deleted slack ID SLACKID"
     assert code == 200
@@ -346,8 +346,8 @@ def test_handle_org_event_rm_member_missing(mock_logging, org_rm_payload):
     mock_facade.query.return_value = []
     webhook_handler = WebhookHandler(mock_facade)
     rsp, code = webhook_handler.handle_organization_event(org_rm_payload)
-    mock_facade.query\
-        .assert_called_once_with(User, [('github_id', 39652351)])
+    mock_facade.query_user\
+        .assert_called_once_with([('github_id', "39652351")])
     mock_logging.error.assert_called_once_with("could not find user 39652351")
     assert rsp == "could not find user 39652351"
     assert code == 404
@@ -363,9 +363,9 @@ def test_handle_org_event_rm_mult_members(mock_logging, org_rm_payload):
     mock_facade.query.return_value = [user1, user2, user3]
     webhook_handler = WebhookHandler(mock_facade)
     rsp, code = webhook_handler.handle_organization_event(org_rm_payload)
-    mock_facade.query\
-        .assert_called_once_with(User, [('github_id', 39652351)])
-    assert mock_facade.delete.call_count is 3
+    mock_facade.query_user\
+        .assert_called_once_with([('github_id', "39652351")])
+    assert mock_facade.delete_user.call_count is 3
     assert mock_logging.info.call_count is 3
     assert rsp == "deleted slack ID SLACKUSER1 SLACKUSER2 SLACKUSER3"
     assert code == 200
