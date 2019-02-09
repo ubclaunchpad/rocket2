@@ -337,8 +337,6 @@ class DynamoDB:
             }
         )
 
-        print(response)
-
         if 'Item' in response.keys():
             return Project.from_dict(response['Item'])
         else:
