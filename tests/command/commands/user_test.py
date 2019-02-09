@@ -249,6 +249,29 @@ class TestUserCommand(TestCase):
         self.mock_facade.retrieve_user.assert_called_once_with("U0G9QF9C6")
         self.mock_facade.store_user.assert_not_called()
 
+    def test_handle_edit_make_admin(self):
+        """Test user command with editor that is admin and user who's not."""
+        editor = User("a1")
+        editee = User("arst")
+        rets = {'a1': editor, 'arst': editee}
+        editor.set_permissions_level(Permissions.admin)
+        self.mock_facade.retrieve_user.side_effect = rets.get
+        self.assertTupleEqual(self.testcommand.handle(
+            "user edit --member arst "
+            "--perm admin",
+            "a1"),
+                              ("User edited: " + str(editee), 200))
+
+    def test_handle_edit_make_admin_no_perms(self):
+        """Test user command with editor that isn't admin."""
+        editor = User("a1")
+        self.mock_facade.retrieve_user.return_value = editor
+        self.assertTupleEqual(self.testcommand.handle(
+            "user edit --perm admin", "a1"),
+                              ("User edited: " + str(editor) +
+                               "\nCannot change user permission: user isn't" +
+                               " admin; this incident will be reported.", 200))
+
     def test_handle_edit_lookup_error_editor(self):
         """Test user command where user editor is not in database."""
         user_editor = User("U0G9QF9C6")
