@@ -33,7 +33,7 @@ class WebhookHandler:
                     slack_id = member.slack_id
                     self.__facade.delete_user(slack_id)
                     logging.info("deleted slack user {}".format(slack_id))
-                    slack_ids_string = slack_ids_string + " " + str(slack_id)
+                    slack_ids_string += " " + str(slack_id)
                 return "deleted slack ID{}".format(slack_ids_string), 200
             else:
                 logging.error("could not find user {}".format(github_id))
@@ -137,3 +137,65 @@ class WebhookHandler:
             logging.error("invalid payload received: {}".
                           format(str(payload)))
             return "invalid payload", 405
+    def handle_membership_event(self, payload):
+        """
+        Handle when a user is added, removed, or invited to an organization.
+
+        If the member is removed, they are removed as a user from rocket's db
+        if they have not been removed already.
+
+        If the member is added or invited, do nothing.
+        """
+        action = payload["action"]
+        github_user = payload["member"]
+        github_username = github_user["login"]
+        github_id = github_user["id"]
+        team = payload["team"]
+        team_id = team["id"]
+        team_name = team["name"]
+        selected_team = self.__facade.retrieve_team(team_id)
+        if action == "member_removed":
+            member_list = self.__facade. \
+                query_user([('github_id', github_id)])
+            slack_ids_string = ""
+            if len(member_list) == 1:
+                slack_id = member_list[0].get_slack_id()
+                if selected_team.is_member(github_id):
+                    selected_team.discard_member(github_id)
+                    logging.info("deleted slack user {} from {}"
+                                 .format(slack_id, team_id))
+                    slack_ids_string = slack_ids_string + " " + \
+                                       str(slack_id)
+                return "deleted slack ID {} from {}"\
+                           .format(slack_ids_string, team_id), 200
+            elif len(member_list) > 1:
+                logging.info("found github ID connected to multiple slack IDs")
+            else:
+                logging.error("could not find user {}".format(github_id))
+                return "could not find user {}".format(github_id), 404
+
+        elif action == "member_added":
+            member_list = self.__facade.query_user([('github_id', github_id)])
+            slack_ids_string = ""
+            if len(member_list) > 0:
+                selected_team.add_member(github_id)
+                for member in member_list:
+                    slack_id = member.get_slack_id()
+                    logging.info("user {} added to {}".
+                                 format(github_username, team_name))
+                    slack_ids_string = slack_ids_string + " " + str(slack_id)
+                return "added slack ID{}".format(slack_ids_string), 200
+            else:
+                logging.error("could not find user {}".format(github_id))
+                return "could not find user {}".format(github_id), 404
+
+        elif action == "member_invited":
+            logging.info("user {} invited to {}".
+                         format(github_username, selected_team))
+            return "user " + github_username + " invited to " + selected_team,\
+                   200
+        else:
+            logging.error(("membership webhook triggered,"
+                           " invalid action specified: {}".
+                           format(str(payload))))
+            return "invalid membership webhook triggered", 405
