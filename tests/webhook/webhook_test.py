@@ -487,4 +487,202 @@ def test_handle_team_event_empty_payload(team_empty_payload):
     webhook_handler = WebhookHandler(mock_facade)
     rsp, code = webhook_handler.handle_team_event(team_empty_payload)
     assert rsp == "invalid payload"
+@pytest.fixture
+def mem_default_payload():
+    """Provide the basic structure for an membership payload."""
+    default_payload =\
+        {
+            "action": "removed",
+            "scope": "team",
+            "member": {
+                "login": "Codertocat",
+                "id": "21031067",
+                "node_id": "MDQ6VXNlcjIxMDMxMDY3",
+                "avatar_url": "https://avatars1.githubusercontent.com/u/21031067?v=4",
+                "gravatar_id": "",
+                "url": "https://api.github.com/users/Codertocat",
+                "html_url": "https://github.com/Codertocat",
+                "followers_url": "https://api.github.com/users/Codertocat/followers",
+                "following_url": "https://api.github.com/users/Codertocat/following{/other_user}",
+                "gists_url": "https://api.github.com/users/Codertocat/gists{/gist_id}",
+                "starred_url": "https://api.github.com/users/Codertocat/starred{/owner}{/repo}",
+                "subscriptions_url": "https://api.github.com/users/Codertocat/subscriptions",
+                "organizations_url": "https://api.github.com/users/Codertocat/orgs",
+                "repos_url": "https://api.github.com/users/Codertocat/repos",
+                "events_url": "https://api.github.com/users/Codertocat/events{/privacy}",
+                "received_events_url": "https://api.github.com/users/Codertocat/received_events",
+                "type": "User",
+                "site_admin": False
+            },
+            "sender": {
+                "login": "Codertocat",
+                "id": "21031067",
+                "node_id": "MDQ6VXNlcjIxMDMxMDY3",
+                "avatar_url": "https://avatars1.githubusercontent.com/u/21031067?v=4",
+                "gravatar_id": "",
+                "url": "https://api.github.com/users/Codertocat",
+                "html_url": "https://github.com/Codertocat",
+                "followers_url": "https://api.github.com/users/Codertocat/followers",
+                "following_url": "https://api.github.com/users/Codertocat/following{/other_user}",
+                "gists_url": "https://api.github.com/users/Codertocat/gists{/gist_id}",
+                "starred_url": "https://api.github.com/users/Codertocat/starred{/owner}{/repo}",
+                "subscriptions_url": "https://api.github.com/users/Codertocat/subscriptions",
+                "organizations_url": "https://api.github.com/users/Codertocat/orgs",
+                "repos_url": "https://api.github.com/users/Codertocat/repos",
+                "events_url": "https://api.github.com/users/Codertocat/events{/privacy}",
+                "received_events_url": "https://api.github.com/users/Codertocat/received_events",
+                "type": "User",
+                "site_admin": False
+            },
+            "team": {
+                "name": "rocket",
+                "id": "2723476",
+                "node_id": "MDQ6VGVhbTI3MjM0NzY=",
+                "slug": "rocket",
+                "description": "hub hub hubber-one",
+                "privacy": "closed",
+                "url": "https://api.github.com/teams/2723476",
+                "members_url": "https://api.github.com/teams/2723476/members{/member}",
+                "repositories_url": "https://api.github.com/teams/2723476/repos",
+                "permission": "pull"
+            },
+            "organization": {
+                "login": "Octocoders",
+                "id": "38302899",
+                "node_id": "MDEyOk9yZ2FuaXphdGlvbjM4MzAyODk5",
+                "url": "https://api.github.com/orgs/Octocoders",
+                "repos_url": "https://api.github.com/orgs/Octocoders/repos",
+                "events_url": "https://api.github.com/orgs/Octocoders/events",
+                "hooks_url": "https://api.github.com/orgs/Octocoders/hooks",
+                "issues_url": "https://api.github.com/orgs/Octocoders/issues",
+                "members_url": "https://api.github.com/orgs/Octocoders/members{/member}",
+                "public_members_url": "https://api.github.com/orgs/Octocoders/public_members{/member}",
+                "avatar_url": "https://avatars1.githubusercontent.com/u/38302899?v=4",
+                "description": ""
+            }
+        }
+    return default_payload
+
+
+@pytest.fixture
+def mem_add_payload(mem_default_payload):
+    """Provide an membership payload for adding a member."""
+    add_payload = mem_default_payload
+    add_payload["action"] = "member_added"
+    return add_payload
+
+
+@pytest.fixture
+def mem_rm_payload(mem_default_payload):
+    """Provide an membership payload for removing a member."""
+    rm_payload = mem_default_payload
+    rm_payload["action"] = "member_removed"
+    return rm_payload
+
+
+@pytest.fixture
+def mem_inv_payload(mem_default_payload):
+    """Provide an membership payload for inviting a member."""
+    inv_payload = mem_default_payload
+    inv_payload["action"] = "member_invited"
+    return inv_payload
+
+
+@pytest.fixture
+def mem_empty_payload(mem_default_payload):
+    """Provide an membership payload with no action."""
+    empty_payload = mem_default_payload
+    empty_payload["action"] = ""
+    return empty_payload
+
+
+@mock.patch('webhook.webhook.logging')
+def test_handle_mem_event_add_member(mock_logging, mem_add_payload):
+    """Test that instances when members are added to the mem are logged."""
+    mock_facade = mock.MagicMock(DBFacade)
+    return_user = User("SLACKID")
+    mock_facade.query_user.return_value = [return_user]
+    webhook_handler = WebhookHandler(mock_facade)
+    rsp, code = webhook_handler.handle_membership_event(mem_add_payload)
+    mock_logging.info.assert_called_once_with(("user Codertocat added "
+                                               "to rocket"))
+    assert rsp == "added slack ID SLACKID"
+    assert code == 200
+
+
+@mock.patch('webhook.webhook.logging')
+def test_handle_mem_event_rm_single_member(mock_logging, mem_rm_payload):
+    """Test that members removed from the mem are deleted from rocket's db."""
+    mock_facade = mock.MagicMock(DBFacade)
+    return_user = User("SLACKID")
+    return_team = Team("2723476", "rocket", "rocket")
+    return_team.add_member("21031067")
+    mock_facade.query_user.return_value = [return_user]
+    mock_facade.retrieve_team.return_value = return_team
+    webhook_handler = WebhookHandler(mock_facade)
+    rsp, code = webhook_handler.handle_membership_event(mem_rm_payload)
+    mock_facade.query_user\
+        .assert_called_once_with([('github_id', "21031067")])
+    mock_facade.retrieve_team \
+        .assert_called_once_with("2723476")
+    mock_logging.info.assert_called_once_with("deleted slack user SLACKID from rocket")
+    assert rsp == "deleted slack ID SLACKID from rocket"
+    assert code == 200
+
+
+@mock.patch('webhook.webhook.logging')
+def test_handle_mem_event_rm_member_missing(mock_logging, mem_rm_payload):
+    """Test that members not in rocket db are handled correctly."""
+    mock_facade = mock.MagicMock(DBFacade)
+    mock_facade.query_user.return_value = []
+    webhook_handler = WebhookHandler(mock_facade)
+    rsp, code = webhook_handler.handle_membership_event(mem_rm_payload)
+    mock_facade.query_user\
+        .assert_called_once_with([('github_id', 21031067)])
+    mock_logging.error.assert_called_once_with("could not find user 21031067")
+    assert rsp == "could not find user 39652351"
+    assert code == 404
+
+
+@mock.patch('webhook.webhook.logging')
+def test_handle_mem_event_rm_mult_members(mock_logging, mem_rm_payload):
+    """Test that multiple members with the same github name can be deleted."""
+    mock_facade = mock.MagicMock(DBFacade)
+    user1 = User("SLACKUSER1")
+    user2 = User("SLACKUSER2")
+    user3 = User("SLACKUSER3")
+    mock_facade.query_user.return_value = [user1, user2, user3]
+    webhook_handler = WebhookHandler(mock_facade)
+    rsp, code = webhook_handler.handle_membership_event(mem_rm_payload)
+    mock_facade.query_user\
+        .assert_called_once_with([('github_id', 21031067)])
+    assert mock_facade.delete_user.call_count is 3
+    assert mock_logging.info.call_count is 3
+    assert rsp == "deleted slack ID SLACKUSER1 SLACKUSER2 SLACKUSER3"
+    assert code == 200
+
+
+@mock.patch('webhook.webhook.logging')
+def test_handle_mem_event_inv_member(mock_logging, mem_inv_payload):
+    """Test that instances when members are added to the mem are logged."""
+    mock_facade = mock.MagicMock(DBFacade)
+    webhook_handler = WebhookHandler(mock_facade)
+    rsp, code = webhook_handler.handle_membership_event(mem_inv_payload)
+    mock_logging.info.assert_called_once_with(("user Codertocat invited "
+                                               "to Octocoders"))
+    assert rsp == "user hacktocat invited to Octocoders"
+    assert code == 200
+
+
+@mock.patch('webhook.webhook.logging')
+def test_handle_mem_event_empty_action(mock_logging, mem_empty_payload):
+    """Test that instances where there is no/invalid action are logged."""
+    mock_facade = mock.MagicMock(DBFacade)
+    webhook_handler = WebhookHandler(mock_facade)
+    rsp, code = webhook_handler.handle_membership_event(mem_empty_payload)
+    mock_logging.error.assert_called_once_with(("membership webhook "
+                                                "triggered, invalid "
+                                                "action specified: {}"
+                                                .format(mem_empty_payload)))
+    assert rsp == "invalid membership webhook triggered"
     assert code == 405
