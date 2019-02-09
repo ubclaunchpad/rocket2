@@ -53,19 +53,14 @@ class Core:
 
     def get_help(self):
         """Get help messages and return a formatted string for messaging."""
-        message = {"text": "Displaying all available commands. To read about"
-                           " a specific command, use `/rocket COMMAND help`\n",
+        message = {"text": "Displaying all available commands. "
+                           "To read about a specific command, use "
+                           "\n`/rocket [command] help`\n",
                    "mrkdwn": "true"}
         attachments = []
-        for cmd in self.__commands:
-            cmd_name = self.__commands[cmd].get_name()
-            cmd_text = "*[" + cmd_name.upper() + "]*\n\n" + \
-                "Commands for editing", cmd_name + "s."
-            # use below when cmd_usage is fixed in #202
-            # cmd_usage = self.__commands[cmd].get_help()
-            # cmd_text = "*[" + cmd_name + "]*\n\n" + \
-            #           "```" + cmd_usage + "```"
-            # perhaps get_help could have a parameter to only return usage?
+        for cmd in self.__commands.values():
+            cmd_name = cmd.get_name()
+            cmd_text = "*" + cmd_name + ":* " + cmd.get_desc()
             attachment = {"text": cmd_text, "mrkdwn_in": ["text"]}
             attachments.append(attachment)
         message["attachments"] = attachments
