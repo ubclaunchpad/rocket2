@@ -196,6 +196,20 @@ class TestUserCommand(TestCase):
         self.mock_facade.retrieve_user.assert_called_once_with("U0G9QF9C6")
         self.mock_facade.store_user.assert_called_once_with(user)
 
+    def test_handle_edit_github_error(self):
+        """Test that editing github username sends request to interface."""
+        user = User("U0G9QF9C6")
+        self.mock_facade.retrieve_user.return_value = user
+        self.mock_github.org_add_member.side_effect = GithubAPIException("")
+        self.assertEqual(self.testcommand.handle("user edit --github rob",
+                                                 "U0G9QF9C6"),
+                         ("User edited: " +
+                         str(user) +
+                         "\nError adding user rob to GitHub organization",
+                          200))
+        self.mock_facade.retrieve_user.assert_called_once_with("U0G9QF9C6")
+        self.mock_facade.store_user.assert_called_once_with(user)
+
     def test_handle_edit_other_user(self):
         """Test user command edit parser with all fields."""
         user = User("ABCDE89JK")
