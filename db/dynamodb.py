@@ -2,6 +2,7 @@
 import boto3
 import logging
 import toml
+from functools import reduce
 from boto3.dynamodb.conditions import Attr
 from model.user import User
 from model.team import Team
@@ -215,10 +216,9 @@ class DynamoDB:
         users = self.ddb.Table(self.users_table)
         if len(parameters) > 0:
             # There are 1 or more parameters that we should care about
-            filter_expr = Attr(parameters[0][0]).eq(parameters[0][1])
-
-            for p in parameters[1:]:
-                filter_expr &= Attr(p[0]).eq(p[1])
+            filter_expr = reduce(lambda a,x: a & x,
+                                 map(lambda x: Attr(x[0]).eq(x[1]),
+                                     parameters))
 
             response = users.scan(
                 FilterExpression=filter_expr
@@ -251,17 +251,13 @@ class DynamoDB:
         teams = self.ddb.Table(self.teams_table)
         if len(parameters) > 0:
             # There are 1 or more parameters that we should care about
-            if parameters[0][0] == 'members':
-                filter_expr = Attr(parameters[0][0]).contains(parameters[0][1])
-            else:
-                filter_expr = Attr(parameters[0][0]).eq(parameters[0][1])
-
-            for p in parameters[1:]:
-                if p[0] == 'members':
-                    filter_expr &= Attr(p[0]).contains(p[1])
+            def f(x):
+                if x[0] == 'members':
+                    return Attr(x[0]).contains(x[1])
                 else:
-                    filter_expr &= Attr(p[0]).eq(p[1])
+                    return Attr(x[0]).eq(x[1])
 
+            filter_expr = reduce(lambda a,x: a & x, map(f, parameters))
             response = teams.scan(
                 FilterExpression=filter_expr
             )
@@ -359,17 +355,13 @@ class DynamoDB:
         projects = self.ddb.Table(self.projects_table)
         if len(parameters) > 0:
             # There are 1 or more parameters that we should care about
-            if parameters[0][0] in ['tags', 'github_urls']:
-                filter_expr = Attr(parameters[0][0]).contains(parameters[0][1])
-            else:
-                filter_expr = Attr(parameters[0][0]).eq(parameters[0][1])
-
-            for p in parameters[1:]:
-                if p[0] in ['tags', 'github_urls']:
-                    filter_expr &= Attr(p[0]).contains(p[1])
+            def f(x):
+                if x[0] in ['tags', 'github_urls']:
+                    return Attr(x[0]).contains(x[1])
                 else:
-                    filter_expr &= Attr(p[0]).eq(p[1])
+                    return Attr(x[0]).eq(x[1])
 
+            filter_expr = reduce(lambda a,x: a & x, map(f, parameters))
             response = projects.scan(
                 FilterExpression=filter_expr
             )
