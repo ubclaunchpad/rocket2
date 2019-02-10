@@ -25,7 +25,7 @@ overwrite users that have already been entered into the database. By using the
 /rocket user edit [--name NAME] [--email EMAIL] [--pos POSITION]
                   [--github GITHUB_HANDLE] [--major MAJOR]
                   [--bio BIOGRAPHY]
-                  [--perm {member,team_lead,admin}]
+                  [--permission {member,team_lead,admin}]
 ```
 
 Allows user to edit their Launch Pad profile. Admins and team leads can edit
