@@ -18,7 +18,7 @@ class TestGithubInterface(TestCase):
 
         # make mock team
         self.mock_team = mock.MagicMock(Team.Team)
-        self.mock_github.get_team_id.return_value = self.mock_team
+        self.mock_github.get_team = mock.MagicMock(return_value=self.mock_team)
 
     def test_org_add_member(self):
         """Test GithubInterface method org_add_member."""
@@ -116,13 +116,16 @@ class TestGithubInterface(TestCase):
         """Test if list_team_members returns the right team members."""
         # Question: should we expect to receive list of username strings or PyGithub's internal user object
         test_team_members_list = [mock.MagicMock(NamedUser.NamedUser)]
-        self.mock_team.list_team_members.return_value =
+        self.mock_team.list_team_members = mock.MagicMock(return_value=test_team_members_list)
         self.test_bot.list_team_members('test_team_id')
-        self.mock_team.get_team_id.assert_called_once_with('test_team_id')
+        self.mock_github.get_team.assert_called_once_with('test_team_id')
 
 
     def test_tmem_get_team_member(self):
         """Test if method gets the correct member when member exists."""
+        test_user = mock.MagicMock(NamedUser.NamedUser)
+        test_user.name = 'member_username'
+
         pass
 
     def test_tmem_add_team_member(self):
