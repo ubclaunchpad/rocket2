@@ -17,12 +17,9 @@ class UserCommand:
            " edit \n --name NAME\n" \
            " --email ADDRESS\n --pos YOURPOSITION\n" \
            " --major YOURMAJOR\n --bio YOURBIO\n" \
-           " 'edit properties of your Launch Pad profile\n" \
-           " surround arguments with spaces with single quotes'" \
            "\n ADMIN/TEAM LEAD ONLY option: --member MEMBER_ID\n" \
            " 'edit properties of another " \
            "user's Launch Pad profile'\n\n" \
-           " view MEMBER_ID\n 'view information about a user'" \
            "\n\n " \
            "help\n 'outputs options for user commands'\n\n " \
            "ADMIN ONLY\n\n delete MEMBER_ID\n" \
@@ -38,7 +35,8 @@ class UserCommand:
         logging.info("Initializing UserCommand instance")
         self.parser = argparse.ArgumentParser(prog="user")
         self.parser.add_argument("user")
-        self.init_subparsers()
+        self.subparsers = self.init_subparsers()
+        self.help = self.get_help()
         self.facade = db_facade
         self.github = github_interface
 
@@ -47,18 +45,17 @@ class UserCommand:
         subparsers = self.parser.add_subparsers(dest="which")
 
         """Parser for view command."""
-        parser_view = subparsers.add_parser("view")
+        parser_view = subparsers. \
+            add_parser("view", help="view information about a given user")
         parser_view.set_defaults(which="view")
-        parser_view.add_argument("--slack_id", type=str, action='store')
+        parser_view. \
+            add_argument("--slack_id", type=str, action='store',
+                         help="use if using slack id instead of username")
 
         """Parser for add command."""
         parser_add = subparsers.add_parser("add")
         parser_add.set_defaults(which="add")
         parser_add.add_argument("-f", "--force", action="store_true")
-
-        """Parser for help command."""
-        parser_help = subparsers.add_parser("help")
-        parser_help.set_defaults(which="help")
 
         """Parser for delete command."""
         parser_delete = subparsers.add_parser("delete")
@@ -66,10 +63,16 @@ class UserCommand:
         parser_delete.add_argument("slack_id", type=str, action='store')
 
         """Parser for edit command."""
-        parser_edit = subparsers.add_parser("edit")
+        parser_edit = subparsers. \
+            add_parser("edit",
+                       help="edit properties of your Launch Pad "
+                            "profile (surround arguments with "
+                            "spaces with quotes)")
         parser_edit.set_defaults(which='edit')
-        parser_edit.add_argument("--name", type=str, action='store')
-        parser_edit.add_argument("--email", type=str, action='store')
+        parser_edit.add_argument("--name", type=str, action='store',
+                                 help="add to change your name")
+        parser_edit.add_argument("--email", type=str, action='store',
+                                 help="add to change your email")
         parser_edit.add_argument("--pos", type=str, action='store')
         parser_edit.add_argument("--github", type=str, action='store')
         parser_edit.add_argument("--major", type=str, action='store')
@@ -77,6 +80,7 @@ class UserCommand:
         parser_edit.add_argument("--member", type=str, action='store')
         parser_edit.add_argument("--permission", type=lambda x: Permissions[x],
                                  action='store', choices=list(Permissions))
+        return [parser_view, parser_add, parser_delete, parser_edit]
 
     def get_name(self):
         """Return the command type."""
@@ -84,7 +88,10 @@ class UserCommand:
 
     def get_help(self):
         """Return command options for user events."""
-        return self.help
+        res = ""
+        for subparser in self.subparsers:
+            res += subparser.format_help()
+        return res
 
     def get_desc(self):
         """Return the description of this command."""
@@ -101,10 +108,7 @@ class UserCommand:
         except SystemExit:
             return self.help, 200
 
-        if args.which is None or args.which == "help":
-            return self.help, 200
-
-        elif args.which == "view":
+        if args.which == "view":
             return self.view_helper(user_id, args.slack_id)
 
         elif args.which == "add":
@@ -126,6 +130,9 @@ class UserCommand:
                 "permission": args.permission,
             }
             return self.edit_helper(user_id, param_list)
+
+        else:
+            return self.get_help(), 200
 
     def edit_helper(self, user_id, param_list):
         """
