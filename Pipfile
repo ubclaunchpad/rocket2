@@ -16,6 +16,7 @@ structlog = "*"
 colorama = "*"
 flask-talisman = "*"
 flask-seasurf = "*"
+pyjwt = "*"
 
 [dev-packages]
 awscli = "*"
