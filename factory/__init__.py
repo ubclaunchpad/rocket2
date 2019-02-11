@@ -1,6 +1,8 @@
 """All necessary class initializations."""
-import toml
 import os
+import random
+import string
+import toml
 
 from command.core import Core
 from command.commands.token import TokenCommandConfig
@@ -33,8 +35,9 @@ def make_core(config, gh=None):
         if os.path.isfile(config['auth']['signing_key_path']):
             signing_key = open(config['auth']['signing_key_path']).read()
         else:
-            signing_key = os.urandom(24).decode('utf-8')
-            open(config['auth']['signing_key_path']).write(signing_key)
+            signing_key = ''.join(
+                random.choice(string.ascii_lowercase) for _ in range(24))
+            open(config['auth']['signing_key_path'], 'w+').write(signing_key)
     facade = DBFacade(DynamoDB(config))
     bot = Bot(SlackClient(slack_api_token))
     # TODO: make token config expiry configurable
