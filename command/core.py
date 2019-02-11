@@ -11,14 +11,14 @@ from flask import jsonify
 class Core:
     """Encapsulate methods for handling events."""
 
-    def __init__(self, db_facade, bot, gh_interface):
+    def __init__(self, db_facade, bot, gh_interface, token_config):
         """Initialize the dictionary of command handlers."""
         self.__commands = {}
         self.__facade = db_facade
         self.__bot = bot
         self.__github = gh_interface
         self.__commands["user"] = UserCommand(self.__facade, self.__github)
-        self.__commands["token"] = TokenCommand(self.__facade)
+        self.__commands["token"] = TokenCommand(self.__facade, token_config)
 
     def handle_app_command(self, cmd_txt, user):
         """

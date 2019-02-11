@@ -1,9 +1,9 @@
 """Command to obtain signed authentication token."""
-import logging
 import jwt
+import logging
 
+from datetime import datetime
 from model.permissions import Permissions
-from datetime import datetime, timedelta
 
 
 class TokenCommand:
@@ -15,7 +15,7 @@ class TokenCommand:
                        "permission level for this command!"
     lookup_error = "Requesting user not found!"
 
-    def __init__(self, db_facade):
+    def __init__(self, db_facade, config):
         """
         Initialize TokenCommand.
 
@@ -23,7 +23,8 @@ class TokenCommand:
         """
         logging.info("Initializing TokenCommand instance")
         self.facade = db_facade
-        self.key = ";alskdjf;alh;alsdjf;aklsdjfl;"
+        self.expiry = config.get_expiry()
+        self.signing_key = config.get_signing_key()
 
     def get_name(self):
         """Return the command's name."""
@@ -37,23 +38,40 @@ class TokenCommand:
         """Handle request for token."""
         logging.debug("Handling token command")
         try:
-            lead_user = self.facade.retrieve_user(user_id)
-            if lead_user.get_permissions_level() == Permissions.member:
+            user = self.facade.retrieve_user(user_id)
+            if user.get_permissions_level() == Permissions.member:
                 return self.permission_error, 403
         except LookupError:
             return self.lookup_error, 404
-        expiry = datetime.utcnow() + timedelta(days=7)
+        expiry = datetime.utcnow() + self.expiry
         payload = {
             'nbf': datetime.utcnow(),
-            # TODO make this configurable
             'exp': expiry,
             'iss': 'ubclaunchpad:rocket2',
             'iat': datetime.utcnow(),
-            'user_id': user_id
+            'user_id': user_id,
+            'permissions': user.get_permissions_level().value
         }
-        token = jwt.encode(payload, self.key, algorithm='HS256') \
+        token = jwt.encode(payload, self.signing_key, algorithm='HS256') \
             .decode('utf-8')
         return "This is your token:\n```\n{}".format(token) + \
                "\n```\nKeep it secret! Keep it safe!\n" \
                "It will expire at {}.".format(expiry), \
                200
+
+
+class TokenCommandConfig:
+    """Configuration options for TokenCommand."""
+
+    def __init__(self, expiry, signing_key):
+        """Initialize config for TokenCommand."""
+        self.expiry = expiry
+        self.signing_key = signing_key
+
+    def get_expiry(self):
+        """Return expiry offset, expressed as a `timedelta`."""
+        return self.expiry
+
+    def get_signing_key(self):
+        """Return string containing secret authentication signing key."""
+        return self.signing_key
