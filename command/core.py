@@ -1,5 +1,6 @@
 """Calls the appropriate handler depending on the event data."""
 from command.commands.user import UserCommand
+from command.commands.token import TokenCommand
 import command.util as util
 from model.user import User
 from interface.slack import SlackAPIError
@@ -17,6 +18,7 @@ class Core:
         self.__bot = bot
         self.__github = gh_interface
         self.__commands["user"] = UserCommand(self.__facade, self.__github)
+        self.__commands["token"] = TokenCommand(self.__facade)
 
     def handle_app_command(self, cmd_txt, user):
         """
