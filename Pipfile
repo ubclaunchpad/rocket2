@@ -17,6 +17,7 @@ colorama = "*"
 flask-talisman = "*"
 flask-seasurf = "*"
 pyjwt = "*"
+flask-limiter = "*"
 
 [dev-packages]
 awscli = "*"
