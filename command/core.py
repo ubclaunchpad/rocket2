@@ -45,7 +45,7 @@ class Core:
     def handle_team_join(self, event_data):
         """
         Handle the event of a new user joining the workspace.
-        
+
         :param event_data: JSON event data
         """
         new_id = event_data["event"]["user"]["id"]
@@ -61,7 +61,7 @@ class Core:
     def get_help(self):
         """
         Get help messages and return a formatted string for messaging.
-        
+
         :return: Preformatted ``flask.Response`` object containing help
                  messages
         """
