@@ -123,7 +123,7 @@ class UserCommand:
                 "github": args.github,
                 "major": args.major,
                 "bio": args.bio,
-                "perm": args.permission,
+                "permission": args.permission,
             }
             return self.edit_helper(user_id, param_list)
 
@@ -178,9 +178,9 @@ class UserCommand:
             edited_user.set_major(param_list["major"])
         if param_list["bio"]:
             edited_user.set_biography(param_list["bio"])
-        if param_list["perm"] and is_admin:
-            edited_user.set_permissions_level(param_list["perm"])
-        elif param_list["perm"] and not is_admin:
+        if param_list["permission"] and is_admin:
+            edited_user.set_permissions_level(param_list["permission"])
+        elif param_list["permission"] and not is_admin:
             msg += "\nCannot change own permission: user isn't admin."
             logging.warn("User {} tried to elevate permissions level."
                          .format(user_id))
