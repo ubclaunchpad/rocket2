@@ -5,8 +5,10 @@ Commands Core
 -------------
 
 .. automodule:: command.core
-    :members:
+   :members:
 
+.. automodule:: command.util
+   :members:
 
 User
 ----

@@ -229,7 +229,7 @@ class UserCommand:
 
         :param user_id: Slack ID of user to be added
         :param use_force: If this is set, we store the user even if they are
-        already added in the database
+                          already added in the database
         :return: ``"User added!", 200``
         """
         # Try to look up and avoid overwriting if we are not using force

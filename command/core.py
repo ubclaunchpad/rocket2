@@ -1,5 +1,6 @@
 """Calls the appropriate handler depending on the event data."""
 from command.commands.user import UserCommand
+import command.util as util
 from model.user import User
 from interface.slack import SlackAPIError
 import logging
@@ -19,16 +20,10 @@ class Core:
 
     def handle_app_command(self, cmd_txt, user):
         """Handle a command call to rocket."""
-        def regularize_char(c):
-            if c == "‘" or c == "’":
-                return "'"
-            if c == '“' or c == '”':
-                return '"'
-            return c
-
         # Slightly hacky way to deal with Apple platform
         # smart punctuation messing with argparse.
-        cmd_txt = ''.join(map(regularize_char, cmd_txt))
+        cmd_txt = ''.join(map(util.regularize_char, cmd_txt))
+        cmd_txt = util.escaped_id_to_id(cmd_txt)
         s = cmd_txt.split(' ', 1)
         if s[0] == "help" or s[0] is None:
             logging.info("Help command was called")
