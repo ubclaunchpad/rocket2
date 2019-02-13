@@ -18,7 +18,17 @@ class TestGithubInterface(TestCase):
 
         # make mock team
         self.mock_team = mock.MagicMock(Team.Team)
+        # right now, any arg team_id to get_team()
+        # will return self.mock_team no mater what.
+        # this is not robust since get_team should
+        # return different teams depending on the team_id
+        # being passed in. If anyone has a better
+        # idea, please let me know.
         self.mock_github.get_team = mock.MagicMock(return_value=self.mock_team)
+        self.test_user = mock.MagicMock(NamedUser.NamedUser)
+        self.test_user.name = 'member_username'
+        self.mock_team.get_members = mock.MagicMock(
+                                        return_value=[self.test_user])
 
     def test_org_add_member(self):
         """Test GithubInterface method org_add_member."""
@@ -114,24 +124,37 @@ class TestGithubInterface(TestCase):
 
     def test_tmem_list_team_members(self):
         """Test if list_team_members returns the right team members."""
-        # Question: should we expect to receive list of username strings or PyGithub's internal user object
-        test_team_members_list = [mock.MagicMock(NamedUser.NamedUser)]
-        self.mock_team.list_team_members = mock.MagicMock(return_value=test_team_members_list)
+        # Question: should we expect to receive list
+        # of username strings or PyGithub's internal user object
+        test_team_members_list = [mock.MagicMock(
+                                    NamedUser.NamedUser)]
+        self.mock_team.list_team_members = mock.MagicMock(
+                                            return_value=test_team_members_list
+                                            )
         self.test_bot.list_team_members('test_team_id')
         self.mock_github.get_team.assert_called_once_with('test_team_id')
 
-
     def test_tmem_get_team_member(self):
         """Test if method gets the correct member when member exists."""
-        test_user = mock.MagicMock(NamedUser.NamedUser)
-        test_user.name = 'member_username'
-
-        pass
+        # notice that any team id will return the same team as
+        # previously mentioned.
+        assert self.test_bot.\
+            get_team_member(
+                self.test_user.name, 'any_team_id') is self.test_user
 
     def test_tmem_add_team_member(self):
         """Test if a user is added to a team properly."""
-        pass
+        self.mock_github.get_user = mock.MagicMock(return_value=self.test_user)
+        self.mock_team.add_membership = mock.MagicMock()
+
+        self.test_bot.add_team_member('member_username', 'test_team_id')
+        self.mock_team.add_membership.assert_called_once_with(self.test_user)
 
     def test_tmem_remove_team_member(self):
         """Test if the user removed is no longer in the team"""
-        pass
+        self.mock_team.remove_membership = mock.MagicMock()
+        self.mock_github.get_user = mock.MagicMock(return_value=self.test_user)
+        self.test_bot.remove_team_member(
+            self.test_user.name, 'any_team_id')
+        self.mock_team.remove_membership.assert_called_once_with(
+                                                        self.test_user)
