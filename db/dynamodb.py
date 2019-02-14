@@ -2,9 +2,11 @@
 import boto3
 import logging
 import toml
+from functools import reduce
 from boto3.dynamodb.conditions import Attr
 from model.user import User
 from model.team import Team
+from model.project import Project
 from model.permissions import Permissions
 
 
@@ -43,6 +45,7 @@ class DynamoDB:
         logging.info("Initializing DynamoDb")
         self.users_table = config['aws']['users_table']
         self.teams_table = config['aws']['teams_table']
+        self.projects_table = config['aws']['projects_table']
         testing = config['testing']
 
         if testing:
@@ -63,69 +66,41 @@ class DynamoDB:
                                       aws_access_key_id=access_key_id,
                                       aws_secret_access_key=secret_access_key)
 
+        # Check for missing tables
         if not self.check_valid_table(self.users_table):
-            self.__create_user_tables()
-
+            self.__create_table(self.users_table, 'slack_id')
         if not self.check_valid_table(self.teams_table):
-            self.__create_team_tables()
+            self.__create_table(self.teams_table, 'github_team_id')
+        if not self.check_valid_table(self.projects_table):
+            self.__create_table(self.projects_table, 'project_id')
 
     def __str__(self):
         """Return a string representing this class."""
         return "DynamoDB"
 
-    def __create_user_tables(self):
+    def __create_table(self, table_name, primary_key, key_type='S'):
         """
-        Create the user table.
+        Create a table.
 
         **Note**: This function should **not** be called externally, and should
         only be called on initialization.
 
-        Users are only required to have a ``slack_id``. Since this is a NoSQL
-        database, no other attributes are required.
+        :param table_name: name of the table to create
+        :param primary_key: name of the primary key for the table
+        :param key_type: type of primary key (S, N, B)
         """
-        logging.info("Creating table '{}'".format(self.users_table))
+        logging.info("Creating table '{}'".format(table_name))
         self.ddb.create_table(
-            TableName=self.users_table,
+            TableName=table_name,
             AttributeDefinitions=[
                 {
-                    'AttributeName': 'slack_id',
-                    'AttributeType': 'S'
+                    'AttributeName': primary_key,
+                    'AttributeType': key_type
                 },
             ],
             KeySchema=[
                 {
-                    'AttributeName': 'slack_id',
-                    'KeyType': 'HASH'
-                },
-            ],
-            ProvisionedThroughput={
-                'ReadCapacityUnits': 1,
-                'WriteCapacityUnits': 1
-            }
-        )
-
-    def __create_team_tables(self):
-        """
-        Create the team table.
-
-        **Note**: This function should **not** be called externally, and should
-        only be called on initialization.
-
-        Teams are only required to have a ``github_team_id``. Since this is a
-        NoSQL database, no other attributes are required.
-        """
-        logging.info("Creating table '{}'".format(self.teams_table))
-        self.ddb.create_table(
-            TableName=self.teams_table,
-            AttributeDefinitions=[
-                {
-                    'AttributeName': 'github_team_id',
-                    'AttributeType': 'S'
-                },
-            ],
-            KeySchema=[
-                {
-                    'AttributeName': 'github_team_id',
+                    'AttributeName': primary_key,
                     'KeyType': 'HASH'
                 },
             ],
@@ -154,24 +129,8 @@ class DynamoDB:
         """
         # Check that there are no blank fields in the user
         if User.is_valid(user):
-            def place_if_filled(name, field):
-                """Populate ``udict`` if ``field`` isn't empty."""
-                if field:
-                    udict[name] = field
-
             user_table = self.ddb.Table(self.users_table)
-            udict = {
-                'slack_id': user.get_slack_id(),
-                'permission_level': user.get_permissions_level().name
-            }
-            place_if_filled('email', user.get_email())
-            place_if_filled('name', user.get_name())
-            place_if_filled('github', user.get_github_username())
-            place_if_filled('github_user_id', user.get_github_id())
-            place_if_filled('major', user.get_major())
-            place_if_filled('position', user.get_position())
-            place_if_filled('bio', user.get_biography())
-            place_if_filled('image_url', user.get_image_url())
+            udict = User.to_dict(user)
 
             logging.info("Storing user {} in table {}".
                          format(user.get_slack_id(), self.users_table))
@@ -188,19 +147,8 @@ class DynamoDB:
         """
         # Check that there are no blank fields in the team
         if Team.is_valid(team):
-            def place_if_filled(name, field):
-                """Populate ``tdict`` if ``field`` isn't empty."""
-                if field:
-                    tdict[name] = field
-
             teams_table = self.ddb.Table(self.teams_table)
-            tdict = {
-                'github_team_id': team.get_github_team_id(),
-                'github_team_name': team.get_github_team_name()
-            }
-            place_if_filled('display_name', team.get_display_name())
-            place_if_filled('platform', team.get_platform())
-            place_if_filled('members', team.get_members())
+            tdict = Team.to_dict(team)
 
             logging.info("Storing team {} in table {}".
                          format(team.get_github_team_name(), self.teams_table))
@@ -225,29 +173,9 @@ class DynamoDB:
         )
 
         if 'Item' in response.keys():
-            return self.user_from_dict(response['Item'])
+            return User.from_dict(response['Item'])
         else:
             raise LookupError('User "{}" not found'.format(slack_id))
-
-    @staticmethod
-    def user_from_dict(d):
-        """
-        Convert dict response object to user model.
-
-        :return: returns converted user model.
-        """
-        user = User(d['slack_id'])
-        user.set_email(d.get('email', ''))
-        user.set_name(d.get('name', ''))
-        user.set_github_username(d.get('github', ''))
-        user.set_github_id(d.get('github_user_id', ''))
-        user.set_major(d.get('major', ''))
-        user.set_position(d.get('position', ''))
-        user.set_biography(d.get('bio', ''))
-        user.set_image_url(d.get('image_url', ''))
-        user.set_permissions_level(Permissions[d.get('permission_level',
-                                                     'members')])
-        return user
 
     def retrieve_team(self, team_id):
         """
@@ -266,25 +194,9 @@ class DynamoDB:
         )
 
         if 'Item' in response.keys():
-            return self.team_from_dict(response['Item'])
+            return Team.from_dict(response['Item'])
         else:
             raise LookupError('Team "{}" not found'.format(team_id))
-
-    @staticmethod
-    def team_from_dict(d):
-        """
-        Convert dict response object to team model.
-
-        :return: returns converted team model.
-        """
-        team = Team(d['github_team_id'],
-                    d['github_team_name'],
-                    d.get('display_name', ''))
-        team.set_platform(d.get('platform', ''))
-        members = set(d.get('members', []))
-        for member in members:
-            team.add_member(member)
-        return team
 
     def query_user(self, parameters):
         """
@@ -304,10 +216,9 @@ class DynamoDB:
         users = self.ddb.Table(self.users_table)
         if len(parameters) > 0:
             # There are 1 or more parameters that we should care about
-            filter_expr = Attr(parameters[0][0]).eq(parameters[0][1])
-
-            for p in parameters[1:]:
-                filter_expr &= Attr(p[0]).eq(p[1])
+            filter_expr = reduce(lambda a, x: a & x,
+                                 map(lambda x: Attr(x[0]).eq(x[1]),
+                                     parameters))
 
             response = users.scan(
                 FilterExpression=filter_expr
@@ -316,7 +227,7 @@ class DynamoDB:
             # No parameters; return all users in table
             response = users.scan()
 
-        return list(map(self.user_from_dict, response['Items']))
+        return list(map(User.from_dict, response['Items']))
 
     def query_team(self, parameters):
         """
@@ -340,17 +251,13 @@ class DynamoDB:
         teams = self.ddb.Table(self.teams_table)
         if len(parameters) > 0:
             # There are 1 or more parameters that we should care about
-            if parameters[0][0] == 'members':
-                filter_expr = Attr(parameters[0][0]).contains(parameters[0][1])
-            else:
-                filter_expr = Attr(parameters[0][0]).eq(parameters[0][1])
-
-            for p in parameters[1:]:
-                if p[0] == 'members':
-                    filter_expr &= Attr(p[0]).contains(p[1])
+            def f(x):
+                if x[0] == 'members':
+                    return Attr(x[0]).contains(x[1])
                 else:
-                    filter_expr &= Attr(p[0]).eq(p[1])
+                    return Attr(x[0]).eq(x[1])
 
+            filter_expr = reduce(lambda a, x: a & x, map(f, parameters))
             response = teams.scan(
                 FilterExpression=filter_expr
             )
@@ -358,7 +265,7 @@ class DynamoDB:
             # No parameters; return all users in table
             response = teams.scan()
 
-        return list(map(self.team_from_dict, response['Items']))
+        return list(map(Team.from_dict, response['Items']))
 
     def delete_user(self, slack_id):
         """
@@ -389,5 +296,92 @@ class DynamoDB:
         team_table.delete_item(
             Key={
                 'github_team_id': team_id
+            }
+        )
+
+    def store_project(self, project):
+        """
+        Store project into projects table.
+
+        :param project: A project model to store
+        :return: True if project is valid, False otherwise
+        """
+        # Check that there are no required blank fields in the project
+        if Project.is_valid(project):
+            project_table = self.ddb.Table(self.projects_table)
+            udict = Project.to_dict(project)
+
+            logging.info("Storing project {} in table {}".
+                         format(project.get_project_id(), self.projects_table))
+            project_table.put_item(Item=udict)
+            return True
+        return False
+
+    def retrieve_project(self, project_id):
+        """
+        Retrieve project from projects table.
+
+        :param project_id: used as key for retrieving project objects.
+        :raise: LookupError if project id is not found.
+        :return: returns a project model if slack id is found.
+        """
+        project_table = self.ddb.Table(self.projects_table)
+        response = project_table.get_item(
+            TableName=self.projects_table,
+            Key={
+                'project_id': project_id
+            }
+        )
+
+        if 'Item' in response.keys():
+            return Project.from_dict(response['Item'])
+        else:
+            raise LookupError('Project "{}" not found'.format(project_id))
+
+    def query_project(self, parameters):
+        """
+        Query for specific projects by parameter.
+
+        Returns list of teams that have **all** of the attributes specified in
+        the parameters. Every item in parameters is a tuple, where the first
+        element is the project attribute, and the second is the value.
+
+        Example: ``[('tags', 'c++')]`` would get all projects with ``c++``
+        (case sensitive) in their tags.
+
+        :param parameters: list of parameters (tuples)
+        :return: returns a list of project models that fit the query parameters
+        """
+        projects = self.ddb.Table(self.projects_table)
+        if len(parameters) > 0:
+            # There are 1 or more parameters that we should care about
+            def f(x):
+                if x[0] in ['tags', 'github_urls']:
+                    return Attr(x[0]).contains(x[1])
+                else:
+                    return Attr(x[0]).eq(x[1])
+
+            filter_expr = reduce(lambda a, x: a & x, map(f, parameters))
+            response = projects.scan(
+                FilterExpression=filter_expr
+            )
+        else:
+            # No parameters; return all users in table
+            response = projects.scan()
+
+        return list(map(Project.from_dict, response['Items']))
+
+    def delete_project(self, project_id):
+        """
+        Remove a project from the projects table.
+
+        :param project_id: the project ID of the project to be removed
+        """
+        logging.info("Deleting project {} from table {}".
+                     format(project_id, self.projects_table))
+        project_table = self.ddb.Table(self.projects_table)
+        project_table.delete_item(
+            Key={
+                'project_id': project_id
             }
         )

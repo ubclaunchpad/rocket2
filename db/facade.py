@@ -87,7 +87,7 @@ class DBFacade:
         Retrieve team from teams table.
 
         :param team_name: used as key for retrieving team objects.
-        :raise: LookupError if team id is not found.
+        :raise: LookupError if team name is not found.
         :return: returns a team model if slack id is found.
         """
         logging.info("Retrieving team {}".format(team_name))
@@ -114,7 +114,54 @@ class DBFacade:
         """
         Remove a team from the teams table.
 
-        :param team_name: team_name: the team_name of the team to be removed
+        :param team_name: the team_name of the team to be removed
         """
         logging.info("Deleting team {}".format(team_name))
         self.ddb.delete_team(team_name)
+
+    def store_project(self, project):
+        """
+        Store project into projects table.
+
+        :param project: A project model to store
+        """
+        logging.info("Storing project " + project.get_project_id())
+        self.ddb.store_project(project)
+
+    def retrieve_project(self, project_id):
+        """
+        Retrieve project from projects table.
+
+        :param project_id: used as key for retrieving project objects.
+        :raise: LookupError if project id is not found.
+        :return: returns a project model if slack id is found.
+        """
+        logging.info("Retrieving project " + project_id)
+        return self.ddb.retrieve_project(project_id)
+
+    def query_project(self, parameters):
+        """
+        Query for specific projects by parameter.
+
+        Returns list of teams that have **all** of the attributes specified in
+        the parameters. Every item in parameters is a tuple, where the first
+        element is the project attribute, and the second is the value.
+
+        Example: ``[('tags', 'c++')]`` would get all projects with ``c++``
+        (case sensitive) in their tags.
+
+        :param parameters: list of parameters (tuples)
+        :return: returns a list of project models that fit the query parameters
+        """
+        logging.info("Querying projects matching parameters: {}"
+                     .format(parameters))
+        return self.ddb.query_project(parameters)
+
+    def delete_project(self, project_id):
+        """
+        Remove a project from the projects table.
+
+        :param project_id: the project ID of the project to be removed
+        """
+        logging.info("Deleting project " + project_id)
+        self.ddb.delete_project(project_id)
