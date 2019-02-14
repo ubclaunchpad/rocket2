@@ -2,11 +2,11 @@
 
 ## Description
 
-Give a brief description of your changes:
+**Give a brief description of your changes:**
 
 ## Testing
 
-If testing this change requires extra setup, please document it here:
+**If testing this change requires extra setup, please document it here:**
 
 ## Ticket(s)
 

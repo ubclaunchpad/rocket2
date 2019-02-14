@@ -41,10 +41,12 @@ class TeamCommand:
            "    * remove the specified user from the team\n\n"\
            "* delete GITHUB_TEAM_NAME\n"\
            "    * permanently delete the specified team\n"
+    desc = "for dealing with " + command_name + "s"
 
     def __init__(self):
         """Initialize team command parser."""
         logging.info("Initializing TeamCommand instance")
+        self.desc = ""
         self.parser = argparse.ArgumentParser(prog="team")
         self.parser.add_argument("team")
         self.init_subparsers()
@@ -101,6 +103,10 @@ class TeamCommand:
     def get_name(self):
         """Return the command type."""
         return self.command_name
+
+    def get_desc(self):
+        """Return the description of this command."""
+        return self.desc
 
     def get_help(self):
         """Return command options for team events."""

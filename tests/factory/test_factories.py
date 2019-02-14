@@ -14,7 +14,8 @@ def test_make_core():
         'testing': True,
         'aws': {
             'users_table': 'users_test',
-            'teams_table': 'teams_test'
+            'teams_table': 'teams_test',
+            'projects_table': 'projects_test'
         }
     }
     core = make_core(test_config, mock.MagicMock(GithubInterface))

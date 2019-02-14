@@ -31,6 +31,7 @@ class UserCommand:
                        "permission level for this command!"
     lookup_error = "User not found!"
     delete_text = "Deleted user with Slack ID: "
+    desc = "for dealing with " + command_name + "s"
 
     def __init__(self, db_facade, github_interface):
         """Initialize user command."""
@@ -74,6 +75,8 @@ class UserCommand:
         parser_edit.add_argument("--major", type=str, action='store')
         parser_edit.add_argument("--bio", type=str, action='store')
         parser_edit.add_argument("--member", type=str, action='store')
+        parser_edit.add_argument("--permission", type=lambda x: Permissions[x],
+                                 action='store', choices=list(Permissions))
 
     def get_name(self):
         """Return the command type."""
@@ -82,6 +85,10 @@ class UserCommand:
     def get_help(self):
         """Return command options for user events."""
         return self.help
+
+    def get_desc(self):
+        """Return the description of this command."""
+        return self.desc
 
     def handle(self, command, user_id):
         """Handle command by splitting into substrings and giving to parser."""
@@ -116,6 +123,7 @@ class UserCommand:
                 "github": args.github,
                 "major": args.major,
                 "bio": args.bio,
+                "permission": args.permission,
             }
             return self.edit_helper(user_id, param_list)
 
@@ -132,6 +140,7 @@ class UserCommand:
         :return: returns error message if not admin and command
                    edits another user, returns edit message if user is edited
         """
+        is_admin = False
         edited_user = None
         msg = ""
         if param_list["member"] is not None:
@@ -140,6 +149,7 @@ class UserCommand:
                 if admin_user.get_permissions_level() != Permissions.admin:
                     return self.permission_error, 200
                 else:
+                    is_admin = True
                     edited_id = param_list["member"]
                     edited_user = self.facade.retrieve_user(edited_id)
             except LookupError:
@@ -168,6 +178,12 @@ class UserCommand:
             edited_user.set_major(param_list["major"])
         if param_list["bio"]:
             edited_user.set_biography(param_list["bio"])
+        if param_list["permission"] and is_admin:
+            edited_user.set_permissions_level(param_list["permission"])
+        elif param_list["permission"] and not is_admin:
+            msg += "\nCannot change own permission: user isn't admin."
+            logging.warn("User {} tried to elevate permissions level."
+                         .format(user_id))
 
         self.facade.store_user(edited_user)
         return "User edited: " + str(edited_user) + msg, 200
@@ -224,7 +240,7 @@ class UserCommand:
 
         :param user_id: Slack ID of user to be added
         :param use_force: If this is set, we store the user even if they are
-        already added in the database
+                          already added in the database
         :return: ``"User added!", 200``
         """
         # Try to look up and avoid overwriting if we are not using force
