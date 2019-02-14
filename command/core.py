@@ -1,5 +1,6 @@
 """Calls the appropriate handler depending on the event data."""
 from command.commands.user import UserCommand
+import command.util as util
 from model.user import User
 from interface.slack import SlackAPIError
 import logging
@@ -18,17 +19,19 @@ class Core:
         self.__commands["user"] = UserCommand(self.__facade, self.__github)
 
     def handle_app_command(self, cmd_txt, user):
-        """Handle a command call to rocket."""
-        def regularize_char(c):
-            if c == "‘" or c == "’":
-                return "'"
-            if c == '“' or c == '”':
-                return '"'
-            return c
+        """
+        Handle a command call to rocket.
 
+        :param cmd_txt: the command itself
+        :param user: slack ID of user who executed the command
+        :return: tuple where first element is the response text (or a
+                 ``flask.Response`` object), and the second element
+                 is the response status code
+        """
         # Slightly hacky way to deal with Apple platform
         # smart punctuation messing with argparse.
-        cmd_txt = ''.join(map(regularize_char, cmd_txt))
+        cmd_txt = ''.join(map(util.regularize_char, cmd_txt))
+        cmd_txt = util.escaped_id_to_id(cmd_txt)
         s = cmd_txt.split(' ', 1)
         if s[0] == "help" or s[0] is None:
             logging.info("Help command was called")
@@ -40,7 +43,11 @@ class Core:
             return 'Please enter a valid command', 200
 
     def handle_team_join(self, event_data):
-        """Handle the event of a new user joining the workspace."""
+        """
+        Handle the event of a new user joining the workspace.
+
+        :param event_data: JSON event data
+        """
         new_id = event_data["event"]["user"]["id"]
         new_user = User(new_id)
         self.__facade.store_user(new_user)
@@ -52,7 +59,12 @@ class Core:
             logging.error(new_id + " added to database - user not notified")
 
     def get_help(self):
-        """Get help messages and return a formatted string for messaging."""
+        """
+        Get help messages and return a formatted string for messaging.
+
+        :return: Preformatted ``flask.Response`` object containing help
+                 messages
+        """
         message = {"text": "Displaying all available commands. "
                            "To read about a specific command, use "
                            "\n`/rocket [command] help`\n",
