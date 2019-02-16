@@ -7,4 +7,9 @@ creds_path = "credentials/slack.toml"
 creds_path = "credentials/aws.toml"
 users_table = "users"
 teams_table = "teams"
+projects_table = "projects"
 region = "us-west-2"
+
+[github]
+creds_path = "credentials/github.toml"
+organization = "ubclaunchpad"

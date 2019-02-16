@@ -17,6 +17,49 @@ class Team:
         self.__members = set()
 
     @staticmethod
+    def from_dict(d):
+        """
+        Convert dict response object to team model.
+
+        :param d: the dictionary representing a team
+        :return: returns converted team model.
+        """
+        team = Team(d['github_team_id'],
+                    d['github_team_name'],
+                    d.get('display_name', ''))
+        team.set_platform(d.get('platform', ''))
+        members = set(d.get('members', []))
+        for member in members:
+            team.add_member(member)
+        return team
+
+    @staticmethod
+    def to_dict(team):
+        """
+        Convert team object to dict object.
+
+        The difference with the in-built ``self.__dict__`` is that this is more
+        compatible with storing into NoSQL databases like DynamoDB.
+
+        :param team: the team object
+        :return: the dictionary representing the team
+        """
+        def place_if_filled(name, field):
+            """Populate ``tdict`` if ``field`` isn't empty."""
+            if field:
+                tdict[name] = field
+
+        tdict = {
+            'github_team_id': team.get_github_team_id(),
+            'github_team_name': team.get_github_team_name()
+        }
+        place_if_filled('display_name', team.get_display_name())
+        place_if_filled('platform', team.get_platform())
+        place_if_filled('members', team.get_members())
+
+        return tdict
+
+    @staticmethod
     def is_valid(team):
         """
         Return true if this team has no missing required fields.
@@ -33,7 +76,7 @@ class Team:
 
     def __eq__(self, other):
         """Return true if this team has the same attributes as the other."""
-        return str(self.__dict__) == str(other.__dict__)
+        return str(self) == str(other)
 
     def __ne__(self, other):
         """Return the opposite of what is returned in self.__eq__(other)."""

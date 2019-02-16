@@ -6,6 +6,7 @@ from model.user import User
 from db.facade import DBFacade
 from model.permissions import Permissions
 from interface.slack import Bot
+from interface.github import GithubInterface, GithubAPIException
 
 
 class TestUserCommand(TestCase):
@@ -15,7 +16,8 @@ class TestUserCommand(TestCase):
         """Set up the test case environment."""
         self.app = Flask(__name__)
         self.mock_facade = mock.MagicMock(DBFacade)
-        self.testcommand = UserCommand(self.mock_facade)
+        self.mock_github = mock.MagicMock(GithubInterface)
+        self.testcommand = UserCommand(self.mock_facade, self.mock_github)
 
     def test_get_command_name(self):
         """Test user command get_name method."""
@@ -40,6 +42,42 @@ class TestUserCommand(TestCase):
         self.assertEqual(self.testcommand.handle('user edit --biology stuff',
                                                  "U0G9QF9C6"),
                          (UserCommand.help, 200))
+
+    def test_handle_add(self):
+        """Test user command add method."""
+        user_id = "U0G9QF9C6"
+        user = User(user_id)
+        lookup_error = LookupError('User "{}" not found'.format(user_id))
+        self.mock_facade.retrieve_user.side_effect = lookup_error
+        self.assertTupleEqual(self.testcommand.handle('user add', user_id),
+                              ('User added!', 200))
+        self.mock_facade.store_user.assert_called_once_with(user)
+
+    def test_handle_add_no_overwriting(self):
+        """Test user command add method when user exists in db."""
+        user_id = "U0G9QF9C6"
+        user = User(user_id)
+        self.mock_facade.retrieve_user.return_value = user
+
+        # Since the user exists, we don't call store_user()
+        err_msg = 'User already exists; to overwrite user, add `-f`'
+        resp = self.testcommand.handle('user add', user_id)
+        self.assertTupleEqual(resp, (err_msg, 200))
+        self.mock_facade.retrieve_user.assert_called_once_with(user_id)
+        self.mock_facade.store_user.assert_not_called()
+
+    def test_handle_add_overwriting(self):
+        """Test user command add method when user exists in db."""
+        user_id = "U0G9QF9C6"
+        user2_id = "U0G9QF9C69"
+        user = User(user_id)
+        user2 = User(user2_id)
+
+        self.testcommand.handle('user add -f', user_id)
+        self.mock_facade.store_user.assert_called_with(user)
+        self.testcommand.handle('user add --force', user2_id)
+        self.mock_facade.store_user.assert_called_with(user2)
+        self.mock_facade.retrieve_user.assert_not_called()
 
     def test_handle_view(self):
         """Test user command view parser and handle method."""
@@ -133,6 +171,45 @@ class TestUserCommand(TestCase):
         user.set_name("rob")
         self.mock_facade.store_user.assert_called_once_with(user)
 
+    def test_handle_edit_github(self):
+        """Test that editing github username sends request to interface."""
+        user = User("U0G9QF9C6")
+        self.mock_facade.retrieve_user.return_value = user
+        self.assertEqual(self.testcommand.handle("user edit --github rob",
+                                                 "U0G9QF9C6"),
+                         ("User edited: " + str(user), 200))
+        self.mock_facade.retrieve_user.assert_called_once_with("U0G9QF9C6")
+        self.mock_facade.store_user.assert_called_once_with(user)
+        self.mock_github.org_add_member.assert_called_once_with("rob")
+
+    def test_handle_edit_github_error(self):
+        """Test that editing github username sends request to interface."""
+        user = User("U0G9QF9C6")
+        self.mock_facade.retrieve_user.return_value = user
+        self.mock_github.org_add_member.side_effect = GithubAPIException("")
+        self.assertEqual(self.testcommand.handle("user edit --github rob",
+                                                 "U0G9QF9C6"),
+                         ("User edited: " +
+                         str(user) +
+                         "\nError adding user rob to GitHub organization",
+                          200))
+        self.mock_facade.retrieve_user.assert_called_once_with("U0G9QF9C6")
+        self.mock_facade.store_user.assert_called_once_with(user)
+
+    def test_handle_edit_github_error(self):
+        """Test that editing github username sends request to interface."""
+        user = User("U0G9QF9C6")
+        self.mock_facade.retrieve_user.return_value = user
+        self.mock_github.org_add_member.side_effect = GithubAPIException("")
+        self.assertEqual(self.testcommand.handle("user edit --github rob",
+                                                 "U0G9QF9C6"),
+                         ("User edited: " +
+                         str(user) +
+                         "\nError adding user rob to GitHub organization",
+                          200))
+        self.mock_facade.retrieve_user.assert_called_once_with("U0G9QF9C6")
+        self.mock_facade.store_user.assert_called_once_with(user)
+
     def test_handle_edit_other_user(self):
         """Test user command edit parser with all fields."""
         user = User("ABCDE89JK")
@@ -171,6 +248,29 @@ class TestUserCommand(TestCase):
                          (UserCommand.permission_error, 200))
         self.mock_facade.retrieve_user.assert_called_once_with("U0G9QF9C6")
         self.mock_facade.store_user.assert_not_called()
+
+    def test_handle_edit_make_admin(self):
+        """Test user command with editor that is admin and user who's not."""
+        editor = User("a1")
+        editee = User("arst")
+        rets = {'a1': editor, 'arst': editee}
+        editor.set_permissions_level(Permissions.admin)
+        self.mock_facade.retrieve_user.side_effect = rets.get
+        self.assertTupleEqual(self.testcommand.handle(
+            "user edit --member arst "
+            "--permission admin",
+            "a1"),
+                              ("User edited: " + str(editee), 200))
+
+    def test_handle_edit_make_admin_no_perms(self):
+        """Test user command with editor that isn't admin."""
+        editor = User("a1")
+        self.mock_facade.retrieve_user.return_value = editor
+        self.assertTupleEqual(self.testcommand.handle(
+            "user edit --permission admin", "a1"),
+                              ("User edited: " + str(editor) +
+                               "\nCannot change own permission: user isn't" +
+                               " admin.", 200))
 
     def test_handle_edit_lookup_error_editor(self):
         """Test user command where user editor is not in database."""

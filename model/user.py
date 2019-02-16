@@ -41,6 +41,58 @@ class User:
         return {'fallback': fallback, 'fields': fields}
 
     @staticmethod
+    def to_dict(user):
+        """
+        Convert user object to dict object.
+
+        The difference with the in-built ``self.__dict__`` is that this is more
+        compatible with storing into NoSQL databases like DynamoDB.
+
+        :param user: the user object
+        :return: the dictionary representing the user
+        """
+        def place_if_filled(name, field):
+            """Populate ``udict`` if ``field`` isn't empty."""
+            if field:
+                udict[name] = field
+
+        udict = {
+            'slack_id': user.get_slack_id(),
+            'permission_level': user.get_permissions_level().name
+        }
+        place_if_filled('email', user.get_email())
+        place_if_filled('name', user.get_name())
+        place_if_filled('github', user.get_github_username())
+        place_if_filled('github_user_id', user.get_github_id())
+        place_if_filled('major', user.get_major())
+        place_if_filled('position', user.get_position())
+        place_if_filled('bio', user.get_biography())
+        place_if_filled('image_url', user.get_image_url())
+
+        return udict
+
+    @staticmethod
+    def from_dict(d):
+        """
+        Convert dict response object to user model.
+
+        :param d: the dictionary representing a user
+        :return: returns converted user model.
+        """
+        user = User(d['slack_id'])
+        user.set_email(d.get('email', ''))
+        user.set_name(d.get('name', ''))
+        user.set_github_username(d.get('github', ''))
+        user.set_github_id(d.get('github_user_id', ''))
+        user.set_major(d.get('major', ''))
+        user.set_position(d.get('position', ''))
+        user.set_biography(d.get('bio', ''))
+        user.set_image_url(d.get('image_url', ''))
+        user.set_permissions_level(Permissions[d.get('permission_level',
+                                                     'member')])
+        return user
+
+    @staticmethod
     def is_valid(user):
         """
         Return true if this user has no missing required fields.

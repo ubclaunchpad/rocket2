@@ -5,13 +5,14 @@ import shlex
 from flask import jsonify
 from model.permissions import Permissions
 from model.user import User
+from interface.github import GithubAPIException
 
 
 class UserCommand:
     """Represent User Command Parser."""
 
     command_name = "user"
-    help = "User Command Reference:\n\n @rocket user" \
+    help = "User Command Reference:\n\n /rocket user" \
            "\n\n Options:\n\n" \
            " edit \n --name NAME\n" \
            " --email ADDRESS\n --pos YOURPOSITION\n" \
@@ -30,14 +31,16 @@ class UserCommand:
                        "permission level for this command!"
     lookup_error = "User not found!"
     delete_text = "Deleted user with Slack ID: "
+    desc = "for dealing with " + command_name + "s"
 
-    def __init__(self, db_facade):
+    def __init__(self, db_facade, github_interface):
         """Initialize user command."""
         logging.info("Initializing UserCommand instance")
         self.parser = argparse.ArgumentParser(prog="user")
         self.parser.add_argument("user")
         self.init_subparsers()
         self.facade = db_facade
+        self.github = github_interface
 
     def init_subparsers(self):
         """Initialize subparsers for user command."""
@@ -49,9 +52,9 @@ class UserCommand:
         parser_view.add_argument("--slack_id", type=str, action='store')
 
         """Parser for add command."""
-        # DEBUG
         parser_add = subparsers.add_parser("add")
         parser_add.set_defaults(which="add")
+        parser_add.add_argument("-f", "--force", action="store_true")
 
         """Parser for help command."""
         parser_help = subparsers.add_parser("help")
@@ -72,6 +75,8 @@ class UserCommand:
         parser_edit.add_argument("--major", type=str, action='store')
         parser_edit.add_argument("--bio", type=str, action='store')
         parser_edit.add_argument("--member", type=str, action='store')
+        parser_edit.add_argument("--permission", type=lambda x: Permissions[x],
+                                 action='store', choices=list(Permissions))
 
     def get_name(self):
         """Return the command type."""
@@ -80,6 +85,10 @@ class UserCommand:
     def get_help(self):
         """Return command options for user events."""
         return self.help
+
+    def get_desc(self):
+        """Return the description of this command."""
+        return self.desc
 
     def handle(self, command, user_id):
         """Handle command by splitting into substrings and giving to parser."""
@@ -100,7 +109,7 @@ class UserCommand:
 
         elif args.which == "add":
             # XXX: Remove in production
-            return self.add_helper(user_id)
+            return self.add_helper(user_id, args.force)
 
         elif args.which == "delete":
             return self.delete_helper(user_id, args.slack_id)
@@ -114,6 +123,7 @@ class UserCommand:
                 "github": args.github,
                 "major": args.major,
                 "bio": args.bio,
+                "permission": args.permission,
             }
             return self.edit_helper(user_id, param_list)
 
@@ -130,13 +140,16 @@ class UserCommand:
         :return: returns error message if not admin and command
                    edits another user, returns edit message if user is edited
         """
+        is_admin = False
         edited_user = None
+        msg = ""
         if param_list["member"] is not None:
             try:
                 admin_user = self.facade.retrieve_user(user_id)
                 if admin_user.get_permissions_level() != Permissions.admin:
                     return self.permission_error, 200
                 else:
+                    is_admin = True
                     edited_id = param_list["member"]
                     edited_user = self.facade.retrieve_user(edited_id)
             except LookupError:
@@ -154,14 +167,26 @@ class UserCommand:
         if param_list["pos"]:
             edited_user.set_position(param_list["pos"])
         if param_list["github"]:
-            edited_user.set_github_username(param_list["github"])
+            try:
+                self.github.org_add_member(param_list["github"])
+                edited_user.set_github_username(param_list["github"])
+            except GithubAPIException as e:
+                msg = "\nError adding user {} to GitHub organization".format(
+                    param_list['github'])
+                logging.error(msg)
         if param_list["major"]:
             edited_user.set_major(param_list["major"])
         if param_list["bio"]:
             edited_user.set_biography(param_list["bio"])
+        if param_list["permission"] and is_admin:
+            edited_user.set_permissions_level(param_list["permission"])
+        elif param_list["permission"] and not is_admin:
+            msg += "\nCannot change own permission: user isn't admin."
+            logging.warn("User {} tried to elevate permissions level."
+                         .format(user_id))
 
         self.facade.store_user(edited_user)
-        return "User edited: " + str(edited_user), 200
+        return "User edited: " + str(edited_user) + msg, 200
 
     def delete_helper(self, user_id, slack_id):
         """
@@ -209,12 +234,22 @@ class UserCommand:
         except LookupError:
             return self.lookup_error, 200
 
-    def add_helper(self, user_id):
+    def add_helper(self, user_id, use_force):
         """
         Add the user to the database via user id.
 
         :param user_id: Slack ID of user to be added
+        :param use_force: If this is set, we store the user even if they are
+                          already added in the database
         :return: ``"User added!", 200``
         """
+        # Try to look up and avoid overwriting if we are not using force
+        if not use_force:
+            try:
+                self.facade.retrieve_user(user_id)
+                return 'User already exists; to overwrite user, add `-f`', 200
+            except LookupError:
+                pass
+
         self.facade.store_user(User(user_id))
         return 'User added!', 200

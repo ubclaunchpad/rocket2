@@ -2,8 +2,11 @@
 from unittest import mock
 from command.core import Core
 from interface.slack import Bot, SlackAPIError
+from interface.github import GithubInterface
 from db.facade import DBFacade
 from slackclient import SlackClient
+from command.commands.user import UserCommand
+from flask import jsonify, json, Flask
 
 
 @mock.patch('command.core.logging')
@@ -11,7 +14,8 @@ def test_handle_invalid_mention(mock_logging):
     """Test the instance of handle_app_command being called inappropriately."""
     mock_facade = mock.MagicMock(DBFacade)
     mock_bot = mock.MagicMock(Bot)
-    core = Core(mock_facade, mock_bot)
+    mock_gh = mock.MagicMock(GithubInterface)
+    core = Core(mock_facade, mock_bot, mock_gh)
     core.handle_app_command('hello world', 'U061F7AUR')
     expected_log_message = "app command triggered incorrectly"
     mock_logging.error.assert_called_once_with(expected_log_message)
@@ -23,11 +27,36 @@ def test_handle_invalid_command(mock_logging, mock_usercommand):
     """Test that invalid commands are being handled appropriately."""
     mock_facade = mock.MagicMock(DBFacade)
     mock_bot = mock.MagicMock(Bot)
+    mock_gh = mock.MagicMock(GithubInterface)
     mock_usercommand.handle.side_effect = KeyError
     user = 'U061F7AUR'
-    core = Core(mock_facade, mock_bot)
+    core = Core(mock_facade, mock_bot, mock_gh)
     core.handle_app_command('fake command', user)
     error_txt = "Please enter a valid command."
+
+
+@mock.patch('command.core.logging')
+def test_handle_help(mock_logging):
+    """Test that a '/rocket help' brings up help."""
+    app = Flask(__name__)
+    mock_usercommand = mock.MagicMock(UserCommand)
+    mock_usercommand.get_name.return_value = "user"
+    mock_facade = mock.MagicMock(DBFacade)
+    mock_bot = mock.MagicMock(Bot)
+    mock_gh = mock.MagicMock(GithubInterface)
+    core = Core(mock_facade, mock_bot, mock_gh)
+    with app.app_context():
+        resp, code = core.handle_app_command("help", "U061F7AUR")
+        expect = json.loads(
+            jsonify({"text": "Displaying all available commands. "
+                             "To read about a specific command, "
+                             "use \n`/rocket [command] help`\n",
+                     "mrkdwn": "true",
+                     "attachments": [
+                         {"text": "*user:* for dealing with users",
+                          "mrkdwn_in": ["text"]}]}).data)
+        resp = json.loads(resp.data)
+    assert resp == expect
 
 
 @mock.patch('command.core.UserCommand')
@@ -36,7 +65,8 @@ def test_handle_user_command(mock_logging, mock_usercommand):
     """Test that UserCommand.handle is called appropriately."""
     mock_facade = mock.MagicMock(DBFacade)
     mock_bot = mock.MagicMock(Bot)
-    core = Core(mock_facade, mock_bot)
+    mock_gh = mock.MagicMock(GithubInterface)
+    core = Core(mock_facade, mock_bot, mock_gh)
     core.handle_app_command('user name', 'U061F7AUR')
     mock_usercommand.\
         return_value.handle.\
@@ -48,6 +78,7 @@ def test_handle_team_join_success(mock_logging):
     """Test that the join handler adds users to the db successfully."""
     mock_facade = mock.MagicMock(DBFacade)
     mock_bot = mock.MagicMock(Bot)
+    mock_gh = mock.MagicMock(GithubInterface)
     event = {
         "token": "XXYYZZ",
         "team_id": "TXXXXXXXX",
@@ -100,7 +131,7 @@ def test_handle_team_join_success(mock_logging):
         "event_id": "Ev08MFMKH6",
         "event_time": 1234567890
     }
-    core = Core(mock_facade, mock_bot)
+    core = Core(mock_facade, mock_bot, mock_gh)
     core.handle_team_join(event)
     welcome = 'Welcome to UBC Launch Pad!'
     id = "W012A3CDE"
@@ -115,6 +146,7 @@ def test_handle_team_join_slack_error(mock_logging):
     """Test that the join handler handles Slack API errors."""
     mock_facade = mock.MagicMock(DBFacade)
     mock_bot = mock.MagicMock(Bot)
+    mock_gh = mock.MagicMock(GithubInterface)
     mock_bot.send_dm.side_effect = SlackAPIError(None)
     event = {
         "token": "XXYYZZ",
@@ -168,7 +200,7 @@ def test_handle_team_join_slack_error(mock_logging):
         "event_id": "Ev08MFMKH6",
         "event_time": 1234567890
     }
-    core = Core(mock_facade, mock_bot)
+    core = Core(mock_facade, mock_bot, mock_gh)
     core.handle_team_join(event)
     welcome = 'Welcome to UBC Launch Pad!'
     id = "W012A3CDE"
