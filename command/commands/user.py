@@ -34,8 +34,9 @@ class UserCommand:
 
         """Parser for view command."""
         parser_view = subparsers. \
-            add_parser("view", help="view information about a given user")
-        parser_view.set_defaults(which="view")
+            add_parser("view")
+        parser_view.set_defaults(which="view",
+                                 help="view information about a given user")
         parser_view. \
             add_argument("--slack_id", type=str, action='store',
                          help="use if using slack id instead of username")
@@ -89,7 +90,7 @@ class UserCommand:
 
     def get_help(self):
         """Return command options for user events."""
-        res = "\n*" + self.command_name + "commands:*```"
+        res = "\n*" + self.command_name + " commands:*```"
         for argument in self.subparser.choices:
             res += "\n*" + argument + " commands*\n"
             res += self.subparser.choices[argument].format_help()

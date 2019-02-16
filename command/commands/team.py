@@ -49,7 +49,7 @@ class TeamCommand:
         self.desc = ""
         self.parser = argparse.ArgumentParser(prog="team")
         self.parser.add_argument("team")
-        self.init_subparsers()
+        self.subparser = self.init_subparsers()
 
     def init_subparsers(self):
         """Initialize subparsers for team command."""
@@ -57,25 +57,30 @@ class TeamCommand:
 
         """Parser for list command."""
         parser_list = subparsers.add_parser("list")
-        parser_list.set_defaults(which="list")
+        parser_list.set_defaults(which="list",
+                                 help="outputs the Github team names "
+                                      "and displays names of all teams")
 
         """Parser for view command."""
         parser_view = subparsers.add_parser("view")
-        parser_view.set_defaults(which="view")
+        parser_view.set_defaults(which="view",
+                                 help="view information and members of "
+                                      "a team")
         parser_view.add_argument("team_name", type=str, action='store')
-
-        """Parser for help command."""
-        parser_view = subparsers.add_parser("help")
-        parser_view.set_defaults(which="help")
 
         """Parser for delete command."""
         parser_delete = subparsers.add_parser("delete")
-        parser_delete.set_defaults(which="delete")
+        parser_delete.set_defaults(which="delete",
+                                   help="permanently delete specified "
+                                        "team (admin only)")
         parser_delete.add_argument("team_name", type=str, action='store')
 
         """Parser for create command."""
         parser_create = subparsers.add_parser("create")
-        parser_create.set_defaults(which="create")
+        parser_create.set_defaults(which="create",
+                                   help="create a new team with the "
+                                        "Github team name and provided "
+                                        "optional parameters")
         parser_create.add_argument("team_name", type=str, action='store')
         parser_create.add_argument("--name", type=str, action='store')
         parser_create.add_argument("--platform", type=str, action='store')
@@ -99,6 +104,7 @@ class TeamCommand:
         parser_edit.add_argument("team_name", type=str, action='store')
         parser_edit.add_argument("--name", type=str, action='store')
         parser_edit.add_argument("--platform", type=str, action='store')
+        return subparsers
 
     def get_name(self):
         """Return the command type."""
@@ -110,7 +116,11 @@ class TeamCommand:
 
     def get_help(self):
         """Return command options for team events."""
-        return self.help
+        res = "\n*" + self.command_name + " commands:*```"
+        for argument in self.subparser.choices:
+            res += "\n*" + argument + " commands*\n"
+            res += self.subparser.choices[argument].format_help()
+        return res + "```"
 
     def handle(self, command, user_id):
         """Handle command by splitting into substrings and giving to parser."""
@@ -121,7 +131,7 @@ class TeamCommand:
         try:
             args = self.parser.parse_args(command_arg)
         except SystemExit:
-            return self.help, 200
+            return self.get_help(), 200
 
         if args.which == "list":
             # stub
@@ -130,10 +140,6 @@ class TeamCommand:
         elif args.which == "view":
             # stub
             return "viewing " + args.team_name, 200
-
-        elif args.which == "help":
-            # stub
-            return self.get_help(), 200
 
         elif args.which == "delete":
             # stub
@@ -166,3 +172,7 @@ class TeamCommand:
             if args.platform is not None:
                 msg += "platform: {}, ".format(args.platform)
             return msg, 200
+
+        else:
+            # stub
+            return self.get_help(), 200

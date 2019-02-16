@@ -67,7 +67,9 @@ class Core:
         """
         message = {"text": "Displaying all available commands. "
                            "To read about a specific command, use "
-                           "\n`/rocket [command] help`\n",
+                           "\n`/rocket [command] help`\n"
+                           "For arguments containing spaces, "
+                           "please enclose them with quotations.\n",
                    "mrkdwn": "true"}
         attachments = []
         for cmd in self.__commands.values():
