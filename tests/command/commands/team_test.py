@@ -3,32 +3,33 @@ from command.commands.team import TeamCommand
 from unittest import TestCase
 
 
-help_text = "\n*team commands:*```\n*list commands*\nusage: team team list " \
-            "[-h]\n\noptional arguments:\n  -h, --help  show this help " \
-            "message and exit\n\n*view commands*\nusage: team team view [" \
-            "-h] team_name\n\npositional arguments:\n  " \
+help_text = "\n*team commands:*```\n*list commands*\nusage: /rocket team " \
+            "list [-h]\n\noptional arguments:\n  -h, --help  show this " \
+            "help message and exit\n\n*view commands*\nusage: /rocket team " \
+            "view [-h] team_name\n\npositional arguments:\n  " \
             "team_name\n\noptional arguments:\n  -h, --help  show this " \
-            "help message and exit\n\n*delete commands*\nusage: team team " \
-            "delete [-h] team_name\n\npositional arguments:\n  " \
+            "help message and exit\n\n*delete commands*\nusage: /rocket " \
+            "team delete [-h] team_name\n\npositional arguments:\n  " \
             "team_name\n\noptional arguments:\n  -h, --help  show this " \
-            "help message and exit\n\n*create commands*\nusage: team team " \
-            "create [-h] [--name NAME] [--platform PLATFORM] [--channel]\n " \
-            "                       team_name\n\npositional arguments:\n  " \
-            "team_name            Github name of your team (" \
-            "required)\n\noptional arguments:\n  -h, --help           show " \
-            "this help message and exit\n  --name NAME          display " \
-            "name of your team\n  --platform PLATFORM  the team's main " \
-            "platform\n  --channel            add all members of this " \
-            "channel to the created team\n\n*add commands*\nusage: team " \
-            "team add [-h] team_name slack_id\n\npositional arguments:\n  " \
-            "team_name   team to add the user to\n  slack_id    user to be " \
-            "added to team\n\noptional arguments:\n  -h, --help  show this " \
-            "help message and exit\n\n*remove commands*\nusage: team team " \
+            "help message and exit\n\n*create commands*\nusage: /rocket " \
+            "team create [-h] [--name NAME] [--platform PLATFORM]\n        " \
+            "                   [--channel]\n                           " \
+            "team_name\n\npositional arguments:\n  team_name            " \
+            "Github name of your team (required)\n\noptional arguments:\n  " \
+            "-h, --help           show this help message and exit\n  " \
+            "--name NAME          display name of your team\n  --platform " \
+            "PLATFORM  the team's main platform\n  --channel            " \
+            "add all members of this channel to the created team\n\n*add " \
+            "commands*\nusage: /rocket team add [-h] team_name " \
+            "slack_id\n\npositional arguments:\n  team_name   team to add " \
+            "the user to\n  slack_id    user to be added to " \
+            "team\n\noptional arguments:\n  -h, --help  show this help " \
+            "message and exit\n\n*remove commands*\nusage: /rocket team " \
             "remove [-h] team_name slack_id\n\npositional arguments:\n  " \
             "team_name   team to remove user from\n  slack_id    user to " \
             "be removed from team\n\noptional arguments:\n  -h, --help  " \
             "show this help message and exit\n\n*edit commands*\nusage: " \
-            "team team edit [-h] [--name NAME] [--platform PLATFORM] " \
+            "/rocket team edit [-h] [--name NAME] [--platform PLATFORM] " \
             "team_name\n\npositional arguments:\n  team_name            " \
             "name of team to edit\n\noptional arguments:\n  -h, --help     " \
             "      show this help message and exit\n  --name NAME          " \
