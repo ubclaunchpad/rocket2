@@ -247,7 +247,7 @@ class TestGithubInterface(TestCase):
         self.mock_team.add_membership.assert_called_once_with(self.test_user)
 
     def test_tmem_remove_team_member(self):
-        """Test if the user removed is no longer in the team"""
+        """Test if the user removed is no longer in the team."""
         self.mock_team.remove_membership = mock.MagicMock()
         self.mock_github.get_user = mock.MagicMock(return_value=self.test_user)
         self.test_bot.remove_team_member(

@@ -118,7 +118,7 @@ class GithubInterface:
             raise GithubAPIException(e.data)
 
     def get_team_member(self, member_username, team_id):
-        """Return a team member with a username of member_username"""
+        """Return a team member with a username of member_username."""
         try:
             team = self.github.get_team(team_id)
             team_members = map(lambda x: x, team.get_members())
