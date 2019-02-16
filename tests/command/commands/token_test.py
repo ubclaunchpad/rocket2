@@ -18,8 +18,6 @@ class TestTokenCommand(TestCase):
         self.testcommand = TokenCommand(self.mock_facade,
                                         TokenCommandConfig(timedelta(days=7),
                                                            "secret"))
-        self.admin_user = User("U13542")
-        self.admin_user.set_permissions_level(Permissions.member)
 
     def test_get_command_name(self):
         """Test get_name()."""
