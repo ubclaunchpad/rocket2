@@ -23,7 +23,7 @@ class TestGithubInterface(TestCase):
         self.mock_github.get_team = mock.MagicMock(side_effect={
             'brussels-sprouts': self.mock_team,
         }.get)
-        
+
         self.test_user = mock.MagicMock(NamedUser.NamedUser)
         self.test_user.name = 'member_username'
         self.mock_team.get_members = mock.MagicMock(
