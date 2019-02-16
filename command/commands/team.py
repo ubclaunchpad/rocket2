@@ -50,6 +50,7 @@ class TeamCommand:
         self.parser = argparse.ArgumentParser(prog="team")
         self.parser.add_argument("team")
         self.subparser = self.init_subparsers()
+        self.help = self.get_help()
 
     def init_subparsers(self):
         """Initialize subparsers for team command."""
@@ -80,30 +81,48 @@ class TeamCommand:
         parser_create.set_defaults(which="create",
                                    help="create a new team with the "
                                         "Github team name and provided "
-                                        "optional parameters")
-        parser_create.add_argument("team_name", type=str, action='store')
-        parser_create.add_argument("--name", type=str, action='store')
-        parser_create.add_argument("--platform", type=str, action='store')
-        parser_create.add_argument('--channel', action='store_true')
+                                        "optional parameters. NOTE: "
+                                        "you will be added to this team "
+                                        "(admin only)")
+        parser_create.add_argument("team_name", type=str, action='store',
+                                   help="Github name of your team (required)")
+        parser_create.add_argument("--name", type=str, action='store',
+                                   help="display name of your team")
+        parser_create.add_argument("--platform", type=str, action='store',
+                                   help="the team's main platform")
+        parser_create.add_argument('--channel', action='store_true',
+                                   help="add all members of this channel "
+                                        "to the created team")
 
         """Parser for add command."""
         parser_add = subparsers.add_parser("add")
-        parser_add.set_defaults(which="add")
-        parser_add.add_argument("team_name", type=str, action='store')
-        parser_add.add_argument("slack_id", type=str, action='store')
+        parser_add.set_defaults(which="add",
+                                help="add a user to a given team")
+        parser_add.add_argument("team_name", type=str, action='store',
+                                help="team to add the user to")
+        parser_add.add_argument("slack_id", type=str, action='store',
+                                help="user to be added to team")
 
         """Parser for remove command."""
         parser_remove = subparsers.add_parser("remove")
-        parser_remove.set_defaults(which="remove")
-        parser_remove.add_argument("team_name", type=str, action='store')
-        parser_remove.add_argument("slack_id", type=str, action='store')
+        parser_remove.set_defaults(which="remove",
+                                   help="remove a user from given team")
+        parser_remove.add_argument("team_name", type=str, action='store',
+                                   help="team to remove user from")
+        parser_remove.add_argument("slack_id", type=str, action='store',
+                                   help="user to be removed from team")
 
         """Parser for edit command."""
         parser_edit = subparsers.add_parser("edit")
-        parser_edit.set_defaults(which='edit')
-        parser_edit.add_argument("team_name", type=str, action='store')
-        parser_edit.add_argument("--name", type=str, action='store')
-        parser_edit.add_argument("--platform", type=str, action='store')
+        parser_edit.set_defaults(which='edit',
+                                 help="edit properties of specified team "
+                                      "(admin only)")
+        parser_edit.add_argument("team_name", type=str, action='store',
+                                 help="name of team to edit")
+        parser_edit.add_argument("--name", type=str, action='store',
+                                 help="display name the team should have")
+        parser_edit.add_argument("--platform", type=str, action='store',
+                                 help="platform the team should have")
         return subparsers
 
     def get_name(self):
@@ -174,5 +193,4 @@ class TeamCommand:
             return msg, 200
 
         else:
-            # stub
             return self.get_help(), 200
