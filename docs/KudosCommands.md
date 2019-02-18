@@ -1,14 +1,14 @@
 # Kudos Command Reference 
 
-Command to give or take away a user's karma
+Command to giveth or taketh away a user's karma
 
 ## Options
 #### For normal users:
-##### Add karma to user
+##### Add 1 karma to user
 ```
 /rocket @user ++
 ```
-##### Remove karma from user
+##### Remove 1 karma from user
 ```
 /rocket @user --
 ```
@@ -38,11 +38,11 @@ Command to give or take away a user's karma
 /rocket kudos reset all #resets all users karma to 1
 ```
 
-### Help
-
+#### Help
+##### Display options for the kudos commands.
 ```sh
 /rocket kudos help
 ```
 
-Display options for the kudos commands.
+
 
