@@ -44,7 +44,7 @@ class TeamCommand:
     desc = "for dealing with " + command_name + "s"
 
     def __init__(self, sc):
-        """Initialize team command parser."""
+        """Initialize team command parser with given Slack Client Interface."""
         logging.info("Initializing TeamCommand instance")
         self.sc = sc
         self.desc = ""
