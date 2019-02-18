@@ -36,51 +36,52 @@ class UserCommand:
         parser_view = subparsers. \
             add_parser("view")
         parser_view.set_defaults(which="view",
-                                 help="view information about a given user")
+                                 help="View information about a given user.")
         parser_view. \
             add_argument("--slack_id", type=str, action='store',
-                         help="use if using slack id instead of username")
+                         help="Use if using slack id instead of username.")
 
         """Parser for add command."""
         parser_add = subparsers.add_parser("add")
         parser_add.set_defaults(which="add",
-                                help="add a user to rocket2's database")
+                                help="Add a user to rocket2's database.")
         parser_add.add_argument("-f", "--force", action="store_true",
-                                help="set to store user even if already "
-                                     "added to database")
+                                help="Set to store user even if already "
+                                     "added to database.")
 
         """Parser for delete command."""
         parser_delete = subparsers.add_parser("delete")
         parser_delete.set_defaults(which="delete",
-                                   help="permanently delete member's "
-                                        "profile (admin only)")
-        parser_delete.add_argument("slack_id", type=str, action='store')
+                                   help="(Admin only) permanently delete "
+                                        "member's profile.")
+        parser_delete.add_argument("slack_id", type=str, action='store',
+                                   help="Slack id of member to delete.")
 
         """Parser for edit command."""
         parser_edit = subparsers. \
             add_parser("edit",
-                       help="edit properties of your Launch Pad "
+                       help="Edit properties of your Launch Pad "
                             "profile (surround arguments containing "
                             "spaces with quotes)")
         parser_edit.set_defaults(which='edit')
         parser_edit.add_argument("--name", type=str, action='store',
-                                 help="add to change your name")
+                                 help="Add to change your name.")
         parser_edit.add_argument("--email", type=str, action='store',
-                                 help="add to change your email")
+                                 help="Add to change your email.")
         parser_edit.add_argument("--pos", type=str, action='store',
-                                 help="add to change your position")
+                                 help="Add to change your position.")
         parser_edit.add_argument("--github", type=str, action='store',
-                                 help="add to change your github username")
+                                 help="Add to change your github username.")
         parser_edit.add_argument("--major", type=str, action='store',
-                                 help="add to change your major")
+                                 help="Add to change your major.")
         parser_edit.add_argument("--bio", type=str, action='store',
-                                 help="add to change your biography")
+                                 help="Add to change your biography.")
         parser_edit.add_argument("--member", type=str, action='store',
-                                 help="add to edit properties of another "
-                                      "user (admin only)")
+                                 help="(Admin only) Add to edit properties "
+                                      "of another user.")
         parser_edit.add_argument("--permission", type=lambda x: Permissions[x],
-                                 help="add to edit permission level of a user "
-                                      "(admin only)",
+                                 help="(Admin only) Add to edit permission "
+                                      "level of a user.",
                                  action='store', choices=list(Permissions))
         return subparsers
 
@@ -92,7 +93,8 @@ class UserCommand:
         """Return command options for user events."""
         res = "\n*" + self.command_name + " commands:*```"
         for argument in self.subparser.choices:
-            res += "\n*" + argument + " commands*\n"
+            name = argument.capitalize()
+            res += "\n*" + name + "*\n"
             res += self.subparser.choices[argument].format_help()
         return res + "```"
 

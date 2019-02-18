@@ -26,70 +26,70 @@ class TeamCommand:
         """Parser for list command."""
         parser_list = subparsers.add_parser("list")
         parser_list.set_defaults(which="list",
-                                 help="outputs the Github team names "
-                                      "and displays names of all teams")
+                                 help="Outputs the Github team names "
+                                      "and displays names of all teams.")
 
         """Parser for view command."""
         parser_view = subparsers.add_parser("view")
         parser_view.set_defaults(which="view",
-                                 help="view information and members of "
-                                      "a team")
+                                 help="View information and members of "
+                                      "a team.")
         parser_view.add_argument("team_name", type=str, action='store')
 
         """Parser for delete command."""
         parser_delete = subparsers.add_parser("delete")
         parser_delete.set_defaults(which="delete",
-                                   help="permanently delete specified "
-                                        "team (admin only)")
+                                   help="(Admin only) Permanently delete "
+                                        "specified team.")
         parser_delete.add_argument("team_name", type=str, action='store')
 
         """Parser for create command."""
         parser_create = subparsers.add_parser("create")
         parser_create.set_defaults(which="create",
-                                   help="create a new team with the "
+                                   help="(Admin only)"
+                                        "Create a new team with the "
                                         "Github team name and provided "
                                         "optional parameters. NOTE: "
-                                        "you will be added to this team "
-                                        "(admin only)")
+                                        "you will be added to this team.")
         parser_create.add_argument("team_name", type=str, action='store',
-                                   help="Github name of your team (required)")
+                                   help="Github name of your team (required).")
         parser_create.add_argument("--name", type=str, action='store',
-                                   help="display name of your team")
+                                   help="Display name of your team.")
         parser_create.add_argument("--platform", type=str, action='store',
-                                   help="the team's main platform")
+                                   help="The team's main platform.")
         parser_create.add_argument('--channel', action='store_true',
-                                   help="add all members of this channel "
-                                        "to the created team")
+                                   help="Add all members of this channel "
+                                        "to the created team.")
 
         """Parser for add command."""
         parser_add = subparsers.add_parser("add")
         parser_add.set_defaults(which="add",
-                                help="add a user to a given team")
+                                help="Add a user to a given team.")
         parser_add.add_argument("team_name", type=str, action='store',
-                                help="team to add the user to")
+                                help="Team to add the user to.")
         parser_add.add_argument("slack_id", type=str, action='store',
-                                help="user to be added to team")
+                                help="User to be added to team.")
 
         """Parser for remove command."""
         parser_remove = subparsers.add_parser("remove")
         parser_remove.set_defaults(which="remove",
-                                   help="remove a user from given team")
+                                   help="Remove a user from given team.")
         parser_remove.add_argument("team_name", type=str, action='store',
-                                   help="team to remove user from")
+                                   help="Team to remove user from.")
         parser_remove.add_argument("slack_id", type=str, action='store',
-                                   help="user to be removed from team")
+                                   help="User to be removed from team.")
 
         """Parser for edit command."""
         parser_edit = subparsers.add_parser("edit")
         parser_edit.set_defaults(which='edit',
-                                 help="edit properties of specified team "
-                                      "(admin only)")
+                                 help="(Admin only)"
+                                      "Edit properties of specified team.")
         parser_edit.add_argument("team_name", type=str, action='store',
-                                 help="name of team to edit")
+                                 help="Name of team to edit.")
         parser_edit.add_argument("--name", type=str, action='store',
-                                 help="display name the team should have")
+                                 help="Display name the team should have.")
         parser_edit.add_argument("--platform", type=str, action='store',
-                                 help="platform the team should have")
+                                 help="Platform the team should have.")
         return subparsers
 
     def get_name(self):
@@ -104,7 +104,8 @@ class TeamCommand:
         """Return command options for team events."""
         res = "\n*" + self.command_name + " commands:*```"
         for argument in self.subparser.choices:
-            res += "\n*" + argument + " commands*\n"
+            name = argument.capitalize()
+            res += "\n*" + name + "*\n"
             res += self.subparser.choices[argument].format_help()
         return res + "```"
 
