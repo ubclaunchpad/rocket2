@@ -89,7 +89,7 @@ class User:
         user.biography = d.get('bio', '')
         user.image_url = d.get('image_url', '')
         user.permissions_level = Permissions[d.get('permission_level',
-                                                     'member')]
+                                                   'member')]
         return user
 
     @staticmethod
