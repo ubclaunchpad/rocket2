@@ -17,7 +17,7 @@ class User:
         self.__biography = ""
         self.__image_url = ""
         self.__permissions_level = Permissions.member
-        self.__karma = 0
+        self.__karma = 1
 
     def get_attachment(self):
         """Return slack-formatted attachment (dictionary) for user."""
@@ -32,7 +32,8 @@ class User:
             ('Position', self.__position),
             ('Biography', self.__biography),
             ('Image URL', self.__image_url),
-            ('Permissions Level', str(self.__permissions_level))
+            ('Permissions Level', str(self.__permissions_level)),
+            ('Karma', self.__karma)
         ]
 
         fields = [{'title': t, 'value': v if v else 'n/a', 'short': True}
@@ -199,3 +200,21 @@ class User:
     def __str__(self):
         """Print information on the user class."""
         return str(self.__dict__)
+
+    def reset_karma(self):
+        """Resets amount of karma for a user, default is one"""
+        self.__karma = 1
+
+    def add_karma_by_amount(self, amount):
+        """Adds karma by amount"""
+        self.__karma += amount
+
+    def remove_karma_by_amount(self, amount):
+        """Removes karma by amount"""
+        self.__karma -= amount
+        if self.__karma <= 0:
+           self.reset_karma
+
+    def get_karma(self):
+        """Returns amount of karma for a User"""
+        return self.__karma

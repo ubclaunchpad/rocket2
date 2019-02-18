@@ -6,7 +6,7 @@ from model.user import User
 from interface.slack import SlackAPIError
 import logging
 from flask import jsonify
-
+import re
 
 class Core:
     """Encapsulate methods for handling events."""
@@ -35,11 +35,15 @@ class Core:
         cmd_txt = ''.join(map(util.regularize_char, cmd_txt))
         cmd_txt = util.escaped_id_to_id(cmd_txt)
         s = cmd_txt.split(' ', 1)
+        print(s)
         if s[0] == "help" or s[0] is None:
             logging.info("Help command was called")
             return self.get_help(), 200
         if s[0] in self.__commands:
             return self.__commands[s[0]].handle(cmd_txt, user)
+        elif re.match("^[UW][A-Z0-9]{8}$", s[0]):
+            logging.info("kudos command activated")
+            return self.__commands['kudos'].handle(cmd_txt, user)
         else:
             logging.error("app command triggered incorrectly")
             return 'Please enter a valid command', 200
