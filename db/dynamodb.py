@@ -133,7 +133,7 @@ class DynamoDB:
             udict = User.to_dict(user)
 
             logging.info("Storing user {} in table {}".
-                         format(user.get_slack_id(), self.users_table))
+                         format(user.slack_id, self.users_table))
             user_table.put_item(Item=udict)
             return True
         return False
@@ -151,7 +151,7 @@ class DynamoDB:
             tdict = Team.to_dict(team)
 
             logging.info("Storing team {} in table {}".
-                         format(team.get_github_team_name(), self.teams_table))
+                         format(team.github_team_name, self.teams_table))
             teams_table.put_item(Item=tdict)
             return True
         return False
@@ -312,7 +312,7 @@ class DynamoDB:
             udict = Project.to_dict(project)
 
             logging.info("Storing project {} in table {}".
-                         format(project.get_project_id(), self.projects_table))
+                         format(project.project_id, self.projects_table))
             project_table.put_item(Item=udict)
             return True
         return False

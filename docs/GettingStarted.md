@@ -38,7 +38,7 @@ steven_universe.set_email('su@gmail.com')
 User.is_valid(steven_universe) # returns true
 
 # To get a user's permission level.
-steven_universe.get_permissions_level() # returns Permissions_member
+steven_universe.permissions_level # returns Permissions_member
 ```
 
 Launchpad is growing every year, so there are a lot of user, hence a lot of user

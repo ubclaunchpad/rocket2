@@ -30,7 +30,7 @@ class WebhookHandler:
             if len(member_list) > 0:
                 slack_ids_string = ""
                 for member in member_list:
-                    slack_id = member.get_slack_id()
+                    slack_id = member.slack_id
                     self.__facade.delete_user(slack_id)
                     logging.info("deleted slack user {}".format(slack_id))
                     slack_ids_string = slack_ids_string + " " + str(slack_id)
@@ -80,7 +80,7 @@ class WebhookHandler:
                 team = self.__facade.retrieve_team(github_id)
                 logging.warning("team {} with id {} already exists.".
                                 format(github_team_name, github_id))
-                team.set_github_team_name(github_team_name)
+                team.github_team_name = github_team_name
             except LookupError:
                 logging.debug("team {} with id {} added to organization.".
                               format(github_team_name, github_id))
@@ -108,7 +108,7 @@ class WebhookHandler:
                           format(str(payload)))
             try:
                 team = self.__facade.retrieve_team(github_id)
-                team.set_github_team_name(github_team_name)
+                team.github_team_name = github_team_name
                 logging.info("changed team's name with id {} from {} to {}".
                              format(github_id, github_team_name,
                                     team.github_team_name))

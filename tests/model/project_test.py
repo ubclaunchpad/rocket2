@@ -12,10 +12,10 @@ def test_project_getters_and_setters():
     """Test project getters and setters methods."""
     p = Project('12345', ['http://www.github.com/ubclaunchpad/rocket'])
 
-    assert isinstance(p.get_project_id(), str)
-    assert p.get_project_id().isalnum()
-    assert p.get_github_team_id() == '12345'
-    assert p.get_github_urls() == ['http://www.github.com/ubclaunchpad/rocket']
+    assert isinstance(p.project_id, str)
+    assert p.project_id.isalnum()
+    assert p.github_team_id == '12345'
+    assert p.github_urls == ['http://www.github.com/ubclaunchpad/rocket']
 
     project_id = 'abcdef1234'
     team_id = '123456'
@@ -29,29 +29,29 @@ def test_project_getters_and_setters():
     appstore_url = 'https://www.placeholder.com'
     playstore_url = 'https://www.google.jp'
 
-    p.set_project_id(project_id)
-    p.set_github_team_id(team_id)
-    p.set_github_urls(github_urls)
-    p.set_display_name(display_name)
-    p.set_short_description(short_description)
-    p.set_long_description(long_description)
-    p.set_tags(tags)
-    p.set_website_url(website_url)
-    p.set_medium_url(medium_url)
-    p.set_appstore_url(appstore_url)
-    p.set_playstore_url(playstore_url)
+    p.project_id = project_id
+    p.github_team_id = team_id
+    p.github_urls = github_urls
+    p.display_name = display_name
+    p.short_description = short_description
+    p.long_description = long_description
+    p.tags = tags
+    p.website_url = website_url
+    p.medium_url = medium_url
+    p.appstore_url = appstore_url
+    p.playstore_url = playstore_url
 
-    assert p.get_project_id() == project_id
-    assert p.get_github_team_id() == team_id
-    assert p.get_github_urls() == github_urls
-    assert p.get_display_name() == display_name
-    assert p.get_short_description() == short_description
-    assert p.get_long_description() == long_description
-    assert p.get_tags() == tags
-    assert p.get_website_url() == website_url
-    assert p.get_medium_url() == medium_url
-    assert p.get_appstore_url() == appstore_url
-    assert p.get_playstore_url() == playstore_url
+    assert p.project_id == project_id
+    assert p.github_team_id == team_id
+    assert p.github_urls == github_urls
+    assert p.display_name == display_name
+    assert p.short_description == short_description
+    assert p.long_description == long_description
+    assert p.tags == tags
+    assert p.website_url == website_url
+    assert p.medium_url == medium_url
+    assert p.appstore_url == appstore_url
+    assert p.playstore_url == playstore_url
 
 
 def test_project_equalities():
@@ -64,8 +64,8 @@ def test_project_equalities():
     assert p0 != p2
     assert p1 != p2
 
-    p0.set_project_id('abc123')
-    p1.set_project_id('abc123')
+    p0.project_id = 'abc123'
+    p1.project_id = 'abc123'
 
     assert p0 == p1
     assert p0 != p2
