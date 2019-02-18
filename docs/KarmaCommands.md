@@ -1,4 +1,4 @@
-# Kudos Command Reference 
+# Karma Command Reference 
 
 Command to giveth or taketh away a user's karma
 
@@ -21,27 +21,27 @@ Command to giveth or taketh away a user's karma
 #### For admin only:
 ##### Set user karma
 ```
-/rocket kudos set @user {amount}
+/rocket karma set @user {amount}
 ```
 ##### Reset user karma
 ```
-/rocket kudos reset @user
+/rocket karma reset @user
 ```
 ##### Reset all user karma
 ```
-/rocket kudos reset all
+/rocket karma reset all
 ```
 ###### Examples:
 ```sh
-/rocket kudos set @coolkid1 5 #sets coolkid's karma to 5
-/rocket kudos reset @coolkid1 #resets coolkid1's karma to 1
-/rocket kudos reset all #resets all users karma to 1
+/rocket karma set @coolkid1 5 #sets coolkid's karma to 5
+/rocket karma reset @coolkid1 #resets coolkid1's karma to 1
+/rocket karma reset all #resets all users karma to 1
 ```
 
 #### Help
-##### Display options for the kudos commands.
+##### Display options for the karma commands.
 ```sh
-/rocket kudos help
+/rocket karma help
 ```
 
 
