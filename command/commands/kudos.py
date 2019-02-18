@@ -1,6 +1,7 @@
 import argparse
 import logging
 import shlex
+import re
 
 class KudosCommand:
     """Kudos command parser"""
@@ -20,16 +21,40 @@ class KudosCommand:
         self.facade = db_facade
 
     def handle(self, command, user_id):
+        """Handle command by splitting into substrings"""
         logging.debug('Handling Kudos Command')
         command_arg = shlex.split(command)
-        reciever = self.parse_reciever(command_arg)
-        print("called handle in kudos")
-        print("kudos to " + reciever)
-        print("Called from id: " + user_id)
 
+        if(self.is_user(command_arg[0])):
+            return self.short_kudos_helper(user_id, command_arg[0], command_arg[1])
+        elif(command_arg[0] == "kudos" and self.is_user(command_arg[1])):
+            reciever = self.parse_reciever(command_arg)
+            return self.kudos_helper(user_id, reciever, 1)
+        elif(command_arg[0] == "kudos" and command_arg[1] == "sub" and self.is_user(command_arg[3])):
+            return self.kudos_helper(user_id, reciever, -1)
 
-        return self.help, 200
+    def short_kudos_helper(self, giver, reciever, amount):
+        logging.info("called short kudos helper")
+        print("amount: " + amount)
+        print("reciever: " + reciever)
+        if(amount == "++"):
+            return self.kudos_helper(giver, reciever, 1)
+        elif(amount == "--"):
+            return self.kudos_helper(giver, reciever, -1)
+        return "ok", 200
+
+    def kudos_helper(self, giver, receiver, amount):
+        if(giver == receiver):
+            return "cannot give karma to self", 200
+        try:
+            user = self.facade.retrieve_user(receiver)
+            print(user)
+        except:
+            return self.lookup_error, 200
 
     def parse_reciever(self, command_arg):
         """Gets the reciever from the command arg"""
         return command_arg[1]
+
+    def is_user(self, id):
+        return re.match("^[UW][A-Z0-9]{8}$", id)

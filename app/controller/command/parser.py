@@ -9,8 +9,9 @@ from db.facade import DBFacade
 from model.user import User
 from interface.slack import SlackAPIError
 import logging
-import command.util as util
+from flask import jsonify
 import re
+
 class Core:
     """Encapsulate methods for handling events."""
 
