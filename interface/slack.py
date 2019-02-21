@@ -1,5 +1,6 @@
 """Utility classes for interacting with Slack API."""
 import logging
+import json
 
 
 class Bot:
@@ -36,6 +37,22 @@ class Bot:
             logging.error("Message to channel {} failed with error: {}".
                           format(channel_name, response['error']))
             raise SlackAPIError(response['error'])
+
+    def get_channel_users(self, channel_id):
+        """Retrieve list of user IDs from channel with channel_id."""
+        logging.debug("Retrieving user IDs from channel {}".format(channel_id))
+        response = self.sc.api_call(
+            "conversation.members",
+            channel=channel_id
+        )
+        if 'ok' not in response:
+            logging.error("User retrieval "
+                          "from channel {} failed with error: {}".
+                          format(channel_id, response['error']))
+            raise SlackAPIError(response['error'])
+        else:
+            json_response = json.loads(response)
+            return json_response["members"]
 
 
 class SlackAPIError(Exception):

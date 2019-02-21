@@ -1,6 +1,6 @@
 """Test team command parsing."""
 from command.commands.team import TeamCommand
-from unittest import TestCase
+from unittest import TestCase, mock
 
 
 user = 'U123456789'
@@ -12,7 +12,8 @@ class TestTeamCommand(TestCase):
 
     def setUp(self):
         """Set up the test case environment."""
-        self.testcommand = TeamCommand()
+        self.sc = mock.MagicMock()
+        self.testcommand = TeamCommand(self.sc)
         self.help_text = self.testcommand.help
 
     def test_get_name(self):

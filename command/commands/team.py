@@ -10,9 +10,10 @@ class TeamCommand:
     command_name = "team"
     desc = "for dealing with " + command_name + "s"
 
-    def __init__(self):
-        """Initialize team command parser."""
+    def __init__(self, sc):
+        """Initialize team command parser with given Slack Client Interface."""
         logging.info("Initializing TeamCommand instance")
+        self.sc = sc
         self.desc = ""
         self.parser = argparse.ArgumentParser(prog="/rocket")
         self.parser.add_argument("team")
