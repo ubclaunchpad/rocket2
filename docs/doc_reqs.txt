@@ -10,7 +10,7 @@ certifi==2018.11.29
 chardet==3.0.4
 Click==7.0
 codecov==2.0.15
-colorama==0.3.9
+colorama==0.4.1
 coverage==4.5.2
 decorator==4.3.0
 Deprecated==1.2.4
@@ -60,6 +60,7 @@ snowballstemmer==1.2.1
 Sphinx==1.8.3
 sphinx-rtd-theme==0.4.2
 sphinxcontrib-websupport==1.1.0
+structlog==18.2.0
 toml==0.10.0
 traitlets==4.3.2
 urllib3==1.24.1

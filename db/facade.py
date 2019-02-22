@@ -65,8 +65,8 @@ class DBFacade:
             ddb = DynamoDb(config)
             users = ddb.query(User, [('platform', 'slack')])
 
-        If you try to query a table without any parameters, the function returns
-        all objects of that table.::
+        If you try to query a table without any parameters, the function will
+        return all objects of that table.::
 
 <<<<<<< HEAD
         :param project: A project model to store
@@ -92,10 +92,11 @@ class DBFacade:
             projects = ddb.query(Project)
 >>>>>>> Fix all pytests
 
-        Attributes that are sets (e.g. ``team.member``, ``project.github_urls``)
-        would be treated differently. This function would check to see if the
-        entry **contains** a certain element. You can specify multiple elements,
-        but they must be in different parameters (one element per tuple).::
+        Attributes that are sets (e.g. ``team.member``,
+        ``project.github_urls``) would be treated differently. This function
+        would check to see if the entry **contains** a certain element. You can
+        specify multiple elements, but they must be in different parameters
+        (one element per tuple).::
 
             teams = ddb.query(Team, [('members', 'abc123'),
                                      ('members', '231abc')])
