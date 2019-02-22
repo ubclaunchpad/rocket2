@@ -2,6 +2,7 @@
 import pytest
 from unittest import mock
 from model.user import User
+from model.team import Team
 from webhook.webhook import WebhookHandler
 from db.facade import DBFacade
 
@@ -327,12 +328,12 @@ def test_handle_org_event_rm_single_member(mock_logging, org_rm_payload):
     """Test that members removed from the org are deleted from rocket's db."""
     mock_facade = mock.MagicMock(DBFacade)
     return_user = User("SLACKID")
-    mock_facade.query_user.return_value = [return_user]
+    mock_facade.query.return_value = [return_user]
     webhook_handler = WebhookHandler(mock_facade)
     rsp, code = webhook_handler.handle_organization_event(org_rm_payload)
-    mock_facade.query_user\
-        .assert_called_once_with([('github_id', 39652351)])
-    mock_facade.delete_user.assert_called_once_with("SLACKID")
+    mock_facade.query\
+        .assert_called_once_with(User, [('github_id', 39652351)])
+    mock_facade.delete.assert_called_once_with(User, "SLACKID")
     mock_logging.info.assert_called_once_with("deleted slack user SLACKID")
     assert rsp == "deleted slack ID SLACKID"
     assert code == 200
@@ -342,11 +343,11 @@ def test_handle_org_event_rm_single_member(mock_logging, org_rm_payload):
 def test_handle_org_event_rm_member_missing(mock_logging, org_rm_payload):
     """Test that members not in rocket db are handled correctly."""
     mock_facade = mock.MagicMock(DBFacade)
-    mock_facade.query_user.return_value = []
+    mock_facade.query.return_value = []
     webhook_handler = WebhookHandler(mock_facade)
     rsp, code = webhook_handler.handle_organization_event(org_rm_payload)
-    mock_facade.query_user\
-        .assert_called_once_with([('github_id', 39652351)])
+    mock_facade.query\
+        .assert_called_once_with(User, [('github_id', 39652351)])
     mock_logging.error.assert_called_once_with("could not find user 39652351")
     assert rsp == "could not find user 39652351"
     assert code == 404
@@ -359,12 +360,12 @@ def test_handle_org_event_rm_mult_members(mock_logging, org_rm_payload):
     user1 = User("SLACKUSER1")
     user2 = User("SLACKUSER2")
     user3 = User("SLACKUSER3")
-    mock_facade.query_user.return_value = [user1, user2, user3]
+    mock_facade.query.return_value = [user1, user2, user3]
     webhook_handler = WebhookHandler(mock_facade)
     rsp, code = webhook_handler.handle_organization_event(org_rm_payload)
-    mock_facade.query_user\
-        .assert_called_once_with([('github_id', 39652351)])
-    assert mock_facade.delete_user.call_count is 3
+    mock_facade.query\
+        .assert_called_once_with(User, [('github_id', 39652351)])
+    assert mock_facade.delete.call_count is 3
     assert mock_logging.info.call_count is 3
     assert rsp == "deleted slack ID SLACKUSER1 SLACKUSER2 SLACKUSER3"
     assert code == 200
@@ -400,12 +401,12 @@ def test_handle_org_event_empty_action(mock_logging, org_empty_payload):
 def test_handle_team_event_created_team(mock_logging, team_created_payload):
     """Test that teams can be created if they are not in the db."""
     mock_facade = mock.MagicMock(DBFacade)
-    mock_facade.retrieve_team.side_effect = LookupError
+    mock_facade.retrieve.side_effect = LookupError
     webhook_handler = WebhookHandler(mock_facade)
     rsp, code = webhook_handler.handle_team_event(team_created_payload)
     mock_logging.debug.assert_called_with(("team github with id 2723476 "
                                            "added to organization."))
-    mock_facade.store_team.assert_called_once()
+    mock_facade.store.assert_called_once()
     assert rsp == "created team with github id 2723476"
     assert code == 200
 
@@ -418,7 +419,7 @@ def test_handle_team_event_create_update(mock_logging, team_created_payload):
     rsp, code = webhook_handler.handle_team_event(team_created_payload)
     mock_logging.warning.assert_called_with(("team github with id 2723476 "
                                              "already exists."))
-    mock_facade.store_team.assert_called_once()
+    mock_facade.store.assert_called_once()
     assert rsp == "created team with github id 2723476"
     assert code == 200
 
@@ -428,7 +429,7 @@ def test_handle_team_event_delete_team(team_deleted_payload):
     mock_facade = mock.MagicMock(DBFacade)
     webhook_handler = WebhookHandler(mock_facade)
     rsp, code = webhook_handler.handle_team_event(team_deleted_payload)
-    mock_facade.delete_team.assert_called_once_with(2723476)
+    mock_facade.delete.assert_called_once_with(Team, 2723476)
     assert rsp == "deleted team with github id 2723476"
     assert code == 200
 
@@ -436,7 +437,7 @@ def test_handle_team_event_delete_team(team_deleted_payload):
 def test_handle_team_event_deleted_miss(team_deleted_payload):
     """Test that attempts to delete a missing team are handled."""
     mock_facade = mock.MagicMock(DBFacade)
-    mock_facade.retrieve_team.side_effect = LookupError
+    mock_facade.retrieve.side_effect = LookupError
     webhook_handler = WebhookHandler(mock_facade)
     rsp, code = webhook_handler.handle_team_event(team_deleted_payload)
     assert rsp == "team with github id 2723476 not found"
@@ -455,7 +456,7 @@ def test_handle_team_event_edit_team(team_edited_payload):
 def test_handle_team_event_edit_miss(team_edited_payload):
     """Test that attempts to edit a missing team are handled."""
     mock_facade = mock.MagicMock(DBFacade)
-    mock_facade.retrieve_team.side_effect = LookupError
+    mock_facade.retrieve.side_effect = LookupError
     webhook_handler = WebhookHandler(mock_facade)
     rsp, code = webhook_handler.handle_team_event(team_edited_payload)
 

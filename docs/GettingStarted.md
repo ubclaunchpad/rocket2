@@ -54,22 +54,22 @@ us to easily switch to using other databases.
 
 ```python
 # To store an user into the database.
-facade.store_user(steven_universe)
+facade.store(steven_universe)
 
 # To retrieve an user from the database.
-facade.retrieve_user('StevenU') # returns steven_universe user model
+facade.retrieve(User, 'StevenU') # returns steven_universe user model
 
 # If we try to retrieve a non-existent: user, a LookupError will be thrown.
-facade.retrieve_user('fakeU') # returns 'User fakeU not found'
+facade.retrieve(User, 'fakeU') # returns 'User fakeU not found'
 
 # To query an user based on a parameter, a list of matching Users will be
 returned.
-facade.query_user(['name', 'Steven Universe'] # returns [steven_universe]
+facade.query(User, ['name', 'Steven Universe'] # returns [steven_universe]
 
 # To query an user based on a non-existent parameter, an empty list will be
 returned.
-facade.query_user(['email', 'fakeemail@gmail.com'] # returns []
+facade.query(User, ['email', 'fakeemail@gmail.com'] # returns []
 
 # To query an user without parameters, all the users will be returned
-facade.query_user([]) # returns [steven_universe, second_user]
+facade.query(User, []) # returns [steven_universe, second_user]
 ```
