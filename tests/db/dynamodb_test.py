@@ -103,7 +103,7 @@ def test_retrieve_invalid_user(ddb):
 
         assert False
     except LookupError as e:
-        assert str(e) == 'User "abc_123" not found'
+        assert str(e) == 'User(id=abc_123) not found'
 
 
 @pytest.mark.db
@@ -114,7 +114,7 @@ def test_retrieve_invalid_project(ddb):
 
         assert False
     except LookupError as e:
-        assert str(e) == 'Project "abc_123" not found'
+        assert str(e) == 'Project(id=abc_123) not found'
 
 
 @pytest.mark.db
@@ -161,7 +161,7 @@ def test_retrieve_invalid_team(ddb):
 
         assert False
     except LookupError as e:
-        assert str(e) == 'Team "{}" not found'.format('1')
+        assert str(e) == 'Team(id=1) not found'
 
 
 @pytest.mark.db

@@ -19,6 +19,10 @@ class DynamoDB:
     facade class.
     """
 
+
+    TABLE_DATA = {}
+
+
     def __init__(self, config):
         """Initialize facade using DynamoDB settings.
 
@@ -48,6 +52,22 @@ class DynamoDB:
         self.projects_table = config['aws']['projects_table']
         testing = config['testing']
 
+        self.TABLE_DATA[User] = self.users_table
+        self.TABLE_DATA[Team] = self.teams_table
+        self.TABLE_DATA[Project] = self.projects_table
+        self.TABLE_DATA[self.users_table] = {
+            'key': 'slack_id',
+            'set_attrs': []
+        }
+        self.TABLE_DATA[self.teams_table] = {
+            'key': 'github_team_id',
+            'set_attrs': ['members']
+        }
+        self.TABLE_DATA[self.projects_table] = {
+            'key': 'project_id',
+            'set_attrs': ['tags', 'github_urls']
+        }
+
         if testing:
             logging.info("Connecting to local DynamoDb")
             self.ddb = boto3.resource(service_name="dynamodb",
@@ -68,17 +88,17 @@ class DynamoDB:
 
         # Check for missing tables
         if not self.check_valid_table(self.users_table):
-            self.__create_table(self.users_table, 'slack_id')
+            self.__create_table(self.users_table)
         if not self.check_valid_table(self.teams_table):
-            self.__create_table(self.teams_table, 'github_team_id')
+            self.__create_table(self.teams_table)
         if not self.check_valid_table(self.projects_table):
-            self.__create_table(self.projects_table, 'project_id')
+            self.__create_table(self.projects_table)
 
     def __str__(self):
         """Return a string representing this class."""
         return "DynamoDB"
 
-    def __create_table(self, table_name, primary_key, key_type='S'):
+    def __create_table(self, table_name, key_type='S'):
         """
         Create a table.
 
@@ -90,6 +110,7 @@ class DynamoDB:
         :param key_type: type of primary key (S, N, B)
         """
         logging.info("Creating table '{}'".format(table_name))
+        primary_key = self.TABLE_DATA[table_name]['key']
         self.ddb.create_table(
             TableName=table_name,
             AttributeDefinitions=[
@@ -120,6 +141,39 @@ class DynamoDB:
         existing_tables = self.ddb.tables.all()
         return any(map(lambda t: t.name == table_name, existing_tables))
 
+    def store(self, obj):
+        """
+        Store object into the correct table.
+
+        Object can be of type :class:`model.user.User`,
+        :class:`model.team.Team`, or :class:`model.project.Project`.
+
+        :param obj: Object to store in database
+        :return: True if object was stored, and false otherwise
+        """
+        Model = None
+        if isinstance(obj, User):
+            Model = User
+        elif isinstance(obj, Team):
+            Model = Team
+        elif isinstance(obj, Project):
+            Model = Project
+        else:
+            logging.error("Cannot store object " + str(obj))
+            raise RuntimeError('Cannot store object ' + str(obj))
+
+        # Check if object is valid
+        if Model.is_valid(obj):
+            table_name = self.TABLE_DATA[Model]
+            table = self.ddb.Table(table_name)
+            d = Model.to_dict(obj)
+
+            logging.info("Storing obj {} in table {}".
+                         format(obj, table_name))
+            table.put_item(Item=d)
+            return True
+        return False
+
     def store_user(self, user):
         """
         Store user into users table.
@@ -127,6 +181,7 @@ class DynamoDB:
         :param user: A user model to store
         :returns: Returns true if the user was stored, and false otherwise
         """
+        return self.store(user)
         # Check that there are no blank fields in the user
         if User.is_valid(user):
             user_table = self.ddb.Table(self.users_table)
@@ -145,6 +200,7 @@ class DynamoDB:
         :param team: A team model to store
         :return: Returns true if stored succesfully; false otherwise
         """
+        return self.store(team)
         # Check that there are no blank fields in the team
         if Team.is_valid(team):
             teams_table = self.ddb.Table(self.teams_table)
@@ -156,6 +212,31 @@ class DynamoDB:
             return True
         return False
 
+    def retrieve(self, Model, k):
+        """
+        Retrieve a model from the database.
+
+        :param Model: the actual class you want to retrieve
+        :param k: retrieve based on this key (or ID)
+        :raise: LookupError if key is not found
+        :return: a model ``Model`` if key is found
+        """
+        table_name = self.TABLE_DATA[Model]
+        table = self.ddb.Table(table_name)
+        resp = table.get_item(
+            TableName=table_name,
+            Key={
+                self.TABLE_DATA[table_name]['key']: k
+            }
+        )
+
+        if 'Item' in resp.keys():
+            return Model.from_dict(resp['Item'])
+        else:
+            err_msg = '{}(id={}) not found'.format(Model.__name__, k)
+            logging.info(err_msg)
+            raise LookupError(err_msg)
+
     def retrieve_user(self, slack_id):
         """
         Retrieve user from users table.
@@ -164,6 +245,7 @@ class DynamoDB:
         :raise: LookupError if slack id is not found.
         :return: returns a user model if slack id is found.
         """
+        return self.retrieve(User, slack_id)
         user_table = self.ddb.Table(self.users_table)
         response = user_table.get_item(
             TableName=self.users_table,
@@ -185,6 +267,7 @@ class DynamoDB:
         :raise: LookupError if team id is not found.
         :return: the team object if team_name is found.
         """
+        return self.retrieve(Team, team_id)
         team_table = self.ddb.Table(self.teams_table)
         response = team_table.get_item(
             TableName=self.teams_table,
@@ -213,6 +296,7 @@ class DynamoDB:
         :param parameters: list of parameters (tuples)
         :return: returns a list of user models that fit the query parameters.
         """
+        return self.query(User, parameters)
         users = self.ddb.Table(self.users_table)
         if len(parameters) > 0:
             # There are 1 or more parameters that we should care about
@@ -228,6 +312,47 @@ class DynamoDB:
             response = users.scan()
 
         return list(map(User.from_dict, response['Items']))
+
+    def query(self, Model, params):
+        """
+        Query a table using a list of parameters.
+
+        Returns a list of ``Model`` that have **all** of the attributes
+        specified in the parameters. Every item in parameters is a tuple, where
+        the first element is the user attribute, and the second is the value.
+
+        Example::
+
+            ddb = DynamoDb(config)
+            users = ddb.query(User, [('platform', 'slack')])
+
+        Attributes that are sets (e.g. ``team.member``, ``project.github_urls``)
+        would be treated differently. This function would check to see if the
+        entry **contains** a certain element. You can specify multiple elements,
+        but they must be in different parameters (one element per tuple).::
+
+            teams = ddb.query(Team, [('members', 'abc123'),
+                                     ('members', '231abc')])
+
+        :param Model: type of list elements you'd want
+        :return: a list of ``Model`` that fit the query parameters
+        """
+        table_name = self.TABLE_DATA[Model]
+        table = self.ddb.Table(table_name)
+        set_attrs = self.TABLE_DATA[table_name]['set_attrs']
+        if len(params) > 0:
+            def f(x):
+                if x[0] in set_attrs:
+                    return Attr(x[0]).contains(x[1])
+                else:
+                    return Attr(x[0]).eq(x[1])
+
+            filter_expr = reduce(lambda a, x: a & x, map(f, params))
+            resp = table.scan(FilterExpression=filter_expr)
+        else:
+            resp = table.scan()
+
+        return list(map(Model.from_dict, resp['Items']))
 
     def query_team(self, parameters):
         """
@@ -248,6 +373,7 @@ class DynamoDB:
         :param parameters:
         :return: returns a list of team models that fit the query parameters.
         """
+        return self.query(Team, parameters)
         teams = self.ddb.Table(self.teams_table)
         if len(parameters) > 0:
             # There are 1 or more parameters that we should care about
@@ -267,12 +393,29 @@ class DynamoDB:
 
         return list(map(Team.from_dict, response['Items']))
 
+    def delete(self, Model, k):
+        """
+        Remove an object from a table.
+
+        :param Model: table type to remove the object from
+        :param k: ID or key of the object to remove (must be primary key)
+        """
+        logging.info("Deleting {}(id={})".format(Model.__name__, k))
+        table_name = self.TABLE_DATA[Model]
+        table = self.ddb.Table(table_name)
+        table.delete_item(
+            Key={
+                self.TABLE_DATA[table_name]['key']: k
+            }
+        )
+
     def delete_user(self, slack_id):
         """
         Remove a user from the users table.
 
         :param slack_id: the slack_id of the user to be removed
         """
+        return self.delete(User, slack_id)
         logging.info("Deleting user {} from table {}".
                      format(slack_id, self.users_table))
         user_table = self.ddb.Table(self.users_table)
@@ -290,6 +433,7 @@ class DynamoDB:
 
         :param team_id: the team_id of the team to be removed
         """
+        return self.delete(Team, team_id)
         logging.info("Deleting team {} from table {}".
                      format(team_id, self.teams_table))
         team_table = self.ddb.Table(self.teams_table)
@@ -306,6 +450,7 @@ class DynamoDB:
         :param project: A project model to store
         :return: True if project is valid, False otherwise
         """
+        return self.store(project)
         # Check that there are no required blank fields in the project
         if Project.is_valid(project):
             project_table = self.ddb.Table(self.projects_table)
@@ -325,6 +470,7 @@ class DynamoDB:
         :raise: LookupError if project id is not found.
         :return: returns a project model if slack id is found.
         """
+        return self.retrieve(Project, project_id)
         project_table = self.ddb.Table(self.projects_table)
         response = project_table.get_item(
             TableName=self.projects_table,
@@ -352,6 +498,7 @@ class DynamoDB:
         :param parameters: list of parameters (tuples)
         :return: returns a list of project models that fit the query parameters
         """
+        return self.query(Project, parameters)
         projects = self.ddb.Table(self.projects_table)
         if len(parameters) > 0:
             # There are 1 or more parameters that we should care about
@@ -377,6 +524,7 @@ class DynamoDB:
 
         :param project_id: the project ID of the project to be removed
         """
+        return self.delete(Project, project_id)
         logging.info("Deleting project {} from table {}".
                      format(project_id, self.projects_table))
         project_table = self.ddb.Table(self.projects_table)
