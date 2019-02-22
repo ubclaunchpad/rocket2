@@ -19,18 +19,18 @@ class Project:
         hfunc = hashlib.sha1()
         hfunc.update(bytes(github_urls[0], 'utf-8'))
         hfunc.update(bytes(str(time.time()), 'utf-8'))
-        self.__project_id = hfunc.hexdigest()
-        self.__github_team_id = github_team_id
-        self.__github_urls = github_urls
+        self.project_id = hfunc.hexdigest()
+        self.github_team_id = github_team_id
+        self.github_urls = github_urls
 
-        self.__display_name = ''
-        self.__short_description = ''
-        self.__long_description = ''
-        self.__tags = []
-        self.__website_url = ''
-        self.__medium_url = ''
-        self.__appstore_url = ''
-        self.__playstore_url = ''
+        self.display_name = ''
+        self.short_description = ''
+        self.long_description = ''
+        self.tags = []
+        self.website_url = ''
+        self.medium_url = ''
+        self.appstore_url = ''
+        self.playstore_url = ''
 
     @staticmethod
     def from_dict(d):
@@ -110,113 +110,3 @@ class Project:
     def __str__(self):
         """Return all fields of this project, JSON format."""
         return str(self.__dict__)
-
-    @property
-    def project_id(self):
-        """Return project ID."""
-        return self.__project_id
-
-    @property
-    def github_team_id(self):
-        """Return Github team ID."""
-        return self.__github_team_id
-
-    @property
-    def github_urls(self):
-        """Return links to a list of Github URLs."""
-        return self.__github_urls
-
-    @property
-    def display_name(self):
-        """Return name of project."""
-        return self.__display_name
-
-    @property
-    def short_description(self):
-        """Return a short description of the project."""
-        return self.__short_description
-
-    @property
-    def long_description(self):
-        """Return a long description of the project."""
-        return self.__long_description
-
-    @property
-    def tags(self):
-        """Return a list of tags used by Github."""
-        return self.__tags
-
-    @property
-    def website_url(self):
-        """Return a URL to the project website."""
-        return self.__website_url
-
-    @property
-    def medium_url(self):
-        """Return a URL to the project Medium page."""
-        return self.__medium_url
-
-    @property
-    def appstore_url(self):
-        """Return a URL to the project on the Appstore."""
-        return self.__appstore_url
-
-    @property
-    def playstore_url(self):
-        """Return a URL to the project on the Google Playstore."""
-        return self.__playstore_url
-
-    @project_id.setter
-    def project_id(self, project_id):
-        """Set project ID."""
-        self.__project_id = project_id
-
-    @github_team_id.setter
-    def github_team_id(self, team_id):
-        """Set Github team ID."""
-        self.__github_team_id = team_id
-
-    @github_urls.setter
-    def github_urls(self, github_urls):
-        """Set links to a list of Github URLs."""
-        self.__github_urls = github_urls
-
-    @display_name.setter
-    def display_name(self, display_name):
-        """Set name of project."""
-        self.__display_name = display_name
-
-    @short_description.setter
-    def short_description(self, short_description):
-        """Set a short description of the project."""
-        self.__short_description = short_description
-
-    @long_description.setter
-    def long_description(self, long_description):
-        """Set a long description of the project."""
-        self.__long_description = long_description
-
-    @tags.setter
-    def tags(self, tags):
-        """Set a list of tags used by Github."""
-        self.__tags = tags
-
-    @website_url.setter
-    def website_url(self, website_url):
-        """Set a URL to the project website."""
-        self.__website_url = website_url
-
-    @medium_url.setter
-    def medium_url(self, medium_url):
-        """Set a URL to the project Medium page."""
-        self.__medium_url = medium_url
-
-    @appstore_url.setter
-    def appstore_url(self, appstore_url):
-        """Set a URL to the project on the Appstore."""
-        self.__appstore_url = appstore_url
-
-    @playstore_url.setter
-    def playstore_url(self, playstore_url):
-        """Set a URL to the project on the Google Playstore."""
-        self.__playstore_url = playstore_url

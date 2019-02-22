@@ -103,8 +103,8 @@ def test_print():
     new_slack_id = "U0G9QF9C6"
     team.add_member(new_slack_id)
     team.platform = "web"
-    assert str(team) == "{'_Team__github_team_id': '1'," \
-                        " '_Team__github_team_name': 'brussel-sprouts'," \
-                        " '_Team__display_name': 'Brussel Sprouts'," \
-                        " '_Team__platform': 'web'," \
-                        " '_Team__members': {'U0G9QF9C6'}}"
+    assert str(team) == "{'github_team_id': '1'," \
+                        " 'github_team_name': 'brussel-sprouts'," \
+                        " 'display_name': 'Brussel Sprouts'," \
+                        " 'platform': 'web'," \
+                        " 'members': {'U0G9QF9C6'}}"
