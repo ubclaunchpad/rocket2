@@ -32,7 +32,7 @@ parameters will remain empty.
 ```python
 # To construct a User model with Slack ID 'StevenU'
 steven_universe = User('StevenU')
-steven_universe.set_email('su@gmail.com')
+steven_universe.email = 'su@gmail.com'
 
 # To check if this user is valid.
 User.is_valid(steven_universe) # returns true
