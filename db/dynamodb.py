@@ -19,7 +19,69 @@ class DynamoDB:
     facade class.
     """
 
-    TABLE_DATA = {}
+    class Const:
+        """A bunch of static constants and functions."""
+
+        def __init__(self, config={}):
+            """Initialize the constants."""
+            self.users_table = config['users_table']
+            self.teams_table = config['teams_table']
+            self.projects_table = config['projects_table']
+
+        def get_table_name(self, cls):
+            """
+            Convert class into corresponding table name.
+
+            Will return ``None`` if ``cls`` isn't either ``User``, ``Team``, or
+            ``Project``.
+
+            :param cls: Either ``User``, ``Team``, or ``Project``
+            :return: table name string
+            """
+            if cls == User:
+                return self.users_table
+            elif cls == Team:
+                return self.teams_table
+            elif cls == Project:
+                return self.projects_table
+            else:
+                return None
+
+        def get_key(self, table_name):
+            """
+            Get primary key of the table name.
+
+            Will return ``None`` if the table does not exist.
+
+            :param cls: the name of the table
+            :return: primary key of the table
+            """
+            if table_name == self.users_table:
+                return 'slack_id'
+            elif table_name == self.teams_table:
+                return 'github_team_id'
+            elif table_name == self.projects_table:
+                return 'project_id'
+            else:
+                return None
+
+        def get_set_attrs(self, table_name):
+            """
+            Get class attributes that are sets.
+
+            Will return ``None`` if the table does not exist.
+
+            :param cls: the table name
+            :return: list of strings of set attributes
+            """
+            if table_name == self.users_table:
+                return []
+            elif table_name == self.teams_table:
+                return ['members']
+            elif table_name == self.projects_table:
+                return ['tags', 'github_urls']
+            else:
+                return None
 
     def __init__(self, config):
         """Initialize facade using DynamoDB settings.
@@ -49,22 +111,9 @@ class DynamoDB:
         self.teams_table = config['aws']['teams_table']
         self.projects_table = config['aws']['projects_table']
         testing = config['testing']
-
-        self.TABLE_DATA[User] = self.users_table
-        self.TABLE_DATA[Team] = self.teams_table
-        self.TABLE_DATA[Project] = self.projects_table
-        self.TABLE_DATA[self.users_table] = {
-            'key': 'slack_id',
-            'set_attrs': []
-        }
-        self.TABLE_DATA[self.teams_table] = {
-            'key': 'github_team_id',
-            'set_attrs': ['members']
-        }
-        self.TABLE_DATA[self.projects_table] = {
-            'key': 'project_id',
-            'set_attrs': ['tags', 'github_urls']
-        }
+        self.CONST = DynamoDB.Const({'users_table': self.users_table,
+                                     'teams_table': self.teams_table,
+                                     'projects_table': self.projects_table})
 
         if testing:
             logging.info("Connecting to local DynamoDb")
@@ -108,7 +157,7 @@ class DynamoDB:
         :param key_type: type of primary key (S, N, B)
         """
         logging.info("Creating table '{}'".format(table_name))
-        primary_key = self.TABLE_DATA[table_name]['key']
+        primary_key = self.CONST.get_key(table_name)
         self.ddb.create_table(
             TableName=table_name,
             AttributeDefinitions=[
@@ -162,7 +211,7 @@ class DynamoDB:
 
         # Check if object is valid
         if Model.is_valid(obj):
-            table_name = self.TABLE_DATA[Model]
+            table_name = self.CONST.get_table_name(Model)
             table = self.ddb.Table(table_name)
             d = Model.to_dict(obj)
 
@@ -181,12 +230,12 @@ class DynamoDB:
         :raise: LookupError if key is not found
         :return: a model ``Model`` if key is found
         """
-        table_name = self.TABLE_DATA[Model]
+        table_name = self.CONST.get_table_name(Model)
         table = self.ddb.Table(table_name)
         resp = table.get_item(
             TableName=table_name,
             Key={
-                self.TABLE_DATA[table_name]['key']: k
+                self.CONST.get_key(table_name): k
             }
         )
 
@@ -227,9 +276,9 @@ class DynamoDB:
         :param Model: type of list elements you'd want
         :return: a list of ``Model`` that fit the query parameters
         """
-        table_name = self.TABLE_DATA[Model]
+        table_name = self.CONST.get_table_name(Model)
         table = self.ddb.Table(table_name)
-        set_attrs = self.TABLE_DATA[table_name]['set_attrs']
+        set_attrs = self.CONST.get_set_attrs(table_name)
         if len(params) > 0:
             def f(x):
                 if x[0] in set_attrs:
@@ -252,10 +301,10 @@ class DynamoDB:
         :param k: ID or key of the object to remove (must be primary key)
         """
         logging.info("Deleting {}(id={})".format(Model.__name__, k))
-        table_name = self.TABLE_DATA[Model]
+        table_name = self.CONST.get_table_name(Model)
         table = self.ddb.Table(table_name)
         table.delete_item(
             Key={
-                self.TABLE_DATA[table_name]['key']: k
+                self.CONST.get_key(table_name): k
             }
         )
