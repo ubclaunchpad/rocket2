@@ -41,8 +41,6 @@ Display options for team commands.
                                      [--channel CHANNEL]
 ```
 
-> **Note:** This command does not create the team on Github.
-
 Create a new team with a Github team name and optional display name. The user
 who runs the command will be automatically added to the new team. If the
 `--channel` flag is used, all members in specified channel will be added.
@@ -68,8 +66,6 @@ they are a part of, but admins can edit any teams.
 /rocket team add GITHUB_TEAM_NAME SLACK_ID
 ```
 
-> **Note:** This command does not add a member on Github.
-
 Add a user to the team. Team Leads can only add users into teams that they are a
 part of, but admins can add users to any team. `SLACK_ID` is the `@`-name, for
 easy slack autocomplete.
@@ -84,8 +80,6 @@ easy slack autocomplete.
 /rocket team remove GITHUB_TEAM_NAME SLACK_ID
 ```
 
-> **Note:** This command does not remove a member of the team from Github.
-
 Remove a user from a team. Team Leads can only remove users from teams that they
 are a part of, but admins can remove users from any team. `SLACK_ID` is the
 `@`-name, for easy slack autocomplete.
@@ -95,8 +89,6 @@ are a part of, but admins can remove users from any team. `SLACK_ID` is the
 ```sh
 /rocket team delete GITHUB_TEAM_NAME
 ```
-
-> **Note:** This command does not remove the team from Github.
 
 Permanently delete a team. Team Leads can only delete teams that they are a part
 of, but admins can delete any team.

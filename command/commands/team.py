@@ -11,6 +11,7 @@ class TeamCommand:
 
     command_name = "team"
     desc = "for dealing with " + command_name + "s"
+    permission_error = "Insufficient permission level to run command!"
 
     def __init__(self, db_facade, gh, sc):
         """
@@ -187,15 +188,18 @@ class TeamCommand:
         try:
             msg = "new team: {}, ".format(param_list["team_name"])
             team_id = self.gh.org_create_team()
-            team = Team(team_id, "", "")
+            team = Team(team_id, param_list["team_name"], "")
             if param_list["name"] is not None:
                 msg += "name: {}, ".format(param_list["name"])
-
+                team.display_name = param_list["name"]
             if param_list["platform"] is not None:
                 msg += "platform: {}, ".format(param_list["platform"])
+                team.platform = param_list["platform"]
             if param_list["channel"] is not None:
                 msg += "add channel"
                 # stub: cannot finish until teamMember PR is pushed
+            self.facade.store_team(team)
+            return msg, 200
         except GithubAPIException as e:
-
-        return msg, 200
+            logging.error("team created unsuccessfully")
+            return "Team created unsuccessfully with the following error" + e.data
