@@ -158,7 +158,7 @@ class UserCommand:
         if param_list["member"] is not None:
             try:
                 admin_user = self.facade.retrieve_user(user_id)
-                if admin_user.get_permissions_level() != Permissions.admin:
+                if admin_user.permissions_level != Permissions.admin:
                     return self.permission_error, 200
                 else:
                     is_admin = True
@@ -173,25 +173,25 @@ class UserCommand:
                 return self.lookup_error, 200
 
         if param_list["name"]:
-            edited_user.set_name(param_list["name"])
+            edited_user.name = param_list["name"]
         if param_list["email"]:
-            edited_user.set_email(param_list["email"])
+            edited_user.email = param_list["email"]
         if param_list["pos"]:
-            edited_user.set_position(param_list["pos"])
+            edited_user.position = param_list["pos"]
         if param_list["github"]:
             try:
                 self.github.org_add_member(param_list["github"])
-                edited_user.set_github_username(param_list["github"])
+                edited_user.github_username = param_list["github"]
             except GithubAPIException as e:
                 msg = "\nError adding user {} to GitHub organization".format(
                     param_list['github'])
                 logging.error(msg)
         if param_list["major"]:
-            edited_user.set_major(param_list["major"])
+            edited_user.major = param_list["major"]
         if param_list["bio"]:
-            edited_user.set_biography(param_list["bio"])
+            edited_user.biography = param_list["bio"]
         if param_list["permission"] and is_admin:
-            edited_user.set_permissions_level(param_list["permission"])
+            edited_user.permissions_level = param_list["permission"]
         elif param_list["permission"] and not is_admin:
             msg += "\nCannot change own permission: user isn't admin."
             logging.warn("User {} tried to elevate permissions level."
@@ -216,7 +216,7 @@ class UserCommand:
         """
         try:
             user_command = self.facade.retrieve_user(user_id)
-            if user_command.get_permissions_level() == Permissions.admin:
+            if user_command.permissions_level == Permissions.admin:
                 self.facade.delete_user(slack_id)
                 return self.delete_text + slack_id, 200
             else:

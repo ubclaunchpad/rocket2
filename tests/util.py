@@ -27,14 +27,14 @@ def create_test_admin(slack_id):
     :return: a filled-in user model (no empty strings)
     """
     u = User(slack_id)
-    u.set_biography('I like puppies and kittens!')
-    u.set_email('admin@ubc.ca')
-    u.set_name('Iemann Atmin')
-    u.set_github_username('kibbles')
-    u.set_image_url('https:///via.placeholder.com/150')
-    u.set_major('Computer Science')
-    u.set_permissions_level(Permissions.admin)
-    u.set_position('Adrenaline Junkie')
+    u.biography = 'I like puppies and kittens!'
+    u.email = 'admin@ubc.ca'
+    u.name = 'Iemann Atmin'
+    u.github_username = 'kibbles'
+    u.image_url = 'https:///via.placeholder.com/150'
+    u.major = 'Computer Science'
+    u.permissions_level = Permissions.admin
+    u.position = 'Adrenaline Junkie'
     return u
 
 
@@ -58,7 +58,7 @@ def create_test_team(tid, team_name, display_name):
     :return: a filled-in team model (no empty strings)
     """
     t = Team(tid, team_name, display_name)
-    t.set_platform('slack')
+    t.platform = 'slack'
     t.add_member('abc_123')
     return t
 
@@ -87,16 +87,15 @@ def create_test_project(github_team_id, github_urls):
     :return: a filled-in project model (no empty strings)
     """
     p = Project(github_team_id, github_urls)
-    p.set_display_name('Rocket2')
-    p.set_short_description(
+    p.display_name = 'Rocket2'
+    p.short_description = \
         'Slack bot, team management, and onboarding system for UBC Launch Pad'
-    )
-    p.set_long_description('''
+    p.long_description = '''
         Slack bot, team management, and onboarding system for UBC Launch Pad
-    ''')
-    p.set_tags(['python', 'docker', 'pipenv', 'waterboarding'])
-    p.set_website_url('https://github.com/ubclaunchpad/rocket2')
-    p.set_appstore_url('¯\\_(ツ)_/¯')
-    p.set_playstore_url('¯\\_(ツ)_/¯')
+    '''
+    p.tags = ['python', 'docker', 'pipenv', 'waterboarding']
+    p.website_url = 'https://github.com/ubclaunchpad/rocket2'
+    p.appstore_url = '¯\\_(ツ)_/¯'
+    p.playstore_url = '¯\\_(ツ)_/¯'
 
     return p
