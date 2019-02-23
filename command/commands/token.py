@@ -14,12 +14,15 @@ class TokenCommand:
     permission_error = "You do not have the sufficient " \
                        "permission level for this command!"
     lookup_error = "Requesting user not found!"
+    success_msg = "This is your token:\n```\n{}\n```" \
+                  "\nKeep it secret! Keep it safe!\nIt will expire at {}."
 
     def __init__(self, db_facade, config):
         """
         Initialize TokenCommand.
 
         :param db_facade: Database connection
+        :param config: :class:`command.commands.TokenCommandConfig` object
         """
         logging.info("Initializing TokenCommand instance")
         self.facade = db_facade
@@ -54,10 +57,8 @@ class TokenCommand:
         }
         token = jwt.encode(payload, self.signing_key, algorithm='HS256') \
             .decode('utf-8')
-        return "This is your token:\n```\n{}".format(token) + \
-               "\n```\nKeep it secret! Keep it safe!\n" \
-               "It will expire at {}.".format(expiry), \
-               200
+        format(token)
+        return self.success_msg.format(token, expiry), 200
 
 
 class TokenCommandConfig:
