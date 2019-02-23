@@ -35,8 +35,7 @@ def make_core(config, gh=None):
         if os.path.isfile(config['auth']['signing_key_path']):
             signing_key = open(config['auth']['signing_key_path']).read()
         else:
-            signing_key = ''.join(
-                random.choice(string.ascii_lowercase) for _ in range(24))
+            signing_key = create_signing_token()
             open(config['auth']['signing_key_path'], 'w+').write(signing_key)
     facade = DBFacade(DynamoDB(config))
     bot = Bot(SlackClient(slack_api_token))
@@ -53,3 +52,8 @@ def make_webhook_handler(config):
     """
     facade = DBFacade(DynamoDB(config))
     return WebhookHandler(facade)
+
+
+def create_signing_token():
+    """Create a new, random signing token."""
+    return ''.join(random.choice(string.ascii_lowercase) for _ in range(24))
