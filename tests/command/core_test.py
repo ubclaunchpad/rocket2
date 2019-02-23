@@ -50,7 +50,9 @@ def test_handle_help(mock_logging):
         expect = json.loads(
             jsonify({"text": "Displaying all available commands. "
                              "To read about a specific command, "
-                             "use \n`/rocket [command] help`\n",
+                             "use \n`/rocket [command] help`\n"
+                             "For arguments containing spaces, "
+                             "please enclose them with quotations.\n",
                      "mrkdwn": "true",
                      "attachments": [
                          {"text": "*user:* for dealing with users",
