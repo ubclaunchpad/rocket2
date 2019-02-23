@@ -12,21 +12,6 @@ class UserCommand:
     """Represent User Command Parser."""
 
     command_name = "user"
-    help = "User Command Reference:\n\n /rocket user" \
-           "\n\n Options:\n\n" \
-           " edit \n --name NAME\n" \
-           " --email ADDRESS\n --pos YOURPOSITION\n" \
-           " --major YOURMAJOR\n --bio YOURBIO\n" \
-           " 'edit properties of your Launch Pad profile\n" \
-           " surround arguments with spaces with single quotes'" \
-           "\n ADMIN/TEAM LEAD ONLY option: --member MEMBER_ID\n" \
-           " 'edit properties of another " \
-           "user's Launch Pad profile'\n\n" \
-           " view MEMBER_ID\n 'view information about a user'" \
-           "\n\n " \
-           "help\n 'outputs options for user commands'\n\n " \
-           "ADMIN ONLY\n\n delete MEMBER_ID\n" \
-           " 'permanently delete member's Launch Pad profile'"
     permission_error = "You do not have the sufficient " \
                        "permission level for this command!"
     lookup_error = "User not found!"
@@ -36,9 +21,10 @@ class UserCommand:
     def __init__(self, db_facade, github_interface):
         """Initialize user command."""
         logging.info("Initializing UserCommand instance")
-        self.parser = argparse.ArgumentParser(prog="user")
+        self.parser = argparse.ArgumentParser(prog="/rocket")
         self.parser.add_argument("user")
-        self.init_subparsers()
+        self.subparser = self.init_subparsers()
+        self.help = self.get_help()
         self.facade = db_facade
         self.github = github_interface
 
@@ -47,36 +33,57 @@ class UserCommand:
         subparsers = self.parser.add_subparsers(dest="which")
 
         """Parser for view command."""
-        parser_view = subparsers.add_parser("view")
-        parser_view.set_defaults(which="view")
-        parser_view.add_argument("--slack_id", type=str, action='store')
+        parser_view = subparsers. \
+            add_parser("view")
+        parser_view.set_defaults(which="view",
+                                 help="View information about a given user.")
+        parser_view. \
+            add_argument("--slack_id", type=str, action='store',
+                         help="Use if using slack id instead of username.")
 
         """Parser for add command."""
         parser_add = subparsers.add_parser("add")
-        parser_add.set_defaults(which="add")
-        parser_add.add_argument("-f", "--force", action="store_true")
-
-        """Parser for help command."""
-        parser_help = subparsers.add_parser("help")
-        parser_help.set_defaults(which="help")
+        parser_add.set_defaults(which="add",
+                                help="Add a user to rocket2's database.")
+        parser_add.add_argument("-f", "--force", action="store_true",
+                                help="Set to store user even if already "
+                                     "added to database.")
 
         """Parser for delete command."""
         parser_delete = subparsers.add_parser("delete")
-        parser_delete.set_defaults(which="delete")
-        parser_delete.add_argument("slack_id", type=str, action='store')
+        parser_delete.set_defaults(which="delete",
+                                   help="(Admin only) permanently delete "
+                                        "member's profile.")
+        parser_delete.add_argument("slack_id", type=str, action='store',
+                                   help="Slack id of member to delete.")
 
         """Parser for edit command."""
-        parser_edit = subparsers.add_parser("edit")
+        parser_edit = subparsers. \
+            add_parser("edit",
+                       help="Edit properties of your Launch Pad "
+                            "profile (surround arguments containing "
+                            "spaces with quotes)")
         parser_edit.set_defaults(which='edit')
-        parser_edit.add_argument("--name", type=str, action='store')
-        parser_edit.add_argument("--email", type=str, action='store')
-        parser_edit.add_argument("--pos", type=str, action='store')
-        parser_edit.add_argument("--github", type=str, action='store')
-        parser_edit.add_argument("--major", type=str, action='store')
-        parser_edit.add_argument("--bio", type=str, action='store')
-        parser_edit.add_argument("--member", type=str, action='store')
+        parser_edit.add_argument("--name", type=str, action='store',
+                                 help="Add to change your name.")
+        parser_edit.add_argument("--email", type=str, action='store',
+                                 help="Add to change your email.")
+        parser_edit.add_argument("--pos", type=str, action='store',
+                                 help="Add to change your position.")
+        parser_edit.add_argument("--github", type=str, action='store',
+                                 help="Add to change your github username.")
+        parser_edit.add_argument("--major", type=str, action='store',
+                                 help="Add to change your major.")
+        parser_edit.add_argument("--bio", type=str, action='store',
+                                 help="Add to change your biography.")
+        parser_edit.add_argument("--member", type=str, action='store',
+                                 help="(Admin only) Add to edit properties "
+                                      "of another user.")
         parser_edit.add_argument("--permission", type=lambda x: Permissions[x],
+                                 help="(Admin only) Add to edit permission "
+                                      "level of a user.",
                                  action='store', choices=list(Permissions))
+        return subparsers
 
     def get_name(self):
         """Return the command type."""
@@ -84,7 +91,12 @@ class UserCommand:
 
     def get_help(self):
         """Return command options for user events."""
-        return self.help
+        res = "\n*" + self.command_name + " commands:*```"
+        for argument in self.subparser.choices:
+            name = argument.capitalize()
+            res += "\n*" + name + "*\n"
+            res += self.subparser.choices[argument].format_help()
+        return res + "```"
 
     def get_desc(self):
         """Return the description of this command."""
@@ -99,12 +111,9 @@ class UserCommand:
         try:
             args = self.parser.parse_args(command_arg)
         except SystemExit:
-            return self.help, 200
+            return self.get_help(), 200
 
-        if args.which is None or args.which == "help":
-            return self.help, 200
-
-        elif args.which == "view":
+        if args.which == "view":
             return self.view_helper(user_id, args.slack_id)
 
         elif args.which == "add":
@@ -126,6 +135,9 @@ class UserCommand:
                 "permission": args.permission,
             }
             return self.edit_helper(user_id, param_list)
+
+        else:
+            return self.get_help(), 200
 
     def edit_helper(self, user_id, param_list):
         """

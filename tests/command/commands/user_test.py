@@ -25,23 +25,23 @@ class TestUserCommand(TestCase):
 
     def test_get_help(self):
         """Test user command get_help method."""
-        assert self.testcommand.get_help() == UserCommand.help
+        assert self.testcommand.get_help() == self.testcommand.help
 
     def test_handle_nosubs(self):
         """Test user with no sub-parsers."""
         self.assertEqual(self.testcommand.handle('user', "U0G9QF9C6"),
-                         (UserCommand.help, 200))
+                         (self.testcommand.help, 200))
 
     def test_handle_bad_args(self):
         """Test user with invalid arguments."""
         self.assertEqual(self.testcommand.handle('user geese', "U0G9QF9C6"),
-                         (UserCommand.help, 200))
+                         (self.testcommand.help, 200))
 
     def test_handle_bad_optional_args(self):
         """Test user edit with invalid optional arguments."""
         self.assertEqual(self.testcommand.handle('user edit --biology stuff',
                                                  "U0G9QF9C6"),
-                         (UserCommand.help, 200))
+                         (self.testcommand.help, 200))
 
     def test_handle_add(self):
         """Test user command add method."""
@@ -123,7 +123,7 @@ class TestUserCommand(TestCase):
     def test_handle_help(self):
         """Test user command help parser."""
         self.assertEqual(self.testcommand.handle('user help', "U0G9QF9C6"),
-                         (UserCommand.help, 200))
+                         (self.testcommand.help, 200))
 
     def test_handle_delete(self):
         """Test user command delete parser."""
