@@ -112,7 +112,7 @@ api_token = "..."
 ```
 
 Replace the `...` value with a personal access token, which can be
-generated at https://github.com/settings/tokens.
+generated [here][github-token].
 
 ## 6: Build and Run Container
 
@@ -238,3 +238,4 @@ Remember to rebulid your Docker image every time you make a change!
 [create-workspace]: https://slack.com/create
 [make-slack-app]: https://api.slack.com/apps
 [download-ngrok]: https://ngrok.com/
+[github-token]: https://github.com/settings/tokens
