@@ -9,8 +9,7 @@ steps:
     versionSpec: '3.7'
     architecture: 'x64'
 
-- displayName: 'Set up pipenv and dependencies'
-  script: |
+- script: |
     # dynamodb
     sudo apt-get update
     sudo apt-get install -y default-jdk
@@ -23,8 +22,9 @@ steps:
     # python
     pip install pipenv
     pipenv install --dev
+  displayName: 'Set up pipenv and dependencies'
 
-- displayName: 'Build checks'
-  script: |
+- script: |
     bash scripts/build_check.sh
     pipenv run codecov
+  displayName: 'Build checks'
