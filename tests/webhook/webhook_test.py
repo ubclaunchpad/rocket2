@@ -617,6 +617,9 @@ def test_handle_mem_event_rm_single_member(mock_logging, mem_rm_payload):
     return_user = User("SLACKID")
     return_team = Team("2723476", "rocket", "rocket")
     return_team.add_member("21031067")
+    #total_members = len(return_team.get_members)
+    #assert len(return_team.get_members) == total_members - 1
+
     mock_facade.query_user.return_value = [return_user]
     mock_facade.retrieve_team.return_value = return_team
     webhook_handler = WebhookHandler(mock_facade)
@@ -638,9 +641,9 @@ def test_handle_mem_event_rm_member_missing(mock_logging, mem_rm_payload):
     webhook_handler = WebhookHandler(mock_facade)
     rsp, code = webhook_handler.handle_membership_event(mem_rm_payload)
     mock_facade.query_user\
-        .assert_called_once_with([('github_id', 21031067)])
+        .assert_called_once_with([('github_id', "21031067")])
     mock_logging.error.assert_called_once_with("could not find user 21031067")
-    assert rsp == "could not find user 39652351"
+    assert rsp == "could not find user 21031067"
     assert code == 404
 
 
@@ -655,11 +658,17 @@ def test_handle_mem_event_rm_mult_members(mock_logging, mem_rm_payload):
     webhook_handler = WebhookHandler(mock_facade)
     rsp, code = webhook_handler.handle_membership_event(mem_rm_payload)
     mock_facade.query_user\
-        .assert_called_once_with([('github_id', 21031067)])
+        .assert_called_once_with([('github_id', "21031067")])
+    assert rsp == "Error: found github ID connected to multiple slack IDs"
+    assert code == 404
+
+
+    '''
     assert mock_facade.delete_user.call_count is 3
     assert mock_logging.info.call_count is 3
     assert rsp == "deleted slack ID SLACKUSER1 SLACKUSER2 SLACKUSER3"
     assert code == 200
+    '''
 
 
 @mock.patch('webhook.webhook.logging')
@@ -669,8 +678,8 @@ def test_handle_mem_event_inv_member(mock_logging, mem_inv_payload):
     webhook_handler = WebhookHandler(mock_facade)
     rsp, code = webhook_handler.handle_membership_event(mem_inv_payload)
     mock_logging.info.assert_called_once_with(("user Codertocat invited "
-                                               "to Octocoders"))
-    assert rsp == "user hacktocat invited to Octocoders"
+                                               "to rocket"))
+    assert rsp == "user Codertocat invited to rocket"
     assert code == 200
 
 

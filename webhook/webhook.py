@@ -164,13 +164,13 @@ class WebhookHandler:
                 if selected_team.is_member(github_id):
                     selected_team.discard_member(github_id)
                     logging.info("deleted slack user {} from {}"
-                                 .format(slack_id, team_id))
-                    slack_ids_string = slack_ids_string + " " + \
-                                       str(slack_id)
+                                 .format(slack_id, team_name))
+                    slack_ids_string += str(slack_id) + ""
                 return "deleted slack ID {} from {}"\
-                           .format(slack_ids_string, team_id), 200
+                           .format(slack_ids_string, team_name), 200
             elif len(member_list) > 1:
-                logging.info("found github ID connected to multiple slack IDs")
+                logging.info("Error: found github ID connected to multiple slack IDs")
+                return "Error: found github ID connected to multiple slack IDs", 404
             else:
                 logging.error("could not find user {}".format(github_id))
                 return "could not find user {}".format(github_id), 404
@@ -192,8 +192,8 @@ class WebhookHandler:
 
         elif action == "member_invited":
             logging.info("user {} invited to {}".
-                         format(github_username, selected_team))
-            return "user " + github_username + " invited to " + selected_team,\
+                         format(github_username, team_name))
+            return "user " + github_username + " invited to " + team_name,\
                    200
         else:
             logging.error(("membership webhook triggered,"
