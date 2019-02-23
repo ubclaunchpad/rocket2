@@ -9,6 +9,10 @@ steps:
     versionSpec: '3.7'
     architecture: 'x64'
 
+- task: UseRubyVersion@0
+  inputs:
+    versionSpec: '>= 2.5'
+
 - script: |
     # dynamodb
     sudo apt-get update
@@ -23,8 +27,13 @@ steps:
     pip install pipenv
     pipenv install --dev
   displayName: 'Set up pipenv and dependencies'
+  failOnStderr: true
 
-- script: |
-    bash scripts/build_check.sh
-    pipenv run codecov
+- script: bash scripts/build_check.sh
   displayName: 'Build checks'
+  failOnStderr: true
+
+- script: pipenv run codecov
+  displayName: 'Upload coverage'
+  failOnStderr: true
+  condition: succeeded()
