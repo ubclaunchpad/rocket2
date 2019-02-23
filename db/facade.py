@@ -68,29 +68,7 @@ class DBFacade:
         If you try to query a table without any parameters, the function will
         return all objects of that table.::
 
-<<<<<<< HEAD
-        :param project: A project model to store
-        """
-        logging.info("Storing project " + project.project_id)
-        self.ddb.store_project(project)
-
-    def retrieve_project(self, project_id):
-        """
-        Retrieve project from projects table.
-
-        :param project_id: used as key for retrieving project objects.
-        :raise: LookupError if project id is not found.
-        :return: returns a project model if slack id is found.
-        """
-        logging.info("Retrieving project " + project_id)
-        return self.ddb.retrieve_project(project_id)
-
-    def query_project(self, parameters):
-        """
-        Query for specific projects by parameter.
-=======
             projects = ddb.query(Project)
->>>>>>> Fix all pytests
 
         Attributes that are sets (e.g. ``team.member``,
         ``project.github_urls``) would be treated differently. This function

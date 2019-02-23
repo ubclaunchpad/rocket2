@@ -264,6 +264,12 @@ class TestUserCommand(TestCase):
             self.assertDictEqual(resp, expect)
             self.assertEqual(code, 200)
         self.mock_facade.retrieve.assert_any_call(User, "U0G9QF9C6")
+        user.name = "rob"
+        user.email = "rob@rob.com"
+        user.position = "dev"
+        user.github_username = "rob@.github.com"
+        user.major = "Computer Science"
+        user.biography = "Im a human"
         self.mock_facade.store.assert_called_once_with(user)
 
     def test_handle_edit_not_admin(self):

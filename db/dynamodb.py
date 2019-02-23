@@ -172,47 +172,6 @@ class DynamoDB:
             return True
         return False
 
-<<<<<<< HEAD
-    def store_user(self, user):
-        """
-        Store user into users table.
-
-        :param user: A user model to store
-        :returns: Returns true if the user was stored, and false otherwise
-        """
-        return self.store(user)
-        # Check that there are no blank fields in the user
-        if User.is_valid(user):
-            user_table = self.ddb.Table(self.users_table)
-            udict = User.to_dict(user)
-
-            logging.info("Storing user {} in table {}".
-                         format(user.slack_id, self.users_table))
-            user_table.put_item(Item=udict)
-            return True
-        return False
-
-    def store_team(self, team):
-        """
-        Store team into teams table.
-
-        :param team: A team model to store
-        :return: Returns true if stored succesfully; false otherwise
-        """
-        return self.store(team)
-        # Check that there are no blank fields in the team
-        if Team.is_valid(team):
-            teams_table = self.ddb.Table(self.teams_table)
-            tdict = Team.to_dict(team)
-
-            logging.info("Storing team {} in table {}".
-                         format(team.github_team_name, self.teams_table))
-            teams_table.put_item(Item=tdict)
-            return True
-        return False
-
-=======
->>>>>>> Fix all pytests
     def retrieve(self, Model, k):
         """
         Retrieve a model from the database.
