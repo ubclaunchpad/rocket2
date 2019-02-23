@@ -13,23 +13,25 @@ steps:
   inputs:
     versionSpec: '>= 2.5'
 
-- script: |
+- bash: |
     # dynamodb
     sudo apt-get update
     sudo apt-get install -y default-jdk
     sudo apt-get install nmap
-    bash scripts/download_dynamodb_and_run.sh
+    scripts/download_dynamodb_and_run.sh
 
     # md
     gem install mdl
-
-    # python
-    pip install pipenv
-    pipenv install --dev
-  displayName: 'Set up pipenv and dependencies'
+  displayName: 'Set up dependencies'
   failOnStderr: true
 
-- script: bash scripts/build_check.sh
+- bash: |
+    pip install pipenv
+    pipenv install --dev
+  displayName: 'Set up pipenv'
+  failOnStderr: true
+
+- script: scripts/build_check.sh
   displayName: 'Build checks'
   failOnStderr: true
 
