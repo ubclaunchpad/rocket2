@@ -102,6 +102,18 @@ secret_access_key = "..."
 Replace the `...` values for both fields with the appropriate values noted
 in section 4.
 
+### 5.3: Set Up Github Credentials
+
+Create the file `credentials/github.toml` and input the following:
+
+```
+organization = "ubclaunchpad"
+api_token = "..."
+```
+
+Replace the `...` value with a personal access token, which can be
+generated at https://github.com/settings/tokens.
+
 ## 6: Build and Run Container
 
 This section assumes you already have installed Docker. Assuming you are in the
