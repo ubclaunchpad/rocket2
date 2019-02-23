@@ -75,8 +75,8 @@ class Core:
                    "mrkdwn": "true"}
         attachments = []
         for cmd in self.__commands.values():
-            cmd_name = cmd.get_name()
-            cmd_text = "*" + cmd_name + ":* " + cmd.get_desc()
+            cmd_name = cmd.command_name
+            cmd_text = "*" + cmd_name + ":* " + cmd.desc
             attachment = {"text": cmd_text, "mrkdwn_in": ["text"]}
             attachments.append(attachment)
         message["attachments"] = attachments

@@ -21,12 +21,12 @@ class TestTokenCommand(TestCase):
 
     def test_get_command_name(self):
         """Test get_name()."""
-        assert self.testcommand.get_name() == "token"
+        assert self.testcommand.command_name == "token"
 
     def test_get_command_desc(self):
         """Test get_desc()."""
-        assert self.testcommand.get_desc() == "Generate a signed token " \
-                                              "for use with the HTTP API"
+        assert self.testcommand.desc == "Generate a signed token " \
+                                        "for use with the HTTP API"
 
     def test_handle_nonexistent_member(self):
         """Test handle() when given a nonexistent member."""
@@ -38,9 +38,9 @@ class TestTokenCommand(TestCase):
     def test_handle_member(self):
         """Test handle() when given a user with member permissions."""
         user = User("U12345")
-        user.set_permissions_level(Permissions.member)
+        user.permissions_level = Permissions.member
         self.mock_facade.retrieve_user.return_value = user
-        ret_val, ret_code = self.testcommand.handle("", user.get_slack_id())
+        ret_val, ret_code = self.testcommand.handle("", user.slack_id)
         assert ret_val == "You do not have the sufficient " \
                           "permission level for this command!"
         assert ret_code == 403
@@ -48,30 +48,30 @@ class TestTokenCommand(TestCase):
     def test_handle_team_lead(self):
         """Test handle() when given a user with team lead permissions."""
         user = User("U12345")
-        user.set_permissions_level(Permissions.team_lead)
+        user.permissions_level = Permissions.team_lead
         self.mock_facade.retrieve_user.return_value = user
         ret_msg, ret_code = \
-            self.testcommand.handle("", user.get_slack_id())
+            self.testcommand.handle("", user.slack_id)
         token = self.__parse_token(ret_msg)
         decoded = jwt.decode(token,
                              "secret",
                              algorithms='HS256')
-        assert decoded['user_id'] == user.get_slack_id()
+        assert decoded['user_id'] == user.slack_id
         assert decoded['permissions'] == Permissions.team_lead.value
         assert ret_code == 200
 
     def test_handle_admin(self):
         """Test handle() when given a user with admin permissions."""
         user = User("U12345")
-        user.set_permissions_level(Permissions.admin)
+        user.permissions_level = Permissions.admin
         self.mock_facade.retrieve_user.return_value = user
         ret_msg, ret_code = \
-            self.testcommand.handle("", user.get_slack_id())
+            self.testcommand.handle("", user.slack_id)
         token = self.__parse_token(ret_msg)
         decoded = jwt.decode(token,
                              "secret",
                              algorithms='HS256')
-        assert decoded['user_id'] == user.get_slack_id()
+        assert decoded['user_id'] == user.slack_id
         assert decoded['permissions'] == Permissions.admin.value
         assert ret_code == 200
 

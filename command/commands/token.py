@@ -26,23 +26,15 @@ class TokenCommand:
         """
         logging.info("Initializing TokenCommand instance")
         self.facade = db_facade
-        self.expiry = config.get_expiry()
-        self.signing_key = config.get_signing_key()
-
-    def get_name(self):
-        """Return the command's name."""
-        return self.command_name
-
-    def get_desc(self):
-        """Return a description of the command."""
-        return self.desc
+        self.expiry = config.expiry
+        self.signing_key = config.signing_key
 
     def handle(self, _command, user_id):
         """Handle request for token."""
         logging.debug("Handling token command")
         try:
             user = self.facade.retrieve_user(user_id)
-            if user.get_permissions_level() == Permissions.member:
+            if user.permissions_level == Permissions.member:
                 return self.permission_error, 403
         except LookupError:
             return self.lookup_error, 404
@@ -53,7 +45,7 @@ class TokenCommand:
             'iss': 'ubclaunchpad:rocket2',
             'iat': datetime.utcnow(),
             'user_id': user_id,
-            'permissions': user.get_permissions_level().value
+            'permissions': user.permissions_level.value
         }
         token = jwt.encode(payload, self.signing_key, algorithm='HS256') \
             .decode('utf-8')
@@ -68,11 +60,3 @@ class TokenCommandConfig:
         """Initialize config for TokenCommand."""
         self.expiry = expiry
         self.signing_key = signing_key
-
-    def get_expiry(self):
-        """Return expiry offset, expressed as a `timedelta`."""
-        return self.expiry
-
-    def get_signing_key(self):
-        """Return string containing secret authentication signing key."""
-        return self.signing_key
