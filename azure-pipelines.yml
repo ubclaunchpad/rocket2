@@ -1,19 +1,30 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
-
-trigger:
-- master
+# Azure project: https://dev.azure.com/ubclaunchpad/rocket
 
 pool:
   vmImage: 'Ubuntu-16.04'
 
 steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
+- task: UsePythonVersion@0
+  inputs:
+    versionSpec: '3.7'
+    architecture: 'x64'
 
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+- displayName: 'Set up pipenv and dependencies'
+  script: |
+    # dynamodb
+    sudo apt-get update
+    sudo apt-get install -y default-jdk
+    sudo apt-get install nmap
+    bash scripts/download_dynamodb_and_run.sh
+
+    # md
+    gem install mdl
+
+    # python
+    pip install pipenv
+    pipenv install --dev
+
+- displayName: 'Build checks'
+  script: |
+    bash scripts/build_check.sh
+    pipenv run codecov
