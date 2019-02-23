@@ -107,7 +107,6 @@ in section 4.
 Create the file `credentials/github.toml` and input the following:
 
 ```
-organization = "ubclaunchpad"
 api_token = "..."
 ```
 
