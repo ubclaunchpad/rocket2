@@ -98,7 +98,7 @@ class TestUserCommand(TestCase):
         """Test user command view handle with slack_id parameter."""
         user_id = "U0G9QF9C6"
         user = User("ABCDE8FA9")
-        command = 'user view --slack_id ' + user.get_slack_id()
+        command = 'user view --slack_id ' + user.slack_id
         self.mock_facade.retrieve_user.return_value = user
         user_attaches = [user.get_attachment()]
         with self.app.app_context():
@@ -128,7 +128,7 @@ class TestUserCommand(TestCase):
     def test_handle_delete(self):
         """Test user command delete parser."""
         user = User("ABCDEFG2F")
-        user.set_permissions_level(Permissions.admin)
+        user.permissions_level = Permissions.admin
         self.mock_facade.retrieve_user.return_value = user
         message = "Deleted user with Slack ID: " + "U0G9QF9C6"
         self.assertEqual(self.testcommand.handle("user delete U0G9QF9C6",
@@ -140,7 +140,7 @@ class TestUserCommand(TestCase):
     def test_handle_delete_not_admin(self):
         """Test user command delete where user is not admin."""
         user = User("ABCDEFG2F")
-        user.set_permissions_level(Permissions.member)
+        user.permissions_level = Permissions.member
         self.mock_facade.retrieve_user.return_value = user
         self.assertEqual(self.testcommand.handle("user delete U0G9QF9C6",
                                                  "ABCDEFG2F"),
@@ -151,7 +151,7 @@ class TestUserCommand(TestCase):
     def test_handle_delete_lookup_error(self):
         """Test user command delete parser."""
         user = User("ABCDEFG2F")
-        user.set_permissions_level(Permissions.admin)
+        user.permissions_level = Permissions.admin
         self.mock_facade.retrieve_user.return_value = user
         self.mock_facade.delete_user.side_effect = LookupError
         self.assertEqual(self.testcommand.handle("user delete U0G9QF9C6",
@@ -168,7 +168,7 @@ class TestUserCommand(TestCase):
                                                  "U0G9QF9C6"),
                          ("User edited: " + str(user), 200))
         self.mock_facade.retrieve_user.assert_called_once_with("U0G9QF9C6")
-        user.set_name("rob")
+        user.name = "rob"
         self.mock_facade.store_user.assert_called_once_with(user)
 
     def test_handle_edit_github(self):
@@ -213,7 +213,7 @@ class TestUserCommand(TestCase):
     def test_handle_edit_other_user(self):
         """Test user command edit parser with all fields."""
         user = User("ABCDE89JK")
-        user.set_permissions_level(Permissions.admin)
+        user.permissions_level = Permissions.admin
         self.mock_facade.retrieve_user.return_value = user
         self.assertEqual(self.testcommand.handle(
             "user edit --member U0G9QF9C6 "
@@ -225,18 +225,18 @@ class TestUserCommand(TestCase):
                          ("User edited: " + str(user), 200))
         self.mock_facade.retrieve_user.assert_any_call("U0G9QF9C6")
         self.mock_facade.retrieve_user.assert_any_call("U0G9QF9C6")
-        user.set_name("rob")
-        user.set_email("rob@rob.com")
-        user.set_position("dev")
-        user.set_github_username("rob@.github.com")
-        user.set_major("Computer Science")
-        user.set_biography("Im a human")
+        user.name = "rob"
+        user.email = "rob@rob.com"
+        user.position = "dev"
+        user.github_username = "rob@.github.com"
+        user.major = "Computer Science"
+        user.biography = "Im a human"
         self.mock_facade.store_user.assert_called_once_with(user)
 
     def test_handle_edit_not_admin(self):
         """Test user command with editor user that is not admin."""
         user_editor = User("U0G9QF9C6")
-        user_editor.set_permissions_level(Permissions.member)
+        user_editor.permissions_level = Permissions.member
         self.mock_facade.retrieve_user.return_value = user_editor
         self.assertEqual(self.testcommand.handle(
             "user edit --member ABCDE89JK "
@@ -254,7 +254,7 @@ class TestUserCommand(TestCase):
         editor = User("a1")
         editee = User("arst")
         rets = {'a1': editor, 'arst': editee}
-        editor.set_permissions_level(Permissions.admin)
+        editor.permissions_level = Permissions.admin
         self.mock_facade.retrieve_user.side_effect = rets.get
         self.assertTupleEqual(self.testcommand.handle(
             "user edit --member arst "

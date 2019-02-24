@@ -47,7 +47,7 @@ def test_store_invalid_team(ddb):
 def test_store_invalid_project(ddb):
     """Test handling of invalid project."""
     project = Project('12456', [''])
-    project.set_github_urls([])
+    project.github_urls = []
     success = ddb.store_project(project)
     assert not success
 
@@ -57,7 +57,7 @@ def test_store_same_users(ddb):
     """Test how database handles overwriting same user (same slack_id)."""
     user = create_test_admin('abc_123')
     user2 = create_test_admin('abc_123')
-    user2.set_name('Sprouts')
+    user2.name = 'Sprouts'
     ddb.store_user(user)
     ddb.store_user(user2)
 
@@ -87,12 +87,12 @@ def test_store_retrieve_project(ddb):
                                   ['https://github.com/ubclaunchpad/rocket2'])
 
     success = ddb.store_project(project)
-    another_project = ddb.retrieve_project(project.get_project_id())
+    another_project = ddb.retrieve_project(project.project_id)
 
     assert success
     assert project == another_project
 
-    ddb.delete_project(project.get_project_id())
+    ddb.delete_project(project.project_id)
 
 
 @pytest.mark.db
@@ -149,7 +149,7 @@ def test_query_project(ddb):
     assert project == strict_projects[0]
     assert project == all_projects[0]
 
-    ddb.delete_project(project.get_project_id())
+    ddb.delete_project(project.project_id)
 
 
 @pytest.mark.db
@@ -171,10 +171,10 @@ def test_update_user(ddb):
     ddb.store_user(u)
 
     u = ddb.retrieve_user('abc_123')
-    u.set_name('Steven Universe')
+    u.name = 'Steven Universe'
     ddb.store_user(u)
 
-    assert ddb.retrieve_user('abc_123').get_name() == 'Steven Universe'
+    assert ddb.retrieve_user('abc_123').name == 'Steven Universe'
 
     ddb.delete_user('abc_123')
 
@@ -190,7 +190,7 @@ def test_update_team(ddb):
     t.add_member('123_abc')
     ddb.store_team(t)
 
-    assert len(ddb.retrieve_team('1').get_members()) == 2
+    assert len(ddb.retrieve_team('1').members) == 2
 
     ddb.delete_team('1')
 
@@ -263,5 +263,5 @@ def test_delete_project(ddb):
     ddb.store_project(project)
 
     assert len(ddb.query_project([])) == 1
-    ddb.delete_project(project.get_project_id())
+    ddb.delete_project(project.project_id)
     assert len(ddb.query_project([])) == 0

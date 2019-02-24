@@ -33,7 +33,7 @@ class DBFacade:
 
         :param user: A user model to store
         """
-        logging.info("Storing user {}".format(user.get_slack_id()))
+        logging.info("Storing user {}".format(user.slack_id))
         self.ddb.store_user(user)
 
     def retrieve_user(self, slack_id):
@@ -79,7 +79,7 @@ class DBFacade:
 
         :param team: A team model to store
         """
-        logging.info("Storing team {}".format(team.get_github_team_name()))
+        logging.info("Storing team {}".format(team.github_team_name))
         self.ddb.store_team(team)
 
     def retrieve_team(self, team_name):
@@ -125,7 +125,7 @@ class DBFacade:
 
         :param project: A project model to store
         """
-        logging.info("Storing project " + project.get_project_id())
+        logging.info("Storing project " + project.project_id)
         self.ddb.store_project(project)
 
     def retrieve_project(self, project_id):
