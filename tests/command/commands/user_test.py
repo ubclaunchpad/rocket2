@@ -164,7 +164,7 @@ class TestUserCommand(TestCase):
     def test_handle_edit_name(self):
         """Test user command edit parser with one field."""
         user = User("U0G9QF9C6")
-        user.set_name("rob")
+        user.name = "rob"
         user_attaches = [user.get_attachment()]
         self.mock_facade.retrieve_user.return_value = user
         with self.app.app_context():
@@ -180,7 +180,7 @@ class TestUserCommand(TestCase):
     def test_handle_edit_github(self):
         """Test that editing github username sends request to interface."""
         user = User("U0G9QF9C6")
-        user.set_github_username("rob")
+        user.github_username = "rob"
         user_attaches = [user.get_attachment()]
         self.mock_facade.retrieve_user.return_value = user
         with self.app.app_context():
@@ -217,13 +217,13 @@ class TestUserCommand(TestCase):
     def test_handle_edit_other_user(self):
         """Test user command edit parser with all fields."""
         user = User("ABCDE89JK")
-        user.set_name("rob")
-        user.set_email("rob@rob.com")
-        user.set_position("dev")
-        user.set_github_username("rob@.github.com")
-        user.set_major("Computer Science")
-        user.set_biography("Im a human")
-        user.set_permissions_level(Permissions.admin)
+        user.name = "rob"
+        user.email = "rob@rob.com"
+        user.position = "dev"
+        user.github_username = "rob@.github.com"
+        user.major = "Computer Science"
+        user.biography = "Im a human"
+        user.permissions_level = Permissions.admin
         user_attaches = [user.get_attachment()]
         self.mock_facade.retrieve_user.return_value = user
         with self.app.app_context():
@@ -263,8 +263,8 @@ class TestUserCommand(TestCase):
         editor = User("a1")
         editee = User("arst")
         rets = {'a1': editor, 'arst': editee}
-        editor.set_permissions_level(Permissions.admin)
-        editee.set_permissions_level(Permissions.admin)
+        editor.permissions_level = Permissions.admin
+        editee.permissions_level = Permissions.admin
         self.mock_facade.retrieve_user.side_effect = rets.get
         editee_attaches = [editee.get_attachment()]
         with self.app.app_context():
