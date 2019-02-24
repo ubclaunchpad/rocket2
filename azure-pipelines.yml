@@ -13,26 +13,22 @@ steps:
   inputs:
     versionSpec: '>= 2.5'
 
-- bash: |
+- script: |
     pip install pipenv
     pipenv install --dev
   displayName: 'Set up pipenv'
-  failOnStderr: true
 
-- bash: |
+- script: |
     sudo apt-get update
     sudo apt-get install -y default-jdk
     sudo apt-get install nmap
     scripts/download_dynamodb_and_run.sh
     gem install mdl
   displayName: 'Set up dependencies'
-  failOnStderr: true
 
 - script: scripts/build_check.sh
   displayName: 'Build checks'
-  failOnStderr: true
 
 - script: pipenv run codecov
   displayName: 'Upload coverage'
-  failOnStderr: true
   condition: succeeded()
