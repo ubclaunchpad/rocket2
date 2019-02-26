@@ -47,7 +47,9 @@ dictConfig({
 
 try:
     app = Flask(__name__)
+    # HTTP security header middleware for Flask
     talisman = Talisman(app)
+    # anti-CSRF middleware for Flask
     csrf = SeaSurf(app)
     config = toml.load('config.toml')
     core = make_core(config)
