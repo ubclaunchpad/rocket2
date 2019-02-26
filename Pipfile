@@ -14,6 +14,8 @@ pygithub = "*"
 toml = "*"
 structlog = "*"
 colorama = "*"
+flask-talisman = "*"
+flask-seasurf = "*"
 
 [dev-packages]
 awscli = "*"
