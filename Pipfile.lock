@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "40e0a46aa2e0a7c27c7b595824b1f76a36c5beca383f5cb27c6f0a2d05bac50b"
+            "sha256": "912b87bd66be92ed91bc254e41ce023badb04aa8f31bc92bf457d5eba8a97652"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -32,18 +32,18 @@
         },
         "boto3": {
             "hashes": [
-                "sha256:1f43d7a4865b75c4628a5084c2c32b00f356a9fd09f97574a8903c574356890a",
-                "sha256:4605a0707e857f316a7b01766fb49350e7b3d922458aa9c870f6393ec6fa22ca"
+                "sha256:3a62698555f170811b406bdf86f404fca6789feb710243a912d7d52c0f7821b8",
+                "sha256:dee89fbbc02c3564fd7c93a507e95c622665ff77d6f16b0ffd04f73384b200e7"
             ],
             "index": "pypi",
-            "version": "==1.9.102"
+            "version": "==1.9.103"
         },
         "botocore": {
             "hashes": [
-                "sha256:00d64c0ce9d85a86dfda51999194621fbc9e50e20b56e857ef00dce8a30dac6a",
-                "sha256:d2e338c2f065b897ae856938af5090c3430ce0f53eddab8f87dad5972c38f975"
+                "sha256:2ec1e94dc4c678bd301bc8023328f043d015e3f143471f07283edc998bdc480c",
+                "sha256:893fef0ab3ee41d207132bd0bea4d114eda5dddbfbd638a6e4e6788b804d5593"
             ],
-            "version": "==1.12.102"
+            "version": "==1.12.103"
         },
         "certifi": {
             "hashes": [
@@ -97,6 +97,13 @@
             "index": "pypi",
             "version": "==1.0.2"
         },
+        "flask-limiter": {
+            "hashes": [
+                "sha256:8cce98dcf25bf2ddbb824c2b503b4fc8e1a139154240fd2c60d9306bad8a0db8"
+            ],
+            "index": "pypi",
+            "version": "==1.0.1"
+        },
         "flask-seasurf": {
             "hashes": [
                 "sha256:c57918c17e9afd988bdc30d8dcb7bfb833741dee38b06c1bbd17821d6fa2b6cf"
@@ -147,6 +154,13 @@
                 "sha256:bde2aef6f44302dfb30320115b17d030798de8c4110e28d5cf6cf91a7a31074c"
             ],
             "version": "==0.9.4"
+        },
+        "limits": {
+            "hashes": [
+                "sha256:9df578f4161017d79f5188609f1d65f6b639f8aad2914c3960c9252e56a0ff95",
+                "sha256:a017b8d9e9da6761f4574642149c337f8f540d4edfe573fb91ad2c4001a2bc76"
+            ],
+            "version": "==1.3"
         },
         "markupsafe": {
             "hashes": [
@@ -222,6 +236,7 @@
                 "sha256:5c6eca3c2940464d106b99ba83b00c6add741c9becaec087fb7ccdefea71350e",
                 "sha256:8d59a976fb773f3e6a39c85636357c4f0e242707394cadadd9814f5cbaa20e96"
             ],
+            "index": "pypi",
             "version": "==1.7.1"
         },
         "pytest": {
@@ -329,6 +344,14 @@
             ],
             "version": "==0.7.12"
         },
+        "appnope": {
+            "hashes": [
+                "sha256:5b26757dc6f79a3b7dc9fab95359328d5747fcb2409d331ea66d0272b90ab2a0",
+                "sha256:8b995ffe925347a2138d7ac0fe77155e4311a0ea6d6da4f5128fe4b3cbe5ed71"
+            ],
+            "markers": "sys_platform == 'darwin'",
+            "version": "==0.1.0"
+        },
         "atomicwrites": {
             "hashes": [
                 "sha256:03472c30eb2c5d1ba9227e4c2ca66ab8287fbfbbda3888aa93dc2e28fc6811b4",
@@ -345,11 +368,11 @@
         },
         "awscli": {
             "hashes": [
-                "sha256:b3ee64a95e85bc7cc38eff40e45a05de9b60db0ab88bc41b292adf39befc847d",
-                "sha256:c9feb7a995a98ccbaf467cf7064575397c9a45caaae5829ce2732095588b1571"
+                "sha256:9336ee810f1f0e037b0322239c6397013801a44d946982c451b0a4b22db528d9",
+                "sha256:d89889b3a434ea594567e5d76730223fee111d0b17ccedc9f819914e43c6fe4b"
             ],
             "index": "pypi",
-            "version": "==1.16.112"
+            "version": "==1.16.113"
         },
         "babel": {
             "hashes": [
@@ -367,10 +390,10 @@
         },
         "botocore": {
             "hashes": [
-                "sha256:00d64c0ce9d85a86dfda51999194621fbc9e50e20b56e857ef00dce8a30dac6a",
-                "sha256:d2e338c2f065b897ae856938af5090c3430ce0f53eddab8f87dad5972c38f975"
+                "sha256:2ec1e94dc4c678bd301bc8023328f043d015e3f143471f07283edc998bdc480c",
+                "sha256:893fef0ab3ee41d207132bd0bea4d114eda5dddbfbd638a6e4e6788b804d5593"
             ],
-            "version": "==1.12.102"
+            "version": "==1.12.103"
         },
         "certifi": {
             "hashes": [
