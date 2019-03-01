@@ -1,6 +1,5 @@
 """Utility classes for interacting with Slack API."""
 import logging
-import json
 
 
 class Bot:
@@ -19,7 +18,7 @@ class Bot:
             channel=slack_user_id,
             text=message
         )
-        if 'ok' not in response:
+        if 'ok' not in response or response['ok'] is False:
             logging.error("Direct message to {} failed with error: {}".
                           format(slack_user_id, response['error']))
             raise SlackAPIError(response['error'])
@@ -33,7 +32,7 @@ class Bot:
             attachments=attachments,
             text=message
         )
-        if 'ok' not in response:
+        if 'ok' not in response or response['ok'] is False:
             logging.error("Message to channel {} failed with error: {}".
                           format(channel_name, response['error']))
             raise SlackAPIError(response['error'])
@@ -45,19 +44,19 @@ class Bot:
             "conversation.members",
             channel=channel_id
         )
-        if 'ok' not in response:
+        if 'ok' not in response or response['ok'] is False:
             logging.error("User retrieval "
                           "from channel {} failed with error: {}".
                           format(channel_id, response['error']))
             raise SlackAPIError(response['error'])
         else:
-            json_response = json.loads(response)
-            return json_response["members"]
+            return response["members"]
 
     def create_channel(self, channel_name):
         """
         Create a channel with the given name.
-        :returns name of newly created channel
+
+        :return name of newly created channel
         """
         logging.debug("Attempting to create channel with name {}".
                       format(channel_name))
@@ -66,14 +65,13 @@ class Bot:
             name=channel_name,
             validate=True
         )
-        if 'ok' not in response:
+        if 'ok' not in response or response['ok'] is False:
             logging.error("Channel creation "
                           "with name {} failed with error: {}".
                           format(channel_name, response['error']))
             raise SlackAPIError(response['error'])
         else:
-            json_response = json.loads(response)
-            return json_response["name"]
+            return response["name"]
 
 
 class SlackAPIError(Exception):
