@@ -69,7 +69,6 @@ class Bot:
             logging.error("Channel creation "
                           "with name {} failed with error: {}".
                           format(channel_name, response['error']))
-            raise SlackAPIError(response['error'])
         else:
             return response["name"]
 

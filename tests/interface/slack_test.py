@@ -98,7 +98,7 @@ class TestBot(TestCase):
             )
 
     def test_create_same_channel_twice(self):
-        """Test create_channel() twice, with the second call failing."""
+        """Test create_channel() twice, with the second call throwing up."""
         name: str = "#rocket2"
         self.mock_sc.api_call.return_value = {"ok": True,
                                               "name": name}
@@ -108,4 +108,4 @@ class TestBot(TestCase):
         try:
             self.bot.create_channel(name)
         except SlackAPIError as e:
-            pass
+            assert 1 == 0
