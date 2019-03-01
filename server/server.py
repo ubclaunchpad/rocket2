@@ -9,6 +9,7 @@ import toml
 import structlog
 from flask_talisman import Talisman
 from flask_seasurf import SeaSurf
+from interface.slack import SlackAPIError
 
 
 dictConfig({
@@ -53,6 +54,9 @@ try:
     csrf = SeaSurf(app)
     config = toml.load('config.toml')
     core = make_core(config)
+    slack_bot_channel = config['slack']['bot_channel']
+    bot = core.__bot
+    bot.create_channel(slack_bot_channel)
     webhook_handler = make_webhook_handler(config)
     if not config['testing']:
         slack_signing_secret = toml.load(
@@ -96,7 +100,9 @@ def handle_team_webhook():
     """Handle GitHub team webhooks."""
     logging.info("team webhook triggered")
     logging.debug("team payload: {}".format(str(request.get_json())))
-    return webhook_handler.handle_team_event(request.get_json())
+    msg = webhook_handler.handle_team_event(request.get_json())
+    send_webhook_notif(msg[0].capitalize())
+    return msg
 
 
 @slack_events_adapter.on("app_mention")
@@ -111,3 +117,14 @@ def handle_team_join(event):
     """Handle instances when user joins the Launchpad slack workspace."""
     logging.info("Handled 'team_join' event")
     core.handle_team_join(event)
+
+
+def send_webhook_notif(message):
+    """Send a message to the slack bot channel, usually for webhook notifs."""
+    try:
+        name = bot.send_to_channel(message, slack_bot_channel, [])
+        logging.info("Webhook notif successfully sent to {} channel".
+                     format(name))
+    except SlackAPIError as se:
+        logging.error("Webhook notif failed to send due to {} error.".
+                      format(se.error))

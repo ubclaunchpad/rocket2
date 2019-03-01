@@ -54,6 +54,27 @@ class Bot:
             json_response = json.loads(response)
             return json_response["members"]
 
+    def create_channel(self, channel_name):
+        """
+        Create a channel with the given name.
+        :returns name of newly created channel
+        """
+        logging.debug("Attempting to create channel with name {}".
+                      format(channel_name))
+        response = self.sc.api_call(
+            "channels.create",
+            name=channel_name,
+            validate=True
+        )
+        if 'ok' not in response:
+            logging.error("Channel creation "
+                          "with name {} failed with error: {}".
+                          format(channel_name, response['error']))
+            raise SlackAPIError(response['error'])
+        else:
+            json_response = json.loads(response)
+            return json_response["name"]
+
 
 class SlackAPIError(Exception):
     """Exception representing an error while calling Slack API."""
