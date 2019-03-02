@@ -97,15 +97,18 @@ class TestBot(TestCase):
                 channel="C1234441"
             )
 
-    def test_create_same_channel_twice(self):
-        """Test create_channel() twice, with the second call throwing up."""
+    def test_create_same_channel_thrice(self):
+        """Test create_channel() thrice, with the third call throwing up."""
         name: str = "#rocket2"
         self.mock_sc.api_call.return_value = {"ok": True,
                                               "name": name}
         assert self.bot.create_channel(name) == name
-        self.mock_sc.api_call.return_value = {"ok": False,
-                                              "error": "name_taken"}
         try:
+            self.mock_sc.api_call.return_value = {"ok": False,
+                                                  "error": "name_taken"}
+            assert self.bot.create_channel(name) == name
+            self.mock_sc.api_call.return_value = {"ok": False,
+                                                  "error": "invalid_name"}
             self.bot.create_channel(name)
         except SlackAPIError as e:
-            assert 1 == 0
+            assert e.error == "invalid_name"

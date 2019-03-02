@@ -18,7 +18,7 @@ class Bot:
             channel=slack_user_id,
             text=message
         )
-        if 'ok' not in response or response['ok'] is False:
+        if 'ok' not in response or not response['ok']:
             logging.error("Direct message to {} failed with error: {}".
                           format(slack_user_id, response['error']))
             raise SlackAPIError(response['error'])
@@ -32,7 +32,7 @@ class Bot:
             attachments=attachments,
             text=message
         )
-        if 'ok' not in response or response['ok'] is False:
+        if 'ok' not in response or not response['ok']:
             logging.error("Message to channel {} failed with error: {}".
                           format(channel_name, response['error']))
             raise SlackAPIError(response['error'])
@@ -44,7 +44,7 @@ class Bot:
             "conversation.members",
             channel=channel_id
         )
-        if 'ok' not in response or response['ok'] is False:
+        if 'ok' not in response or not response['ok']:
             logging.error("User retrieval "
                           "from channel {} failed with error: {}".
                           format(channel_id, response['error']))
@@ -65,10 +65,17 @@ class Bot:
             name=channel_name,
             validate=True
         )
-        if 'ok' not in response or response['ok'] is False:
-            logging.error("Channel creation "
-                          "with name {} failed with error: {}".
-                          format(channel_name, response['error']))
+        if 'ok' not in response or not response['ok']:
+            if response['error'] == "name_taken":
+                logging.warning("Channel with name {} "
+                                "already exists!".
+                                format(channel_name))
+                return channel_name
+            else:
+                logging.error("Channel creation "
+                              "with name {} failed with error: {}".
+                              format(channel_name, response['error']))
+                raise SlackAPIError(response['error'])
         else:
             return response["name"]
 
