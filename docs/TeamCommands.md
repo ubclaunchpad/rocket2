@@ -38,14 +38,14 @@ Display options for team commands.
 ```sh
 /rocket team create GITHUB_TEAM_NAME [--name DISPLAY_NAME]
                                      [--platform PLATFORM]
-                                     [--channel]
+                                     [--channel CHANNEL]
 ```
 
 > **Note:** This command does not create the team on Github.
 
 Create a new team with a Github team name and optional display name. The user
 who runs the command will be automatically added to the new team. If the
-`--channel` flag is used, all members in the current channel will be added.
+`--channel` flag is used, all members in specified channel will be added.
 
 The Github team name cannot contain spaces.
 
