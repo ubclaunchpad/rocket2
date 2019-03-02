@@ -623,7 +623,7 @@ def test_handle_mem_event_rm_single_member(mock_logging, mem_rm_payload):
     mock_facade.query_user.return_value = [return_user]
     mock_facade.retrieve_team.return_value = return_team
     webhook_handler = WebhookHandler(mock_facade)
-    rsp, code = webhook_handler.handle_membership_event(mem_rm_payload)
+    (rsp, code) = webhook_handler.handle_membership_event(mem_rm_payload)
     mock_facade.query_user\
         .assert_called_once_with([('github_id', "21031067")])
     mock_facade.retrieve_team \
