@@ -232,11 +232,15 @@ class TestGithubInterface(TestCase):
 
     def test_tmem_get_team_member(self):
         """Test if method gets the correct member when member exists."""
-        # notice that any team id will return the same team as
-        # previously mentioned.
         assert self.test_bot.\
             get_team_member(
                 self.test_user.name, 'brussels-sprouts') is self.test_user
+
+    def test_tmem_get_nonexistent_team_member(self):
+        with self.assertRaises(GithubAPIException):
+            self.test_bot.\
+            get_team_member(
+                'inexistent_username', 'brussels-sprouts')
 
     def test_tmem_add_team_member(self):
         """Test if a user is added to a team properly."""
