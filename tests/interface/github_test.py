@@ -239,8 +239,8 @@ class TestGithubInterface(TestCase):
     def test_tmem_get_nonexistent_team_member(self):
         with self.assertRaises(GithubAPIException):
             self.test_bot.\
-            get_team_member(
-                'inexistent_username', 'brussels-sprouts')
+                    get_team_member(
+                        'inexistent_username', 'brussels-sprouts')
 
     def test_tmem_add_team_member(self):
         """Test if a user is added to a team properly."""
