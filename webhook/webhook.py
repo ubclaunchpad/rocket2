@@ -36,8 +36,10 @@ class WebhookHandler:
                     slack_ids_string += " " + str(slack_id)
                 return "deleted slack ID{}".format(slack_ids_string), 200
             elif len(member_list) > 1:
-                logging.error("Error: found github ID connected to multiple slack IDs")
-                return "Error: found github ID connected to multiple slack IDs", 412
+                logging.error("Error: found github ID connected to"
+                              " multiple slack IDs")
+                return ("Error: found github ID connected to multiple slack"
+                        " IDs", 412)
             else:
                 logging.error("could not find user {}".format(github_id))
                 return "could not find user {}".format(github_id), 404
@@ -140,6 +142,7 @@ class WebhookHandler:
             logging.error("invalid payload received: {}".
                           format(str(payload)))
             return "invalid payload", 405
+
     def handle_membership_event(self, payload):
         """
         Handle when a user is added, removed, or invited to an organization.
@@ -169,10 +172,12 @@ class WebhookHandler:
                                  .format(slack_id, team_name))
                     slack_ids_string += str(slack_id)
                 return "deleted slack ID {} from {}"\
-                           .format(slack_ids_string, team_name), 200
+                    .format(slack_ids_string, team_name), 200
             elif len(member_list) > 1:
-                logging.error("Error: found github ID connected to multiple slack IDs")
-                return "Error: found github ID connected to multiple slack IDs", 412
+                logging.error("Error: found github ID connected to"
+                              " multiple slack IDs")
+                return ("Error: found github ID connected to multiple"
+                        " slack IDs", 412)
             else:
                 logging.error("could not find user {}".format(github_id))
                 return "could not find user {}".format(github_id), 404
