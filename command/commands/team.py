@@ -175,14 +175,14 @@ class TeamCommand:
 
     def create_helper(self, param_list):
         """
-        Creates Team and calls GitHub API to create in GitHub.
+        Create Team and calls GitHub API to create in GitHub.
 
         If ``param_list[name]`` is not ``None``, will
         add a display name. If ``param_list[channel] is not
         ``None``, will add all members of channel in which the
         command was called into the team.
         :param param_list: List of parameters for creating team
-        :return: returns error message if team created unsuccessfully
+        :return: return error message if team created unsuccessfully
                     otherwise returns success message
         """
         try:

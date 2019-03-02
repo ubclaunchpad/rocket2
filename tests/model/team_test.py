@@ -119,9 +119,11 @@ def test_print():
     team = Team("1", "brussel-sprouts", "Brussel Sprouts")
     new_slack_id = "U0G9QF9C6"
     team.add_member(new_slack_id)
+    team.add_team_lead(new_slack_id)
     team.platform = "web"
     assert str(team) == "{'github_team_id': '1'," \
                         " 'github_team_name': 'brussel-sprouts'," \
                         " 'display_name': 'Brussel Sprouts'," \
                         " 'platform': 'web'," \
-                        " 'members': {'U0G9QF9C6'}}"
+                        " 'members': {'U0G9QF9C6'}}" \
+                        " 'team_leads': {'U0G9QF9C6'}"
