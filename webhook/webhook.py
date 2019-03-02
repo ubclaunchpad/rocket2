@@ -27,7 +27,7 @@ class WebhookHandler:
         if action == "member_removed":
             member_list = self.__facade.\
                 query_user([('github_id', github_id)])
-            if len(member_list) > 0:
+            if len(member_list) == 1:
                 slack_ids_string = ""
                 for member in member_list:
                     slack_id = member.slack_id
@@ -35,6 +35,9 @@ class WebhookHandler:
                     logging.info("deleted slack user {}".format(slack_id))
                     slack_ids_string += " " + str(slack_id)
                 return "deleted slack ID{}".format(slack_ids_string), 200
+            elif len(member_list) > 1:
+                logging.error("Error: found github ID connected to multiple slack IDs")
+                return "Error: found github ID connected to multiple slack IDs", 412
             else:
                 logging.error("could not find user {}".format(github_id))
                 return "could not find user {}".format(github_id), 404
@@ -164,12 +167,12 @@ class WebhookHandler:
                     selected_team.discard_member(github_id)
                     logging.info("deleted slack user {} from {}"
                                  .format(slack_id, team_name))
-                    slack_ids_string += str(slack_id) + ""
+                    slack_ids_string += str(slack_id)
                 return "deleted slack ID {} from {}"\
                            .format(slack_ids_string, team_name), 200
             elif len(member_list) > 1:
-                logging.info("Error: found github ID connected to multiple slack IDs")
-                return "Error: found github ID connected to multiple slack IDs", 404
+                logging.error("Error: found github ID connected to multiple slack IDs")
+                return "Error: found github ID connected to multiple slack IDs", 412
             else:
                 logging.error("could not find user {}".format(github_id))
                 return "could not find user {}".format(github_id), 404
@@ -183,7 +186,7 @@ class WebhookHandler:
                     slack_id = member.get_slack_id()
                     logging.info("user {} added to {}".
                                  format(github_username, team_name))
-                    slack_ids_string = slack_ids_string + " " + str(slack_id)
+                    slack_ids_string += " " + str(slack_id)
                 return "added slack ID{}".format(slack_ids_string), 200
             else:
                 logging.error("could not find user {}".format(github_id))

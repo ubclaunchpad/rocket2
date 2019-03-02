@@ -36,7 +36,7 @@ def org_default_payload():
                     "events_url": "",
                     "received_events_url": "",
                     "type": "User",
-                    "site_admin": False
+                    "site_admin": "False"
                 }
             },
             "organization": {
@@ -71,7 +71,7 @@ def org_default_payload():
                 "events_url": "",
                 "received_events_url": "",
                 "type": "User",
-                "site_admin": False
+                "site_admin": "False"
             }
         }
     return default_payload
@@ -365,10 +365,10 @@ def test_handle_org_event_rm_mult_members(mock_logging, org_rm_payload):
     rsp, code = webhook_handler.handle_organization_event(org_rm_payload)
     mock_facade.query_user\
         .assert_called_once_with([('github_id', "39652351")])
-    assert mock_facade.delete_user.call_count is 3
-    assert mock_logging.info.call_count is 3
-    assert rsp == "deleted slack ID SLACKUSER1 SLACKUSER2 SLACKUSER3"
-    assert code == 200
+    mock_logging.error.assert_called_once_with("Error: found github ID "
+                                               "connected to multiple slack IDs")
+    assert rsp == "Error: found github ID connected to multiple slack IDs"
+    assert code == 412
 
 
 @mock.patch('webhook.webhook.logging')
@@ -512,7 +512,7 @@ def mem_default_payload():
                 "events_url": "https://api.github.com/users/Codertocat/events{/privacy}",
                 "received_events_url": "https://api.github.com/users/Codertocat/received_events",
                 "type": "User",
-                "site_admin": False
+                "site_admin": "False"
             },
             "sender": {
                 "login": "Codertocat",
@@ -532,7 +532,7 @@ def mem_default_payload():
                 "events_url": "https://api.github.com/users/Codertocat/events{/privacy}",
                 "received_events_url": "https://api.github.com/users/Codertocat/received_events",
                 "type": "User",
-                "site_admin": False
+                "site_admin": "False"
             },
             "team": {
                 "name": "rocket",
@@ -617,9 +617,6 @@ def test_handle_mem_event_rm_single_member(mock_logging, mem_rm_payload):
     return_user = User("SLACKID")
     return_team = Team("2723476", "rocket", "rocket")
     return_team.add_member("21031067")
-    #total_members = len(return_team.get_members)
-    #assert len(return_team.get_members) == total_members - 1
-
     mock_facade.query_user.return_value = [return_user]
     mock_facade.retrieve_team.return_value = return_team
     webhook_handler = WebhookHandler(mock_facade)
@@ -628,7 +625,9 @@ def test_handle_mem_event_rm_single_member(mock_logging, mem_rm_payload):
         .assert_called_once_with([('github_id', "21031067")])
     mock_facade.retrieve_team \
         .assert_called_once_with("2723476")
-    mock_logging.info.assert_called_once_with("deleted slack user SLACKID from rocket")
+    mock_logging.info.assert_called_once_with("deleted slack user SLACKID"
+                                              " from rocket")
+    assert not return_team.is_member("21031067")
     assert rsp == "deleted slack ID SLACKID from rocket"
     assert code == 200
 
@@ -659,16 +658,10 @@ def test_handle_mem_event_rm_mult_members(mock_logging, mem_rm_payload):
     rsp, code = webhook_handler.handle_membership_event(mem_rm_payload)
     mock_facade.query_user\
         .assert_called_once_with([('github_id', "21031067")])
+    mock_logging.error.assert_called_once_with("Error: found github ID "
+                                               "connected to multiple slack IDs")
     assert rsp == "Error: found github ID connected to multiple slack IDs"
-    assert code == 404
-
-
-    '''
-    assert mock_facade.delete_user.call_count is 3
-    assert mock_logging.info.call_count is 3
-    assert rsp == "deleted slack ID SLACKUSER1 SLACKUSER2 SLACKUSER3"
-    assert code == 200
-    '''
+    assert code == 412
 
 
 @mock.patch('webhook.webhook.logging')
