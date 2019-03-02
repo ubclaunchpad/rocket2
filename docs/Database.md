@@ -18,6 +18,7 @@ Attribute Name | Description
 `bio` | `String`; A short (auto)biography
 `image_url` | `String`; The user's avatar image URL
 `permission_level` | `String`; The user's permission level
+`karma` | `Integer`; The user's karma points
 
 The user's permission level is one of [`member`, `admin`, `team_lead`].
 

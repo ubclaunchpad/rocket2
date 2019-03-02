@@ -1,14 +1,19 @@
 """All necessary class initializations."""
+import os
+import random
+import string
+import toml
+
+from command.core import Core
+from command.commands.token import TokenCommandConfig
+from datetime import timedelta
 from db.facade import DBFacade
 from db.dynamodb import DynamoDB
-from command.core import Core
-from slackclient import SlackClient
-from interface.slack import Bot
-from webhook.webhook import WebhookHandler
-from github import Github, GithubException
-import toml
+from github import Github
 from interface.github import GithubInterface
-import logging
+from interface.slack import Bot
+from slackclient import SlackClient
+from webhook.webhook import WebhookHandler
 
 
 def make_core(config, gh=None):
@@ -17,7 +22,9 @@ def make_core(config, gh=None):
 
     :return: a new ``Core`` object, freshly initialized
     """
-    slack_api_token, github_api_token, github_organization = "", "", ""
+    slack_api_token = ""
+    github_api_token, github_organization = "", ""
+    signing_key = ""
     if not config['testing']:
         slack_api_token = toml.load(
             config['slack']['creds_path'])['api_token']
@@ -25,9 +32,16 @@ def make_core(config, gh=None):
             config['github']['creds_path'])['api_token']
         github_organization = config['github']['organization']
         gh = GithubInterface(Github(github_api_token), github_organization)
+        if os.path.isfile(config['auth']['signing_key_path']):
+            signing_key = open(config['auth']['signing_key_path']).read()
+        else:
+            signing_key = create_signing_token()
+            open(config['auth']['signing_key_path'], 'w+').write(signing_key)
     facade = DBFacade(DynamoDB(config))
     bot = Bot(SlackClient(slack_api_token))
-    return Core(facade, bot, gh)
+    # TODO: make token config expiry configurable
+    token_config = TokenCommandConfig(timedelta(days=7), signing_key)
+    return Core(facade, bot, gh, token_config)
 
 
 def make_webhook_handler(config):
@@ -38,3 +52,8 @@ def make_webhook_handler(config):
     """
     facade = DBFacade(DynamoDB(config))
     return WebhookHandler(facade)
+
+
+def create_signing_token():
+    """Create a new, random signing token."""
+    return ''.join(random.choice(string.ascii_lowercase) for _ in range(24))
