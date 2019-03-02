@@ -1,5 +1,6 @@
 """Calls the appropriate handler depending on the event data."""
 from command.commands.user import UserCommand
+from command.commands.token import TokenCommand
 import command.util as util
 from model.user import User
 from interface.slack import SlackAPIError
@@ -10,13 +11,14 @@ from flask import jsonify
 class Core:
     """Encapsulate methods for handling events."""
 
-    def __init__(self, db_facade, bot, gh_interface):
+    def __init__(self, db_facade, bot, gh_interface, token_config):
         """Initialize the dictionary of command handlers."""
         self.__commands = {}
         self.__facade = db_facade
         self.__bot = bot
         self.__github = gh_interface
         self.__commands["user"] = UserCommand(self.__facade, self.__github)
+        self.__commands["token"] = TokenCommand(self.__facade, token_config)
 
     def handle_app_command(self, cmd_txt, user):
         """
@@ -73,8 +75,8 @@ class Core:
                    "mrkdwn": "true"}
         attachments = []
         for cmd in self.__commands.values():
-            cmd_name = cmd.get_name()
-            cmd_text = "*" + cmd_name + ":* " + cmd.get_desc()
+            cmd_name = cmd.command_name
+            cmd_text = "*" + cmd_name + ":* " + cmd.desc
             attachment = {"text": cmd_text, "mrkdwn_in": ["text"]}
             attachments.append(attachment)
         message["attachments"] = attachments

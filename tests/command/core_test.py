@@ -1,12 +1,13 @@
 """Test the core event handler."""
-from unittest import mock
 from command.core import Core
+from command.commands.user import UserCommand
+from command.commands.token import TokenCommandConfig
+from datetime import datetime
+from db.facade import DBFacade
+from flask import jsonify, json, Flask
 from interface.slack import Bot, SlackAPIError
 from interface.github import GithubInterface
-from db.facade import DBFacade
-from slackclient import SlackClient
-from command.commands.user import UserCommand
-from flask import jsonify, json, Flask
+from unittest import mock
 
 
 @mock.patch('command.core.logging')
@@ -15,7 +16,8 @@ def test_handle_invalid_mention(mock_logging):
     mock_facade = mock.MagicMock(DBFacade)
     mock_bot = mock.MagicMock(Bot)
     mock_gh = mock.MagicMock(GithubInterface)
-    core = Core(mock_facade, mock_bot, mock_gh)
+    mock_token_config = TokenCommandConfig(datetime.utcnow(), '')
+    core = Core(mock_facade, mock_bot, mock_gh, mock_token_config)
     core.handle_app_command('hello world', 'U061F7AUR')
     expected_log_message = "app command triggered incorrectly"
     mock_logging.error.assert_called_once_with(expected_log_message)
@@ -28,9 +30,10 @@ def test_handle_invalid_command(mock_logging, mock_usercommand):
     mock_facade = mock.MagicMock(DBFacade)
     mock_bot = mock.MagicMock(Bot)
     mock_gh = mock.MagicMock(GithubInterface)
+    mock_token_config = TokenCommandConfig(datetime.utcnow(), '')
     mock_usercommand.handle.side_effect = KeyError
     user = 'U061F7AUR'
-    core = Core(mock_facade, mock_bot, mock_gh)
+    core = Core(mock_facade, mock_bot, mock_gh, mock_token_config)
     core.handle_app_command('fake command', user)
     error_txt = "Please enter a valid command."
 
@@ -44,7 +47,8 @@ def test_handle_help(mock_logging):
     mock_facade = mock.MagicMock(DBFacade)
     mock_bot = mock.MagicMock(Bot)
     mock_gh = mock.MagicMock(GithubInterface)
-    core = Core(mock_facade, mock_bot, mock_gh)
+    mock_token_config = TokenCommandConfig(datetime.utcnow(), '')
+    core = Core(mock_facade, mock_bot, mock_gh, mock_token_config)
     with app.app_context():
         resp, code = core.handle_app_command("help", "U061F7AUR")
         expect = json.loads(
@@ -56,6 +60,9 @@ def test_handle_help(mock_logging):
                      "mrkdwn": "true",
                      "attachments": [
                          {"text": "*user:* for dealing with users",
+                          "mrkdwn_in": ["text"]},
+                         {"text": "*token:* Generate a signed "
+                                  "token for use with the HTTP API",
                           "mrkdwn_in": ["text"]}]}).data)
         resp = json.loads(resp.data)
     assert resp == expect
@@ -68,10 +75,11 @@ def test_handle_user_command(mock_logging, mock_usercommand):
     mock_facade = mock.MagicMock(DBFacade)
     mock_bot = mock.MagicMock(Bot)
     mock_gh = mock.MagicMock(GithubInterface)
-    core = Core(mock_facade, mock_bot, mock_gh)
+    mock_token_config = TokenCommandConfig(datetime.utcnow(), '')
+    core = Core(mock_facade, mock_bot, mock_gh, mock_token_config)
     core.handle_app_command('user name', 'U061F7AUR')
-    mock_usercommand.\
-        return_value.handle.\
+    mock_usercommand. \
+        return_value.handle. \
         assert_called_once_with("user name", "U061F7AUR")
 
 
@@ -81,6 +89,7 @@ def test_handle_team_join_success(mock_logging):
     mock_facade = mock.MagicMock(DBFacade)
     mock_bot = mock.MagicMock(Bot)
     mock_gh = mock.MagicMock(GithubInterface)
+    mock_token_config = TokenCommandConfig(datetime.utcnow(), '')
     event = {
         "token": "XXYYZZ",
         "team_id": "TXXXXXXXX",
@@ -133,7 +142,7 @@ def test_handle_team_join_success(mock_logging):
         "event_id": "Ev08MFMKH6",
         "event_time": 1234567890
     }
-    core = Core(mock_facade, mock_bot, mock_gh)
+    core = Core(mock_facade, mock_bot, mock_gh, mock_token_config)
     core.handle_team_join(event)
     welcome = 'Welcome to UBC Launch Pad!'
     id = "W012A3CDE"
@@ -149,6 +158,7 @@ def test_handle_team_join_slack_error(mock_logging):
     mock_facade = mock.MagicMock(DBFacade)
     mock_bot = mock.MagicMock(Bot)
     mock_gh = mock.MagicMock(GithubInterface)
+    mock_token_config = TokenCommandConfig(datetime.utcnow(), '')
     mock_bot.send_dm.side_effect = SlackAPIError(None)
     event = {
         "token": "XXYYZZ",
@@ -202,7 +212,7 @@ def test_handle_team_join_slack_error(mock_logging):
         "event_id": "Ev08MFMKH6",
         "event_time": 1234567890
     }
-    core = Core(mock_facade, mock_bot, mock_gh)
+    core = Core(mock_facade, mock_bot, mock_gh, mock_token_config)
     core.handle_team_join(event)
     welcome = 'Welcome to UBC Launch Pad!'
     id = "W012A3CDE"
