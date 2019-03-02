@@ -366,7 +366,8 @@ def test_handle_org_event_rm_mult_members(mock_logging, org_rm_payload):
     mock_facade.query_user\
         .assert_called_once_with([('github_id', "39652351")])
     mock_logging.error.assert_called_once_with("Error: found github ID "
-                                               "connected to multiple slack IDs")
+                                               "connected to multiple"
+                                               " slack IDs")
     assert rsp == "Error: found github ID connected to multiple slack IDs"
     assert code == 412
 
@@ -487,6 +488,8 @@ def test_handle_team_event_empty_payload(team_empty_payload):
     webhook_handler = WebhookHandler(mock_facade)
     rsp, code = webhook_handler.handle_team_event(team_empty_payload)
     assert rsp == "invalid payload"
+
+
 @pytest.fixture
 def mem_default_payload():
     """Provide the basic structure for an membership payload."""
@@ -498,19 +501,19 @@ def mem_default_payload():
                 "login": "Codertocat",
                 "id": "21031067",
                 "node_id": "MDQ6VXNlcjIxMDMxMDY3",
-                "avatar_url": "https://avatars1.githubusercontent.com/u/21031067?v=4",
+                "avatar_url": "",
                 "gravatar_id": "",
-                "url": "https://api.github.com/users/Codertocat",
-                "html_url": "https://github.com/Codertocat",
-                "followers_url": "https://api.github.com/users/Codertocat/followers",
-                "following_url": "https://api.github.com/users/Codertocat/following{/other_user}",
-                "gists_url": "https://api.github.com/users/Codertocat/gists{/gist_id}",
-                "starred_url": "https://api.github.com/users/Codertocat/starred{/owner}{/repo}",
-                "subscriptions_url": "https://api.github.com/users/Codertocat/subscriptions",
-                "organizations_url": "https://api.github.com/users/Codertocat/orgs",
-                "repos_url": "https://api.github.com/users/Codertocat/repos",
-                "events_url": "https://api.github.com/users/Codertocat/events{/privacy}",
-                "received_events_url": "https://api.github.com/users/Codertocat/received_events",
+                "url": "",
+                "html_url": "",
+                "followers_url": "",
+                "following_url": "",
+                "gists_url": "",
+                "starred_url": "",
+                "subscriptions_url": "",
+                "organizations_url": "",
+                "repos_url": "",
+                "events_url": "",
+                "received_events_url": "",
                 "type": "User",
                 "site_admin": "False"
             },
@@ -518,19 +521,19 @@ def mem_default_payload():
                 "login": "Codertocat",
                 "id": "21031067",
                 "node_id": "MDQ6VXNlcjIxMDMxMDY3",
-                "avatar_url": "https://avatars1.githubusercontent.com/u/21031067?v=4",
+                "avatar_url": "",
                 "gravatar_id": "",
-                "url": "https://api.github.com/users/Codertocat",
-                "html_url": "https://github.com/Codertocat",
-                "followers_url": "https://api.github.com/users/Codertocat/followers",
-                "following_url": "https://api.github.com/users/Codertocat/following{/other_user}",
-                "gists_url": "https://api.github.com/users/Codertocat/gists{/gist_id}",
-                "starred_url": "https://api.github.com/users/Codertocat/starred{/owner}{/repo}",
-                "subscriptions_url": "https://api.github.com/users/Codertocat/subscriptions",
-                "organizations_url": "https://api.github.com/users/Codertocat/orgs",
-                "repos_url": "https://api.github.com/users/Codertocat/repos",
-                "events_url": "https://api.github.com/users/Codertocat/events{/privacy}",
-                "received_events_url": "https://api.github.com/users/Codertocat/received_events",
+                "url": "",
+                "html_url": "",
+                "followers_url": "",
+                "following_url": "",
+                "gists_url": "",
+                "starred_url": "",
+                "subscriptions_url": "",
+                "organizations_url": "",
+                "repos_url": "",
+                "events_url": "",
+                "received_events_url": "",
                 "type": "User",
                 "site_admin": "False"
             },
@@ -541,23 +544,23 @@ def mem_default_payload():
                 "slug": "rocket",
                 "description": "hub hub hubber-one",
                 "privacy": "closed",
-                "url": "https://api.github.com/teams/2723476",
-                "members_url": "https://api.github.com/teams/2723476/members{/member}",
-                "repositories_url": "https://api.github.com/teams/2723476/repos",
+                "url": "",
+                "members_url": "",
+                "repositories_url": "",
                 "permission": "pull"
             },
             "organization": {
                 "login": "Octocoders",
                 "id": "38302899",
-                "node_id": "MDEyOk9yZ2FuaXphdGlvbjM4MzAyODk5",
-                "url": "https://api.github.com/orgs/Octocoders",
-                "repos_url": "https://api.github.com/orgs/Octocoders/repos",
-                "events_url": "https://api.github.com/orgs/Octocoders/events",
-                "hooks_url": "https://api.github.com/orgs/Octocoders/hooks",
-                "issues_url": "https://api.github.com/orgs/Octocoders/issues",
-                "members_url": "https://api.github.com/orgs/Octocoders/members{/member}",
-                "public_members_url": "https://api.github.com/orgs/Octocoders/public_members{/member}",
-                "avatar_url": "https://avatars1.githubusercontent.com/u/38302899?v=4",
+                "node_id": "",
+                "url": "",
+                "repos_url": "",
+                "events_url": "",
+                "hooks_url": "",
+                "issues_url": "",
+                "members_url": "",
+                "public_members_url": "",
+                "avatar_url": "",
                 "description": ""
             }
         }
@@ -659,7 +662,8 @@ def test_handle_mem_event_rm_mult_members(mock_logging, mem_rm_payload):
     mock_facade.query_user\
         .assert_called_once_with([('github_id', "21031067")])
     mock_logging.error.assert_called_once_with("Error: found github ID "
-                                               "connected to multiple slack IDs")
+                                               "connected to multiple"
+                                               " slack IDs")
     assert rsp == "Error: found github ID connected to multiple slack IDs"
     assert code == 412
 
