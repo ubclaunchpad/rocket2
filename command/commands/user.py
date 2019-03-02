@@ -198,7 +198,10 @@ class UserCommand:
                          .format(user_id))
 
         self.facade.store_user(edited_user)
-        return "User edited: " + str(edited_user) + msg, 200
+        ret = {'attachments': [edited_user.get_attachment()]}
+        if msg != "":
+            ret['text'] = msg
+        return jsonify(ret), 200
 
     def delete_helper(self, user_id, slack_id):
         """
