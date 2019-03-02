@@ -165,7 +165,7 @@ class WebhookHandler:
                 query_user([('github_id', github_id)])
             slack_ids_string = ""
             if len(member_list) == 1:
-                slack_id = member_list[0].get_slack_id()
+                slack_id = member_list[0].slack_id
                 if selected_team.is_member(github_id):
                     selected_team.discard_member(github_id)
                     logging.info("deleted slack user {} from {}"
@@ -188,7 +188,7 @@ class WebhookHandler:
             if len(member_list) > 0:
                 selected_team.add_member(github_id)
                 for member in member_list:
-                    slack_id = member.get_slack_id()
+                    slack_id = member.slack_id
                     logging.info("user {} added to {}".
                                  format(github_username, team_name))
                     slack_ids_string += " " + str(slack_id)
