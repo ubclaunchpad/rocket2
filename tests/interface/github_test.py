@@ -237,6 +237,7 @@ class TestGithubInterface(TestCase):
                 self.test_user.name, 'brussels-sprouts') is self.test_user
 
     def test_tmem_get_nonexistent_team_member(self):
+        """Test if raises GithubException when memeber does not exist."""
         with self.assertRaises(GithubAPIException):
             self.test_bot.\
                     get_team_member(
