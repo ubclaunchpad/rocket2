@@ -43,7 +43,7 @@ Display options for team commands.
 ```
 
 Create a new team with a Github team name and optional display name. The user
-who runs the command will be automatically added to team and as Team Lead. If the
+who runs the command will be automatically added to team as Team Lead. If the
 `--lead` flag is used, user with `SLACK_ID` will be added as Team Lead
 instead. If the `--channel` flag is used, all members in specified
 channel will be added. 'SLACK_ID' is the `@`-name, for easy slack autocomplete.
@@ -93,9 +93,10 @@ are a part of, but admins can remove users from any team. `SLACK_ID` is the
 /rocket team lead SLACK_ID
 ```
 
-Adds a user as Team Lead, and adds them to team if not already added. Team Leads can
-only promote users in teams that they are part of, but admins can promote users
-in any team. 'SLACK_ID' is the `@`-name, for easy slack autocomplete.
+Adds a user as Team Lead, and adds them to team if not already added.
+Team Leads can only promote users in teams that they are part
+of, but admins can promote users in any team. 'SLACK_ID' is the
+`@`-name, for easy slack autocomplete.
 
 ### Delete (Team Lead\* and Admin only)
 
