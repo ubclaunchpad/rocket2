@@ -125,5 +125,5 @@ def test_print():
                         " 'github_team_name': 'brussel-sprouts'," \
                         " 'display_name': 'Brussel Sprouts'," \
                         " 'platform': 'web'," \
-                        " 'members': {'U0G9QF9C6'}}" \
-                        " 'team_leads': {'U0G9QF9C6'}"
+                        " 'team_leads': {'U0G9QF9C6'}," \
+                        " 'members': {'U0G9QF9C6'}}"
