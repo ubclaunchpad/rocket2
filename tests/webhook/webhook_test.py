@@ -349,7 +349,7 @@ def test_handle_org_event_rm_member_missing(mock_logging, org_rm_payload):
     mock_facade.query_user\
         .assert_called_once_with([('github_id', "39652351")])
     mock_logging.error.assert_called_once_with("could not find user 39652351")
-    assert rsp == "could not find user 39652351"
+    assert rsp == "could not find user hacktocat"
     assert code == 404
 
 
@@ -611,6 +611,18 @@ def test_handle_mem_event_add_member(mock_logging, mem_add_payload):
                                                "to rocket"))
     assert rsp == "added slack ID SLACKID"
     assert code == 200
+
+
+@mock.patch('webhook.webhook.logging')
+def test_handle_mem_event_add_missing_member(mock_logging, mem_add_payload):
+    """Test that instances when members are added to the mem are logged."""
+    mock_facade = mock.MagicMock(DBFacade)
+    mock_facade.query_user.return_value = []
+    webhook_handler = WebhookHandler(mock_facade)
+    rsp, code = webhook_handler.handle_membership_event(mem_add_payload)
+    mock_logging.error.assert_called_once_with("could not find user 21031067")
+    assert rsp == "could not find user Codertocat"
+    assert code == 404
 
 
 @mock.patch('webhook.webhook.logging')
