@@ -68,3 +68,38 @@ class TestBot(TestCase):
                 attachments=[],
                 channel="#random"
             )
+
+    def test_get_channel_users(self):
+        """Test the bot method get_channel_users()."""
+        bot = Bot(self.mock_sc)
+        ids = ["U12314", "U42839", "U31055"]
+        self.mock_sc.api_call.return_value = """
+            {
+                "ok": true,
+                "members": [
+                    "U12314",
+                    "U42839",
+                    "U31055"
+                ]
+            }"""
+
+        assert bot.get_channel_users("C1234441") == ids
+        self.mock_sc.api_call.assert_called_with(
+            'conversation.members',
+            channel="C1234441"
+        )
+
+    def test_get_channel_users_failure(self):
+        """Test get_channel_users() when Slack API call fails."""
+        bot = Bot(self.mock_sc)
+        self.mock_sc.api_call = mock.MagicMock(return_value={"error": "Error"})
+
+        try:
+            bot.get_channel_users("C1234441")
+        except SlackAPIError as e:
+            assert e.error == "Error"
+        finally:
+            self.mock_sc.api_call.assert_called_with(
+                'conversation.members',
+                channel="C1234441"
+            )
