@@ -24,9 +24,9 @@ class WebhookHandler:
         github_id = github_user["id"]
         github_username = github_user["login"]
         organization = payload["organization"]["login"]
+        member_list = self.__facade.\
+            query_user([('github_id', github_id)])
         if action == "member_removed":
-            member_list = self.__facade.\
-                query_user([('github_id', github_id)])
             if len(member_list) == 1:
                 slack_ids_string = ""
                 for member in member_list:
@@ -42,7 +42,7 @@ class WebhookHandler:
                         " IDs", 412)
             else:
                 logging.error("could not find user {}".format(github_id))
-                return "could not find user {}".format(github_id), 404
+                return "could not find user {}".format(github_username), 404
         elif action == "member_added":
             logging.info("user {} added to {}".
                          format(github_username, organization))
@@ -195,7 +195,7 @@ class WebhookHandler:
                 return "added slack ID{}".format(slack_ids_string), 200
             else:
                 logging.error("could not find user {}".format(github_id))
-                return "could not find user {}".format(github_id), 404
+                return "could not find user {}".format(github_username), 404
 
         elif action == "member_invited":
             logging.info("user {} invited to {}".
