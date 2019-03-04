@@ -219,29 +219,28 @@ class TestUserCommand(TestCase):
         user = User("U0G9QF9C6")
         self.mock_facade.retrieve.return_value = user
         self.mock_github.org_add_member.side_effect = GithubAPIException("")
-        self.assertEqual(self.testcommand.handle("user edit --github rob",
-                                                 "U0G9QF9C6"),
-                         ("User edited: " +
-                         str(user) +
-                         "\nError adding user rob to GitHub organization",
-                          200))
+        user_attaches = [user.get_attachment()]
+
+        with self.app.app_context():
+            resp, code = self.testcommand.handle('user edit --github rob',
+                                                 'U0G9QF9C6')
+            expect = {
+                'attachments': user_attaches,
+                'text': '\nError adding user rob to GitHub organization'
+            }
+
+            expect = json.loads(jsonify(expect).data)
+            resp = json.loads(resp.data)
+
+            self.assertDictEqual(resp, expect)
+            self.assertEqual(code, 200)
+
         self.mock_facade.retrieve.assert_called_once_with(User, "U0G9QF9C6")
         self.mock_facade.store.assert_called_once_with(user)
 
     def test_handle_edit_other_user(self):
         """Test user command edit parser with all fields."""
         user = User("ABCDE89JK")
-        user.permissions_level = Permissions.admin
-        self.mock_facade.retrieve.return_value = user
-        self.assertEqual(self.testcommand.handle(
-            "user edit --member U0G9QF9C6 "
-            "--name rob "
-            "--email rob@rob.com --pos dev --github"
-            " rob@.github.com --major 'Computer Science'"
-            " --bio 'Im a human'",
-            "U0G9QF9C6"),
-                         ("User edited: " + str(user), 200))
-        self.mock_facade.retrieve.assert_any_call(User, "U0G9QF9C6")
         user.name = "rob"
         user.email = "rob@rob.com"
         user.position = "dev"
@@ -264,12 +263,6 @@ class TestUserCommand(TestCase):
             self.assertDictEqual(resp, expect)
             self.assertEqual(code, 200)
         self.mock_facade.retrieve.assert_any_call(User, "U0G9QF9C6")
-        user.name = "rob"
-        user.email = "rob@rob.com"
-        user.position = "dev"
-        user.github_username = "rob@.github.com"
-        user.major = "Computer Science"
-        user.biography = "Im a human"
         self.mock_facade.store.assert_called_once_with(user)
 
     def test_handle_edit_not_admin(self):
@@ -295,7 +288,7 @@ class TestUserCommand(TestCase):
         rets = [editor, editee]
         editor.permissions_level = Permissions.admin
         editee.permissions_level = Permissions.admin
-        self.mock_facade.retrieve.side_effect = rets.get
+        self.mock_facade.retrieve.side_effect = rets
         editee_attaches = [editee.get_attachment()]
         with self.app.app_context():
             resp, code = self.testcommand.handle(
