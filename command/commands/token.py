@@ -4,6 +4,7 @@ import logging
 
 from datetime import datetime
 from model.permissions import Permissions
+from model.user import User
 
 
 class TokenCommand:
@@ -33,7 +34,7 @@ class TokenCommand:
         """Handle request for token."""
         logging.debug("Handling token command")
         try:
-            user = self.facade.retrieve_user(user_id)
+            user = self.facade.retrieve(User, user_id)
             if user.permissions_level == Permissions.member:
                 return self.permission_error, 403
         except LookupError:
