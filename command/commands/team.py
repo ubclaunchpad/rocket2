@@ -203,4 +203,4 @@ class TeamCommand:
         except GithubAPIException as e:
             logging.error("team created unsuccessfully")
             return "Team created unsuccessfully with the following error"\
-                   + e.data
+                   + e.data, 200
