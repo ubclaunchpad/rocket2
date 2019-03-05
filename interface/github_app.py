@@ -64,7 +64,7 @@ class GithubAppInterface:
 
         def __init__(self, app_id, private_key):
             """Initialize Github App authentication."""
-            expiry = datetime.utcnow() + timedelta(minutes=10)
+            expiry = (datetime.utcnow() + timedelta(minutes=10)).timestamp()
             payload = {
                 'iat': datetime.utcnow(),
                 'exp': expiry,
@@ -78,4 +78,4 @@ class GithubAppInterface:
 
         def is_expired(self):
             """Check if Github App token is expired."""
-            return datetime.utcnow() >= self.expiry
+            return datetime.utcnow() >= datetime.fromtimestamp(self.expiry)
