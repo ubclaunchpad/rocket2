@@ -80,6 +80,7 @@ def test_get_app_details(mock_request):
         'Authorization': f'Bearer {mock_token}',
         'Accept': 'application/vnd.github.machine-man-preview+json'
     }
+    mock_request.return_value.status_code = 200
 
     app_interface.get_app_details()
 
@@ -117,9 +118,11 @@ def test_create_api_token(mock_post, mock_get):
 
     mock_ret_val = "token"
     mock_id = 7
+    mock_get.return_value.status_code = 200
     mock_get.return_value.json.return_value = [{
         'id': mock_id
     }]
+    mock_post.return_value.status_code = 201
     mock_post.return_value.json.return_value = {
         'token': "token"
     }

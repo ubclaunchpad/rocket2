@@ -1,5 +1,6 @@
 """Utility classes for interacting with Github API via PyGithub."""
 from github import Github, GithubObject, GithubException
+from interface.exceptions.github import GithubAPIException
 from interface.github_app import GithubAppInterface, \
     DefaultGithubAppAuthFactory
 
@@ -153,18 +154,6 @@ class GithubInterface:
             team.remove_membership(to_be_removed_member)
         except GithubException as e:
             raise GithubAPIException(e.data)
-
-
-class GithubAPIException(Exception):
-    """Exception representing an error while calling Github API."""
-
-    def __init__(self, data):
-        """
-        Initialize a new GithubAPIException.
-
-        :param data:
-        """
-        self.data = data
 
 
 class DefaultGithubFactory:

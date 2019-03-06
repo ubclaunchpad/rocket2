@@ -9,7 +9,6 @@ import toml
 import structlog
 from flask_talisman import Talisman
 
-
 dictConfig({
     'version': 1,
     'disable_existing_loggers': False,
@@ -23,9 +22,11 @@ dictConfig({
             'datefmt': '%Y-%m-%d %H:%M:%S',
         },
         "colored": {
-            'format': '{Time: %(asctime)s, Level: [%(levelname)s], ' +
-            'module: %(module)s, function: %(funcName)s():%(lineno)s, ' +
-            'message: %(message)s}',
+            'format': '{Time: %(asctime)s, '
+                      'Level: [%(levelname)s], ' +
+                      'module: %(module)s, '
+                      'function: %(funcName)s():%(lineno)s, ' +
+                      'message: %(message)s}',
             "()": structlog.stdlib.ProcessorFormatter,
             "processor": structlog.dev.ConsoleRenderer(colors=True),
             'datefmt': '%Y-%m-%d %H:%M:%S',
@@ -44,26 +45,19 @@ dictConfig({
     }
 })
 
-try:
-    app = Flask(__name__)
-    # HTTP security header middleware for Flask
-    talisman = Talisman(app)
-    # anti-CSRF middleware for Flask
-    config = toml.load('config.toml')
-    core = make_core(config)
-    webhook_handler = make_webhook_handler(config)
-    if not config['testing']:
-        slack_signing_secret = toml.load(
-            config['slack']['creds_path'])['signing_secret']
-    else:
-        slack_signing_secret = ""
-    slack_events_adapter = SlackEventAdapter(slack_signing_secret,
-                                             "/slack/events", app)
-except Exception as e:
-    # A bit of a hack to catch exceptions
-    # that Gunicorn/uWSGI would swallow otherwise
-    logging.error(e)
-    sys.exit(1)
+app = Flask(__name__)
+# HTTP security header middleware for Flask
+talisman = Talisman(app)
+config = toml.load('config.toml')
+core = make_core(config)
+webhook_handler = make_webhook_handler(config)
+if not config['testing']:
+    slack_signing_secret = toml.load(
+        config['slack']['creds_path'])['signing_secret']
+else:
+    slack_signing_secret = ""
+slack_events_adapter = SlackEventAdapter(slack_signing_secret,
+                                         "/slack/events", app)
 
 
 @app.route('/')

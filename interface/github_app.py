@@ -1,7 +1,9 @@
 """Interface to Github App API."""
 from datetime import datetime, timedelta
+from interface.exceptions.github import GithubAPIException
 import jwt
 import requests
+import logging
 
 
 class GithubAppInterface:
@@ -28,13 +30,17 @@ class GithubAppInterface:
         """
         url = "https://api.github.com/app"
         headers = self._gen_headers()
-        return requests.get(url=url, headers=headers).json()
+        r = requests.get(url=url, headers=headers)
+        if r.status_code != 200:
+            raise GithubAPIException(r.text)
+        return r.json()
 
     def create_api_token(self):
         """
         Create installation token to make Github API requests.
 
         See
+        https://developer.github.com/v3/apps/#find-installations and
         https://developer.github.com/v3/apps/#create-a-new-installation-token
         for details.
 
@@ -42,12 +48,18 @@ class GithubAppInterface:
         """
         url = "https://api.github.com/app/installations"
         headers = self._gen_headers()
-        installation_id = requests.get(url=url,
-                                       headers=headers).json()[0]['id']
+        r = requests.get(url=url,
+                         headers=headers)
+        if r.status_code != 200:
+            raise GithubAPIException(r.text)
+        installation_id = r.json()[0]['id']
 
         url = f"https://api.github.com/app/installations/" \
               f"{installation_id}/access_tokens"
-        return requests.post(url=url, headers=headers).json()['token']
+        r = requests.post(url=url, headers=headers)
+        if r.status_code != 201:
+            raise GithubAPIException(r.text)
+        return r.json()['token']
 
     def _gen_headers(self):
         if self.auth.is_expired():
@@ -62,7 +74,9 @@ class GithubAppInterface:
 
         def __init__(self, app_id, private_key):
             """Initialize Github App authentication."""
-            expiry = (datetime.utcnow() + timedelta(minutes=10)).timestamp()
+            expiry = (datetime.utcnow() + timedelta(minutes=1)).timestamp()
+            logging.error(datetime.utcnow().timestamp())
+            logging.error(expiry)
             payload = {
                 'iat': datetime.utcnow(),
                 'exp': expiry,
