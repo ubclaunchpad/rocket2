@@ -1,8 +1,8 @@
 """Tests for Github App interface."""
-from interface.github_app import GithubAppInterface, GithubAppAuthFactory
+from interface.github_app import GithubAppInterface, \
+    DefaultGithubAppAuthFactory
 from datetime import datetime, timedelta
 import jwt
-import json
 from unittest.mock import MagicMock, patch
 
 PRIVATE_KEY = \
@@ -49,7 +49,7 @@ PUBLIC_KEY = \
 def test_github_app_auth():
     """Test GithubAppAuth internal class."""
     app_id = "test_app_id"
-    factory = GithubAppAuthFactory(app_id, PRIVATE_KEY)
+    factory = DefaultGithubAppAuthFactory(app_id, PRIVATE_KEY)
     auth = factory.create()
     token = jwt.decode(auth.token, PUBLIC_KEY, algorithms='RS256')
     assert token['exp'] == auth.expiry
@@ -73,7 +73,7 @@ def test_get_app_details(mock_request):
     mock_auth = MagicMock(GithubAppInterface.GithubAppAuth)
     mock_auth.is_expired = MagicMock(return_value=False)
     mock_auth.token = mock_token
-    mock_factory = MagicMock(GithubAppAuthFactory)
+    mock_factory = MagicMock(DefaultGithubAppAuthFactory)
     mock_factory.create = MagicMock(return_value=mock_auth)
     app_interface = GithubAppInterface(mock_factory)
     expected_headers = {
@@ -111,7 +111,7 @@ def test_create_api_token(mock_post, mock_get):
     mock_auth = MagicMock(GithubAppInterface.GithubAppAuth)
     mock_auth.is_expired = MagicMock(return_value=False)
     mock_auth.token = mock_token
-    mock_factory = MagicMock(GithubAppAuthFactory)
+    mock_factory = MagicMock(DefaultGithubAppAuthFactory)
     mock_factory.create = MagicMock(return_value=mock_auth)
     app_interface = GithubAppInterface(mock_factory)
 

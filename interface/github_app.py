@@ -79,7 +79,7 @@ class GithubAppInterface:
             return datetime.utcnow() >= datetime.fromtimestamp(self.expiry)
 
 
-class GithubAppAuthFactory:
+class DefaultGithubAppAuthFactory:
     """Factory for creating GithubAppAuth objects."""
 
     def __init__(self, app_id, private_key):
