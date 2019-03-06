@@ -52,7 +52,6 @@ def test_github_app_auth():
     factory = DefaultGithubAppAuthFactory(app_id, PRIVATE_KEY)
     auth = factory.create()
     token = jwt.decode(auth.token, PUBLIC_KEY, algorithms='RS256')
-    assert token['exp'] == auth.expiry
     assert token['iss'] == app_id
     assert not auth.is_expired()
 

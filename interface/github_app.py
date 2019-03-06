@@ -3,7 +3,6 @@ from datetime import datetime, timedelta
 from interface.exceptions.github import GithubAPIException
 import jwt
 import requests
-import logging
 
 
 class GithubAppInterface:
@@ -74,15 +73,12 @@ class GithubAppInterface:
 
         def __init__(self, app_id, private_key):
             """Initialize Github App authentication."""
-            expiry = (datetime.utcnow() + timedelta(minutes=1)).timestamp()
-            logging.error(datetime.utcnow().timestamp())
-            logging.error(expiry)
+            self.expiry = (datetime.utcnow() + timedelta(minutes=1))
             payload = {
                 'iat': datetime.utcnow(),
-                'exp': expiry,
+                'exp': self.expiry,
                 'iss': app_id
             }
-            self.expiry = expiry
             self.token = jwt.encode(payload,
                                     private_key,
                                     algorithm='RS256') \
@@ -90,7 +86,7 @@ class GithubAppInterface:
 
         def is_expired(self):
             """Check if Github App token is expired."""
-            return datetime.utcnow() >= datetime.fromtimestamp(self.expiry)
+            return datetime.utcnow() >= self.expiry
 
 
 class DefaultGithubAppAuthFactory:
