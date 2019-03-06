@@ -30,7 +30,7 @@ class TestTokenCommand(TestCase):
 
     def test_handle_nonexistent_member(self):
         """Test handle() when given a nonexistent member."""
-        self.mock_facade.retrieve_user.side_effect = LookupError
+        self.mock_facade.retrieve.side_effect = LookupError
         ret_val, ret_code = self.testcommand.handle("", "nonexistent")
         assert ret_val == "Requesting user not found!"
         assert ret_code == 404
@@ -39,7 +39,7 @@ class TestTokenCommand(TestCase):
         """Test handle() when given a user with member permissions."""
         user = User("U12345")
         user.permissions_level = Permissions.member
-        self.mock_facade.retrieve_user.return_value = user
+        self.mock_facade.retrieve.return_value = user
         ret_val, ret_code = self.testcommand.handle("", user.slack_id)
         assert ret_val == "You do not have the sufficient " \
                           "permission level for this command!"
@@ -49,7 +49,7 @@ class TestTokenCommand(TestCase):
         """Test handle() when given a user with team lead permissions."""
         user = User("U12345")
         user.permissions_level = Permissions.team_lead
-        self.mock_facade.retrieve_user.return_value = user
+        self.mock_facade.retrieve.return_value = user
         ret_msg, ret_code = \
             self.testcommand.handle("", user.slack_id)
         token = self.__parse_token(ret_msg)
@@ -64,7 +64,7 @@ class TestTokenCommand(TestCase):
         """Test handle() when given a user with admin permissions."""
         user = User("U12345")
         user.permissions_level = Permissions.admin
-        self.mock_facade.retrieve_user.return_value = user
+        self.mock_facade.retrieve.return_value = user
         ret_msg, ret_code = \
             self.testcommand.handle("", user.slack_id)
         token = self.__parse_token(ret_msg)

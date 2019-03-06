@@ -52,7 +52,7 @@ class Core:
         """
         new_id = event_data["event"]["user"]["id"]
         new_user = User(new_id)
-        self.__facade.store_user(new_user)
+        self.__facade.store(new_user)
         welcome = 'Welcome to UBC Launch Pad!'
         try:
             self.__bot.send_dm(welcome, new_id)

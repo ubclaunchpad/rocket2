@@ -17,6 +17,18 @@ class TestGithubInterface(TestCase):
         self.mock_github.get_organization.return_value = self.mock_org
         self.test_bot = GithubInterface(self.mock_github, "ubclaunchpad")
 
+        # make mock team
+        self.mock_team = mock.MagicMock(Team.Team)
+
+        self.mock_github.get_team = mock.MagicMock(side_effect={
+            'brussels-sprouts': self.mock_team,
+        }.get)
+
+        self.test_user = mock.MagicMock(NamedUser.NamedUser)
+        self.test_user.name = 'member_username'
+        self.mock_team.get_members = mock.MagicMock(
+                                        return_value=[self.test_user])
+
     def test_org_add_member(self):
         """Test GithubInterface method org_add_member."""
         mock_user: MagicMock = mock.MagicMock(NamedUser.NamedUser)
@@ -203,3 +215,47 @@ class TestGithubInterface(TestCase):
             assert False
         except GithubAPIException as e:
             pass
+
+# -------------------------------------------------------------
+# --------------- Tests related to team members ---------------
+# -------------------------------------------------------------
+
+    def test_tmem_list_team_members(self):
+        """Test if list_team_members returns the right team members."""
+        test_team_members_list = [mock.MagicMock(
+                                    NamedUser.NamedUser)]
+        self.mock_team.list_team_members = mock.MagicMock(
+                                            return_value=test_team_members_list
+                                            )
+        self.test_bot.list_team_members('brussels-sprouts')
+        self.mock_github.get_team.assert_called_once_with('brussels-sprouts')
+
+    def test_tmem_get_team_member(self):
+        """Test if method gets the correct member when member exists."""
+        assert self.test_bot.\
+            get_team_member(
+                self.test_user.name, 'brussels-sprouts') is self.test_user
+
+    def test_tmem_get_nonexistent_team_member(self):
+        """Test if raises GithubException when memeber does not exist."""
+        with self.assertRaises(GithubAPIException):
+            self.test_bot.\
+                    get_team_member(
+                        'inexistent_username', 'brussels-sprouts')
+
+    def test_tmem_add_team_member(self):
+        """Test if a user is added to a team properly."""
+        self.mock_github.get_user = mock.MagicMock(return_value=self.test_user)
+        self.mock_team.add_membership = mock.MagicMock()
+
+        self.test_bot.add_team_member('member_username', 'brussels-sprouts')
+        self.mock_team.add_membership.assert_called_once_with(self.test_user)
+
+    def test_tmem_remove_team_member(self):
+        """Test if the user removed is no longer in the team."""
+        self.mock_team.remove_membership = mock.MagicMock()
+        self.mock_github.get_user = mock.MagicMock(return_value=self.test_user)
+        self.test_bot.remove_team_member(
+            self.test_user.name, 'brussels-sprouts')
+        self.mock_team.remove_membership.assert_called_once_with(
+                                                        self.test_user)
