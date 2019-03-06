@@ -1,7 +1,7 @@
 """Test the facade for the database."""
 from unittest import mock
 from db.facade import DBFacade
-from tests.util import create_test_admin, create_test_team
+from tests.util import *
 
 
 @mock.patch('db.dynamodb.DynamoDB', autospec=True)
@@ -15,8 +15,8 @@ def test_store_user(ddb):
     """Test storing user calls correct functions."""
     dbf = DBFacade(ddb)
     test_user = create_test_admin('abc_123')
-    dbf.store_user(test_user)
-    ddb.store_user.assert_called_with(test_user)
+    dbf.store(test_user)
+    ddb.store.assert_called_with(test_user)
 
 
 @mock.patch('db.dynamodb.DynamoDB', autospec=True)
@@ -24,16 +24,16 @@ def test_retrieve_user(ddb):
     """Test retrieving user calls correct functions."""
     dbf = DBFacade(ddb)
     slack_id = 'abc_123'
-    dbf.retrieve_user(slack_id)
-    ddb.retrieve_user.assert_called_with(slack_id)
+    dbf.retrieve(User, slack_id)
+    ddb.retrieve.assert_called_with(User, slack_id)
 
 
 @mock.patch('db.dynamodb.DynamoDB', autospec=True)
 def test_query_user(ddb):
     """Test querying user calls correct functions."""
     dbf = DBFacade(ddb)
-    dbf.query_user(['permission_level', 'admin'])
-    ddb.query_user.assert_called_with(['permission_level', 'admin'])
+    dbf.query(User, ['permission_level', 'admin'])
+    ddb.query.assert_called_with(User, ['permission_level', 'admin'])
 
 
 @mock.patch('db.dynamodb.DynamoDB', autospec=True)
@@ -41,8 +41,8 @@ def test_store_team(ddb):
     """Test storing team calls correct functions."""
     dbf = DBFacade(ddb)
     test_team = create_test_team('1', 'brussel-sprouts', 'Brussel Sprouts')
-    dbf.store_team(test_team)
-    ddb.store_team.assert_called_with(test_team)
+    dbf.store(test_team)
+    ddb.store.assert_called_with(test_team)
 
 
 @mock.patch('db.dynamodb.DynamoDB', autospec=True)
@@ -50,16 +50,16 @@ def test_retrieve_team(ddb):
     """Test retrieving team calls correct functions."""
     dbf = DBFacade(ddb)
     team_name = 'brussel-sprouts'
-    dbf.retrieve_team(team_name)
-    ddb.retrieve_team.assert_called_with(team_name)
+    dbf.retrieve(Team, team_name)
+    ddb.retrieve.assert_called_with(Team, team_name)
 
 
 @mock.patch('db.dynamodb.DynamoDB', autospec=True)
 def test_query_team(ddb):
     """Test querying team calls correct functions."""
     dbf = DBFacade(ddb)
-    dbf.query_team([('platform', 'slack')])
-    ddb.query_team.assert_called_with([('platform', 'slack')])
+    dbf.query(Team, [('platform', 'slack')])
+    ddb.query.assert_called_with(Team, [('platform', 'slack')])
 
 
 @mock.patch('db.dynamodb.DynamoDB', autospec=True)
@@ -67,8 +67,8 @@ def test_delete_team(ddb):
     """Test deleting team calls correct functions."""
     dbf = DBFacade(ddb)
     team_name = 'brussel-sprouts'
-    dbf.delete_team(team_name)
-    ddb.delete_team.assert_called_with(team_name)
+    dbf.delete(Team, team_name)
+    ddb.delete.assert_called_with(Team, team_name)
 
 
 @mock.patch('db.dynamodb.DynamoDB', autospec=True)
@@ -76,5 +76,40 @@ def test_delete_user(ddb):
     """Test deleting user calls correct functions."""
     dbf = DBFacade(ddb)
     slack_id = 'abc_123'
-    dbf.delete_user(slack_id)
-    ddb.delete_user.assert_called_with(slack_id)
+    dbf.delete(User, slack_id)
+    ddb.delete.assert_called_with(User, slack_id)
+
+
+@mock.patch('db.dynamodb.DynamoDB', autospec=True)
+def test_store_project(ddb):
+    """Test storing project calls correct functions."""
+    dbf = DBFacade(ddb)
+    test_project = create_test_project('1', ['a'])
+    dbf.store(test_project)
+    ddb.store.assert_called_with(test_project)
+
+
+@mock.patch('db.dynamodb.DynamoDB', autospec=True)
+def test_retrieve_project(ddb):
+    """Test retrieving project calls correct functions."""
+    dbf = DBFacade(ddb)
+    project_id = 'brussel-sprouts'
+    dbf.retrieve(Project, project_id)
+    ddb.retrieve.assert_called_with(Project, project_id)
+
+
+@mock.patch('db.dynamodb.DynamoDB', autospec=True)
+def test_query_project(ddb):
+    """Test querying project calls correct functions."""
+    dbf = DBFacade(ddb)
+    dbf.query(Project, [('platform', 'slack')])
+    ddb.query.assert_called_with(Project, [('platform', 'slack')])
+
+
+@mock.patch('db.dynamodb.DynamoDB', autospec=True)
+def test_delete_project(ddb):
+    """Test deleting project calls correct functions."""
+    dbf = DBFacade(ddb)
+    project_id = 'brussel-sprouts'
+    dbf.delete(Project, project_id)
+    ddb.delete.assert_called_with(Project, project_id)
