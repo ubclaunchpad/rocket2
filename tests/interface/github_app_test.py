@@ -1,7 +1,9 @@
 """Tests for Github App interface."""
-from interface.github_app import GithubAppInterface
-from datetime import datetime
+from interface.github_app import GithubAppInterface, GithubAppAuthFactory
+from datetime import datetime, timedelta
 import jwt
+import json
+from unittest.mock import MagicMock, patch
 
 PRIVATE_KEY = \
     "-----BEGIN PRIVATE KEY-----\n" \
@@ -52,3 +54,83 @@ def test_github_app_auth():
     assert token['exp'] == auth.expiry
     assert token['iss'] == app_id
     assert not auth.is_expired()
+
+
+@patch('requests.get')
+def test_get_app_details(mock_request):
+    """Test get_app_details()."""
+    app_id = "test_app_id"
+    payload = {
+        'iat': datetime.utcnow(),
+        'exp': datetime.utcnow() + timedelta(minutes=1),
+        'iss': app_id
+    }
+    mock_token = jwt.encode(payload,
+                            PRIVATE_KEY,
+                            algorithm='RS256') \
+        .decode('utf-8')
+    mock_auth = MagicMock(GithubAppInterface.GithubAppAuth)
+    mock_auth.is_expired = MagicMock(return_value=False)
+    mock_auth.token = mock_token
+    mock_factory = MagicMock(GithubAppAuthFactory)
+    mock_factory.create = MagicMock(return_value=mock_auth)
+    app_interface = GithubAppInterface(mock_factory)
+    expected_headers = {
+        'Authorization': f'Bearer {mock_token}',
+        'Accept': 'application/vnd.github.machine-man-preview+json'
+    }
+
+    app_interface.get_app_details()
+
+    mock_request.assert_called_once_with(url="https://api.github.com/app",
+                                         headers=expected_headers)
+    mock_factory.create.assert_called_once()
+    mock_auth.is_expired.assert_called_once()
+
+
+@patch('requests.get')
+@patch('requests.post')
+def test_create_api_token(mock_post, mock_get):
+    """Test create_api_token()."""
+    app_id = "test_app_id"
+
+    payload = {
+        'iat': datetime.utcnow(),
+        'exp': datetime.utcnow() + timedelta(minutes=1),
+        'iss': app_id
+    }
+    mock_token = jwt.encode(payload,
+                            PRIVATE_KEY,
+                            algorithm='RS256') \
+        .decode('utf-8')
+    expected_headers = {
+        'Authorization': f'Bearer {mock_token}',
+        'Accept': 'application/vnd.github.machine-man-preview+json'
+    }
+    mock_auth = MagicMock(GithubAppInterface.GithubAppAuth)
+    mock_auth.is_expired = MagicMock(return_value=False)
+    mock_auth.token = mock_token
+    mock_factory = MagicMock(GithubAppAuthFactory)
+    mock_factory.create = MagicMock(return_value=mock_auth)
+    app_interface = GithubAppInterface(mock_factory)
+
+    mock_ret_val = "token"
+    mock_id = 7
+    mock_get.return_value.json.return_value = [{
+        'id': mock_id
+    }]
+    mock_post.return_value.json.return_value = {
+        'token': "token"
+    }
+
+    assert app_interface.create_api_token() == mock_ret_val
+
+    mock_get.assert_called_once_with(
+        url="https://api.github.com/app/installations",
+        headers=expected_headers)
+    mock_post.assert_called_once_with(
+        url=f"https://api.github.com/app/installations/"
+            f"{mock_id}/access_tokens",
+        headers=expected_headers)
+    mock_factory.create.assert_called_once()
+    mock_auth.is_expired.assert_called_once()

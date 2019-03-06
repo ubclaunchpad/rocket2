@@ -7,16 +7,14 @@ import requests
 class GithubAppInterface:
     """Interface class for interacting with Github App API."""
 
-    def __init__(self, app_id, private_key):
+    def __init__(self, app_auth_factory):
         """
         Initialize GithubAppInterface.
 
-        :param app_id: Github App ID
-        :param private_key: RSA private key from Github App
+        :param app_auth_factory: Factory for creating auth objects
         """
-        self.app_id = app_id
-        self.private_key = private_key
-        self.auth = self.GithubAppAuth(app_id, private_key)
+        self.app_auth_factory = app_auth_factory
+        self.auth = app_auth_factory.create()
 
     def get_app_details(self):
         """
@@ -53,7 +51,7 @@ class GithubAppInterface:
 
     def _gen_headers(self):
         if self.auth.is_expired():
-            self.auth = self.GithubAppAuth(self.app_id, self.private_key)
+            self.auth = self.app_auth_factory.create()
         return {
             'Authorization': f'Bearer {self.auth.token}',
             'Accept': 'application/vnd.github.machine-man-preview+json'
@@ -79,3 +77,22 @@ class GithubAppInterface:
         def is_expired(self):
             """Check if Github App token is expired."""
             return datetime.utcnow() >= datetime.fromtimestamp(self.expiry)
+
+
+class GithubAppAuthFactory:
+    """Factory for creating GithubAppAuth objects."""
+
+    def __init__(self, app_id, private_key):
+        """
+        Initialize a Github App API auth factory.
+
+        :param app_id: Github Apps ID
+        :param private_key: Private key from application
+        """
+        self.app_id = app_id
+        self.private_key = private_key
+        self.auth = GithubAppInterface.GithubAppAuth
+
+    def create(self):
+        """Create an instance of GithubAppAuth."""
+        return self.auth(self.app_id, self.private_key)
