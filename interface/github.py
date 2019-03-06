@@ -75,8 +75,6 @@ class GithubInterface:
                                     GithubObject.NotSet,
                                     "closed",
                                     "push")
-        print(team)
-        print(team.id)
         return team.id
 
     @handle_github_error
