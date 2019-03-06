@@ -49,7 +49,8 @@ PUBLIC_KEY = \
 def test_github_app_auth():
     """Test GithubAppAuth internal class."""
     app_id = "test_app_id"
-    auth = GithubAppInterface.GithubAppAuth(app_id, PRIVATE_KEY)
+    factory = GithubAppAuthFactory(app_id, PRIVATE_KEY)
+    auth = factory.create()
     token = jwt.decode(auth.token, PUBLIC_KEY, algorithms='RS256')
     assert token['exp'] == auth.expiry
     assert token['iss'] == app_id
