@@ -17,7 +17,8 @@ def handle_github_error(func):
                     return func(self, *arg, **kwargs)
                 except GithubException as e:
                     raise GithubAPIException(e.data)
-            raise GithubAPIException(e.data)
+            else:
+                raise GithubAPIException(e.data)
 
     return wrapper
 
@@ -61,8 +62,7 @@ class GithubInterface:
     @handle_github_error
     def org_get_team(self, id):
         """Given Github team ID, return team from organization."""
-        team = self.org.get_team(id)
-        return team
+        return self.org.get_team(id)
 
     @handle_github_error
     def org_create_team(self, name):
@@ -110,18 +110,17 @@ class GithubInterface:
             team_array.append(team)
         return team_array
 
-# ---------------------------------------------------------------
-# --------------- methods related to team members ---------------
-# ---------------------------------------------------------------
+    # ---------------------------------------------------------------
+    # --------------- methods related to team members ---------------
+    # ---------------------------------------------------------------
 
+    @handle_github_error
     def list_team_members(self, team_id):
         """Return a list of users in the team of id team_id."""
-        try:
-            team = self.github.get_team(team_id)
-            return list(map(lambda x: x, team.get_members()))
-        except GithubException as e:
-            raise GithubAPIException(e.data)
+        team = self.github.get_team(team_id)
+        return list(map(lambda x: x, team.get_members()))
 
+    @handle_github_error
     def get_team_member(self, username, team_id):
         """Return a team member with a username of username."""
         try:
@@ -130,30 +129,23 @@ class GithubInterface:
             return next(
                 member for member in team_members
                 if member.name == username)
-        except GithubException as e:
-            raise GithubAPIException(e.data)
-        except StopIteration as e:
+        except StopIteration:
             raise GithubAPIException(
-                "user \"{}\" does not exist in team \"{}\""
-                .format(username, team_id))
+                f"User \"{username}\" does not exist in team \"{team_id}\"!")
 
+    @handle_github_error
     def add_team_member(self, username, team_id):
         """Add user with given username to team with id team_id."""
-        try:
-            team = self.github.get_team(team_id)
-            new_member = self.github.get_user(username)
-            team.add_membership(new_member)
-        except GithubException as e:
-            raise GithubAPIException(e.data)
+        team = self.github.get_team(team_id)
+        new_member = self.github.get_user(username)
+        team.add_membership(new_member)
 
+    @handle_github_error
     def remove_team_member(self, username, team_id):
         """Remove user with given username from team with id team_id."""
-        try:
-            team = self.github.get_team(team_id)
-            to_be_removed_member = self.github.get_user(username)
-            team.remove_membership(to_be_removed_member)
-        except GithubException as e:
-            raise GithubAPIException(e.data)
+        team = self.github.get_team(team_id)
+        to_be_removed_member = self.github.get_user(username)
+        team.remove_membership(to_be_removed_member)
 
 
 class DefaultGithubFactory:
