@@ -569,7 +569,7 @@ def mem_default_payload():
 
 @pytest.fixture
 def mem_add_payload(mem_default_payload):
-    """Provide an membership payload for adding a member."""
+    """Provide a membership payload for adding a member."""
     add_payload = mem_default_payload
     add_payload["action"] = "member_added"
     return add_payload
@@ -577,7 +577,7 @@ def mem_add_payload(mem_default_payload):
 
 @pytest.fixture
 def mem_rm_payload(mem_default_payload):
-    """Provide an membership payload for removing a member."""
+    """Provide a membership payload for removing a member."""
     rm_payload = mem_default_payload
     rm_payload["action"] = "member_removed"
     return rm_payload
@@ -585,7 +585,7 @@ def mem_rm_payload(mem_default_payload):
 
 @pytest.fixture
 def mem_inv_payload(mem_default_payload):
-    """Provide an membership payload for inviting a member."""
+    """Provide a membership payload for inviting a member."""
     inv_payload = mem_default_payload
     inv_payload["action"] = "member_invited"
     return inv_payload
@@ -593,7 +593,7 @@ def mem_inv_payload(mem_default_payload):
 
 @pytest.fixture
 def mem_empty_payload(mem_default_payload):
-    """Provide an membership payload with no action."""
+    """Provide a membership payload with no action."""
     empty_payload = mem_default_payload
     empty_payload["action"] = ""
     return empty_payload

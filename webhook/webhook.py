@@ -146,12 +146,14 @@ class WebhookHandler:
 
     def handle_membership_event(self, payload):
         """
-        Handle when a user is added, removed, or invited to an organization.
+        Handle when a user is added, removed, or invited for membership.
 
         If the member is removed, they are removed as a user from rocket's db
         if they have not been removed already.
 
-        If the member is added or invited, do nothing.
+        If the member is added, they are added to rocket's db
+
+        If invited, do nothing.
         """
         action = payload["action"]
         github_user = payload["member"]
@@ -160,7 +162,7 @@ class WebhookHandler:
         team = payload["team"]
         team_id = team["id"]
         team_name = team["name"]
-        selected_team = self.__facade.retrieve_team(team_id)
+        selected_team = self.__facade.retrieve(team, team_id)
         if action == "member_removed":
             member_list = self.__facade. \
                 query_user([('github_id', github_id)])
