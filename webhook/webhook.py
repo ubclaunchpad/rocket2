@@ -164,56 +164,71 @@ class WebhookHandler:
         team_name = team["name"]
         selected_team = self.__facade.retrieve(Team, team_id)
         if action == "member_removed":
-            member_list = self.__facade. \
-                query(User, [('github_id', github_id)])
-            slack_ids_string = ""
-            if len(member_list) == 1:
-                slack_id = member_list[0].slack_id
-                if selected_team.is_member(github_id):
-                    selected_team.discard_member(github_id)
-                    logging.info("deleted slack user {} from {}"
-                                 .format(slack_id, team_name))
-                    slack_ids_string += str(slack_id)
-                    return "deleted slack ID {} from {}"\
-                        .format(slack_ids_string, team_name), 200
-                else:
-                    logging.error("slack user {} not in {}"
-                                  .format(slack_id, team_name))
-                    return "slack user {} not in {}"\
-                        .format(slack_id, team_name), 404
-            elif len(member_list) > 1:
-                logging.error("Error: found github ID connected to"
-                              " multiple slack IDs")
-                return ("Error: found github ID connected to multiple"
-                        " slack IDs", 412)
-            else:
-                logging.error("could not find user {}".format(github_id))
-                return "could not find user {}".format(github_id), 404
-
+            return self.mem_remove(github_id, selected_team, team_name)
         elif action == "member_added":
-            member_list = self.__facade.query(User, [('github_id', github_id)])
-            slack_ids_string = ""
-            if len(member_list) > 0:
-                selected_team.add_member(github_id)
-                for member in member_list:
-                    slack_id = member.slack_id
-                    logging.info("user {} added to {}".
-                                 format(github_username, team_name))
-                    slack_ids_string += " " + str(slack_id)
-                    return "added slack ID{}".format(slack_ids_string), 200
-            else:
-                logging.error("could not find user {}".format(github_id))
-                return "could not find user {}".format(github_username), 404
-
+            return self.mem_added(github_id, selected_team, team_name,
+                                  github_username)
         elif action == "member_invited":
-            logging.info("user {} invited to {}".
-                         format(github_username, team_name))
-            return "user " + github_username + " invited to " + team_name,\
-                   200
+            return self.mem_invited(github_username, team_name)
         else:
             logging.error(("membership webhook triggered,"
                            " invalid action specified: {}".
                            format(str(payload))))
             return "invalid membership webhook triggered", 405
 
+    def mem_remove(self, github_id, selected_team, team_name):
+        """
+        Helper function for membership if payload action is removal
+        """
+        member_list = self.__facade. \
+            query(User, [('github_id', github_id)])
+        slack_ids_string = ""
+        if len(member_list) == 1:
+            slack_id = member_list[0].slack_id
+            if selected_team.is_member(github_id):
+                selected_team.discard_member(github_id)
+                logging.info("deleted slack user {} from {}"
+                             .format(slack_id, team_name))
+                slack_ids_string += str(slack_id)
+                return "deleted slack ID {} from {}"\
+                    .format(slack_ids_string, team_name), 200
+            else:
+                logging.error("slack user {} not in {}"
+                              .format(slack_id, team_name))
+                return "slack user {} not in {}"\
+                    .format(slack_id, team_name), 404
+        elif len(member_list) > 1:
+            logging.error("Error: found github ID connected to"
+                          " multiple slack IDs")
+            return ("Error: found github ID connected to multiple"
+                    " slack IDs", 412)
+        else:
+            logging.error("could not find user {}".format(github_id))
+            return "could not find user {}".format(github_id), 404
 
+    def mem_added(self, github_id, selected_team, team_name, github_username):
+        """
+        Helper function for membership if payload action is added
+        """
+        member_list = self.__facade.query(User, [('github_id', github_id)])
+        slack_ids_string = ""
+        if len(member_list) > 0:
+            selected_team.add_member(github_id)
+            for member in member_list:
+                slack_id = member.slack_id
+                logging.info("user {} added to {}".
+                             format(github_username, team_name))
+                slack_ids_string += " " + str(slack_id)
+                return "added slack ID{}".format(slack_ids_string), 200
+        else:
+            logging.error("could not find user {}".format(github_id))
+            return "could not find user {}".format(github_username), 404
+
+    def mem_invited(self, github_username, team_name):
+        """
+        Helper function for membership if payload action is invited
+        """
+        logging.info("user {} invited to {}".
+                     format(github_username, team_name))
+        return "user " + github_username + " invited to " + team_name,\
+               200
