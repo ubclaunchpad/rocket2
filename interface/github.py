@@ -105,6 +105,51 @@ class GithubInterface:
         except GithubException as e:
             raise GithubAPIException(e.data)
 
+# ---------------------------------------------------------------
+# --------------- methods related to team members ---------------
+# ---------------------------------------------------------------
+
+    def list_team_members(self, team_id):
+        """Return a list of users in the team of id team_id."""
+        try:
+            team = self.github.get_team(team_id)
+            return list(map(lambda x: x, team.get_members()))
+        except GithubException as e:
+            raise GithubAPIException(e.data)
+
+    def get_team_member(self, username, team_id):
+        """Return a team member with a username of username."""
+        try:
+            team = self.github.get_team(team_id)
+            team_members = map(lambda x: x, team.get_members())
+            return next(
+                member for member in team_members
+                if member.name == username)
+        except GithubException as e:
+            raise GithubAPIException(e.data)
+        except StopIteration as e:
+            raise GithubAPIException(
+                "user \"{}\" does not exist in team \"{}\""
+                .format(username, team_id))
+
+    def add_team_member(self, username, team_id):
+        """Add user with given username to team with id team_id."""
+        try:
+            team = self.github.get_team(team_id)
+            new_member = self.github.get_user(username)
+            team.add_membership(new_member)
+        except GithubException as e:
+            raise GithubAPIException(e.data)
+
+    def remove_team_member(self, username, team_id):
+        """Remove user with given username from team with id team_id."""
+        try:
+            team = self.github.get_team(team_id)
+            to_be_removed_member = self.github.get_user(username)
+            team.remove_membership(to_be_removed_member)
+        except GithubException as e:
+            raise GithubAPIException(e.data)
+
 
 class GithubAPIException(Exception):
     """Exception representing an error while calling Github API."""

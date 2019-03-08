@@ -157,18 +157,18 @@ class UserCommand:
         msg = ""
         if param_list["member"] is not None:
             try:
-                admin_user = self.facade.retrieve_user(user_id)
+                admin_user = self.facade.retrieve(User, user_id)
                 if admin_user.permissions_level != Permissions.admin:
                     return self.permission_error, 200
                 else:
                     is_admin = True
                     edited_id = param_list["member"]
-                    edited_user = self.facade.retrieve_user(edited_id)
+                    edited_user = self.facade.retrieve(User, edited_id)
             except LookupError:
                 return self.lookup_error, 200
         else:
             try:
-                edited_user = self.facade.retrieve_user(user_id)
+                edited_user = self.facade.retrieve(User, user_id)
             except LookupError:
                 return self.lookup_error, 200
 
@@ -197,7 +197,7 @@ class UserCommand:
             logging.warn("User {} tried to elevate permissions level."
                          .format(user_id))
 
-        self.facade.store_user(edited_user)
+        self.facade.store(edited_user)
         ret = {'attachments': [edited_user.get_attachment()]}
         if msg != "":
             ret['text'] = msg
@@ -218,9 +218,9 @@ class UserCommand:
                  deletion message if user is deleted.
         """
         try:
-            user_command = self.facade.retrieve_user(user_id)
+            user_command = self.facade.retrieve(User, user_id)
             if user_command.permissions_level == Permissions.admin:
-                self.facade.delete_user(slack_id)
+                self.facade.delete(User, slack_id)
                 return self.delete_text + slack_id, 200
             else:
                 return self.permission_error, 200
@@ -241,9 +241,9 @@ class UserCommand:
         """
         try:
             if slack_id is None:
-                user = self.facade.retrieve_user(user_id)
+                user = self.facade.retrieve(User, user_id)
             else:
-                user = self.facade.retrieve_user(slack_id)
+                user = self.facade.retrieve(User, slack_id)
 
             return jsonify({'attachments': [user.get_attachment()]}), 200
         except LookupError:
@@ -261,10 +261,10 @@ class UserCommand:
         # Try to look up and avoid overwriting if we are not using force
         if not use_force:
             try:
-                self.facade.retrieve_user(user_id)
+                self.facade.retrieve(User, user_id)
                 return 'User already exists; to overwrite user, add `-f`', 200
             except LookupError:
                 pass
 
-        self.facade.store_user(User(user_id))
+        self.facade.store(User(user_id))
         return 'User added!', 200

@@ -1,5 +1,6 @@
 """Contain all the logic for handling webhooks in a class."""
 import logging
+from model.user import User
 from model.team import Team
 
 
@@ -26,12 +27,12 @@ class WebhookHandler:
         organization = payload["organization"]["login"]
         if action == "member_removed":
             member_list = self.__facade.\
-                query_user([('github_id', github_id)])
+                query(User, [('github_id', github_id)])
             if len(member_list) > 0:
                 slack_ids_string = ""
                 for member in member_list:
                     slack_id = member.slack_id
-                    self.__facade.delete_user(slack_id)
+                    self.__facade.delete(User, slack_id)
                     logging.info("deleted slack user {}".format(slack_id))
                     slack_ids_string = slack_ids_string + " " + str(slack_id)
                 return "deleted slack ID{}".format(slack_ids_string), 200
@@ -77,7 +78,7 @@ class WebhookHandler:
             logging.debug("team added event triggered: {}".
                           format(str(payload)))
             try:
-                team = self.__facade.retrieve_team(github_id)
+                team = self.__facade.retrieve(Team, github_id)
                 logging.warning("team {} with id {} already exists.".
                                 format(github_team_name, github_id))
                 team.github_team_name = github_team_name
@@ -85,7 +86,7 @@ class WebhookHandler:
                 logging.debug("team {} with id {} added to organization.".
                               format(github_team_name, github_id))
                 team = Team(github_id, github_team_name, "")
-            self.__facade.store_team(team)
+            self.__facade.store(team)
             logging.info("team {} with id {} added to rocket db.".
                          format(github_team_name, github_id))
             return "created team with github id {}".format(github_id), 200
@@ -93,8 +94,8 @@ class WebhookHandler:
             logging.debug("team deleted event triggered: {}".
                           format(str(payload)))
             try:
-                self.__facade.retrieve_team(github_id)
-                self.__facade.delete_team(github_id)
+                self.__facade.retrieve(Team, github_id)
+                self.__facade.delete(Team, github_id)
                 logging.info("team {} with github id {} removed from db".
                              format(github_team_name, github_id))
                 return "deleted team with github id {}".format(github_id), 200
@@ -107,12 +108,12 @@ class WebhookHandler:
             logging.debug("team edited event triggered: {}".
                           format(str(payload)))
             try:
-                team = self.__facade.retrieve_team(github_id)
+                team = self.__facade.retrieve(Team, github_id)
                 team.github_team_name = github_team_name
                 logging.info("changed team's name with id {} from {} to {}".
                              format(github_id, github_team_name,
                                     team.github_team_name))
-                self.__facade.store_team(team)
+                self.__facade.store(team)
                 logging.info("updated team with id {} in rocket db."
                              .format(github_id))
                 return "updated team with id {}".format(github_id), 200

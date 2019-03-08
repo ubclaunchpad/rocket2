@@ -27,141 +27,71 @@ class DBFacade:
         """Return a string representing this class."""
         return "Database Facade"
 
-    def store_user(self, user):
+    def store(self, obj):
         """
-        Store user into users table.
+        Store object into the correct table.
 
-        :param user: A user model to store
+        Object can be of type :class:`model.user.User`,
+        :class:`model.team.Team`, or :class:`model.project.Project`.
+
+        :param obj: Object to store in database
+        :return: True if object was stored, and false otherwise
         """
-        logging.info("Storing user {}".format(user.slack_id))
-        self.ddb.store_user(user)
+        logging.info("Storing object {}".format(obj))
+        self.ddb.store(obj)
 
-    def retrieve_user(self, slack_id):
+    def retrieve(self, Model, k):
         """
-        Retrieve user from users table.
+        Retrieve a model from the database.
 
-        :param slack_id: retrieve based on this slack id
-        :raise: LookupError if slack id is not found.
-        :return: returns a user model if slack id is found.
+        :param Model: the actual class you want to retrieve
+        :param k: retrieve based on this key (or ID)
+        :raise: LookupError if key is not found
+        :return: a model ``Model`` if key is found
         """
-        logging.info("Retrieving user {}".format(slack_id))
-        return self.ddb.retrieve_user(slack_id)
+        logging.info("Retrieving {}(id={})".format(Model.__name__, k))
+        return self.ddb.retrieve(Model, k)
 
-    def query_user(self, parameter):
+    def query(self, Model, params=[]):
         """
-        Query for specific users by parameter.
+        Query a table using a list of parameters.
 
-        Returns list of users that have **all** of the attributes specified in
-        the parameters. Every item in parameters is a tuple, where the first
-        element is the user attribute, and the second is the value.
+        Returns a list of ``Model`` that have **all** of the attributes
+        specified in the parameters. Every item in parameters is a tuple, where
+        the first element is the user attribute, and the second is the value.
 
-        Example: ``[('permission_level', 'admin')]``
+        Example::
 
-        :param parameters: list of parameters (tuples)
-        :return: returns a list of user models that fit the query parameters.
+            ddb = DynamoDb(config)
+            users = ddb.query(User, [('platform', 'slack')])
+
+        If you try to query a table without any parameters, the function will
+        return all objects of that table.::
+
+            projects = ddb.query(Project)
+
+        Attributes that are sets (e.g. ``team.member``,
+        ``project.github_urls``) would be treated differently. This function
+        would check to see if the entry **contains** a certain element. You can
+        specify multiple elements, but they must be in different parameters
+        (one element per tuple).::
+
+            teams = ddb.query(Team, [('members', 'abc123'),
+                                     ('members', '231abc')])
+
+        :param Model: type of list elements you'd want
+        :return: a list of ``Model`` that fit the query parameters
         """
-        logging.info("Querying users matching parameters: {}".
-                     format(parameter))
-        return self.ddb.query_user(parameter)
+        logging.info("Querying {} matching parameters: {}".
+                     format(Model.__name__, params))
+        return self.ddb.query(Model, params)
 
-    def delete_user(self, slack_id):
+    def delete(self, Model, k):
         """
-        Remove a user from the users table.
+        Remove an object from a table.
 
-        :param slack_id: the slack_id of the user to be removed
+        :param Model: table type to remove the object from
+        :param k: ID or key of the object to remove (must be primary key)
         """
-        logging.info("Deleting user {}".format(slack_id))
-        self.ddb.delete_user(slack_id)
-
-    def store_team(self, team):
-        """
-        Store team into teams table.
-
-        :param team: A team model to store
-        """
-        logging.info("Storing team {}".format(team.github_team_name))
-        self.ddb.store_team(team)
-
-    def retrieve_team(self, team_name):
-        """
-        Retrieve team from teams table.
-
-        :param team_name: used as key for retrieving team objects.
-        :raise: LookupError if team name is not found.
-        :return: returns a team model if slack id is found.
-        """
-        logging.info("Retrieving team {}".format(team_name))
-        return self.ddb.retrieve_team(team_name)
-
-    def query_team(self, parameter):
-        """
-        Query for specific teams by parameter.
-
-        Returns list of teams that have **all** of the attributes specified in
-        the parameters. Every item in parameters is a tuple, where the first
-        element is the user attribute, and the second is the value.
-
-        Example: ``[('platform', 'slack')]``
-
-        :param parameters: list of parameters (tuples)
-        :return: returns a list of team models that fit the query parameters.
-        """
-        logging.info("Querying teams matching parameters: {}".
-                     format(parameter))
-        return self.ddb.query_team(parameter)
-
-    def delete_team(self, team_name):
-        """
-        Remove a team from the teams table.
-
-        :param team_name: the team_name of the team to be removed
-        """
-        logging.info("Deleting team {}".format(team_name))
-        self.ddb.delete_team(team_name)
-
-    def store_project(self, project):
-        """
-        Store project into projects table.
-
-        :param project: A project model to store
-        """
-        logging.info("Storing project " + project.project_id)
-        self.ddb.store_project(project)
-
-    def retrieve_project(self, project_id):
-        """
-        Retrieve project from projects table.
-
-        :param project_id: used as key for retrieving project objects.
-        :raise: LookupError if project id is not found.
-        :return: returns a project model if slack id is found.
-        """
-        logging.info("Retrieving project " + project_id)
-        return self.ddb.retrieve_project(project_id)
-
-    def query_project(self, parameters):
-        """
-        Query for specific projects by parameter.
-
-        Returns list of teams that have **all** of the attributes specified in
-        the parameters. Every item in parameters is a tuple, where the first
-        element is the project attribute, and the second is the value.
-
-        Example: ``[('tags', 'c++')]`` would get all projects with ``c++``
-        (case sensitive) in their tags.
-
-        :param parameters: list of parameters (tuples)
-        :return: returns a list of project models that fit the query parameters
-        """
-        logging.info("Querying projects matching parameters: {}"
-                     .format(parameters))
-        return self.ddb.query_project(parameters)
-
-    def delete_project(self, project_id):
-        """
-        Remove a project from the projects table.
-
-        :param project_id: the project ID of the project to be removed
-        """
-        logging.info("Deleting project " + project_id)
-        self.ddb.delete_project(project_id)
+        logging.info("Deleting {}(id={})".format(Model.__name__, k))
+        self.ddb.delete(Model, k)

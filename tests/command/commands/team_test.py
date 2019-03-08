@@ -12,8 +12,10 @@ class TestTeamCommand(TestCase):
 
     def setUp(self):
         """Set up the test case environment."""
+        self.gh = mock.MagicMock()
+        self.db = mock.MagicMock()
         self.sc = mock.MagicMock()
-        self.testcommand = TeamCommand(self.sc)
+        self.testcommand = TeamCommand(self.db, self.sc, self.gh)
         self.help_text = self.testcommand.help
 
     def test_get_name(self):
