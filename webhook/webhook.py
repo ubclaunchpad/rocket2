@@ -178,9 +178,9 @@ class WebhookHandler:
                         .format(slack_ids_string, team_name), 200
                 else:
                     logging.error("slack user {} not in {}"
-                                 .format(slack_id, team_name))
+                                  .format(slack_id, team_name))
                     return "slack user {} not in {}"\
-                                 .format(slack_id, team_name), 404
+                        .format(slack_id, team_name), 404
             elif len(member_list) > 1:
                 logging.error("Error: found github ID connected to"
                               " multiple slack IDs")
@@ -217,4 +217,3 @@ class WebhookHandler:
             return "invalid membership webhook triggered", 405
 
 
-    

@@ -659,9 +659,11 @@ def test_handle_mem_event_rm_member_missing(mock_logging, mem_rm_payload):
     rsp, code = webhook_handler.handle_membership_event(mem_rm_payload)
     mock_facade.query\
         .assert_called_once_with(User, [('github_id', "21031067")])
-    mock_logging.error.assert_called_once_with("slack user SLACKID not in rocket")
+    mock_logging.error.assert_called_once_with("slack user SLACKID "
+                                               "not in rocket")
     assert rsp == "slack user SLACKID not in rocket"
     assert code == 404
+
 
 @mock.patch('webhook.webhook.logging')
 def test_handle_mem_event_rm_member_wrong_team(mock_logging, mem_rm_payload):
