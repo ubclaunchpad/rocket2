@@ -26,7 +26,7 @@ class WebhookHandler:
         github_username = github_user["login"]
         organization = payload["organization"]["login"]
         member_list = self.__facade.\
-            query_user([('github_id', github_id)])
+            query(User, [('github_id', github_id)])
         if action == "member_removed":
             if len(member_list) == 1:
                 slack_ids_string = ""
@@ -146,7 +146,7 @@ class WebhookHandler:
 
     def handle_membership_event(self, payload):
         """
-        Handle when a user is added, removed, or invited for membership.
+        Handle when a user is added, removed, or invited to team.
 
         If the member is removed, they are removed as a user from rocket's db
         if they have not been removed already.
@@ -162,10 +162,10 @@ class WebhookHandler:
         team = payload["team"]
         team_id = team["id"]
         team_name = team["name"]
-        selected_team = self.__facade.retrieve(team, team_id)
+        selected_team = self.__facade.retrieve(Team, team_id)
         if action == "member_removed":
             member_list = self.__facade. \
-                query_user([('github_id', github_id)])
+                query(User, [('github_id', github_id)])
             slack_ids_string = ""
             if len(member_list) == 1:
                 slack_id = member_list[0].slack_id
@@ -174,8 +174,13 @@ class WebhookHandler:
                     logging.info("deleted slack user {} from {}"
                                  .format(slack_id, team_name))
                     slack_ids_string += str(slack_id)
-                return "deleted slack ID {} from {}"\
-                    .format(slack_ids_string, team_name), 200
+                    return "deleted slack ID {} from {}"\
+                        .format(slack_ids_string, team_name), 200
+                else:
+                    logging.error("slack user {} not in {}"
+                                 .format(slack_id, team_name))
+                    return "slack user {} not in {}"\
+                                 .format(slack_id, team_name), 404
             elif len(member_list) > 1:
                 logging.error("Error: found github ID connected to"
                               " multiple slack IDs")
@@ -186,7 +191,7 @@ class WebhookHandler:
                 return "could not find user {}".format(github_id), 404
 
         elif action == "member_added":
-            member_list = self.__facade.query_user([('github_id', github_id)])
+            member_list = self.__facade.query(User, [('github_id', github_id)])
             slack_ids_string = ""
             if len(member_list) > 0:
                 selected_team.add_member(github_id)
@@ -195,7 +200,7 @@ class WebhookHandler:
                     logging.info("user {} added to {}".
                                  format(github_username, team_name))
                     slack_ids_string += " " + str(slack_id)
-                return "added slack ID{}".format(slack_ids_string), 200
+                    return "added slack ID{}".format(slack_ids_string), 200
             else:
                 logging.error("could not find user {}".format(github_id))
                 return "could not find user {}".format(github_username), 404
@@ -210,3 +215,6 @@ class WebhookHandler:
                            " invalid action specified: {}".
                            format(str(payload))))
             return "invalid membership webhook triggered", 405
+
+
+    
