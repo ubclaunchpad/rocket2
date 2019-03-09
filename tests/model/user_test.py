@@ -132,14 +132,14 @@ def test_set_permissions_level():
 
 
 def test_set_karma():
-    """Test setting karma"""
+    """Test setting karma."""
     user = User("U0G9QF9C6")
     user.karma = 5
     assert user.karma == 5
 
 
 def test_get_karma():
-    """Test getting karma"""
+    """Test getting karma."""
     user = User("U0G9QF9C6")
     assert user.karma == 1
 
