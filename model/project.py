@@ -1,6 +1,8 @@
 """Represent a team project."""
 import hashlib
 import time
+import uuid
+import random
 
 
 class Project:
@@ -18,7 +20,7 @@ class Project:
         """
         hfunc = hashlib.sha1()
         hfunc.update(bytes(github_urls[0], 'utf-8'))
-        hfunc.update(bytes(str(time.time()), 'utf-8'))
+        hfunc.update(bytes(str(uuid.uuid1()), 'utf-8'))
         self.project_id = hfunc.hexdigest()
         self.github_team_id = github_team_id
         self.github_urls = github_urls
