@@ -667,7 +667,7 @@ def test_handle_mem_event_rm_member_missing(mock_logging, mem_rm_payload):
 
 @mock.patch('webhook.webhook.logging')
 def test_handle_mem_event_rm_member_wrong_team(mock_logging, mem_rm_payload):
-    """Test what happens when member removed from a team they are not in"""
+    """Test what happens when member removed from a team they are not in."""
     mock_facade = mock.MagicMock(DBFacade)
     mock_facade.query.return_value = []
     webhook_handler = WebhookHandler(mock_facade)

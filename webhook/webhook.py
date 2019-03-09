@@ -177,9 +177,7 @@ class WebhookHandler:
             return "invalid membership webhook triggered", 405
 
     def mem_remove(self, github_id, selected_team, team_name):
-        """
-        Helper function for membership if payload action is removal
-        """
+        """Help membership function if payload action is removal."""
         member_list = self.__facade. \
             query(User, [('github_id', github_id)])
         slack_ids_string = ""
@@ -207,9 +205,7 @@ class WebhookHandler:
             return "could not find user {}".format(github_id), 404
 
     def mem_added(self, github_id, selected_team, team_name, github_username):
-        """
-        Helper function for membership if payload action is added
-        """
+        """Help membership function if payload action is added."""
         member_list = self.__facade.query(User, [('github_id', github_id)])
         slack_ids_string = ""
         if len(member_list) > 0:
@@ -225,9 +221,7 @@ class WebhookHandler:
             return "could not find user {}".format(github_username), 404
 
     def mem_invited(self, github_username, team_name):
-        """
-        Helper function for membership if payload action is invited
-        """
+        """Help membership function if payload action is invited."""
         logging.info("user {} invited to {}".
                      format(github_username, team_name))
         return "user " + github_username + " invited to " + team_name,\
