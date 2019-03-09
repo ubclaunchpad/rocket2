@@ -34,6 +34,7 @@ Attribute Name | Description
 `github_team_name` | `String`; The team's Github name
 `display_name` | `String`; The teams's display
 `platform` | `String`; The team's working platform
+`team_leads` | `String Set`; The team's set of team leads' Github IDs
 `members` | `String Set`; The team's set of members' Github IDs
 
 ## `projects` Table

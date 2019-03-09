@@ -6,7 +6,7 @@ must be enclosed by quotation marks.
 ## Options
 
 ```sh
-/rocket team {list, view, help, create, edit, add, remove, delete}
+/rocket team {list, view, help, create, edit, add, remove, lead, delete}
 ```
 
 ### List
@@ -39,18 +39,19 @@ Display options for team commands.
 /rocket team create GITHUB_TEAM_NAME [--name DISPLAY_NAME]
                                      [--platform PLATFORM]
                                      [--channel CHANNEL]
+                                     [--lead SLACK_ID]
 ```
 
-> **Note:** This command does not create the team on Github.
-
 Create a new team with a Github team name and optional display name. The user
-who runs the command will be automatically added to the new team. If the
-`--channel` flag is used, all members in specified channel will be added.
+who runs the command will be automatically added to team as Team Lead. If the
+`--lead` flag is used, user with `SLACK_ID` will be added as Team Lead
+instead. If the `--channel` flag is used, all members in specified
+channel will be added. 'SLACK_ID' is the `@`-name, for easy slack autocomplete.
 
 The Github team name cannot contain spaces.
 
 ```sh
-/rocket team create "struddle-bouts" --name "Struddle Bouts" --channel
+/rocket team create "struddle-bouts" --name "Struddle Bouts" --channel @brussel_sprouts
 ```
 
 ### Edit (Team Lead\* and Admin only)
@@ -68,8 +69,6 @@ they are a part of, but admins can edit any teams.
 /rocket team add GITHUB_TEAM_NAME SLACK_ID
 ```
 
-> **Note:** This command does not add a member on Github.
-
 Add a user to the team. Team Leads can only add users into teams that they are a
 part of, but admins can add users to any team. `SLACK_ID` is the `@`-name, for
 easy slack autocomplete.
@@ -84,10 +83,21 @@ easy slack autocomplete.
 /rocket team remove GITHUB_TEAM_NAME SLACK_ID
 ```
 
-> **Note:** This command does not remove a member of the team from Github.
-
-Remove a user from a team. Team Leads can only remove users from teams that they
+Remove a user from a team, removes them as Team Lead if they were one.
+Team Leads can only remove users from teams that they
 are a part of, but admins can remove users from any team. `SLACK_ID` is the
+`@`-name, for easy slack autocomplete.
+
+### Lead (Team Lead\* and Admin only)
+
+```sh
+/rocket team lead GITHUB_TEAM_NAME SLACK_ID [--remove]
+```
+
+Adds a user as Team Lead, and adds them to team if not already added.
+If `--remove` flag is used, will remove user as Team Lead, but not from the team.
+Team Leads can only promote/demote users in teams that they are part
+of, but admins can promote/demote users in any team. 'SLACK_ID' is the
 `@`-name, for easy slack autocomplete.
 
 ### Delete (Team Lead\* and Admin only)
@@ -95,8 +105,6 @@ are a part of, but admins can remove users from any team. `SLACK_ID` is the
 ```sh
 /rocket team delete GITHUB_TEAM_NAME
 ```
-
-> **Note:** This command does not remove the team from Github.
 
 Permanently delete a team. Team Leads can only delete teams that they are a part
 of, but admins can delete any team.

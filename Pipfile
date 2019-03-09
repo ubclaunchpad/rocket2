@@ -18,6 +18,9 @@ flask-talisman = "*"
 flask-seasurf = "*"
 pyjwt = "*"
 flask-limiter = "*"
+pem = "*"
+cryptography = "*"
+requests = "*"
 
 [dev-packages]
 awscli = "*"
