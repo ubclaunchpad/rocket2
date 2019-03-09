@@ -1,5 +1,6 @@
 """All necessary class initializations."""
 import os
+import pem
 import random
 import string
 import toml
@@ -9,8 +10,7 @@ from command.commands.token import TokenCommandConfig
 from datetime import timedelta
 from db.facade import DBFacade
 from db.dynamodb import DynamoDB
-from github import Github
-from interface.github import GithubInterface
+from interface.github import GithubInterface, DefaultGithubFactory
 from interface.slack import Bot
 from slackclient import SlackClient
 from webhook.webhook import WebhookHandler
@@ -23,15 +23,17 @@ def make_core(config, gh=None):
     :return: a new ``Core`` object, freshly initialized
     """
     slack_api_token = ""
-    github_api_token, github_organization = "", ""
     signing_key = ""
     if not config['testing']:
         slack_api_token = toml.load(
             config['slack']['creds_path'])['api_token']
-        github_api_token = toml.load(
-            config['github']['creds_path'])['api_token']
+        github_auth_key = pem.parse_file(
+            config['github']['signing_key_path'])[0].as_text()
+        github_app_id = config['github']['app_id']
         github_organization = config['github']['organization']
-        gh = GithubInterface(Github(github_api_token), github_organization)
+        gh = GithubInterface(DefaultGithubFactory(github_app_id,
+                                                  github_auth_key),
+                             github_organization)
         if os.path.isfile(config['auth']['signing_key_path']):
             signing_key = open(config['auth']['signing_key_path']).read()
         else:
