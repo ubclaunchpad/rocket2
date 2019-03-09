@@ -1,12 +1,12 @@
 """Command parsing for team events."""
 import logging
 import shlex
-
 from argparse import ArgumentParser, _SubParsersAction
 from command import ResponseTuple
 from db.facade import DBFacade
 from interface.github import GithubAPIException, GithubInterface
-from model import Team
+from model import Team, User
+from command.util import check_credentials
 from typing import Any, Dict, Optional
 
 
@@ -15,7 +15,9 @@ class TeamCommand:
 
     command_name = "team"
     desc = "for dealing with " + command_name + "s"
-    permission_error = "Insufficient permission level to run command!"
+    permission_error = "You do not have the sufficient " \
+                       "permission level for this command!"
+    lookup_error = "Lookup error! User not found!"
 
     def __init__(self,
                  db_facade: DBFacade,
@@ -76,9 +78,12 @@ class TeamCommand:
                                    help="Display name of your team.")
         parser_create.add_argument("--platform", type=str, action='store',
                                    help="The team's main platform.")
-        parser_create.add_argument('--channel', type=str, action='store',
+        parser_create.add_argument("--channel", type=str, action='store',
                                    help="Add all members of this channel "
                                         "to the created team.")
+        parser_create.add_argument("--lead", type=str, action='store',
+                                   help="Add given user as team lead"
+                                        "to created team.")
 
         """Parser for add command."""
         parser_add = subparsers.add_parser("add")
@@ -158,9 +163,10 @@ class TeamCommand:
                 "team_name": args.team_name,
                 "name": args.name,
                 "platform": args.platform,
-                "channel": args.channel
+                "channel": args.channel,
+                "lead": args.lead
             }
-            return self.create_helper(param_list)
+            return self.create_helper(param_list, user_id)
 
         elif args.which == "add":
             # stub
@@ -181,9 +187,8 @@ class TeamCommand:
 
         else:
             return self.get_help(), 200
-
-    def create_helper(self,
-                      param_list: Dict[str, str]) -> ResponseTuple:
+        
+    def create_helper(self, param_list, user_id):
         """
         Create Team and calls GitHub API to create in GitHub.
 
@@ -196,6 +201,10 @@ class TeamCommand:
                  otherwise returns success message
         """
         try:
+            command_user = self.facade.retrieve(User, user_id)
+            if not check_credentials(command_user, None):
+                return self.permission_error, 200
+
             msg = "new team: {}, ".format(param_list["team_name"])
             team_id = self.gh.org_create_team(param_list["team_name"])
             team = Team(str(team_id), param_list["team_name"], "")
@@ -207,10 +216,24 @@ class TeamCommand:
                 team.platform = param_list["platform"]
             if param_list["channel"] is not None:
                 msg += "add channel"
-                # stub: cannot finish until teamMember PR is pushed
-            self.facade.store(team)
+                for member_id in self.sc.get_channel_users(param_list["channel"]):
+                    member = self.facade.retrieve(User, member_id)
+                    self.gh.add_team_member(member.github_username, team_id)
+            else:
+                self.gh.add_team_member(command_user.github_username, team_id)
+            if param_list["lead"] is not None:
+                lead_user = self.facade.retrieve(User, param_list["lead"])
+                team.add_team_lead(lead_user.github_id)
+                if not self.gh.has_team_member(lead_user.github_username, team_id):
+                    self.gh.add_team_member(lead_user.github_username, team_id)
+            else:
+                team.add_team_lead(command_user.github_id)
+
+            self.facade.store_team(team)
             return msg, 200
         except GithubAPIException as e:
             logging.error("team creation unsuccessful")
             return "Team creation unsuccessful with the following error" \
                    + e.data, 200
+        except LookupError:
+            return self.lookup_error, 200
