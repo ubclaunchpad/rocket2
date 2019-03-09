@@ -17,6 +17,7 @@ class User:
         self.biography = ""
         self.image_url = ""
         self.permissions_level = Permissions.member
+        self.karma = 1
 
     def get_attachment(self):
         """Return slack-formatted attachment (dictionary) for user."""
@@ -31,7 +32,8 @@ class User:
             ('Position', self.position),
             ('Biography', self.biography),
             ('Image URL', self.image_url),
-            ('Permissions Level', str(self.permissions_level))
+            ('Permissions Level', str(self.permissions_level)),
+            ('Karma', self.karma)
         ]
 
         fields = [{'title': t, 'value': v if v else 'n/a', 'short': True}
@@ -68,6 +70,7 @@ class User:
         place_if_filled('position', user.position)
         place_if_filled('bio', user.biography)
         place_if_filled('image_url', user.image_url)
+        place_if_filled('karma', user.karma)
 
         return udict
 
@@ -90,6 +93,7 @@ class User:
         user.image_url = d.get('image_url', '')
         user.permissions_level = Permissions[d.get('permission_level',
                                                    'member')]
+        user.karma = d['karma']
         return user
 
     @staticmethod
