@@ -35,6 +35,7 @@ def create_test_admin(slack_id):
     u.major = 'Computer Science'
     u.permissions_level = Permissions.admin
     u.position = 'Adrenaline Junkie'
+    u.karma = 1
     return u
 
 

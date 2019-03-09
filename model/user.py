@@ -93,7 +93,7 @@ class User:
         user.image_url = d.get('image_url', '')
         user.permissions_level = Permissions[d.get('permission_level',
                                                    'member')]
-        user.karma = d.get('karma', 1)
+        user.karma = int(d.get('karma', 1))
         return user
 
     @staticmethod

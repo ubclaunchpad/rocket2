@@ -100,7 +100,6 @@ def test_retrieve_invalid_user(ddb):
     """Test to see if we can retrieve a non-existant user."""
     try:
         user = ddb.retrieve(User, 'abc_123')
-
         assert False
     except LookupError as e:
         assert str(e) == 'User(id=abc_123) not found'
@@ -126,7 +125,6 @@ def test_query_user(ddb):
     strict_users = ddb.query(User, [('permission_level', 'admin'),
                                     ('slack_id', 'abc_123')])
     all_users = ddb.query(User)
-
     assert user == users[0]
     assert user == all_users[0]
     assert user == strict_users[0]
