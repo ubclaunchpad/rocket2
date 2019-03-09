@@ -6,7 +6,7 @@ must be enclosed in quotation marks.
 ## Options
 
 ```sh
-/rocket user {add,edit, view, help, delete}
+/rocket user {add, edit, view, help, delete}
 ```
 
 ### Add

@@ -2,6 +2,8 @@
 import argparse
 import logging
 import shlex
+from interface.github import GithubAPIException
+from model.team import Team
 
 
 class TeamCommand:
@@ -9,10 +11,19 @@ class TeamCommand:
 
     command_name = "team"
     desc = "for dealing with " + command_name + "s"
+    permission_error = "Insufficient permission level to run command!"
 
-    def __init__(self, sc):
-        """Initialize team command parser with given Slack Client Interface."""
+    def __init__(self, db_facade, gh, sc):
+        """
+        Initialize team command parser.
+
+        :param db_facade: Given Dynamo_DB Facade
+        :param gh: Given Github Interface
+        :param sc: GIven Slack Client Interface
+        """
         logging.info("Initializing TeamCommand instance")
+        self.facade = db_facade
+        self.gh = gh
         self.sc = sc
         self.desc = ""
         self.parser = argparse.ArgumentParser(prog="/rocket")
@@ -58,7 +69,7 @@ class TeamCommand:
                                    help="Display name of your team.")
         parser_create.add_argument("--platform", type=str, action='store',
                                    help="The team's main platform.")
-        parser_create.add_argument('--channel', action='store_true',
+        parser_create.add_argument('--channel', type=str, action='store',
                                    help="Add all members of this channel "
                                         "to the created team.")
 
@@ -134,15 +145,13 @@ class TeamCommand:
             return args.team_name + " was deleted", 200
 
         elif args.which == "create":
-            # stub
-            msg = "new team: {}, ".format(args.team_name)
-            if args.name is not None:
-                msg += "name: {}, ".format(args.name)
-            if args.platform is not None:
-                msg += "platform: {}, ".format(args.platform)
-            if args.channel:
-                msg += "add channel"
-            return msg, 200
+            param_list = {
+                "team_name": args.team_name,
+                "name": args.name,
+                "platform": args.platform,
+                "channel": args.channel
+            }
+            return self.create_helper(param_list)
 
         elif args.which == "add":
             # stub
@@ -163,3 +172,35 @@ class TeamCommand:
 
         else:
             return self.get_help(), 200
+
+    def create_helper(self, param_list):
+        """
+        Create Team and calls GitHub API to create in GitHub.
+
+        If ``param_list[name]`` is not ``None``, will
+        add a display name. If ``param_list[channel] is not
+        ``None``, will add all members of channel in which the
+        command was called into the team.
+        :param param_list: List of parameters for creating team
+        :return: return error message if team created unsuccessfully
+                    otherwise returns success message
+        """
+        try:
+            msg = "new team: {}, ".format(param_list["team_name"])
+            team_id = self.gh.org_create_team()
+            team = Team(team_id, param_list["team_name"], "")
+            if param_list["name"] is not None:
+                msg += "name: {}, ".format(param_list["name"])
+                team.display_name = param_list["name"]
+            if param_list["platform"] is not None:
+                msg += "platform: {}, ".format(param_list["platform"])
+                team.platform = param_list["platform"]
+            if param_list["channel"] is not None:
+                msg += "add channel"
+                # stub: cannot finish until teamMember PR is pushed
+            self.facade.store_team(team)
+            return msg, 200
+        except GithubAPIException as e:
+            logging.error("team creation unsuccessful")
+            return "Team creation unsuccessful with the following error"\
+                   + e.data, 200

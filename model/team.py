@@ -14,6 +14,7 @@ class Team:
         self.github_team_name = github_team_name
         self.display_name = display_name
         self.platform = ""
+        self.team_leads = set()
         self.members = set()
 
     @staticmethod
@@ -28,6 +29,7 @@ class Team:
                     d['github_team_name'],
                     d.get('display_name', ''))
         team.platform = d.get('platform', '')
+        team.team_leads = set(d.get('team_leads', []))
         members = set(d.get('members', []))
         for member in members:
             team.add_member(member)
@@ -56,6 +58,7 @@ class Team:
         place_if_filled('display_name', team.display_name)
         place_if_filled('platform', team.platform)
         place_if_filled('members', team.members)
+        place_if_filled('team_leads', team.team_leads)
 
         return tdict
 
@@ -93,6 +96,14 @@ class Team:
     def is_member(self, github_user_id):
         """Identify if any member has the ID specified in the argument."""
         return github_user_id in self.members
+
+    def add_team_lead(self, github_user_id):
+        """Add a user's Github ID to the team's set of team lead IDs."""
+        self.team_leads.add(github_user_id)
+
+    def is_team_lead(self, github_user_id):
+        """Identify if user with given ID is a team lead."""
+        return github_user_id in self.team_leads
 
     def __str__(self):
         """Print information on the team class."""

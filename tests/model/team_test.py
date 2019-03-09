@@ -72,29 +72,46 @@ def test_get_members():
 
 
 def test_add_member():
-    """Test the Team class method add_member(uuid)."""
+    """Test the Team class method add_member(github_id)."""
     team = Team("1", "brussel-sprouts", "Brussel Sprouts")
-    new_slack_id = "U0G9QF9C6"
-    team.add_member(new_slack_id)
-    assert new_slack_id in team.members
+    new_github_id = "U0G9QF9C6"
+    team.add_member(new_github_id)
+    assert new_github_id in team.members
 
 
 def test_discard_member():
-    """Test the Team class method discard_member(slack_id)."""
+    """Test the Team class method discard_member(github_id)."""
     team = Team("1", "brussel-sprouts", "Brussel Sprouts")
-    new_slack_id = "U0G9QF9C6"
-    team.add_member(new_slack_id)
-    team.discard_member(new_slack_id)
+    new_github_id = "U0G9QF9C6"
+    team.add_member(new_github_id)
+    team.discard_member(new_github_id)
     assert team.members == set()
 
 
 def test_is_member():
-    """Test the Team class method is_member(slack_id)."""
+    """Test the Team class method is_member(github_id)."""
     team = Team("1", "brussel-sprouts", "Brussel Sprouts")
-    new_slack_id = "U0G9QF9C6"
-    assert team.is_member(new_slack_id) is False
-    team.add_member(new_slack_id)
-    assert team.is_member(new_slack_id)
+    new_github_id = "U0G9QF9C6"
+    assert team.is_member(new_github_id) is False
+    team.add_member(new_github_id)
+    assert team.is_member(new_github_id)
+
+
+def test_add_lead():
+    """Test the Team class method add_team_lead(github_id)."""
+    team = Team("1", "brussel-sprouts", "Brussel Sprouts")
+    new_github_id = "U0G9QF9C6"
+    team.add_team_lead(new_github_id)
+    assert new_github_id in team.team_leads
+
+
+def test_is_lead():
+    """Test the Team class method is_team_lead(github_id)."""
+    team = Team("1", "brussel-sprouts", "Brussel Sprouts")
+    new_github_id = "U0G9QF9C6"
+    assert team.is_team_lead(new_github_id) is False
+    team.add_team_lead(new_github_id)
+    assert team.is_team_lead(new_github_id) is True
 
 
 def test_print():
@@ -102,9 +119,11 @@ def test_print():
     team = Team("1", "brussel-sprouts", "Brussel Sprouts")
     new_slack_id = "U0G9QF9C6"
     team.add_member(new_slack_id)
+    team.add_team_lead(new_slack_id)
     team.platform = "web"
     assert str(team) == "{'github_team_id': '1'," \
                         " 'github_team_name': 'brussel-sprouts'," \
                         " 'display_name': 'Brussel Sprouts'," \
                         " 'platform': 'web'," \
+                        " 'team_leads': {'U0G9QF9C6'}," \
                         " 'members': {'U0G9QF9C6'}}"
