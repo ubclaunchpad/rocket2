@@ -8,7 +8,6 @@ import sys
 import toml
 import structlog
 from flask_talisman import Talisman
-from flask_seasurf import SeaSurf
 
 
 dictConfig({
@@ -50,7 +49,6 @@ try:
     # HTTP security header middleware for Flask
     talisman = Talisman(app)
     # anti-CSRF middleware for Flask
-    csrf = SeaSurf(app)
     config = toml.load('config.toml')
     core = make_core(config)
     webhook_handler = make_webhook_handler(config)
