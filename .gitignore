@@ -18,3 +18,4 @@ inertia.toml
 # Docs generation files
 _build/
 /credentials/
+.mypy_cache/

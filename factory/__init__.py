@@ -15,8 +15,12 @@ from interface.slack import Bot
 from slackclient import SlackClient
 from webhook.webhook import WebhookHandler
 
+from typing import MutableMapping, Dict, Any, Optional, cast
 
-def make_core(config, credentials, gh=None):
+
+def make_core(config: Dict[str, Any],
+              credentials,
+              gh: Optional[GithubInterface] = None) -> Core:
     """
     Initialize and returns a :class:`command.core.Core` object.
 
@@ -43,10 +47,10 @@ def make_core(config, credentials, gh=None):
     bot = Bot(SlackClient(slack_api_token), slack_bot_channel)
     # TODO: make token config expiry configurable
     token_config = TokenCommandConfig(timedelta(days=7), signing_key)
-    return Core(facade, bot, gh, token_config)
+    return Core(facade, bot, cast(GithubInterface, gh), token_config)
 
 
-def make_webhook_handler(config, credentials):
+def make_webhook_handler(config: Dict[str, Any], credentials) -> WebhookHandler:
     """
     Initialize and returns a :class:`webhook.webhook.WebhookHandler` object.
 
@@ -56,6 +60,6 @@ def make_webhook_handler(config, credentials):
     return WebhookHandler(facade)
 
 
-def create_signing_token():
+def create_signing_token() -> str:
     """Create a new, random signing token."""
     return ''.join(random.choice(string.ascii_lowercase) for _ in range(24))

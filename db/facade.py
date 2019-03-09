@@ -1,4 +1,7 @@
 """Database Facade."""
+from model import UnionModels, UnionModelTypes
+from typing import List, Tuple
+from db.dynamodb import DynamoDB
 import logging
 
 
@@ -12,7 +15,7 @@ class DBFacade:
     would stay the same.
     """
 
-    def __init__(self, db):
+    def __init__(self, db: DynamoDB) -> None:
         """
         Initialize facade using a given class.
 
@@ -23,11 +26,11 @@ class DBFacade:
         logging.info("Initializing database facade")
         self.ddb = db
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Return a string representing this class."""
         return "Database Facade"
 
-    def store(self, obj):
+    def store(self, obj: UnionModels) -> bool:
         """
         Store object into the correct table.
 
@@ -38,9 +41,11 @@ class DBFacade:
         :return: True if object was stored, and false otherwise
         """
         logging.info(f"Storing object {obj}")
-        self.ddb.store(obj)
+        return self.ddb.store(obj)
 
-    def retrieve(self, Model, k):
+    def retrieve(self,
+                 Model: UnionModelTypes,
+                 k: str) -> UnionModels:
         """
         Retrieve a model from the database.
 
@@ -52,7 +57,9 @@ class DBFacade:
         logging.info(f"Retrieving {Model.__name__}(id={k})")
         return self.ddb.retrieve(Model, k)
 
-    def query(self, Model, params=[]):
+    def query(self,
+              Model: UnionModelTypes,
+              params: List[Tuple[str, str]] = []) -> List[UnionModels]:
         """
         Query a table using a list of parameters.
 
@@ -86,7 +93,9 @@ class DBFacade:
                      f"parameters: {params}")
         return self.ddb.query(Model, params)
 
-    def delete(self, Model, k):
+    def delete(self,
+               Model: UnionModelTypes,
+               k: str) -> None:
         """
         Remove an object from a table.
 

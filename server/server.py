@@ -11,6 +11,8 @@ from flask_talisman import Talisman
 from flask_seasurf import SeaSurf
 from interface.slack import SlackAPIError
 from config import Credentials
+from typing import cast, Dict
+
 
 dictConfig({
     'version': 1,

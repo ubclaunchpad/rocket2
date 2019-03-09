@@ -1,26 +1,37 @@
 """Calls the appropriate handler depending on the event data."""
+from command import ResponseTuple
+from command.commands import UnionCommands
 from command.commands.user import UserCommand
 from command.commands.token import TokenCommand
-import command.util as util
+from db.facade import DBFacade
 from model.user import User
-from interface.slack import SlackAPIError
-import logging
+from interface.slack import Bot, SlackAPIError
+from interface.github import GithubInterface
 from flask import jsonify
+from typing import Dict
+import logging
+import command.util as util
 
 
 class Core:
     """Encapsulate methods for handling events."""
 
-    def __init__(self, db_facade, bot, gh_interface, token_config):
+    def __init__(self,
+                 db_facade: DBFacade,
+                 bot: Bot,
+                 gh_interface: GithubInterface,
+                 token_config) -> None:
         """Initialize the dictionary of command handlers."""
-        self.__commands = {}
+        self.__commands: Dict[str, UnionCommands] = {}
         self.__facade = db_facade
         self.__bot = bot
         self.__github = gh_interface
         self.__commands["user"] = UserCommand(self.__facade, self.__github)
         self.__commands["token"] = TokenCommand(self.__facade, token_config)
 
-    def handle_app_command(self, cmd_txt, user):
+    def handle_app_command(self,
+                           cmd_txt: str,
+                           user: str) -> ResponseTuple:
         """
         Handle a command call to rocket.
 

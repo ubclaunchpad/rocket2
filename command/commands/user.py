@@ -1,11 +1,14 @@
 """Command parsing for user events."""
-import argparse
+from argparse import ArgumentParser, _SubParsersAction
 import logging
 import shlex
 from flask import jsonify
 from model.permissions import Permissions
 from model.user import User
-from interface.github import GithubAPIException
+from interface.github import GithubAPIException, GithubInterface
+from command import ResponseTuple
+from db.facade import DBFacade
+from typing import Dict, cast
 
 
 class UserCommand:
@@ -18,17 +21,19 @@ class UserCommand:
     delete_text = "Deleted user with Slack ID: "
     desc = f"for dealing with {command_name}s"
 
-    def __init__(self, db_facade, github_interface):
+    def __init__(self,
+                 db_facade: DBFacade,
+                 github_interface: GithubInterface) -> None:
         """Initialize user command."""
         logging.info("Initializing UserCommand instance")
-        self.parser = argparse.ArgumentParser(prog="/rocket")
+        self.parser = ArgumentParser(prog="/rocket")
         self.parser.add_argument("user")
         self.subparser = self.init_subparsers()
         self.help = self.get_help()
         self.facade = db_facade
         self.github = github_interface
 
-    def init_subparsers(self):
+    def init_subparsers(self) -> _SubParsersAction:
         """Initialize subparsers for user command."""
         subparsers = self.parser.add_subparsers(dest="which")
 
@@ -85,11 +90,11 @@ class UserCommand:
                                  action='store', choices=list(Permissions))
         return subparsers
 
-    def get_name(self):
+    def get_name(self) -> str:
         """Return the command type."""
         return self.command_name
 
-    def get_help(self):
+    def get_help(self) -> str:
         """Return command options for user events."""
         res = f"\n*{self.command_name} commands:*```"
         for argument in self.subparser.choices:
@@ -98,11 +103,13 @@ class UserCommand:
             res += self.subparser.choices[argument].format_help()
         return res + "```"
 
-    def get_desc(self):
+    def get_desc(self) -> str:
         """Return the description of this command."""
         return self.desc
 
-    def handle(self, command, user_id):
+    def handle(self,
+               command: str,
+               user_id: str) -> ResponseTuple:
         """Handle command by splitting into substrings and giving to parser."""
         logging.debug("Handling UserCommand")
         command_arg = shlex.split(command)
@@ -139,7 +146,9 @@ class UserCommand:
         else:
             return self.get_help(), 200
 
-    def edit_helper(self, user_id, param_list):
+    def edit_helper(self,
+                    user_id: str,
+                    param_list: Dict[str, str]) -> ResponseTuple:
         """
         Edit user from database.
 
@@ -157,18 +166,19 @@ class UserCommand:
         msg = ""
         if param_list["member"] is not None:
             try:
-                admin_user = self.facade.retrieve(User, user_id)
+                admin_user = cast(User, self.facade.retrieve(User, user_id))
                 if admin_user.permissions_level != Permissions.admin:
                     return self.permission_error, 200
                 else:
                     is_admin = True
                     edited_id = param_list["member"]
-                    edited_user = self.facade.retrieve(User, edited_id)
+                    edited_user = cast(User, self.facade.retrieve(User,
+                                                                  edited_id))
             except LookupError:
                 return self.lookup_error, 200
         else:
             try:
-                edited_user = self.facade.retrieve(User, user_id)
+                edited_user = cast(User, self.facade.retrieve(User, user_id))
             except LookupError:
                 return self.lookup_error, 200
 
@@ -191,7 +201,8 @@ class UserCommand:
         if param_list["bio"]:
             edited_user.biography = param_list["bio"]
         if param_list["permission"] and is_admin:
-            edited_user.permissions_level = param_list["permission"]
+            edited_user.permissions_level =\
+                Permissions[param_list["permission"]]
         elif param_list["permission"] and not is_admin:
             msg += "\nCannot change own permission: user isn't admin."
             logging.warning(f"User {user_id} tried to elevate permissions"
@@ -200,10 +211,15 @@ class UserCommand:
         self.facade.store(edited_user)
         ret = {'attachments': [edited_user.get_attachment()]}
         if msg != "":
-            ret['text'] = msg
+            # mypy doesn't like the fact that there could be different types
+            # for the values of the dict ret, so we have to ignore this line
+            # for now
+            ret['text'] = msg       # type: ignore
         return jsonify(ret), 200
 
-    def delete_helper(self, user_id, slack_id):
+    def delete_helper(self,
+                      user_id: str,
+                      slack_id: str) -> ResponseTuple:
         """
         Delete user from database.
 
@@ -218,7 +234,7 @@ class UserCommand:
                  deletion message if user is deleted.
         """
         try:
-            user_command = self.facade.retrieve(User, user_id)
+            user_command = cast(User, self.facade.retrieve(User, user_id))
             if user_command.permissions_level == Permissions.admin:
                 self.facade.delete(User, slack_id)
                 return self.delete_text + slack_id, 200
@@ -227,7 +243,9 @@ class UserCommand:
         except LookupError:
             return self.lookup_error, 200
 
-    def view_helper(self, user_id, slack_id):
+    def view_helper(self,
+                    user_id: str,
+                    slack_id: str) -> ResponseTuple:
         """
         View user info from database.
 
@@ -241,15 +259,17 @@ class UserCommand:
         """
         try:
             if slack_id is None:
-                user = self.facade.retrieve(User, user_id)
+                user = cast(User, self.facade.retrieve(User, user_id))
             else:
-                user = self.facade.retrieve(User, slack_id)
+                user = cast(User, self.facade.retrieve(User, slack_id))
 
             return jsonify({'attachments': [user.get_attachment()]}), 200
         except LookupError:
             return self.lookup_error, 200
 
-    def add_helper(self, user_id, use_force):
+    def add_helper(self,
+                   user_id: str,
+                   use_force: bool) -> ResponseTuple:
         """
         Add the user to the database via user id.
 
