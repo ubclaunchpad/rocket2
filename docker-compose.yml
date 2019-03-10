@@ -6,7 +6,7 @@ services:
         volumes:
             - /etc/letsencrypt
             - /usr/share/nginx/html
-            - /etc/nginx/nginx.conf
+            - /etc/nginx
         ports:
             - 80:80
             - 443:443
