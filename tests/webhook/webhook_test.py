@@ -36,7 +36,7 @@ def org_default_payload():
                     "events_url": "",
                     "received_events_url": "",
                     "type": "User",
-                    "site_admin": "False"
+                    "site_admin": False
                 }
             },
             "organization": {
@@ -71,7 +71,7 @@ def org_default_payload():
                 "events_url": "",
                 "received_events_url": "",
                 "type": "User",
-                "site_admin": "False"
+                "site_admin": False
             }
         }
     return default_payload
@@ -515,7 +515,7 @@ def mem_default_payload():
                 "events_url": "",
                 "received_events_url": "",
                 "type": "User",
-                "site_admin": "False"
+                "site_admin": False
             },
             "sender": {
                 "login": "Codertocat",
@@ -535,7 +535,7 @@ def mem_default_payload():
                 "events_url": "",
                 "received_events_url": "",
                 "type": "User",
-                "site_admin": "False"
+                "site_admin": False
             },
             "team": {
                 "name": "rocket",

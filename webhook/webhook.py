@@ -33,26 +33,24 @@ class WebhookHandler:
                 for member in member_list:
                     slack_id = member.slack_id
                     self.__facade.delete(User, slack_id)
-                    logging.info("deleted slack user {}".format(slack_id))
-                    slack_ids_string += " " + str(slack_id)
-                return "deleted slack ID{}".format(slack_ids_string), 200
+                    logging.info(f"deleted slack user {slack_id}")
+                    slack_ids_string += f" {slack_id}"
+                return f"deleted slack ID{slack_ids_string}", 200
             elif len(member_list) > 1:
                 logging.error("Error: found github ID connected to"
                               " multiple slack IDs")
                 return ("Error: found github ID connected to multiple slack"
                         " IDs", 412)
             else:
-                logging.error("could not find user {}".format(github_id))
-                return "could not find user {}".format(github_username), 404
+                logging.error(f"could not find user {github_id}")
+                return f"could not find user {github_username}", 404
         elif action == "member_added":
-            logging.info("user {} added to {}".
-                         format(github_username, organization))
-            return "user " + github_username + " added to " + organization, 200
+            logging.info(f"user {github_username} added to {organization}")
+            return f"user {github_username} added to {organization}", 200
         elif action == "member_invited":
             logging.info("user {} invited to {}".
                          format(github_username, organization))
-            return "user " + github_username + " invited to " + organization,\
-                   200
+            return f"user {github_username} invited to {organization}", 200
         else:
             logging.error(("organization webhook triggered,"
                            " invalid action specified: {}".
@@ -94,54 +92,46 @@ class WebhookHandler:
             self.__facade.store(team)
             logging.info("team {} with id {} added to rocket db.".
                          format(github_team_name, github_id))
-            return "created team with github id {}".format(github_id), 200
+            return f"created team with github id {github_id}", 200
         elif action == "deleted":
-            logging.debug("team deleted event triggered: {}".
-                          format(str(payload)))
+            logging.debug(f"team deleted event triggered: {str(payload)}")
             try:
                 self.__facade.retrieve(Team, github_id)
                 self.__facade.delete(Team, github_id)
                 logging.info("team {} with github id {} removed from db".
                              format(github_team_name, github_id))
-                return "deleted team with github id {}".format(github_id), 200
+                return f"deleted team with github id {github_id}", 200
             except LookupError:
-                logging.error("team with github id {} not found.".
-                              format(github_id))
-                return "team with github id {} not found"\
-                       .format(github_id), 404
+                logging.error(f"team with github id {github_id} not found.")
+                return f"team with github id {github_id} not found", 404
         elif action == "edited":
-            logging.debug("team edited event triggered: {}".
-                          format(str(payload)))
+            logging.debug(f"team edited event triggered: {str(payload)}")
             try:
                 team = self.__facade.retrieve(Team, github_id)
                 team.github_team_name = github_team_name
-                logging.info("changed team's name with id {} from {} to {}".
-                             format(github_id, github_team_name,
-                                    team.github_team_name))
+                logging.info(f"changed team's name with id {github_id} from "
+                             f"{github_team_name} to {team.github_team_name}")
                 self.__facade.store(team)
-                logging.info("updated team with id {} in rocket db."
-                             .format(github_id))
-                return "updated team with id {}".format(github_id), 200
+                logging.info(f"updated team with id {github_id} in"
+                             " rocket db.")
+                return f"updated team with id {github_id}", 200
             except LookupError:
-                logging.error("team with github id {} not found.".
-                              format(github_id))
-                return "team with github id {} not found"\
-                       .format(github_id), 404
+                logging.error(f"team with github id {github_id} not found.")
+                return f"team with github id {github_id} not found", 404
         elif action == "added_to_repository":
             repository_name = payload["repository"]["name"]
-            logging.info("team with id {} added to repository {}"
-                         .format(github_id, repository_name))
-            return "team with id {} added to repository {}"\
-                   .format(github_id, repository_name), 200
+            logging.info(f"team with id {github_id} added to repository"
+                         f" {repository_name}")
+            return (f"team with id {github_id} added to repository"
+                    f" {repository_name}", 200)
         elif action == "removed_from_repository":
             repository_name = payload["repository"]["name"]
-            logging.info("team with id {} from repository {}"
-                         .format(github_id, repository_name))
-            return "team with id {} removed repository {}"\
-                   .format(github_id, repository_name), 200
+            logging.info(f"team with id {github_id} from repository"
+                         f" {repository_name}")
+            return (f"team with id {github_id} removed repository "
+                    f"{repository_name}", 200)
         else:
-            logging.error("invalid payload received: {}".
-                          format(str(payload)))
+            logging.error(f"invalid payload received: {str(payload)}")
             return "invalid payload", 405
 
     def handle_membership_event(self, payload):
@@ -185,24 +175,22 @@ class WebhookHandler:
             slack_id = member_list[0].slack_id
             if selected_team.is_member(github_id):
                 selected_team.discard_member(github_id)
-                logging.info("deleted slack user {} from {}"
-                             .format(slack_id, team_name))
-                slack_ids_string += str(slack_id)
-                return "deleted slack ID {} from {}"\
-                    .format(slack_ids_string, team_name), 200
+                logging.info(f"deleted slack user {slack_id} "
+                             f"from {team_name}")
+                slack_ids_string += f" {slack_id}"
+                return (f"deleted slack ID{slack_ids_string} "
+                        f"from {team_name}", 200)
             else:
-                logging.error("slack user {} not in {}"
-                              .format(slack_id, team_name))
-                return "slack user {} not in {}"\
-                    .format(slack_id, team_name), 404
+                logging.error(f"slack user {slack_id} not in {team_name}")
+                return (f"slack user {slack_id} not in {team_name}", 404)
         elif len(member_list) > 1:
             logging.error("Error: found github ID connected to"
                           " multiple slack IDs")
             return ("Error: found github ID connected to multiple"
                     " slack IDs", 412)
         else:
-            logging.error("could not find user {}".format(github_id))
-            return "could not find user {}".format(github_id), 404
+            logging.error(f"could not find user {github_id}")
+            return f"could not find user {github_id}", 404
 
     def mem_added(self, github_id, selected_team, team_name, github_username):
         """Help membership function if payload action is added."""
@@ -214,15 +202,14 @@ class WebhookHandler:
                 slack_id = member.slack_id
                 logging.info("user {} added to {}".
                              format(github_username, team_name))
-                slack_ids_string += " " + str(slack_id)
-                return "added slack ID{}".format(slack_ids_string), 200
+                slack_ids_string += f" {slack_id}"
+                return f"added slack ID{slack_ids_string}", 200
         else:
-            logging.error("could not find user {}".format(github_id))
-            return "could not find user {}".format(github_username), 404
+            logging.error(f"could not find user {github_id}")
+            return f"could not find user {github_username}", 404
 
     def mem_invited(self, github_username, team_name):
         """Help membership function if payload action is invited."""
         logging.info("user {} invited to {}".
                      format(github_username, team_name))
-        return "user " + github_username + " invited to " + team_name,\
-               200
+        return f"user {github_username} invited to {team_name}", 200
