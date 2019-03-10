@@ -4,9 +4,9 @@ services:
     nginx:
         image: nginx:stable-alpine
         volumes:
-            - /etc/letsencrypt:/etc/letsencrypt
-            - /usr/share/nginx/html:/usr/share/nginx/html
-            - ./nginx.conf:/etc/nginx/nginx.conf
+            - /etc/letsencrypt
+            - /usr/share/nginx/html
+            - /etc/nginx/nginx.conf
         ports:
             - 80:80
             - 443:443
