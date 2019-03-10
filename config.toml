@@ -12,7 +12,8 @@ projects_table = "projects"
 region = "us-west-2"
 
 [github]
-creds_path = "credentials/github.toml"
+signing_key_path = "credentials/github_signing_key.pem"
+app_id = 26418
 organization = "ubclaunchpad"
 
 [auth]

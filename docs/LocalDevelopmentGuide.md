@@ -102,16 +102,25 @@ secret_access_key = "..."
 Replace the `...` values for both fields with the appropriate values noted
 in section 4.
 
-### 5.3: Set Up Github Credentials
+### 5.3: Set Up Github App
 
-Create the file `credentials/github.toml` and input the following:
+Register Rocket 2 as a Github App under an appropriate testing organization
+(our team has one of these set up already). Make sure to install the Github App
+to the organization in addition to regsitering it.
+
+Under ''Private keys'', click ''Generate a new private key''. This will generate
+and allow you to download a new secret key for Rocket 2. Save this to the
+`credentials/` directory as `github_signing_key.pem` - it should already be in
+the PEM file format, bracketed by:
 
 ```
-api_token = "..."
+-----BEGIN RSA PRIVATE KEY-----
+...
+-----END RSA PRIVATE KEY-----
 ```
 
-Replace the `...` value with a personal access token, which can be
-generated [here][github-token].
+Authenticating Rocket 2 as a Github App and obtaining an access token for the
+Github API should be automated, once the signing key is available.
 
 ## 6: Build and Run Container
 
