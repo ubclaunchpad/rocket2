@@ -54,7 +54,7 @@ class User:
         :param user: the user object
         :return: the dictionary representing the user
         """
-        def place_if_filled(name: str, field: str) -> None:
+        def place_if_filled(name: str, field: Any) -> None:
             """Populate ``udict`` if ``field`` isn't empty."""
             if field:
                 udict[name] = field

@@ -60,7 +60,7 @@ class GithubInterface:
     def org_has_member(self, username: str) -> bool:
         """Return true if user with username is member of organization."""
         user = self.github.get_user(username)
-        return self.org.has_in_members(user)
+        return cast(bool, self.org.has_in_members(user))
 
     @handle_github_error
     def org_get_team(self, id: int) -> Team:
@@ -79,16 +79,19 @@ class GithubInterface:
                                     GithubObject.NotSet,
                                     "closed",
                                     "push")
-        return team.id
+        return cast(int, team.id)
 
     @handle_github_error
-    def org_delete_team(self, id):
+    def org_delete_team(self, id: int) -> None:
         """Get team with given ID and delete it from organization."""
         team = self.org_get_team(id)
         team.delete()
 
     @handle_github_error
-    def org_edit_team(self, key, name, description=None):
+    def org_edit_team(self,
+                      key: int,
+                      name: str,
+                      description: str = None):
         """
         Get team with given ID and edit name and description.
 
