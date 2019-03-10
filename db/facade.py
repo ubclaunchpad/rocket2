@@ -87,6 +87,7 @@ class DBFacade:
                                      ('members', '231abc')])
 
         :param Model: type of list elements you'd want
+        :param params: list of tuples to match
         :return: a list of ``Model`` that fit the query parameters
         """
         logging.info(f"Querying {Model.__name__} matching "

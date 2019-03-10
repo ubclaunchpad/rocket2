@@ -7,8 +7,8 @@ from db.facade import DBFacade
 from model.user import User
 from interface.slack import Bot, SlackAPIError
 from interface.github import GithubInterface
-from flask import jsonify
-from typing import Dict
+from flask import jsonify, Response
+from typing import Dict, Any, cast
 import logging
 import command.util as util
 
@@ -55,7 +55,7 @@ class Core:
             logging.error("app command triggered incorrectly")
             return 'Please enter a valid command', 200
 
-    def handle_team_join(self, event_data):
+    def handle_team_join(self, event_data: Dict[str, Any]) -> None:
         """
         Handle the event of a new user joining the workspace.
 
@@ -80,7 +80,7 @@ class Core:
         self.__bot.send_event_notif(msg)
         logging.info("Core passing notification to bot")
 
-    def get_help(self):
+    def get_help(self) -> Response:
         """
         Get help messages and return a formatted string for messaging.
 
@@ -99,5 +99,5 @@ class Core:
             cmd_text = f"*{cmd_name}:* {cmd.desc}"
             attachment = {"text": cmd_text, "mrkdwn_in": ["text"]}
             attachments.append(attachment)
-        message["attachments"] = attachments
-        return jsonify(message)
+        message["attachments"] = attachments    # type: ignore
+        return cast(Response, jsonify(message))

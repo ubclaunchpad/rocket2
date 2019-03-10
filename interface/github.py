@@ -3,6 +3,9 @@ from github import Github, GithubObject, GithubException
 from interface.exceptions.github import GithubAPIException
 from interface.github_app import GithubAppInterface, \
     DefaultGithubAppAuthFactory
+from github.Team import Team
+from github.NamedUser import NamedUser
+from typing import List, cast, Optional, Iterable
 
 
 def handle_github_error(func):
@@ -36,36 +39,36 @@ class GithubInterface:
             raise GithubAPIException(e.data)
 
     @handle_github_error
-    def org_add_member(self, username):
+    def org_add_member(self, username: str) -> None:
         """Add/update to member with given username to organization."""
         user = self.github.get_user(username)
         self.org.add_to_members(user, "member")
 
     @handle_github_error
-    def org_add_admin(self, username):
+    def org_add_admin(self, username: str) -> None:
         """Add member with given username as admin to organization."""
         user = self.github.get_user(username)
         self.org.add_to_members(user, "admin")
 
     @handle_github_error
-    def org_remove_member(self, username):
+    def org_remove_member(self, username: str) -> None:
         """Remove member with given username from organization."""
         user = self.github.get_user(username)
         self.org.remove_from_membership(user)
 
     @handle_github_error
-    def org_has_member(self, username):
+    def org_has_member(self, username: str) -> bool:
         """Return true if user with username is member of organization."""
         user = self.github.get_user(username)
         return self.org.has_in_members(user)
 
     @handle_github_error
-    def org_get_team(self, id):
+    def org_get_team(self, id: int) -> Team:
         """Given Github team ID, return team from organization."""
         return self.org.get_team(id)
 
     @handle_github_error
-    def org_create_team(self, name):
+    def org_create_team(self, name: str) -> int:
         """
         Create team with given name and add to organization.
 
@@ -92,7 +95,6 @@ class GithubInterface:
         :param key: team's Github ID
         :param name: new team name
         :param description: new team description
-        :return: None
         """
         team = self.org_get_team(key)
         if description is not None:
@@ -125,7 +127,7 @@ class GithubInterface:
         """Return a team member with a username of username."""
         try:
             team = self.github.get_team(team_id)
-            team_members = map(lambda x: x, team.get_members())
+            team_members = team.get_members()
             return next(
                 member for member in team_members
                 if member.name == username)

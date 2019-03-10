@@ -201,8 +201,8 @@ class UserCommand:
         if param_list["bio"]:
             edited_user.biography = param_list["bio"]
         if param_list["permission"] and is_admin:
-            edited_user.permissions_level =\
-                Permissions[param_list["permission"]]
+            edited_user.permissions_level = cast(Permissions,
+                                                 param_list["permission"])
         elif param_list["permission"] and not is_admin:
             msg += "\nCannot change own permission: user isn't admin."
             logging.warning(f"User {user_id} tried to elevate permissions"

@@ -13,6 +13,12 @@ Team
 .. automodule:: model.team
     :members:
 
+Project
+-------
+
+.. automodule:: model.project
+    :members:
+
 Permissions
 -----------
 

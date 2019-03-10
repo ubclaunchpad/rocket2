@@ -4,12 +4,12 @@ import logging
 import toml
 from functools import reduce
 from boto3.dynamodb.conditions import Attr
-from model import UnionModels, UnionModelTypes
+from model import UnionModelTypes, UnionModels
 from model.user import User
 from model.team import Team
 from model.project import Project
 from model.permissions import Permissions
-from typing import Dict, Optional, Union, Any, Tuple, List, Type, Sequence
+from typing import Dict, Optional, Any, Tuple, List, Type, Sequence
 
 
 class DynamoDB:
@@ -31,9 +31,7 @@ class DynamoDB:
             self.projects_table = config['projects_table']
 
         def get_table_name(self,
-                           cls: Union[Type[User],
-                                      Type[Team],
-                                      Type[Project]]) -> str:
+                           cls: UnionModelTypes) -> str:
             """
             Convert class into corresponding table name.
 
@@ -278,6 +276,7 @@ class DynamoDB:
                                      ('members', '231abc')])
 
         :param Model: type of list elements you'd want
+        :param params: list of tuples to match
         :return: a list of ``Model`` that fit the query parameters
         """
         table_name = self.CONST.get_table_name(Model)

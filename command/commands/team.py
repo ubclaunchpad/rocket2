@@ -192,12 +192,12 @@ class TeamCommand:
         command was called into the team.
         :param param_list: List of parameters for creating team
         :return: return error message if team created unsuccessfully
-                    otherwise returns success message
+                 otherwise returns success message
         """
         try:
             msg = "new team: {}, ".format(param_list["team_name"])
             team_id = self.gh.org_create_team(param_list["team_name"])
-            team = Team(team_id, param_list["team_name"], "")
+            team = Team(str(team_id), param_list["team_name"], "")
             if param_list["name"] is not None:
                 msg += "name: {}, ".format(param_list["name"])
                 team.display_name = param_list["name"]

@@ -2,16 +2,20 @@
 import logging
 from model.user import User
 from model.team import Team
+from db.facade import DBFacade
+from typing import Dict, Any, cast
+from command import ResponseTuple
 
 
 class WebhookHandler:
     """Encapsulate methods for GitHub webhook triggered events."""
 
-    def __init__(self, db_facade):
+    def __init__(self, db_facade: DBFacade) -> None:
         """Give handler access to the database."""
         self.__facade = db_facade
 
-    def handle_organization_event(self, payload):
+    def handle_organization_event(self,
+                                  payload: Dict[str, Any]) -> ResponseTuple:
         """
         Handle when a user is added, removed, or invited to an organization.
 
@@ -67,7 +71,7 @@ class WebhookHandler:
         logging.info(f"user {github_username} invited to {organization}")
         return f"user {github_username} invited to {organization}", 200
 
-    def handle_team_event(self, payload):
+    def handle_team_event(self, payload: Dict[str, Any]) -> ResponseTuple:
         """
         Handle team events of the organization.
 
@@ -116,7 +120,7 @@ class WebhookHandler:
         elif action == "edited":
             logging.debug(f"team edited event triggered: {str(payload)}")
             try:
-                team = self.__facade.retrieve(Team, github_id)
+                team = cast(Team, self.__facade.retrieve(Team, github_id))
                 team.github_team_name = github_team_name
                 logging.info(f"changed team's name with id {github_id} from "
                              f"{github_team_name} to {team.github_team_name}")
