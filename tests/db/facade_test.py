@@ -1,5 +1,5 @@
 """Test the facade for the database."""
-from db.facade import DBFacade
+from db import DBFacade
 from unittest import mock
 from tests.util import *
 

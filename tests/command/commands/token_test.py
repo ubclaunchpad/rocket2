@@ -3,7 +3,7 @@ import jwt
 
 from command.commands.token import TokenCommand, TokenCommandConfig
 from datetime import timedelta
-from db.facade import DBFacade
+from db import DBFacade
 from model import User, Permissions
 from unittest import mock, TestCase
 
