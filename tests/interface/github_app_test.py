@@ -1,8 +1,9 @@
 """Tests for Github App interface."""
+import jwt
+
+from datetime import datetime, timedelta
 from interface.github_app import GithubAppInterface, \
     DefaultGithubAppAuthFactory
-from datetime import datetime, timedelta
-import jwt
 from unittest.mock import MagicMock, patch
 
 PRIVATE_KEY = \

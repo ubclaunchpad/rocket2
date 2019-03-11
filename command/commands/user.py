@@ -1,13 +1,13 @@
 """Command parsing for user events."""
-from argparse import ArgumentParser, _SubParsersAction
 import logging
 import shlex
-from flask import jsonify
-from model.permissions import Permissions
-from model.user import User
-from interface.github import GithubAPIException, GithubInterface
+
+from argparse import ArgumentParser, _SubParsersAction
 from command import ResponseTuple
 from db.facade import DBFacade
+from flask import jsonify
+from interface.github import GithubAPIException, GithubInterface
+from model import User, Permissions
 from typing import Dict, cast
 
 
@@ -194,7 +194,7 @@ class UserCommand:
                 edited_user.github_username = param_list["github"]
             except GithubAPIException as e:
                 msg = f"\nError adding user {param_list['github']} to " \
-                    "GitHub organization"
+                      "GitHub organization"
                 logging.error(msg)
         if param_list["major"]:
             edited_user.major = param_list["major"]
@@ -214,7 +214,7 @@ class UserCommand:
             # mypy doesn't like the fact that there could be different types
             # for the values of the dict ret, so we have to ignore this line
             # for now
-            ret['text'] = msg       # type: ignore
+            ret['text'] = msg  # type: ignore
         return jsonify(ret), 200
 
     def delete_helper(self,

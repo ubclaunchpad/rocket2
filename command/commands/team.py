@@ -1,12 +1,13 @@
 """Command parsing for team events."""
-from argparse import ArgumentParser, _SubParsersAction
-from interface.github import GithubAPIException, GithubInterface
-from typing import Any, Dict, Optional
-from command import ResponseTuple
-from model.team import Team
-from db.facade import DBFacade
 import logging
 import shlex
+
+from argparse import ArgumentParser, _SubParsersAction
+from command import ResponseTuple
+from db.facade import DBFacade
+from interface.github import GithubAPIException, GithubInterface
+from model import Team
+from typing import Any, Dict, Optional
 
 
 class TeamCommand:
@@ -211,5 +212,5 @@ class TeamCommand:
             return msg, 200
         except GithubAPIException as e:
             logging.error("team creation unsuccessful")
-            return "Team creation unsuccessful with the following error"\
+            return "Team creation unsuccessful with the following error" \
                    + e.data, 200

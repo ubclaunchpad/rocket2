@@ -2,14 +2,11 @@
 import boto3
 import logging
 import toml
-from functools import reduce
-from boto3.dynamodb.conditions import Attr
-from model.user import User
-from model.team import Team
-from model.project import Project
-from model.permissions import Permissions
-from typing import Dict, Optional, Any, Tuple, List, Type, Sequence, TypeVar
 
+from boto3.dynamodb.conditions import Attr
+from functools import reduce
+from model import User, Team, Project, Permissions
+from typing import Dict, Optional, Any, Tuple, List, Type, Sequence, TypeVar
 
 T = TypeVar('T', User, Team, Project)
 
@@ -211,7 +208,7 @@ class DynamoDB:
             raise RuntimeError(f'Cannot store object{str(obj)}')
 
         # Check if object is valid
-        if Model.is_valid(obj):     # type: ignore
+        if Model.is_valid(obj):  # type: ignore
             table_name = self.CONST.get_table_name(Model)
             table = self.ddb.Table(table_name)
             d = Model.to_dict(obj)  # type: ignore

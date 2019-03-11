@@ -1,12 +1,10 @@
 """Test user command parsing."""
-from flask import jsonify, json, Flask
 from command.commands.user import UserCommand
-from unittest import mock, TestCase
-from model.user import User
 from db.facade import DBFacade
-from model.permissions import Permissions
-from interface.slack import Bot
+from flask import jsonify, json, Flask
 from interface.github import GithubInterface, GithubAPIException
+from model import User, Permissions
+from unittest import mock, TestCase
 
 
 class TestUserCommand(TestCase):
@@ -109,7 +107,7 @@ class TestUserCommand(TestCase):
             resp = json.loads(resp.data)
             self.assertDictEqual(resp, expect)
             self.assertEqual(code, 200)
-        self.mock_facade.retrieve.\
+        self.mock_facade.retrieve. \
             assert_called_once_with(User, "ABCDE8FA9")
 
     def test_handle_view_lookup_error(self):
