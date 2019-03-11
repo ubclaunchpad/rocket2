@@ -2,7 +2,7 @@
 from command import ResponseTuple
 from command.commands import UnionCommands
 from command.commands.user import UserCommand
-from command.commands.token import TokenCommand
+from command.commands.token import TokenCommand, TokenCommandConfig
 from db.facade import DBFacade
 from model.user import User
 from interface.slack import Bot, SlackAPIError
@@ -20,7 +20,7 @@ class Core:
                  db_facade: DBFacade,
                  bot: Bot,
                  gh_interface: GithubInterface,
-                 token_config) -> None:
+                 token_config: TokenCommandConfig) -> None:
         """Initialize the dictionary of command handlers."""
         self.__commands: Dict[str, UnionCommands] = {}
         self.__facade = db_facade
