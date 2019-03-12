@@ -1,6 +1,44 @@
-# Deployment Process
+# Deployment
 
-## Travis CI
+## Deployment Process
+
+### SSL
+
+Before deploying for the first time, you must set up SSL and configuration for
+Nginx, which we are using as a proxy server. This can be done by running the
+[`setup_deploy.sh`](../scripts/setup_deploy.sh) script. This runs the official
+[Let's Encrypt](https://letsencrypt.org/) container to request SSL certificates,
+sets up a cronjob to periodically revalidate them, and copies
+[`nginx.conf`](../nginx.conf) to the correct location. Do note that the Let's
+Encrypt container needs to use port 443, so if you have another process or
+container using that port, you will need to kill it before running the
+set up script.
+
+### Inertia
+
+For UBC Launch Pad, we continuously deploy off the master branch on Github
+using UBC Launch Pad's [Inertia](https://github.com/ubclaunchpad/inertia).
+This will pull the repo when changes are merged, rebuild the containers from
+[`docker-compose.yml`](../docker-compose.yml), and redeploy.
+
+### Docker Compose
+
+Our main deployment configuration is contained in
+[`docker-compose.yml`](../docker-compose.yml). We deploy an Nginx container
+to serve as a proxy, as well as building and running a Rocket 2 container.
+The Nginx proxy exposes ports 80 and 443, for HTTP/S, which must also be
+accessible from the outside world. The Rocket 2 container exposes port 5000,
+as Gunicorn is listening on this port; this should *not* be accessible to
+the outside world.
+
+Note that Docker Compose has a rather complex networking utility. In particular,
+note that to access HTTP endpoints in other composed containers, you must
+reference them by their service name in `docker-compose.yml`, *not* via
+localhost. This is already handled in `nginx.conf`.
+
+## Other Build Tools
+
+### Travis CI
 
 [Travis CI](https://docs.travis-ci.com/user/tutorial/) is a continuous integration
 service that is used to build and test software projects hosted on Github.
@@ -15,7 +53,7 @@ test the code.
 Travis CI can also be integrated with slack channels to notify developers
 when its processes have completed.
 
-## Docker
+### Docker
 
 [Docker](https://docs.docker.com/get-started/) is a program that run software
 packages called containers. Every container is isolated from each other and is
@@ -34,7 +72,7 @@ and all the dependencies and the virtual environment installed.
 Docker is different than virtual machines because it can run multiple containers
 using only one kernel which makes it more lightweight.
 
-## Code Coverage
+### Code Coverage
 
 Code coverage measures the lines that were executed by the test suite.
 [CodeCov](https://docs.codecov.io/docs/about-code-coverage) is used in Rocket2.
