@@ -184,7 +184,7 @@ class UserCommand:
                 edited_user.github_username = param_list["github"]
             except GithubAPIException as e:
                 msg = (f"\nError adding user {param_list['github']} to GitHub"
-                         " organization")
+                       " organization")
                 logging.error(msg)
         if param_list["major"]:
             edited_user.major = param_list["major"]
@@ -195,7 +195,7 @@ class UserCommand:
         elif param_list["permission"] and not is_admin:
             msg += "\nCannot change own permission: user isn't admin."
             logging.warn(f"User {user_id} tried to elevate permissions"
-                            " level.")
+                         " level.")
 
         self.facade.store(edited_user)
         ret = {'attachments': [edited_user.get_attachment()]}
