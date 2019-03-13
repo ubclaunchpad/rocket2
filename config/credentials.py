@@ -14,37 +14,60 @@ class Credentials:
         :param credentials_path: path to folder that contains toml files
                                  of credentials for all needed services
         """
-        missing_creds_list = []
+        self.missing_cred_files = []
+        self.missing_cred_fields = {}
 
         slack_toml_path = join(credentials_path, 'slack.toml')
         try:
-            self.slack = toml.load(slack_toml_path)
+            slack_toml = toml.load(slack_toml_path)
+            self.slack_signing_secret = self.attempt_toml_read(
+                slack_toml, 'signing_secret')
+            self.slack_api_token = self.attempt_toml_read(
+                slack_toml, 'api_token')
         except IOError:
-            missing_creds_list.append(slack_toml_path)
-
-        github_toml_path = join(credentials_path, 'github.toml')
-        try:
-            self.github = toml.load(github_toml_path)
-        except IOError:
-            missing_creds_list.append(github_toml_path)
+            missing_cred_files.append('slack.toml')
 
         aws_toml_path = join(credentials_path, 'aws.toml')
         try:
-            self.aws = toml.load(aws_toml_path)
+            aws_toml = toml.load(aws_toml_path)
+            self.aws_access_key_id = self.attempt_toml_read(
+                aws_toml, 'access_key_id')
+            self.aws_secret_access_key = self.attempt_toml_read(
+                aws_toml, 'secret_access_key')
         except IOError:
-            missing_creds_list.append(aws_toml_path)
+            missing_cred_files.append('aws.toml')
 
-        if len(missing_creds_list) > 0:
-            raise MissingCredentialsError(missing_creds_list)
+        github_signing_key_path = join(
+            credentials_path, 'github_signing_key.pem')
+        if not isfile(github_signing_key_path):
+            missing_cred_files.append('github_signing_key.pem')
+
+        if len(missing_cred_files) > 0 or len(missing_cred_fields) > 0:
+            raise MissingCredentialsError(self.missing_cred_files,
+                                          self.missing_cred_fields)
+
+    def attempt_toml_read(toml_dict, key):
+        try:
+            value = toml_dict[key]
+            return value
+        except KeyError:
+            try:
+                missing_fields = self.missing_cred_fields[toml_dict]
+                missing_fields.append(key)
+                self.missing_cred_fields[toml_dict] = missing_fields
+            except KeyError:
+                self.missing_cred_fields[toml_dict] = [key]
+            return None
 
 
 class MissingCredentialsError(Exception):
     """Exception representing an error while loading credentials."""
 
-    def __init__(self, missing_creds_list):
+    def __init__(self, missing_cred_files, missing_cred_fields):
         """
         Initialize a new MissingCredentialsError.
 
-        :param missing_creds_list: List of missing toml files of credentials.
+        :param missing_cred_files: List of missing files of credentials.
         """
-        self.error = 'Missing credentials files: ' + str(missing_creds_list)
+        self.error = 'Missing files: {}\nMissing fields: {}'
+                     .format(str(missing_cred_files), str(missing_cred_fields)
