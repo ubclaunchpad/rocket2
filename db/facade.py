@@ -82,8 +82,8 @@ class DBFacade:
         :param Model: type of list elements you'd want
         :return: a list of ``Model`` that fit the query parameters
         """
-        logging.info("Querying {} matching parameters: {}".
-                     format(Model.__name__, params))
+        logging.info(f"Querying {Model.__name__} matching "
+                     f"parameters: {params}")
         return self.ddb.query(Model, params)
 
     def delete(self, Model, k):

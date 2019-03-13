@@ -20,8 +20,8 @@ class Bot:
             text=message
         )
         if 'ok' not in response:
-            logging.error("Direct message to {} failed with error: {}".
-                          format(slack_user_id, response['error']))
+            logging.error(f"Direct message to {slack_user_id} failed with "
+                          f"error: {response['error']}")
             raise SlackAPIError(response['error'])
 
     def send_to_channel(self, message, channel_name, attachments=[]):
@@ -34,8 +34,8 @@ class Bot:
             text=message
         )
         if 'ok' not in response:
-            logging.error("Message to channel {} failed with error: {}".
-                          format(channel_name, response['error']))
+            logging.error(f"Message to channel {channel_name} failed with "
+                          f"error: { response['error']}")
             raise SlackAPIError(response['error'])
 
     def get_channel_users(self, channel_id):
@@ -47,8 +47,8 @@ class Bot:
         )
         if 'ok' not in response:
             logging.error("User retrieval "
-                          "from channel {} failed with error: {}".
-                          format(channel_id, response['error']))
+                          f"from channel {channel_id} failed with "
+                          f"error: {response['error']}")
             raise SlackAPIError(response['error'])
         else:
             json_response = json.loads(response)

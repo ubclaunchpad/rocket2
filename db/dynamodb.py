@@ -206,8 +206,8 @@ class DynamoDB:
         elif isinstance(obj, Project):
             Model = Project
         else:
-            logging.error("Cannot store object " + str(obj))
-            raise RuntimeError('Cannot store object ' + str(obj))
+            logging.error(f"Cannot store object {str(obj)}")
+            raise RuntimeError(f'Cannot store object{str(obj)}')
 
         # Check if object is valid
         if Model.is_valid(obj):
@@ -215,8 +215,7 @@ class DynamoDB:
             table = self.ddb.Table(table_name)
             d = Model.to_dict(obj)
 
-            logging.info("Storing obj {} in table {}".
-                         format(obj, table_name))
+            logging.info(f"Storing obj {obj} in table {table_name}")
             table.put_item(Item=d)
             return True
         return False

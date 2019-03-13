@@ -16,7 +16,7 @@ class UserCommand:
                        "permission level for this command!"
     lookup_error = "User not found!"
     delete_text = "Deleted user with Slack ID: "
-    desc = "for dealing with " + command_name + "s"
+    desc = f"for dealing with {command_name}s"
 
     def __init__(self, db_facade, github_interface):
         """Initialize user command."""
@@ -91,10 +91,10 @@ class UserCommand:
 
     def get_help(self):
         """Return command options for user events."""
-        res = "\n*" + self.command_name + " commands:*```"
+        res = f"\n*{self.command_name} commands:*```"
         for argument in self.subparser.choices:
             name = argument.capitalize()
-            res += "\n*" + name + "*\n"
+            res += f"\n*{name}*\n"
             res += self.subparser.choices[argument].format_help()
         return res + "```"
 
