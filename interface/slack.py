@@ -35,7 +35,7 @@ class Bot:
         )
         if 'ok' not in response:
             logging.error(f"Message to channel {channel_name} failed with "
-                          f"error: { response['error']}")
+                          f"error: {response['error']}")
             raise SlackAPIError(response['error'])
 
     def get_channel_users(self, channel_id):
