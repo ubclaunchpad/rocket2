@@ -37,7 +37,7 @@ class DBFacade:
         :param obj: Object to store in database
         :return: True if object was stored, and false otherwise
         """
-        logging.info("Storing object {}".format(obj))
+        logging.info(f"Storing object {obj}")
         self.ddb.store(obj)
 
     def retrieve(self, Model, k):
@@ -49,7 +49,7 @@ class DBFacade:
         :raise: LookupError if key is not found
         :return: a model ``Model`` if key is found
         """
-        logging.info("Retrieving {}(id={})".format(Model.__name__, k))
+        logging.info(f"Retrieving {Model.__name__}(id={k})")
         return self.ddb.retrieve(Model, k)
 
     def query(self, Model, params=[]):
@@ -93,5 +93,5 @@ class DBFacade:
         :param Model: table type to remove the object from
         :param k: ID or key of the object to remove (must be primary key)
         """
-        logging.info("Deleting {}(id={})".format(Model.__name__, k))
+        logging.info(f"Deleting {Model.__name__}(id={k})")
         self.ddb.delete(Model, k)

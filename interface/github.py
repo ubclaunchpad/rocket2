@@ -129,8 +129,7 @@ class GithubInterface:
             raise GithubAPIException(e.data)
         except StopIteration as e:
             raise GithubAPIException(
-                "user \"{}\" does not exist in team \"{}\""
-                .format(username, team_id))
+                f"user \"{username}\" does not exist in team \"{team_id}\"")
 
     def add_team_member(self, username, team_id):
         """Add user with given username to team with id team_id."""

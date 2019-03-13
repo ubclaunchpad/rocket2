@@ -13,7 +13,7 @@ class Bot:
 
     def send_dm(self, message, slack_user_id):
         """Send direct message to user with id of slack_user_id."""
-        logging.debug("Sending direct message to {}".format(slack_user_id))
+        logging.debug(f"Sending direct message to {slack_user_id}")
         response = self.sc.api_call(
             "chat.postMessage",
             channel=slack_user_id,
@@ -26,7 +26,7 @@ class Bot:
 
     def send_to_channel(self, message, channel_name, attachments=[]):
         """Send message to channel with name channel_name."""
-        logging.debug("Sending message to channel {}".format(channel_name))
+        logging.debug(f"Sending message to channel {channel_name}")
         response = self.sc.api_call(
             "chat.postMessage",
             channel=channel_name,
@@ -40,7 +40,7 @@ class Bot:
 
     def get_channel_users(self, channel_id):
         """Retrieve list of user IDs from channel with channel_id."""
-        logging.debug("Retrieving user IDs from channel {}".format(channel_id))
+        logging.debug(f"Retrieving user IDs from channel {channel_id}")
         response = self.sc.api_call(
             "conversation.members",
             channel=channel_id
