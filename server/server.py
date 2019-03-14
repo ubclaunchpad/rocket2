@@ -50,6 +50,7 @@ dictConfig({
 app = Flask(__name__)
 # HTTP security header middleware for Flask
 talisman = Talisman(app)
+talisman.force_https = False
 config = toml.load('config.toml')
 core = make_core(config)
 webhook_handler = make_webhook_handler(config)
