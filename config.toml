@@ -2,6 +2,7 @@ testing = false
 
 [slack]
 creds_path = "credentials/slack.toml"
+bot_channel = "#rocket2"
 
 [aws]
 creds_path = "credentials/aws.toml"
