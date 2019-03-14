@@ -60,6 +60,15 @@ class Core:
         except SlackAPIError:
             logging.error(f"{new_id} added to database - user not notified")
 
+    def send_event_notif(self, msg):
+        """
+        For use in getting bot to report events in designated slack channel.
+
+        :param msg: message to send to slack bot channel
+        """
+        self.__bot.send_event_notif(msg)
+        logging.info("Core passing notification to bot")
+
     def get_help(self):
         """
         Get help messages and return a formatted string for messaging.
