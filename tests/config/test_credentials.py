@@ -39,3 +39,9 @@ def test_exception_raised_on_missing_fields():
     """Assert that loading files without proper fields raises an exception."""
     with pytest.raises(MissingCredentialsError):
         Credentials('tests/credentials/missing_fields/')
+
+
+def test_exception_raised_on_missing_files():
+    """Assert that missing credentials files raises an exception."""
+    with pytest.raises(MissingCredentialsError):
+        Credentials('tests/credentials/missing_files/')
