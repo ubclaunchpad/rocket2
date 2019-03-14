@@ -6,10 +6,10 @@
 
 Before deploying for the first time, you must set up SSL and configuration for
 Nginx, which we are using as a proxy server. This can be done by running the
-[`setup_deploy.sh`](../scripts/setup_deploy.sh) script. This runs the official
+`setup_deploy.sh` script. This runs the official
 [Let's Encrypt](https://letsencrypt.org/) container to request SSL certificates,
 sets up a cronjob to periodically revalidate them, and copies
-[`nginx.conf`](../nginx.conf) to the correct location. Do note that the Let's
+`nginx.conf` to the correct location. Do note that the Let's
 Encrypt container needs to use port 443, so if you have another process or
 container using that port, you will need to kill it before running the
 set up script.
@@ -19,12 +19,12 @@ set up script.
 For UBC Launch Pad, we continuously deploy off the master branch on Github
 using UBC Launch Pad's [Inertia](https://github.com/ubclaunchpad/inertia).
 This will pull the repo when changes are merged, rebuild the containers from
-[`docker-compose.yml`](../docker-compose.yml), and redeploy.
+`docker-compose.yml`, and redeploy.
 
 ### Docker Compose
 
 Our main deployment configuration is contained in
-[`docker-compose.yml`](../docker-compose.yml). We deploy an Nginx container
+`docker-compose.yml`. We deploy an Nginx container
 to serve as a proxy, as well as building and running a Rocket 2 container.
 The Nginx proxy exposes ports 80 and 443, for HTTP/S, which must also be
 accessible from the outside world. The Rocket 2 container exposes port 5000,
