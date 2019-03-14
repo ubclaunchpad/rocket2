@@ -25,7 +25,7 @@ class Credentials:
             self.slack_api_token = self.attempt_toml_read(
                 slack_toml, 'api_token')
         except IOError:
-            missing_cred_files.append('slack.toml')
+            self.missing_cred_files.append('slack.toml')
 
         aws_toml_path = join(credentials_path, 'aws.toml')
         try:
@@ -35,18 +35,30 @@ class Credentials:
             self.aws_secret_access_key = self.attempt_toml_read(
                 aws_toml, 'secret_access_key')
         except IOError:
-            missing_cred_files.append('aws.toml')
+            self.missing_cred_files.append('aws.toml')
 
         github_signing_key_path = join(
             credentials_path, 'github_signing_key.pem')
-        if not isfile(github_signing_key_path):
-            missing_cred_files.append('github_signing_key.pem')
+        if isfile(github_signing_key_path):
+            self.github_signing_key_path = github_signing_key_path
+        else:
+            self.missing_cred_files.append('github_signing_key.pem')
 
-        if len(missing_cred_files) > 0 or len(missing_cred_fields) > 0:
+        if len(self.missing_cred_files) > 0 or \
+                len(self.missing_cred_fields) > 0:
             raise MissingCredentialsError(self.missing_cred_files,
                                           self.missing_cred_fields)
 
-    def attempt_toml_read(toml_dict, key):
+    def attempt_toml_read(self, toml_dict, key):
+        """
+        Attempt to get a value from the toml dictionary given a key.
+
+        :param toml_dict: dictionary derived from toml file being attempted
+                          to be read from
+        :param key: key being attempted to read from the toml_dict with
+        :return: value associated with key if the key exists in the toml_dict,
+                 None if it does not exist
+        """
         try:
             value = toml_dict[key]
             return value
@@ -67,7 +79,7 @@ class MissingCredentialsError(Exception):
         """
         Initialize a new MissingCredentialsError.
 
-        :param missing_cred_files: List of missing files of credentials.
+        : param missing_cred_files: List of missing files of credentials.
         """
-        self.error = 'Missing files: {}\nMissing fields: {}'
-                     .format(str(missing_cred_files), str(missing_cred_fields)
+        self.error = 'Missing files: {}\nMissing fields: {}'.format(
+            str(missing_cred_files), str(missing_cred_fields))
