@@ -1,6 +1,6 @@
 """Test the loading of credentials."""
 import pytest
-from config.credentials import Credentials
+from config.credentials import Credentials, MissingCredentialsError
 
 
 @pytest.fixture
@@ -33,3 +33,9 @@ def test_load_github_signing_key_path(complete_credentials):
     """Assert that the github signing key path can be loaded correctly."""
     assert complete_credentials.github_signing_key_path == \
         'tests/credentials/complete/github_signing_key.pem'
+
+
+def test_exception_raised_on_missing_fields():
+    """Assert that loading files without proper fields raises an exception."""
+    with pytest.raises(MissingCredentialsError):
+        Credentials('tests/credentials/missing_fields/')

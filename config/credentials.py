@@ -21,9 +21,9 @@ class Credentials:
         try:
             slack_toml = toml.load(slack_toml_path)
             self.slack_signing_secret = self.attempt_toml_read(
-                slack_toml, 'signing_secret')
+                slack_toml, 'signing_secret', 'slack')
             self.slack_api_token = self.attempt_toml_read(
-                slack_toml, 'api_token')
+                slack_toml, 'api_token', 'slack')
         except IOError:
             self.missing_cred_files.append('slack.toml')
 
@@ -31,9 +31,9 @@ class Credentials:
         try:
             aws_toml = toml.load(aws_toml_path)
             self.aws_access_key_id = self.attempt_toml_read(
-                aws_toml, 'access_key_id')
+                aws_toml, 'access_key_id', 'aws')
             self.aws_secret_access_key = self.attempt_toml_read(
-                aws_toml, 'secret_access_key')
+                aws_toml, 'secret_access_key', 'aws')
         except IOError:
             self.missing_cred_files.append('aws.toml')
 
@@ -49,12 +49,15 @@ class Credentials:
             raise MissingCredentialsError(self.missing_cred_files,
                                           self.missing_cred_fields)
 
-    def attempt_toml_read(self, toml_dict, key):
+    def attempt_toml_read(self, toml_dict, key, service):
         """
         Attempt to get a value from the toml dictionary given a key.
 
         :param toml_dict: dictionary derived from toml file being attempted
                           to be read from
+        :param service: name of the service whose type of credential
+                        belongs to, and the key to the list of its missing
+                        credentials fields in the `missing_creds_fields` dict
         :param key: key being attempted to read from the toml_dict with
         :return: value associated with key if the key exists in the toml_dict,
                  None if it does not exist
@@ -64,11 +67,11 @@ class Credentials:
             return value
         except KeyError:
             try:
-                missing_fields = self.missing_cred_fields[toml_dict]
+                missing_fields = self.missing_cred_fields[service]
                 missing_fields.append(key)
-                self.missing_cred_fields[toml_dict] = missing_fields
+                self.missing_cred_fields[service] = missing_fields
             except KeyError:
-                self.missing_cred_fields[toml_dict] = [key]
+                self.missing_cred_fields[service] = [key]
             return None
 
 
