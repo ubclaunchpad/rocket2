@@ -55,7 +55,7 @@ talisman.force_https = False
 config = toml.load('config.toml')
 credentials = Credentials(config['creds_path'])
 core = make_core(config, credentials)
-webhook_handler = make_webhook_handler(config)
+webhook_handler = make_webhook_handler(config, credentials)
 if not config['testing']:
     slack_signing_secret = credentials.slack_signing_secret
 else:

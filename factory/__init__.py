@@ -39,20 +39,20 @@ def make_core(config, credentials, gh=None):
         else:
             signing_key = create_signing_token()
             open(config['auth']['signing_key_path'], 'w+').write(signing_key)
-    facade = DBFacade(DynamoDB(config))
+    facade = DBFacade(DynamoDB(config, credentials))
     bot = Bot(SlackClient(slack_api_token), slack_bot_channel)
     # TODO: make token config expiry configurable
     token_config = TokenCommandConfig(timedelta(days=7), signing_key)
     return Core(facade, bot, gh, token_config)
 
 
-def make_webhook_handler(config):
+def make_webhook_handler(config, credentials):
     """
     Initialize and returns a :class:`webhook.webhook.WebhookHandler` object.
 
     :return: a new ``WebhookHandler`` object, freshly initialized
     """
-    facade = DBFacade(DynamoDB(config))
+    facade = DBFacade(DynamoDB(config, credentials))
     return WebhookHandler(facade)
 
 
