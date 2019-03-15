@@ -1,4 +1,5 @@
 testing = false
+creds_path = "credentials/"
 
 [slack]
 creds_path = "credentials/slack.toml"

@@ -10,6 +10,7 @@ import structlog
 from flask_talisman import Talisman
 from flask_seasurf import SeaSurf
 from interface.slack import SlackAPIError
+from config import Credentials
 
 dictConfig({
     'version': 1,
@@ -52,11 +53,11 @@ app = Flask(__name__)
 talisman = Talisman(app)
 talisman.force_https = False
 config = toml.load('config.toml')
-core = make_core(config)
+credentials = Credentials(config['creds_path'])
+core = make_core(config, credentials)
 webhook_handler = make_webhook_handler(config)
 if not config['testing']:
-    slack_signing_secret = toml.load(
-        config['slack']['creds_path'])['signing_secret']
+    slack_signing_secret = credentials.slack_signing_secret
 else:
     slack_signing_secret = ""
 slack_events_adapter = SlackEventAdapter(slack_signing_secret,
