@@ -1,6 +1,6 @@
 """Test the loading of credentials."""
 import pytest
-from config.credentials import Credentials, MissingCredentialsError
+from config import Credentials, MissingCredentialsError
 
 
 @pytest.fixture
