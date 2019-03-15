@@ -8,7 +8,6 @@ class Bot:
     """Utility class for calling Slack APIs."""
 
     def __init__(self, sc: SlackClient, slack_channel: str = '') -> None:
->>>>>>> Finish adding types and documentation
         """Initialize Bot by creating a SlackClient Object."""
         logging.info("Initializing Slack client interface")
         self.sc = sc
@@ -93,9 +92,9 @@ class Bot:
         :param message to send to configured bot channel
         """
         try:
-            name = self.send_to_channel(message, self.slack_channel, [])
+            self.send_to_channel(message, self.slack_channel, [])
             logging.info("Webhook notif successfully sent to {} channel".
-                         format(name))
+                         format(self.slack_channel))
         except SlackAPIError as se:
             logging.error("Webhook notif failed to send due to {} error.".
                           format(se.error))
