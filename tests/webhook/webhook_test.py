@@ -492,7 +492,7 @@ def test_handle_team_event_empty_payload(team_empty_payload):
 
 @pytest.fixture
 def mem_default_payload():
-    """Provide the basic structure for an membership payload."""
+    """Provide the basic structure for a membership payload."""
     default_payload =\
         {
             "action": "removed",
