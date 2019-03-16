@@ -28,34 +28,44 @@ class WebhookHandler:
         member_list = self.__facade.\
             query(User, [('github_id', github_id)])
         if action == "member_removed":
-            if len(member_list) == 1:
-                slack_ids_string = ""
-                for member in member_list:
-                    slack_id = member.slack_id
-                    self.__facade.delete(User, slack_id)
-                    logging.info(f"deleted slack user {slack_id}")
-                    slack_ids_string += f" {slack_id}"
-                return f"deleted slack ID{slack_ids_string}", 200
-            elif len(member_list) > 1:
-                logging.error("Error: found github ID connected to"
-                              " multiple slack IDs")
-                return ("Error: found github ID connected to multiple slack"
-                        " IDs", 412)
-            else:
-                logging.error(f"could not find user {github_id}")
-                return f"could not find user {github_username}", 404
+            return self.org_remove(member_list, github_id, github_username)
         elif action == "member_added":
-            logging.info(f"user {github_username} added to {organization}")
-            return f"user {github_username} added to {organization}", 200
+            return self.org_added(github_username, organization)
         elif action == "member_invited":
-            logging.info("user {} invited to {}".
-                         format(github_username, organization))
-            return f"user {github_username} invited to {organization}", 200
+            return self.org_invited(github_username, organization)
         else:
-            logging.error(("organization webhook triggered,"
-                           " invalid action specified: {}".
-                           format(str(payload))))
+            logging.error("organization webhook triggered,"
+                          f" invalid action specified: {str(payload)}")
             return "invalid organization webhook triggered", 405
+
+    def org_remove(self, member_list, github_id, github_username):
+        """Help organization function if payload action is remove."""
+        if len(member_list) == 1:
+            slack_ids_string = ""
+            for member in member_list:
+                slack_id = member.slack_id
+                self.__facade.delete(User, slack_id)
+                logging.info(f"deleted slack user {slack_id}")
+                slack_ids_string += f" {slack_id}"
+            return f"deleted slack ID{slack_ids_string}", 200
+        elif len(member_list) > 1:
+            logging.error("Error: found github ID connected to"
+                          " multiple slack IDs")
+            return ("Error: found github ID connected to multiple slack"
+                    " IDs", 412)
+        else:
+            logging.error(f"could not find user {github_id}")
+            return f"could not find user {github_username}", 404
+
+    def org_added(self, github_username, organization):
+        """Help organization function if payload action is added."""
+        logging.info(f"user {github_username} added to {organization}")
+        return f"user {github_username} added to {organization}", 200
+
+    def org_invited(self, github_username, organization):
+        """Help organization function if payload action is invited."""
+        logging.info(f"user {github_username} invited to {organization}")
+        return f"user {github_username} invited to {organization}", 200
 
     def handle_team_event(self, payload):
         """
@@ -78,28 +88,27 @@ class WebhookHandler:
         github_id = github_team["id"]
         github_team_name = github_team["name"]
         if action == "created":
-            logging.debug("team added event triggered: {}".
-                          format(str(payload)))
+            logging.debug(f"team added event triggered: {str(payload)}")
             try:
                 team = self.__facade.retrieve(Team, github_id)
-                logging.warning("team {} with id {} already exists.".
-                                format(github_team_name, github_id))
+                logging.warning(f"team {github_team_name} with "
+                                f"id {github_id} already exists.")
                 team.github_team_name = github_team_name
             except LookupError:
-                logging.debug("team {} with id {} added to organization.".
-                              format(github_team_name, github_id))
+                logging.debug(f"team {github_team_name} with "
+                              f"id {github_id} added to organization.")
                 team = Team(github_id, github_team_name, "")
             self.__facade.store(team)
-            logging.info("team {} with id {} added to rocket db.".
-                         format(github_team_name, github_id))
+            logging.info(f"team {github_team_name} with "
+                         f"id {github_id} added to rocket db.")
             return f"created team with github id {github_id}", 200
         elif action == "deleted":
             logging.debug(f"team deleted event triggered: {str(payload)}")
             try:
                 self.__facade.retrieve(Team, github_id)
                 self.__facade.delete(Team, github_id)
-                logging.info("team {} with github id {} removed from db".
-                             format(github_team_name, github_id))
+                logging.info(f"team {github_team_name} with github "
+                             f"id {github_id} removed from db")
                 return f"deleted team with github id {github_id}", 200
             except LookupError:
                 logging.error(f"team with github id {github_id} not found.")
@@ -161,9 +170,8 @@ class WebhookHandler:
         elif action == "member_invited":
             return self.mem_invited(github_username, team_name)
         else:
-            logging.error(("membership webhook triggered,"
-                           " invalid action specified: {}".
-                           format(str(payload))))
+            logging.error("membership webhook triggered,"
+                          f" invalid action specified: {str(payload)}")
             return "invalid membership webhook triggered", 405
 
     def mem_remove(self, github_id, selected_team, team_name):
@@ -200,8 +208,7 @@ class WebhookHandler:
             selected_team.add_member(github_id)
             for member in member_list:
                 slack_id = member.slack_id
-                logging.info("user {} added to {}".
-                             format(github_username, team_name))
+                logging.info(f"user {github_username} added to {team_name}")
                 slack_ids_string += f" {slack_id}"
                 return f"added slack ID{slack_ids_string}", 200
         else:
@@ -210,6 +217,5 @@ class WebhookHandler:
 
     def mem_invited(self, github_username, team_name):
         """Help membership function if payload action is invited."""
-        logging.info("user {} invited to {}".
-                     format(github_username, team_name))
+        logging.info(f"user {github_username} invited to {team_name}")
         return f"user {github_username} invited to {team_name}", 200
