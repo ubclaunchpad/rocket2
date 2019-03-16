@@ -56,9 +56,9 @@ class Core:
         welcome = 'Welcome to UBC Launch Pad!'
         try:
             self.__bot.send_dm(welcome, new_id)
-            logging.info(new_id + " added to database - user notified")
+            logging.info(f"{new_id} added to database - user notified")
         except SlackAPIError:
-            logging.error(new_id + " added to database - user not notified")
+            logging.error(f"{new_id} added to database - user not notified")
 
     def send_event_notif(self, msg):
         """
@@ -85,7 +85,7 @@ class Core:
         attachments = []
         for cmd in self.__commands.values():
             cmd_name = cmd.command_name
-            cmd_text = "*" + cmd_name + ":* " + cmd.desc
+            cmd_text = f"*{cmd_name}:* {cmd.desc}"
             attachment = {"text": cmd_text, "mrkdwn_in": ["text"]}
             attachments.append(attachment)
         message["attachments"] = attachments

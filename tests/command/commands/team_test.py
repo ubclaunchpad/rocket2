@@ -24,7 +24,7 @@ class TestTeamCommand(TestCase):
 
     def test_get_help(self):
         """Test team command get_help method."""
-        print("\n" + self.testcommand.get_help())
+        print(f"\n{self.testcommand.get_help()}")
         self.assertEqual(self.testcommand.get_help(), self.help_text)
 
     def test_handle_list(self):

@@ -48,7 +48,7 @@ class TestUserCommand(TestCase):
         """Test user command add method."""
         user_id = "U0G9QF9C6"
         user = User(user_id)
-        lookup_error = LookupError('User "{}" not found'.format(user_id))
+        lookup_error = LookupError(f'User "{user_id}" not found')
         self.mock_facade.retrieve.side_effect = lookup_error
         self.assertTupleEqual(self.testcommand.handle('user add', user_id),
                               ('User added!', 200))

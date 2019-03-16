@@ -392,8 +392,8 @@ def test_handle_org_event_empty_action(mock_logging, org_empty_payload):
     rsp, code = webhook_handler.handle_organization_event(org_empty_payload)
     mock_logging.error.assert_called_once_with(("organization webhook "
                                                 "triggered, invalid "
-                                                "action specified: {}"
-                                                .format(org_empty_payload)))
+                                                "action specified: "
+                                                f"{org_empty_payload}"))
     assert rsp == "invalid organization webhook triggered"
     assert code == 405
 
