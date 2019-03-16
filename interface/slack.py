@@ -19,7 +19,7 @@ class Bot:
             channel=slack_user_id,
             text=message
         )
-        if 'ok' not in response:
+        if 'ok' not in response or not response['ok']:
             logging.error(f"Direct message to {slack_user_id} failed with "
                           f"error: {response['error']}")
             raise SlackAPIError(response['error'])
@@ -33,7 +33,7 @@ class Bot:
             attachments=attachments,
             text=message
         )
-        if 'ok' not in response:
+        if 'ok' not in response or not response['ok']:
             logging.error(f"Message to channel {channel_name} failed with "
                           f"error: {response['error']}")
             raise SlackAPIError(response['error'])
