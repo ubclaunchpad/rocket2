@@ -22,7 +22,7 @@ def make_core(config, gh=None):
 
     :return: a new ``Core`` object, freshly initialized
     """
-    slack_api_token = ""
+    slack_api_token, slack_bot_channel = "", ""
     signing_key = ""
     if not config['testing']:
         slack_api_token = toml.load(
@@ -31,6 +31,7 @@ def make_core(config, gh=None):
             config['github']['signing_key_path'])[0].as_text()
         github_app_id = config['github']['app_id']
         github_organization = config['github']['organization']
+        slack_bot_channel = config['slack']['bot_channel']
         gh = GithubInterface(DefaultGithubFactory(github_app_id,
                                                   github_auth_key),
                              github_organization)
@@ -40,7 +41,7 @@ def make_core(config, gh=None):
             signing_key = create_signing_token()
             open(config['auth']['signing_key_path'], 'w+').write(signing_key)
     facade = DBFacade(DynamoDB(config))
-    bot = Bot(SlackClient(slack_api_token))
+    bot = Bot(SlackClient(slack_api_token), slack_bot_channel)
     # TODO: make token config expiry configurable
     token_config = TokenCommandConfig(timedelta(days=7), signing_key)
     return Core(facade, bot, gh, token_config)

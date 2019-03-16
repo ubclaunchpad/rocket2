@@ -8,6 +8,8 @@ import sys
 import toml
 import structlog
 from flask_talisman import Talisman
+from flask_seasurf import SeaSurf
+from interface.slack import SlackAPIError
 
 dictConfig({
     'version': 1,
@@ -48,6 +50,7 @@ dictConfig({
 app = Flask(__name__)
 # HTTP security header middleware for Flask
 talisman = Talisman(app)
+talisman.force_https = False
 config = toml.load('config.toml')
 core = make_core(config)
 webhook_handler = make_webhook_handler(config)
@@ -88,7 +91,9 @@ def handle_team_webhook():
     """Handle GitHub team webhooks."""
     logging.info("team webhook triggered")
     logging.debug("team payload: {}".format(str(request.get_json())))
-    return webhook_handler.handle_team_event(request.get_json())
+    msg = webhook_handler.handle_team_event(request.get_json())
+    core.send_event_notif(msg[0].capitalize())
+    return msg
 
 
 @slack_events_adapter.on("app_mention")
