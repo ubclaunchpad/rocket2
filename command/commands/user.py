@@ -195,7 +195,7 @@ class UserCommand:
         elif param_list["permission"] and not is_admin:
             msg += "\nCannot change own permission: user isn't admin."
             logging.warning(f"User {user_id} tried to elevate permissions"
-                         " level.")
+                            " level.")
 
         self.facade.store(edited_user)
         ret = {'attachments': [edited_user.get_attachment()]}
