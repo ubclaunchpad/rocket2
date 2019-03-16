@@ -1,0 +1,1 @@
+"""Exceptions from API requests."""
