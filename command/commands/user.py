@@ -16,7 +16,7 @@ class UserCommand:
                        "permission level for this command!"
     lookup_error = "User not found!"
     delete_text = "Deleted user with Slack ID: "
-    desc = "for dealing with " + command_name + "s"
+    desc = f"for dealing with {command_name}s"
 
     def __init__(self, db_facade, github_interface):
         """Initialize user command."""
@@ -91,10 +91,10 @@ class UserCommand:
 
     def get_help(self):
         """Return command options for user events."""
-        res = "\n*" + self.command_name + " commands:*```"
+        res = f"\n*{self.command_name} commands:*```"
         for argument in self.subparser.choices:
             name = argument.capitalize()
-            res += "\n*" + name + "*\n"
+            res += f"\n*{name}*\n"
             res += self.subparser.choices[argument].format_help()
         return res + "```"
 
@@ -183,8 +183,8 @@ class UserCommand:
                 self.github.org_add_member(param_list["github"])
                 edited_user.github_username = param_list["github"]
             except GithubAPIException as e:
-                msg = "\nError adding user {} to GitHub organization".format(
-                    param_list['github'])
+                msg = f"\nError adding user {param_list['github']} to " \
+                    "GitHub organization"
                 logging.error(msg)
         if param_list["major"]:
             edited_user.major = param_list["major"]
@@ -194,8 +194,8 @@ class UserCommand:
             edited_user.permissions_level = param_list["permission"]
         elif param_list["permission"] and not is_admin:
             msg += "\nCannot change own permission: user isn't admin."
-            logging.warn("User {} tried to elevate permissions level."
-                         .format(user_id))
+            logging.warning(f"User {user_id} tried to elevate permissions"
+                            " level.")
 
         self.facade.store(edited_user)
         ret = {'attachments': [edited_user.get_attachment()]}

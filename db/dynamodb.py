@@ -155,7 +155,7 @@ class DynamoDB:
         :param primary_key: name of the primary key for the table
         :param key_type: type of primary key (S, N, B)
         """
-        logging.info("Creating table '{}'".format(table_name))
+        logging.info(f"Creating table '{table_name}'")
         primary_key = self.CONST.get_key(table_name)
         self.ddb.create_table(
             TableName=table_name,
@@ -205,8 +205,8 @@ class DynamoDB:
         elif isinstance(obj, Project):
             Model = Project
         else:
-            logging.error("Cannot store object " + str(obj))
-            raise RuntimeError('Cannot store object ' + str(obj))
+            logging.error(f"Cannot store object {str(obj)}")
+            raise RuntimeError(f'Cannot store object{str(obj)}')
 
         # Check if object is valid
         if Model.is_valid(obj):
@@ -214,8 +214,7 @@ class DynamoDB:
             table = self.ddb.Table(table_name)
             d = Model.to_dict(obj)
 
-            logging.info("Storing obj {} in table {}".
-                         format(obj, table_name))
+            logging.info(f"Storing obj {obj} in table {table_name}")
             table.put_item(Item=d)
             return True
         return False
@@ -241,7 +240,7 @@ class DynamoDB:
         if 'Item' in resp.keys():
             return Model.from_dict(resp['Item'])
         else:
-            err_msg = '{}(id={}) not found'.format(Model.__name__, k)
+            err_msg = f'{Model.__name__}(id={k}) not found'
             logging.info(err_msg)
             raise LookupError(err_msg)
 
@@ -299,7 +298,7 @@ class DynamoDB:
         :param Model: table type to remove the object from
         :param k: ID or key of the object to remove (must be primary key)
         """
-        logging.info("Deleting {}(id={})".format(Model.__name__, k))
+        logging.info(f"Deleting {Model.__name__}(id={k})")
         table_name = self.CONST.get_table_name(Model)
         table = self.ddb.Table(table_name)
         table.delete_item(
