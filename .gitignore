@@ -17,4 +17,4 @@ inertia.toml
 
 # Docs generation files
 _build/
-credentials/
+/credentials/
