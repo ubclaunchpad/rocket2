@@ -18,7 +18,7 @@ def ddb():
         },
         'testing': True
     }
-    return DynamoDB(test_config)
+    return DynamoDB(test_config, None)
 
 
 @pytest.mark.db

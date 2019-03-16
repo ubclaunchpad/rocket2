@@ -83,7 +83,7 @@ class DynamoDB:
             else:
                 return None
 
-    def __init__(self, config):
+    def __init__(self, config, credentials):
         """Initialize facade using DynamoDB settings.
 
         To avoid local tests failure when the DynamoDb server is used,
@@ -125,9 +125,8 @@ class DynamoDB:
         else:
             logging.info("Connecting to remote DynamoDb")
             region_name = config['aws']['region']
-            credentials = toml.load(config['aws']['creds_path'])
-            access_key_id = credentials['access_key_id']
-            secret_access_key = credentials['secret_access_key']
+            access_key_id = credentials.aws_access_key_id
+            secret_access_key = credentials.aws_secret_access_key
             self.ddb = boto3.resource(service_name='dynamodb',
                                       region_name=region_name,
                                       aws_access_key_id=access_key_id,
