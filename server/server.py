@@ -52,6 +52,8 @@ app = Flask(__name__)
 # HTTP security header middleware for Flask
 talisman = Talisman(app)
 talisman.force_https = False
+# cross-site request forgery security middleware for Flask
+csrf = SeaSurf(app)
 config = toml.load('config.toml')
 credentials = Credentials(config['creds_path'])
 core = make_core(config, credentials)
@@ -64,6 +66,7 @@ slack_events_adapter = SlackEventAdapter(slack_signing_secret,
                                          "/slack/events", app)
 
 
+@csrf.exempt
 @app.route('/')
 def check():
     """Display a Rocket status image."""
@@ -71,6 +74,7 @@ def check():
     return "🚀"
 
 
+@csrf.exempt
 @app.route('/slack/commands', methods=['POST'])
 def handle_commands():
     """Handle rocket slash commands."""
@@ -79,6 +83,7 @@ def handle_commands():
     return core.handle_app_command(txt, uid)
 
 
+@csrf.exempt
 @app.route('/webhook/organization', methods=['POST'])
 def handle_organization_webhook():
     """Handle GitHub organization webhooks."""
@@ -87,6 +92,7 @@ def handle_organization_webhook():
     return webhook_handler.handle_organization_event(request.get_json())
 
 
+@csrf.exempt
 @app.route('/webhook/team', methods=['POST'])
 def handle_team_webhook():
     """Handle GitHub team webhooks."""
@@ -97,6 +103,7 @@ def handle_team_webhook():
     return msg
 
 
+@csrf.exempt
 @slack_events_adapter.on("app_mention")
 def handle_app_mention(event):
     """Handle a mention to @rocket."""
@@ -104,6 +111,7 @@ def handle_app_mention(event):
     core.handle_app_mention(event)
 
 
+@csrf.exempt
 @slack_events_adapter.on("team_join")
 def handle_team_join(event):
     """Handle instances when user joins the Launchpad slack workspace."""
