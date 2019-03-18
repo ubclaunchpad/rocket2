@@ -3,7 +3,7 @@ import logging
 from model.user import User
 from model.team import Team
 from db.facade import DBFacade
-from typing import Dict, Any, cast
+from typing import Dict, Any, cast, List
 from command import ResponseTuple
 
 
@@ -42,7 +42,10 @@ class WebhookHandler:
                           f" invalid action specified: {str(payload)}")
             return "invalid organization webhook triggered", 405
 
-    def org_remove(self, member_list, github_id, github_username):
+    def org_remove(self,
+                   member_list: List[User],
+                   github_id: str,
+                   github_username: str) -> ResponseTuple:
         """Help organization function if payload action is remove."""
         if len(member_list) == 1:
             slack_ids_string = ""
@@ -61,12 +64,16 @@ class WebhookHandler:
             logging.error(f"could not find user {github_id}")
             return f"could not find user {github_username}", 404
 
-    def org_added(self, github_username, organization):
+    def org_added(self,
+                  github_username: str,
+                  organization: str) -> ResponseTuple:
         """Help organization function if payload action is added."""
         logging.info(f"user {github_username} added to {organization}")
         return f"user {github_username} added to {organization}", 200
 
-    def org_invited(self, github_username, organization):
+    def org_invited(self,
+                    github_username: str,
+                    organization: str) -> ResponseTuple:
         """Help organization function if payload action is invited."""
         logging.info(f"user {github_username} invited to {organization}")
         return f"user {github_username} invited to {organization}", 200
@@ -147,7 +154,8 @@ class WebhookHandler:
             logging.error(f"invalid payload received: {str(payload)}")
             return "invalid payload", 405
 
-    def handle_membership_event(self, payload):
+    def handle_membership_event(self,
+                                payload: Dict[str, Any]) -> ResponseTuple:
         """
         Handle when a user is added, removed, or invited to team.
 
@@ -178,7 +186,10 @@ class WebhookHandler:
                           f" invalid action specified: {str(payload)}")
             return "invalid membership webhook triggered", 405
 
-    def mem_remove(self, github_id, selected_team, team_name):
+    def mem_remove(self,
+                   github_id: str,
+                   selected_team: Team,
+                   team_name: str) -> ResponseTuple:
         """Help membership function if payload action is removal."""
         member_list = self.__facade. \
             query(User, [('github_id', github_id)])
@@ -204,7 +215,11 @@ class WebhookHandler:
             logging.error(f"could not find user {github_id}")
             return f"could not find user {github_id}", 404
 
-    def mem_added(self, github_id, selected_team, team_name, github_username):
+    def mem_added(self,
+                  github_id: str,
+                  selected_team: Team,
+                  team_name: str,
+                  github_username: str) -> ResponseTuple:
         """Help membership function if payload action is added."""
         member_list = self.__facade.query(User, [('github_id', github_id)])
         slack_ids_string = ""
@@ -214,12 +229,14 @@ class WebhookHandler:
                 slack_id = member.slack_id
                 logging.info(f"user {github_username} added to {team_name}")
                 slack_ids_string += f" {slack_id}"
-                return f"added slack ID{slack_ids_string}", 200
+            return f"added slack ID{slack_ids_string}", 200
         else:
             logging.error(f"could not find user {github_id}")
             return f"could not find user {github_username}", 404
 
-    def mem_invited(self, github_username, team_name):
+    def mem_invited(self,
+                    github_username: str,
+                    team_name: str) -> ResponseTuple:
         """Help membership function if payload action is invited."""
         logging.info(f"user {github_username} invited to {team_name}")
         return f"user {github_username} invited to {team_name}", 200

@@ -4,12 +4,14 @@ import logging
 import toml
 from functools import reduce
 from boto3.dynamodb.conditions import Attr
-from model import UnionModelTypes, UnionModels
 from model.user import User
 from model.team import Team
 from model.project import Project
 from model.permissions import Permissions
-from typing import Dict, Optional, Any, Tuple, List, Type, Sequence
+from typing import Dict, Optional, Any, Tuple, List, Type, Sequence, TypeVar
+
+
+T = TypeVar('T', User, Team, Project)
 
 
 class DynamoDB:
@@ -31,7 +33,7 @@ class DynamoDB:
             self.projects_table = config['projects_table']
 
         def get_table_name(self,
-                           cls: UnionModelTypes) -> str:
+                           cls: Type[T]) -> str:
             """
             Convert class into corresponding table name.
 
@@ -187,7 +189,7 @@ class DynamoDB:
         return any(map(lambda t: bool(t.name == table_name),
                        existing_tables))
 
-    def store(self, obj: UnionModels) -> bool:
+    def store(self, obj: T) -> bool:
         """
         Store object into the correct table.
 
@@ -197,7 +199,7 @@ class DynamoDB:
         :param obj: Object to store in database
         :return: True if object was stored, and false otherwise
         """
-        Model: Optional[UnionModelTypes] = None
+        Model: Optional[Type[T]] = None
         if isinstance(obj, User):
             Model = User
         elif isinstance(obj, Team):
@@ -220,8 +222,8 @@ class DynamoDB:
         return False
 
     def retrieve(self,
-                 Model: UnionModelTypes,
-                 k: str) -> UnionModels:
+                 Model: Type[T],
+                 k: str) -> T:
         """
         Retrieve a model from the database.
 
@@ -247,8 +249,8 @@ class DynamoDB:
             raise LookupError(err_msg)
 
     def query(self,
-              Model: UnionModelTypes,
-              params: List[Tuple[str, str]] = []) -> List[UnionModels]:
+              Model: Type[T],
+              params: List[Tuple[str, str]] = []) -> List[T]:
         """
         Query a table using a list of parameters.
 
@@ -297,7 +299,7 @@ class DynamoDB:
         return list(map(Model.from_dict, resp['Items']))
 
     def delete(self,
-               Model: UnionModelTypes,
+               Model: Type[T],
                k: str) -> None:
         """
         Remove an object from a table.

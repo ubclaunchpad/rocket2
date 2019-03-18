@@ -56,7 +56,7 @@ class Bot:
                           f"error: {response['error']}")
             raise SlackAPIError(response['error'])
         else:
-            return response["members"]
+            return cast(Dict[str, Any], response["members"])
 
     def create_channel(self, channel_name):
         """

@@ -1,8 +1,13 @@
 """Database Facade."""
-from model import UnionModels, UnionModelTypes
-from typing import List, Tuple
+from model.user import User
+from model.team import Team
+from model.project import Project
+from typing import List, Tuple, TypeVar, Type
 from db.dynamodb import DynamoDB
 import logging
+
+
+T = TypeVar('T', User, Team, Project)
 
 
 class DBFacade:
@@ -30,7 +35,7 @@ class DBFacade:
         """Return a string representing this class."""
         return "Database Facade"
 
-    def store(self, obj: UnionModels) -> bool:
+    def store(self, obj: T) -> bool:
         """
         Store object into the correct table.
 
@@ -44,8 +49,8 @@ class DBFacade:
         return self.ddb.store(obj)
 
     def retrieve(self,
-                 Model: UnionModelTypes,
-                 k: str) -> UnionModels:
+                 Model: Type[T],
+                 k: str) -> T:
         """
         Retrieve a model from the database.
 
@@ -58,8 +63,8 @@ class DBFacade:
         return self.ddb.retrieve(Model, k)
 
     def query(self,
-              Model: UnionModelTypes,
-              params: List[Tuple[str, str]] = []) -> List[UnionModels]:
+              Model: Type[T],
+              params: List[Tuple[str, str]] = []) -> List[T]:
         """
         Query a table using a list of parameters.
 
@@ -95,7 +100,7 @@ class DBFacade:
         return self.ddb.query(Model, params)
 
     def delete(self,
-               Model: UnionModelTypes,
+               Model: Type[T],
                k: str) -> None:
         """
         Remove an object from a table.

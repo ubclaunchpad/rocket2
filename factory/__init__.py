@@ -14,12 +14,13 @@ from interface.github import GithubInterface, DefaultGithubFactory
 from interface.slack import Bot
 from slackclient import SlackClient
 from webhook.webhook import WebhookHandler
+from config import Credentials
 
 from typing import MutableMapping, Dict, Any, Optional, cast
 
 
 def make_core(config: Dict[str, Any],
-              credentials,
+              credentials: Credentials,
               gh: Optional[GithubInterface] = None) -> Core:
     """
     Initialize and returns a :class:`command.core.Core` object.
@@ -50,7 +51,8 @@ def make_core(config: Dict[str, Any],
     return Core(facade, bot, cast(GithubInterface, gh), token_config)
 
 
-def make_webhook_handler(config: Dict[str, Any], credentials) -> WebhookHandler:
+def make_webhook_handler(config: Dict[str, Any],
+                         credentials: Credentials) -> WebhookHandler:
     """
     Initialize and returns a :class:`webhook.webhook.WebhookHandler` object.
 
