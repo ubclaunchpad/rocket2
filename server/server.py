@@ -11,6 +11,8 @@ from flask_talisman import Talisman
 from flask_seasurf import SeaSurf
 from interface.slack import SlackAPIError
 from config import Credentials
+from typing import cast, Dict, Any
+
 
 dictConfig({
     'version': 1,
@@ -52,7 +54,7 @@ app = Flask(__name__)
 # HTTP security header middleware for Flask
 talisman = Talisman(app)
 talisman.force_https = False
-config = toml.load('config.toml')
+config = cast(Dict[str, Any], toml.load('config.toml'))
 credentials = Credentials(config['creds_path'])
 core = make_core(config, credentials)
 webhook_handler = make_webhook_handler(config, credentials)

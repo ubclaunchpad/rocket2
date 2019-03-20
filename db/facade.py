@@ -1,5 +1,13 @@
 """Database Facade."""
+from model.user import User
+from model.team import Team
+from model.project import Project
+from typing import List, Tuple, TypeVar, Type
+from db.dynamodb import DynamoDB
 import logging
+
+
+T = TypeVar('T', User, Team, Project)
 
 
 class DBFacade:
@@ -12,7 +20,7 @@ class DBFacade:
     would stay the same.
     """
 
-    def __init__(self, db):
+    def __init__(self, db: DynamoDB) -> None:
         """
         Initialize facade using a given class.
 
@@ -23,11 +31,11 @@ class DBFacade:
         logging.info("Initializing database facade")
         self.ddb = db
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Return a string representing this class."""
         return "Database Facade"
 
-    def store(self, obj):
+    def store(self, obj: T) -> bool:
         """
         Store object into the correct table.
 
@@ -38,9 +46,11 @@ class DBFacade:
         :return: True if object was stored, and false otherwise
         """
         logging.info(f"Storing object {obj}")
-        self.ddb.store(obj)
+        return self.ddb.store(obj)
 
-    def retrieve(self, Model, k):
+    def retrieve(self,
+                 Model: Type[T],
+                 k: str) -> T:
         """
         Retrieve a model from the database.
 
@@ -52,7 +62,9 @@ class DBFacade:
         logging.info(f"Retrieving {Model.__name__}(id={k})")
         return self.ddb.retrieve(Model, k)
 
-    def query(self, Model, params=[]):
+    def query(self,
+              Model: Type[T],
+              params: List[Tuple[str, str]] = []) -> List[T]:
         """
         Query a table using a list of parameters.
 
@@ -80,13 +92,16 @@ class DBFacade:
                                      ('members', '231abc')])
 
         :param Model: type of list elements you'd want
+        :param params: list of tuples to match
         :return: a list of ``Model`` that fit the query parameters
         """
         logging.info(f"Querying {Model.__name__} matching "
                      f"parameters: {params}")
         return self.ddb.query(Model, params)
 
-    def delete(self, Model, k):
+    def delete(self,
+               Model: Type[T],
+               k: str) -> None:
         """
         Remove an object from a table.
 

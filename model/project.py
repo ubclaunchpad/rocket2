@@ -1,11 +1,14 @@
 """Represent a team project."""
+from typing import List, Mapping, Dict, Any
 import uuid
 
 
 class Project:
     """Represent a team project with team ID and related fields and methods."""
 
-    def __init__(self, github_team_id, github_urls):
+    def __init__(self,
+                 github_team_id: str,
+                 github_urls: List[str]) -> None:
         """
         Initialize the team project.
 
@@ -21,14 +24,14 @@ class Project:
         self.display_name = ''
         self.short_description = ''
         self.long_description = ''
-        self.tags = []
+        self.tags: List[str] = []
         self.website_url = ''
         self.medium_url = ''
         self.appstore_url = ''
         self.playstore_url = ''
 
     @staticmethod
-    def from_dict(d):
+    def from_dict(d: Dict[str, Any]) -> 'Project':
         """
         Return a project from a dict object.
 
@@ -49,7 +52,7 @@ class Project:
         return p
 
     @staticmethod
-    def to_dict(p):
+    def to_dict(p: 'Project') -> Dict[str, Any]:
         """
         Return a dict object representing a project.
 
@@ -59,7 +62,7 @@ class Project:
         :param p: the Project object
         :return: a dictionary representing a project
         """
-        def place_if_filled(name, field):
+        def place_if_filled(name: str, field: Any):
             """Populate ``udict`` if ``field`` isn't empty."""
             if field:
                 udict[name] = field
@@ -80,7 +83,7 @@ class Project:
         return udict
 
     @staticmethod
-    def is_valid(p):
+    def is_valid(p: 'Project') -> bool:
         """
         Return true if this project has no missing fields.
 
@@ -94,14 +97,14 @@ class Project:
         return len(p.project_id) > 0 and\
             len(p.github_urls) > 0
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         """Return true if this project is equal to the other project."""
-        return str(self) == str(other)
+        return isinstance(other, Project) and str(self) == str(other)
 
-    def __ne__(self, other):
+    def __ne__(self, other: object) -> bool:
         """Return true if this project isn't equal to the other project."""
         return not (self == other)
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Return all fields of this project, JSON format."""
         return str(self.__dict__)

@@ -200,26 +200,6 @@ class TestUserCommand(TestCase):
         self.mock_facade.retrieve.return_value = user
         self.mock_github.org_add_member.side_effect = GithubAPIException("")
         user_attaches = [user.get_attachment()]
-        with self.app.app_context():
-            resp, code = self.testcommand.handle("user edit --github rob",
-                                                 "U0G9QF9C6")
-            expect = {
-                'attachments': user_attaches,
-                'text': "\nError adding user rob to GitHub organization"
-            }
-            expect = json.loads(jsonify(expect).data)
-            resp = json.loads(resp.data)
-            self.assertDictEqual(resp, expect)
-            self.assertEqual(code, 200)
-        self.mock_facade.retrieve.assert_called_once_with(User, "U0G9QF9C6")
-        self.mock_facade.store.assert_called_once_with(user)
-
-    def test_handle_edit_github_error(self):
-        """Test that editing github username sends request to interface."""
-        user = User("U0G9QF9C6")
-        self.mock_facade.retrieve.return_value = user
-        self.mock_github.org_add_member.side_effect = GithubAPIException("")
-        user_attaches = [user.get_attachment()]
 
         with self.app.app_context():
             resp, code = self.testcommand.handle('user edit --github rob',

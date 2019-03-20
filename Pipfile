@@ -32,6 +32,9 @@ pydocstyle = "*"
 pytest-cov = "*"
 sphinx = "*"
 sphinx-rtd-theme = "*"
+mypy = "*"
+pytest-mypy = "*"
+sphinx-autodoc-typehints = "*"
 
 [requires]
 python_version = "3.7"

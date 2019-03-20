@@ -1,9 +1,12 @@
 """Command parsing for team events."""
-import argparse
+from argparse import ArgumentParser, _SubParsersAction
+from interface.github import GithubAPIException, GithubInterface
+from typing import Any, Dict, Optional
+from command import ResponseTuple
+from model.team import Team
+from db.facade import DBFacade
 import logging
 import shlex
-from interface.github import GithubAPIException
-from model.team import Team
 
 
 class TeamCommand:
@@ -13,7 +16,10 @@ class TeamCommand:
     desc = "for dealing with " + command_name + "s"
     permission_error = "Insufficient permission level to run command!"
 
-    def __init__(self, db_facade, gh, sc):
+    def __init__(self,
+                 db_facade: DBFacade,
+                 gh: GithubInterface,
+                 sc: Any) -> None:
         """
         Initialize team command parser.
 
@@ -26,12 +32,12 @@ class TeamCommand:
         self.gh = gh
         self.sc = sc
         self.desc = ""
-        self.parser = argparse.ArgumentParser(prog="/rocket")
+        self.parser = ArgumentParser(prog="/rocket")
         self.parser.add_argument("team")
         self.subparser = self.init_subparsers()
         self.help = self.get_help()
 
-    def init_subparsers(self):
+    def init_subparsers(self) -> _SubParsersAction:
         """Initialize subparsers for team command."""
         subparsers = self.parser.add_subparsers(dest="which")
 
@@ -104,15 +110,15 @@ class TeamCommand:
                                  help="Platform the team should have.")
         return subparsers
 
-    def get_name(self):
+    def get_name(self) -> str:
         """Return the command type."""
         return self.command_name
 
-    def get_desc(self):
+    def get_desc(self) -> str:
         """Return the description of this command."""
         return self.desc
 
-    def get_help(self):
+    def get_help(self) -> str:
         """Return command options for team events."""
         res = "\n*" + self.command_name + " commands:*```"
         for argument in self.subparser.choices:
@@ -121,7 +127,9 @@ class TeamCommand:
             res += self.subparser.choices[argument].format_help()
         return res + "```"
 
-    def handle(self, command, user_id):
+    def handle(self,
+               command: str,
+               user_id: str) -> ResponseTuple:
         """Handle command by splitting into substrings and giving to parser."""
         logging.debug("Handling TeamCommand")
         command_arg = shlex.split(command)
@@ -173,7 +181,8 @@ class TeamCommand:
         else:
             return self.get_help(), 200
 
-    def create_helper(self, param_list):
+    def create_helper(self,
+                      param_list: Dict[str, str]) -> ResponseTuple:
         """
         Create Team and calls GitHub API to create in GitHub.
 
@@ -183,12 +192,12 @@ class TeamCommand:
         command was called into the team.
         :param param_list: List of parameters for creating team
         :return: return error message if team created unsuccessfully
-                    otherwise returns success message
+                 otherwise returns success message
         """
         try:
             msg = "new team: {}, ".format(param_list["team_name"])
-            team_id = self.gh.org_create_team()
-            team = Team(team_id, param_list["team_name"], "")
+            team_id = self.gh.org_create_team(param_list["team_name"])
+            team = Team(str(team_id), param_list["team_name"], "")
             if param_list["name"] is not None:
                 msg += "name: {}, ".format(param_list["name"])
                 team.display_name = param_list["name"]
@@ -198,7 +207,7 @@ class TeamCommand:
             if param_list["channel"] is not None:
                 msg += "add channel"
                 # stub: cannot finish until teamMember PR is pushed
-            self.facade.store_team(team)
+            self.facade.store(team)
             return msg, 200
         except GithubAPIException as e:
             logging.error("team creation unsuccessful")

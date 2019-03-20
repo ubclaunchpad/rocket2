@@ -6,7 +6,7 @@ The following are a few function to help in command handling.
 import re
 
 
-def regularize_char(c):
+def regularize_char(c: str) -> str:
     """
     Convert any unicode quotation marks to ascii ones.
 
@@ -22,9 +22,9 @@ def regularize_char(c):
     return c
 
 
-def escaped_id_to_id(s):
+def escaped_id_to_id(s: str) -> str:
     """
-    Convert an string with escaped IDs to just the IDs.
+    Convert a string with escaped IDs to just the IDs.
 
     Before::
 

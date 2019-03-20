@@ -8,6 +8,10 @@ from model.user import User
 from model.team import Team
 from model.project import Project
 from model.permissions import Permissions
+from typing import Dict, Optional, Any, Tuple, List, Type, Sequence, TypeVar
+
+
+T = TypeVar('T', User, Team, Project)
 
 
 class DynamoDB:
@@ -22,20 +26,19 @@ class DynamoDB:
     class Const:
         """A bunch of static constants and functions."""
 
-        def __init__(self, config={}):
+        def __init__(self, config: Dict[str, str]) -> None:
             """Initialize the constants."""
             self.users_table = config['users_table']
             self.teams_table = config['teams_table']
             self.projects_table = config['projects_table']
 
-        def get_table_name(self, cls):
+        def get_table_name(self,
+                           cls: Type[T]) -> str:
             """
             Convert class into corresponding table name.
 
-            Will return ``None`` if ``cls`` isn't either ``User``, ``Team``, or
-            ``Project``.
-
             :param cls: Either ``User``, ``Team``, or ``Project``
+            :raise: TypeError if it is not either User, Team, or Project
             :return: table name string
             """
             if cls == User:
@@ -45,15 +48,14 @@ class DynamoDB:
             elif cls == Project:
                 return self.projects_table
             else:
-                return None
+                raise TypeError('Type of class one of [User, Team, Project]')
 
-        def get_key(self, table_name):
+        def get_key(self, table_name: str) -> str:
             """
             Get primary key of the table name.
 
-            Will return ``None`` if the table does not exist.
-
             :param cls: the name of the table
+            :raise: TypeError if table does not exist
             :return: primary key of the table
             """
             if table_name == self.users_table:
@@ -63,15 +65,14 @@ class DynamoDB:
             elif table_name == self.projects_table:
                 return 'project_id'
             else:
-                return None
+                raise TypeError('Table name does not correspond to anything')
 
-        def get_set_attrs(self, table_name):
+        def get_set_attrs(self, table_name: str) -> List[str]:
             """
             Get class attributes that are sets.
 
-            Will return ``None`` if the table does not exist.
-
             :param cls: the table name
+            :raise: TypeError if table does not exist
             :return: list of strings of set attributes
             """
             if table_name == self.users_table:
@@ -81,9 +82,9 @@ class DynamoDB:
             elif table_name == self.projects_table:
                 return ['tags', 'github_urls']
             else:
-                return None
+                raise TypeError('Table name does not correspond to anything')
 
-    def __init__(self, config, credentials):
+    def __init__(self, config: Dict[str, Any], credentials) -> None:
         """Initialize facade using DynamoDB settings.
 
         To avoid local tests failure when the DynamoDb server is used,
@@ -140,11 +141,11 @@ class DynamoDB:
         if not self.check_valid_table(self.projects_table):
             self.__create_table(self.projects_table)
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Return a string representing this class."""
         return "DynamoDB"
 
-    def __create_table(self, table_name, key_type='S'):
+    def __create_table(self, table_name: str, key_type: str = 'S') -> None:
         """
         Create a table.
 
@@ -177,7 +178,7 @@ class DynamoDB:
             }
         )
 
-    def check_valid_table(self, table_name):
+    def check_valid_table(self, table_name: str) -> bool:
         """
         Check if table with ``table_name`` exists.
 
@@ -185,9 +186,10 @@ class DynamoDB:
         :return: boolean value, true if table exists, false otherwise
         """
         existing_tables = self.ddb.tables.all()
-        return any(map(lambda t: t.name == table_name, existing_tables))
+        return any(map(lambda t: bool(t.name == table_name),
+                       existing_tables))
 
-    def store(self, obj):
+    def store(self, obj: T) -> bool:
         """
         Store object into the correct table.
 
@@ -197,7 +199,7 @@ class DynamoDB:
         :param obj: Object to store in database
         :return: True if object was stored, and false otherwise
         """
-        Model = None
+        Model: Optional[Type[T]] = None
         if isinstance(obj, User):
             Model = User
         elif isinstance(obj, Team):
@@ -209,17 +211,19 @@ class DynamoDB:
             raise RuntimeError(f'Cannot store object{str(obj)}')
 
         # Check if object is valid
-        if Model.is_valid(obj):
+        if Model.is_valid(obj):     # type: ignore
             table_name = self.CONST.get_table_name(Model)
             table = self.ddb.Table(table_name)
-            d = Model.to_dict(obj)
+            d = Model.to_dict(obj)  # type: ignore
 
             logging.info(f"Storing obj {obj} in table {table_name}")
             table.put_item(Item=d)
             return True
         return False
 
-    def retrieve(self, Model, k):
+    def retrieve(self,
+                 Model: Type[T],
+                 k: str) -> T:
         """
         Retrieve a model from the database.
 
@@ -244,7 +248,9 @@ class DynamoDB:
             logging.info(err_msg)
             raise LookupError(err_msg)
 
-    def query(self, Model, params=[]):
+    def query(self,
+              Model: Type[T],
+              params: List[Tuple[str, str]] = []) -> List[T]:
         """
         Query a table using a list of parameters.
 
@@ -272,6 +278,7 @@ class DynamoDB:
                                      ('members', '231abc')])
 
         :param Model: type of list elements you'd want
+        :param params: list of tuples to match
         :return: a list of ``Model`` that fit the query parameters
         """
         table_name = self.CONST.get_table_name(Model)
@@ -291,7 +298,9 @@ class DynamoDB:
 
         return list(map(Model.from_dict, resp['Items']))
 
-    def delete(self, Model, k):
+    def delete(self,
+               Model: Type[T],
+               k: str) -> None:
         """
         Remove an object from a table.
 

@@ -1,10 +1,14 @@
 """Represent a data model for a team."""
+from typing import Mapping, Set, Dict, Any
 
 
 class Team:
     """Represent a team with related fields and methods."""
 
-    def __init__(self, github_team_id, github_team_name, display_name):
+    def __init__(self,
+                 github_team_id: str,
+                 github_team_name: str,
+                 display_name: str) -> None:
         """
         Initialize the team.
 
@@ -14,11 +18,11 @@ class Team:
         self.github_team_name = github_team_name
         self.display_name = display_name
         self.platform = ""
-        self.team_leads = set()
-        self.members = set()
+        self.team_leads: Set[str] = set()
+        self.members: Set[str] = set()
 
     @staticmethod
-    def from_dict(d):
+    def from_dict(d: Dict[str, Any]) -> 'Team':
         """
         Convert dict response object to team model.
 
@@ -36,7 +40,7 @@ class Team:
         return team
 
     @staticmethod
-    def to_dict(team):
+    def to_dict(team: 'Team') -> Dict[str, Any]:
         """
         Convert team object to dict object.
 
@@ -46,7 +50,7 @@ class Team:
         :param team: the team object
         :return: the dictionary representing the team
         """
-        def place_if_filled(name, field):
+        def place_if_filled(name: str, field: Any) -> None:
             """Populate ``tdict`` if ``field`` isn't empty."""
             if field:
                 tdict[name] = field
@@ -63,7 +67,7 @@ class Team:
         return tdict
 
     @staticmethod
-    def is_valid(team):
+    def is_valid(team: 'Team') -> bool:
         """
         Return true if this team has no missing required fields.
 
@@ -77,34 +81,34 @@ class Team:
         return len(team.github_team_name) > 0 and\
             len(team.github_team_id) > 0
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         """Return true if this team has the same attributes as the other."""
-        return str(self) == str(other)
+        return isinstance(other, Team) and str(self) == str(other)
 
-    def __ne__(self, other):
+    def __ne__(self, other: object) -> bool:
         """Return the opposite of what is returned in self.__eq__(other)."""
         return not (self == other)
 
-    def add_member(self, github_user_id):
+    def add_member(self, github_user_id: str) -> None:
         """Add a new member's Github ID to the team's set of members' IDs."""
         self.members.add(github_user_id)
 
-    def discard_member(self, github_user_id):
+    def discard_member(self, github_user_id: str) -> None:
         """Discard the member of the team with Github ID in the argument."""
         self.members.discard(github_user_id)
 
-    def is_member(self, github_user_id):
+    def is_member(self, github_user_id: str) -> bool:
         """Identify if any member has the ID specified in the argument."""
         return github_user_id in self.members
 
-    def add_team_lead(self, github_user_id):
+    def add_team_lead(self, github_user_id: str) -> None:
         """Add a user's Github ID to the team's set of team lead IDs."""
         self.team_leads.add(github_user_id)
 
-    def is_team_lead(self, github_user_id):
+    def is_team_lead(self, github_user_id: str) -> bool:
         """Identify if user with given ID is a team lead."""
         return github_user_id in self.team_leads
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Print information on the team class."""
         return str(self.__dict__)

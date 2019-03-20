@@ -1,26 +1,37 @@
 """Calls the appropriate handler depending on the event data."""
+from command import ResponseTuple
+from command.commands import UnionCommands
 from command.commands.user import UserCommand
-from command.commands.token import TokenCommand
-import command.util as util
+from command.commands.token import TokenCommand, TokenCommandConfig
+from db.facade import DBFacade
 from model.user import User
-from interface.slack import SlackAPIError
+from interface.slack import Bot, SlackAPIError
+from interface.github import GithubInterface
+from flask import jsonify, Response
+from typing import Dict, Any, cast
 import logging
-from flask import jsonify
+import command.util as util
 
 
 class Core:
     """Encapsulate methods for handling events."""
 
-    def __init__(self, db_facade, bot, gh_interface, token_config):
+    def __init__(self,
+                 db_facade: DBFacade,
+                 bot: Bot,
+                 gh_interface: GithubInterface,
+                 token_config: TokenCommandConfig) -> None:
         """Initialize the dictionary of command handlers."""
-        self.__commands = {}
+        self.__commands: Dict[str, UnionCommands] = {}
         self.__facade = db_facade
         self.__bot = bot
         self.__github = gh_interface
         self.__commands["user"] = UserCommand(self.__facade, self.__github)
         self.__commands["token"] = TokenCommand(self.__facade, token_config)
 
-    def handle_app_command(self, cmd_txt, user):
+    def handle_app_command(self,
+                           cmd_txt: str,
+                           user: str) -> ResponseTuple:
         """
         Handle a command call to rocket.
 
@@ -44,7 +55,7 @@ class Core:
             logging.error("app command triggered incorrectly")
             return 'Please enter a valid command', 200
 
-    def handle_team_join(self, event_data):
+    def handle_team_join(self, event_data: Dict[str, Any]) -> None:
         """
         Handle the event of a new user joining the workspace.
 
@@ -69,7 +80,7 @@ class Core:
         self.__bot.send_event_notif(msg)
         logging.info("Core passing notification to bot")
 
-    def get_help(self):
+    def get_help(self) -> Response:
         """
         Get help messages and return a formatted string for messaging.
 
@@ -88,5 +99,5 @@ class Core:
             cmd_text = f"*{cmd_name}:* {cmd.desc}"
             attachment = {"text": cmd_text, "mrkdwn_in": ["text"]}
             attachments.append(attachment)
-        message["attachments"] = attachments
-        return jsonify(message)
+        message["attachments"] = attachments    # type: ignore
+        return cast(Response, jsonify(message))
