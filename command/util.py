@@ -44,7 +44,7 @@ def escaped_id_to_id(s: str) -> str:
 
 def check_credentials(user, team):
         """
-        Checks if given user is admin or team lead.
+        Check if given user is admin or team lead.
 
         If team is specified and user is not admin, checks if user is
         team lead in team.
@@ -57,4 +57,4 @@ def check_credentials(user, team):
         if team is None:
             return user.permissions_level == Permissions.team_lead
         else:
-            return team.is_team_lead(user.github_id)
+            return team.has_team_lead(user.github_id)

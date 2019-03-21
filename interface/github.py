@@ -147,7 +147,7 @@ class GithubInterface:
 
     @handle_github_error
     def has_team_member(self, username, team_id):
-        """Checks if team with team_id contains user with username."""
+        """Check if team with team_id contains user with username."""
         team = self.github.get_team(team_id)
         member = self.github.get_user(username)
         return team.has_in_members(member)
