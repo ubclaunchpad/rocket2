@@ -19,7 +19,7 @@ class WebhookHandler:
         self.__facade = db_facade
         self.__secret = credentials.github_webhook_secret
 
-    def verify_hash(self, request_body, xhub_signature):
+    def verify_hash(self, request_body: str, xhub_signature: str):
         """
         Verify if a webhook event comes from GitHub.
 
