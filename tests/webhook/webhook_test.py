@@ -78,7 +78,7 @@ def org_default_payload():
 
 
 @pytest.fixture
-def org_add_payload(org_default_payload):
+def org_add_payload(org_default_payload, credentials):
     """Provide an organization payload for adding a member."""
     add_payload = org_default_payload
     add_payload["action"] = "member_added"
@@ -86,7 +86,7 @@ def org_add_payload(org_default_payload):
 
 
 @pytest.fixture
-def org_rm_payload(org_default_payload):
+def org_rm_payload(org_default_payload, credentials):
     """Provide an organization payload for removing a member."""
     rm_payload = org_default_payload
     rm_payload["action"] = "member_removed"
@@ -94,7 +94,7 @@ def org_rm_payload(org_default_payload):
 
 
 @pytest.fixture
-def org_inv_payload(org_default_payload):
+def org_inv_payload(org_default_payload, credentials):
     """Provide an organization payload for inviting a member."""
     inv_payload = org_default_payload
     inv_payload["action"] = "member_invited"
@@ -102,7 +102,7 @@ def org_inv_payload(org_default_payload):
 
 
 @pytest.fixture
-def org_empty_payload(org_default_payload):
+def org_empty_payload(org_default_payload, credentials):
     """Provide an organization payload with no action."""
     empty_payload = org_default_payload
     empty_payload["action"] = ""
@@ -264,7 +264,7 @@ def team_default_payload():
 
 
 @pytest.fixture
-def team_created_payload(team_default_payload):
+def team_created_payload(team_default_payload, credentials):
     """Provide a team payload for creating a team."""
     created_payload = team_default_payload
     created_payload["action"] = "created"
@@ -272,7 +272,7 @@ def team_created_payload(team_default_payload):
 
 
 @pytest.fixture
-def team_deleted_payload(team_default_payload):
+def team_deleted_payload(team_default_payload, credentials):
     """Provide a team payload for deleting a team."""
     deleted_payload = team_default_payload
     deleted_payload["action"] = "deleted"
@@ -280,7 +280,7 @@ def team_deleted_payload(team_default_payload):
 
 
 @pytest.fixture
-def team_edited_payload(team_default_payload):
+def team_edited_payload(team_default_payload, credentials):
     """Provide a team payload for editing a team."""
     edited_payload = team_default_payload
     edited_payload["action"] = "edited"
@@ -288,7 +288,7 @@ def team_edited_payload(team_default_payload):
 
 
 @pytest.fixture
-def team_added_to_repository_payload(team_default_payload):
+def team_added_to_repository_payload(team_default_payload, credentials):
     """Provide a team payload for adding a team to a repository."""
     added_to_repository_payload = team_default_payload
     added_to_repository_payload["action"] = "added_to_repository"
@@ -296,7 +296,7 @@ def team_added_to_repository_payload(team_default_payload):
 
 
 @pytest.fixture
-def team_rm_from_repository_payload(team_default_payload):
+def team_rm_from_repository_payload(team_default_payload, credentials):
     """Provide a team payload for removing a team from a repository."""
     removed_from_repository_payload = team_default_payload
     removed_from_repository_payload["action"] = "removed_from_repository"
@@ -304,18 +304,25 @@ def team_rm_from_repository_payload(team_default_payload):
 
 
 @pytest.fixture
-def team_empty_payload(team_default_payload):
+def team_empty_payload(team_default_payload, credentials):
     """Provide an empty team payload."""
     empty_payload = team_default_payload
     empty_payload["action"] = ""
     return empty_payload
 
 
+@pytest.fixture
+def credentials():
+    """Return a credentials object with complete attributes."""
+    return Credentials('tests/credentials/complete')
+
+
 @mock.patch('webhook.webhook.logging')
-def test_handle_org_event_add_member(mock_logging, org_add_payload):
+def test_handle_org_event_add_member(mock_logging, org_add_payload,
+                                     credentials):
     """Test that instances when members are added to the org are logged."""
     mock_facade = mock.MagicMock(DBFacade)
-    webhook_handler = WebhookHandler(mock_facade)
+    webhook_handler = WebhookHandler(mock_facade, credentials)
     rsp, code = webhook_handler.handle_organization_event(org_add_payload)
     mock_logging.info.assert_called_once_with(("user hacktocat added "
                                                "to Octocoders"))
@@ -324,12 +331,13 @@ def test_handle_org_event_add_member(mock_logging, org_add_payload):
 
 
 @mock.patch('webhook.webhook.logging')
-def test_handle_org_event_rm_single_member(mock_logging, org_rm_payload):
+def test_handle_org_event_rm_single_member(mock_logging, org_rm_payload,
+                                           credentials):
     """Test that members removed from the org are deleted from rocket's db."""
     mock_facade = mock.MagicMock(DBFacade)
     return_user = User("SLACKID")
     mock_facade.query.return_value = [return_user]
-    webhook_handler = WebhookHandler(mock_facade)
+    webhook_handler = WebhookHandler(mock_facade, credentials)
     rsp, code = webhook_handler.handle_organization_event(org_rm_payload)
     mock_facade.query\
         .assert_called_once_with(User, [('github_id', "39652351")])
@@ -340,11 +348,12 @@ def test_handle_org_event_rm_single_member(mock_logging, org_rm_payload):
 
 
 @mock.patch('webhook.webhook.logging')
-def test_handle_org_event_rm_member_missing(mock_logging, org_rm_payload):
+def test_handle_org_event_rm_member_missing(mock_logging, org_rm_payload,
+                                            credentials):
     """Test that members not in rocket db are handled correctly."""
     mock_facade = mock.MagicMock(DBFacade)
     mock_facade.query.return_value = []
-    webhook_handler = WebhookHandler(mock_facade)
+    webhook_handler = WebhookHandler(mock_facade, credentials)
     rsp, code = webhook_handler.handle_organization_event(org_rm_payload)
     mock_facade.query\
         .assert_called_once_with(User, [('github_id', "39652351")])
@@ -354,14 +363,15 @@ def test_handle_org_event_rm_member_missing(mock_logging, org_rm_payload):
 
 
 @mock.patch('webhook.webhook.logging')
-def test_handle_org_event_rm_mult_members(mock_logging, org_rm_payload):
+def test_handle_org_event_rm_mult_members(mock_logging, org_rm_payload,
+                                          credentials):
     """Test that multiple members with the same github name can be deleted."""
     mock_facade = mock.MagicMock(DBFacade)
     user1 = User("SLACKUSER1")
     user2 = User("SLACKUSER2")
     user3 = User("SLACKUSER3")
     mock_facade.query.return_value = [user1, user2, user3]
-    webhook_handler = WebhookHandler(mock_facade)
+    webhook_handler = WebhookHandler(mock_facade, credentials)
     rsp, code = webhook_handler.handle_organization_event(org_rm_payload)
     mock_facade.query\
         .assert_called_once_with(User, [('github_id', "39652351")])
@@ -373,10 +383,11 @@ def test_handle_org_event_rm_mult_members(mock_logging, org_rm_payload):
 
 
 @mock.patch('webhook.webhook.logging')
-def test_handle_org_event_inv_member(mock_logging, org_inv_payload):
+def test_handle_org_event_inv_member(mock_logging, org_inv_payload,
+                                     credentials):
     """Test that instances when members are added to the org are logged."""
     mock_facade = mock.MagicMock(DBFacade)
-    webhook_handler = WebhookHandler(mock_facade)
+    webhook_handler = WebhookHandler(mock_facade, credentials)
     rsp, code = webhook_handler.handle_organization_event(org_inv_payload)
     mock_logging.info.assert_called_once_with(("user hacktocat invited "
                                                "to Octocoders"))
@@ -385,10 +396,11 @@ def test_handle_org_event_inv_member(mock_logging, org_inv_payload):
 
 
 @mock.patch('webhook.webhook.logging')
-def test_handle_org_event_empty_action(mock_logging, org_empty_payload):
+def test_handle_org_event_empty_action(mock_logging, org_empty_payload,
+                                       credentials):
     """Test that instances where there is no/invalid action are logged."""
     mock_facade = mock.MagicMock(DBFacade)
-    webhook_handler = WebhookHandler(mock_facade)
+    webhook_handler = WebhookHandler(mock_facade, credentials)
     rsp, code = webhook_handler.handle_organization_event(org_empty_payload)
     mock_logging.error.assert_called_once_with(("organization webhook "
                                                 "triggered, invalid "
@@ -399,11 +411,12 @@ def test_handle_org_event_empty_action(mock_logging, org_empty_payload):
 
 
 @mock.patch('webhook.webhook.logging')
-def test_handle_team_event_created_team(mock_logging, team_created_payload):
+def test_handle_team_event_created_team(mock_logging, team_created_payload,
+                                        credentials):
     """Test that teams can be created if they are not in the db."""
     mock_facade = mock.MagicMock(DBFacade)
     mock_facade.retrieve.side_effect = LookupError
-    webhook_handler = WebhookHandler(mock_facade)
+    webhook_handler = WebhookHandler(mock_facade, credentials)
     rsp, code = webhook_handler.handle_team_event(team_created_payload)
     mock_logging.debug.assert_called_with(("team github with id 2723476 "
                                            "added to organization."))
@@ -413,10 +426,11 @@ def test_handle_team_event_created_team(mock_logging, team_created_payload):
 
 
 @mock.patch('webhook.webhook.logging')
-def test_handle_team_event_create_update(mock_logging, team_created_payload):
+def test_handle_team_event_create_update(mock_logging, team_created_payload,
+                                         credentials):
     """Test that teams can be updated if they are in the db."""
     mock_facade = mock.MagicMock(DBFacade)
-    webhook_handler = WebhookHandler(mock_facade)
+    webhook_handler = WebhookHandler(mock_facade, credentials)
     rsp, code = webhook_handler.handle_team_event(team_created_payload)
     mock_logging.warning.assert_called_with(("team github with id 2723476 "
                                              "already exists."))
@@ -425,67 +439,69 @@ def test_handle_team_event_create_update(mock_logging, team_created_payload):
     assert code == 200
 
 
-def test_handle_team_event_delete_team(team_deleted_payload):
+def test_handle_team_event_delete_team(team_deleted_payload, credentials):
     """Test that teams can be deleted if they are in the db."""
     mock_facade = mock.MagicMock(DBFacade)
-    webhook_handler = WebhookHandler(mock_facade)
+    webhook_handler = WebhookHandler(mock_facade, credentials)
     rsp, code = webhook_handler.handle_team_event(team_deleted_payload)
     mock_facade.delete.assert_called_once_with(Team, 2723476)
     assert rsp == "deleted team with github id 2723476"
     assert code == 200
 
 
-def test_handle_team_event_deleted_miss(team_deleted_payload):
+def test_handle_team_event_deleted_miss(team_deleted_payload, credentials):
     """Test that attempts to delete a missing team are handled."""
     mock_facade = mock.MagicMock(DBFacade)
     mock_facade.retrieve.side_effect = LookupError
-    webhook_handler = WebhookHandler(mock_facade)
+    webhook_handler = WebhookHandler(mock_facade, credentials)
     rsp, code = webhook_handler.handle_team_event(team_deleted_payload)
     assert rsp == "team with github id 2723476 not found"
     assert code == 404
 
 
-def test_handle_team_event_edit_team(team_edited_payload):
+def test_handle_team_event_edit_team(team_edited_payload, credentials):
     """Test that teams can be edited if they are in the db."""
     mock_facade = mock.MagicMock(DBFacade)
-    webhook_handler = WebhookHandler(mock_facade)
+    webhook_handler = WebhookHandler(mock_facade, credentials)
     rsp, code = webhook_handler.handle_team_event(team_edited_payload)
     assert rsp == "updated team with id 2723476"
     assert code == 200
 
 
-def test_handle_team_event_edit_miss(team_edited_payload):
+def test_handle_team_event_edit_miss(team_edited_payload, credentials):
     """Test that attempts to edit a missing team are handled."""
     mock_facade = mock.MagicMock(DBFacade)
     mock_facade.retrieve.side_effect = LookupError
-    webhook_handler = WebhookHandler(mock_facade)
+    webhook_handler = WebhookHandler(mock_facade, credentials)
     rsp, code = webhook_handler.handle_team_event(team_edited_payload)
 
 
-def test_handle_team_event_add_to_repo(team_added_to_repository_payload):
+def test_handle_team_event_add_to_repo(team_added_to_repository_payload,
+                                       credentials):
     """Test that rocket knows when team is added to a repo."""
     mock_facade = mock.MagicMock(DBFacade)
-    webhook_handler = WebhookHandler(mock_facade)
+    webhook_handler = WebhookHandler(mock_facade, credentials)
     rsp, code = \
         webhook_handler.handle_team_event(team_added_to_repository_payload)
     assert rsp == "team with id 2723476 added to repository Hello-World"
     assert code == 200
 
 
-def test_handle_team_event_rm_from_repo(team_rm_from_repository_payload):
+def test_handle_team_event_rm_from_repo(team_rm_from_repository_payload,
+                                        credentials):
     """Test that rocket knows when team is removed from a repo."""
     mock_facade = mock.MagicMock(DBFacade)
-    webhook_handler = WebhookHandler(mock_facade)
+    webhook_handler = WebhookHandler(mock_facade, credentials)
     rsp, code = \
         webhook_handler.handle_team_event(team_rm_from_repository_payload)
     assert rsp == "team with id 2723476 removed repository Hello-World"
     assert code == 200
 
 
-def test_handle_team_event_empty_payload(team_empty_payload):
+def test_handle_team_event_empty_payload(team_empty_payload, credentials):
     """Test that empty/invalid payloads can be handled."""
     mock_facade = mock.MagicMock(DBFacade)
-    webhook_handler = WebhookHandler(mock_facade)
+    webhook_handler = WebhookHandler(mock_facade, credentials)
     rsp, code = webhook_handler.handle_team_event(team_empty_payload)
     assert rsp == "invalid payload"
 
@@ -568,7 +584,7 @@ def mem_default_payload():
 
 
 @pytest.fixture
-def mem_add_payload(mem_default_payload):
+def mem_add_payload(mem_default_payload, credentials):
     """Provide a membership payload for adding a member."""
     add_payload = mem_default_payload
     add_payload["action"] = "member_added"
@@ -576,7 +592,7 @@ def mem_add_payload(mem_default_payload):
 
 
 @pytest.fixture
-def mem_rm_payload(mem_default_payload):
+def mem_rm_payload(mem_default_payload, credentials):
     """Provide a membership payload for removing a member."""
     rm_payload = mem_default_payload
     rm_payload["action"] = "member_removed"
@@ -584,7 +600,7 @@ def mem_rm_payload(mem_default_payload):
 
 
 @pytest.fixture
-def mem_inv_payload(mem_default_payload):
+def mem_inv_payload(mem_default_payload, credentials):
     """Provide a membership payload for inviting a member."""
     inv_payload = mem_default_payload
     inv_payload["action"] = "member_invited"
@@ -592,7 +608,7 @@ def mem_inv_payload(mem_default_payload):
 
 
 @pytest.fixture
-def mem_empty_payload(mem_default_payload):
+def mem_empty_payload(mem_default_payload, credentials):
     """Provide a membership payload with no action."""
     empty_payload = mem_default_payload
     empty_payload["action"] = ""
@@ -600,12 +616,13 @@ def mem_empty_payload(mem_default_payload):
 
 
 @mock.patch('webhook.webhook.logging')
-def test_handle_mem_event_add_member(mock_logging, mem_add_payload):
+def test_handle_mem_event_add_member(mock_logging, mem_add_payload,
+                                     credentials):
     """Test that instances when members are added to the mem are logged."""
     mock_facade = mock.MagicMock(DBFacade)
     return_user = User("SLACKID")
     mock_facade.query.return_value = [return_user]
-    webhook_handler = WebhookHandler(mock_facade)
+    webhook_handler = WebhookHandler(mock_facade, credentials)
     rsp, code = webhook_handler.handle_membership_event(mem_add_payload)
     mock_logging.info.assert_called_once_with(("user Codertocat added "
                                                "to rocket"))
@@ -614,11 +631,12 @@ def test_handle_mem_event_add_member(mock_logging, mem_add_payload):
 
 
 @mock.patch('webhook.webhook.logging')
-def test_handle_mem_event_add_missing_member(mock_logging, mem_add_payload):
+def test_handle_mem_event_add_missing_member(mock_logging, mem_add_payload,
+                                             credentials):
     """Test that instances when members are added to the mem are logged."""
     mock_facade = mock.MagicMock(DBFacade)
     mock_facade.query.return_value = []
-    webhook_handler = WebhookHandler(mock_facade)
+    webhook_handler = WebhookHandler(mock_facade, credentials)
     rsp, code = webhook_handler.handle_membership_event(mem_add_payload)
     mock_logging.error.assert_called_once_with("could not find user 21031067")
     assert rsp == "could not find user Codertocat"
@@ -626,7 +644,8 @@ def test_handle_mem_event_add_missing_member(mock_logging, mem_add_payload):
 
 
 @mock.patch('webhook.webhook.logging')
-def test_handle_mem_event_rm_single_member(mock_logging, mem_rm_payload):
+def test_handle_mem_event_rm_single_member(mock_logging, mem_rm_payload,
+                                           credentials):
     """Test that members removed from the mem are deleted from rocket's db."""
     mock_facade = mock.MagicMock(DBFacade)
     return_user = User("SLACKID")
@@ -634,7 +653,7 @@ def test_handle_mem_event_rm_single_member(mock_logging, mem_rm_payload):
     return_team.add_member("21031067")
     mock_facade.query.return_value = [return_user]
     mock_facade.retrieve.return_value = return_team
-    webhook_handler = WebhookHandler(mock_facade)
+    webhook_handler = WebhookHandler(mock_facade, credentials)
     (rsp, code) = webhook_handler.handle_membership_event(mem_rm_payload)
     mock_facade.query\
         .assert_called_once_with(User, [('github_id', "21031067")])
@@ -648,14 +667,15 @@ def test_handle_mem_event_rm_single_member(mock_logging, mem_rm_payload):
 
 
 @mock.patch('webhook.webhook.logging')
-def test_handle_mem_event_rm_member_missing(mock_logging, mem_rm_payload):
+def test_handle_mem_event_rm_member_missing(mock_logging, mem_rm_payload,
+                                            credentials):
     """Test that members not in rocket db are handled correctly."""
     mock_facade = mock.MagicMock(DBFacade)
     return_user = User("SLACKID")
     return_team = Team("2723476", "rocket", "rocket")
     mock_facade.query.return_value = [return_user]
     mock_facade.retrieve.return_value = return_team
-    webhook_handler = WebhookHandler(mock_facade)
+    webhook_handler = WebhookHandler(mock_facade, credentials)
     rsp, code = webhook_handler.handle_membership_event(mem_rm_payload)
     mock_facade.query\
         .assert_called_once_with(User, [('github_id', "21031067")])
@@ -666,11 +686,12 @@ def test_handle_mem_event_rm_member_missing(mock_logging, mem_rm_payload):
 
 
 @mock.patch('webhook.webhook.logging')
-def test_handle_mem_event_rm_member_wrong_team(mock_logging, mem_rm_payload):
+def test_handle_mem_event_rm_member_wrong_team(mock_logging, mem_rm_payload,
+                                               credentials):
     """Test what happens when member removed from a team they are not in."""
     mock_facade = mock.MagicMock(DBFacade)
     mock_facade.query.return_value = []
-    webhook_handler = WebhookHandler(mock_facade)
+    webhook_handler = WebhookHandler(mock_facade, credentials)
     rsp, code = webhook_handler.handle_membership_event(mem_rm_payload)
     mock_facade.query\
         .assert_called_once_with(User, [('github_id', "21031067")])
@@ -680,14 +701,15 @@ def test_handle_mem_event_rm_member_wrong_team(mock_logging, mem_rm_payload):
 
 
 @mock.patch('webhook.webhook.logging')
-def test_handle_mem_event_rm_mult_members(mock_logging, mem_rm_payload):
+def test_handle_mem_event_rm_mult_members(mock_logging, mem_rm_payload,
+                                          credentials):
     """Test that multiple members with the same github name can be deleted."""
     mock_facade = mock.MagicMock(DBFacade)
     user1 = User("SLACKUSER1")
     user2 = User("SLACKUSER2")
     user3 = User("SLACKUSER3")
     mock_facade.query.return_value = [user1, user2, user3]
-    webhook_handler = WebhookHandler(mock_facade)
+    webhook_handler = WebhookHandler(mock_facade, credentials)
     rsp, code = webhook_handler.handle_membership_event(mem_rm_payload)
     mock_facade.query\
         .assert_called_once_with(User, [('github_id', "21031067")])
@@ -699,10 +721,11 @@ def test_handle_mem_event_rm_mult_members(mock_logging, mem_rm_payload):
 
 
 @mock.patch('webhook.webhook.logging')
-def test_handle_mem_event_inv_member(mock_logging, mem_inv_payload):
+def test_handle_mem_event_inv_member(mock_logging, mem_inv_payload,
+                                     credentials):
     """Test that instances when members are added to the mem are logged."""
     mock_facade = mock.MagicMock(DBFacade)
-    webhook_handler = WebhookHandler(mock_facade)
+    webhook_handler = WebhookHandler(mock_facade, credentials)
     rsp, code = webhook_handler.handle_membership_event(mem_inv_payload)
     mock_logging.info.assert_called_once_with(("user Codertocat invited "
                                                "to rocket"))
@@ -711,10 +734,11 @@ def test_handle_mem_event_inv_member(mock_logging, mem_inv_payload):
 
 
 @mock.patch('webhook.webhook.logging')
-def test_handle_mem_event_empty_action(mock_logging, mem_empty_payload):
+def test_handle_mem_event_empty_action(mock_logging, mem_empty_payload,
+                                       credentials):
     """Test that instances where there is no/invalid action are logged."""
     mock_facade = mock.MagicMock(DBFacade)
-    webhook_handler = WebhookHandler(mock_facade)
+    webhook_handler = WebhookHandler(mock_facade, credentials)
     rsp, code = webhook_handler.handle_membership_event(mem_empty_payload)
     mock_logging.error.assert_called_once_with(("membership webhook "
                                                 "triggered, invalid "
