@@ -21,6 +21,40 @@ class Team:
         self.team_leads: Set[str] = set()
         self.members: Set[str] = set()
 
+    def get_attachment(self):
+        """Return slack-formatted attachment (dictionary) for team."""
+        text_pairs = [
+            ('Github ID', self.github_team_id),
+            ('Github Team Name', self.github_team_name),
+            ('Display Name', self.display_name),
+            ('Platform', self.platform),
+            ('Team Leads', '\n'.join(self.team_leads)
+                           if self.team_leads != set() else 'n/a'),
+            ('Members', '\n'.join(self.members)
+                        if self.members != set() else 'n/a')
+        ]
+        fields = [{'title': t, 'value': v if v else 'n/a', 'short': True}
+                  for t, v in text_pairs]
+        fallback = str('\n'.join(map(str, text_pairs)))
+
+        return {'fallback': fallback, 'fields': fields}
+
+    def get_basic_attachment(self):
+        """Return basic slack-formatted attachment (dictionary) for team."""
+        text_pairs = [
+            ('Github ID', self.github_team_id),
+            ('Github Team Name', self.github_team_name),
+            ('Display Name', self.display_name),
+            ('Platform', self.platform),
+            ('Team Leads' '\n'.join(self.team_leads)),
+            ('Members', '\n'.join(self.members))
+        ]
+        fields = [{'title': t, 'value': v if v else 'n/a', 'short': True}
+                  for t, v in text_pairs]
+        fallback = str('\n'.join(map(str, text_pairs)))
+
+        return {'fallback': fallback, 'fields': fields}
+
     @staticmethod
     def from_dict(d: Dict[str, Any]) -> 'Team':
         """

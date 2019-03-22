@@ -6,6 +6,7 @@ from command import ResponseTuple
 from db.facade import DBFacade
 from interface.github import GithubAPIException, GithubInterface
 from model import Team, User
+from flask import jsonify
 from command.util import check_credentials
 from typing import Any, Dict, Optional
 
@@ -123,7 +124,7 @@ class TeamCommand:
                                  help="Name of team to edit.")
         parser_lead.add_argument("slack_id", type=str, action='store',
                                  help="User to be added/removed as lead.")
-        parser_lead.add_argument("--remove", type=str, action='store_true',
+        parser_lead.add_argument("--remove", action='store_true',
                                  help="Remove the user as team lead.")
         return subparsers
 
@@ -162,8 +163,7 @@ class TeamCommand:
             return "listing all teams", 200
 
         elif args.which == "view":
-            # stub
-            return "viewing " + args.team_name, 200
+            return self.view_helper(args.team_name)
 
         elif args.which == "delete":
             return self.delete_helper(args.team_name, user_id)
@@ -210,6 +210,20 @@ class TeamCommand:
 
         else:
             return self.get_help(), 200
+
+    def view_helper(self, team_name):
+        """
+        Returns display information and members of specified team.
+
+        :param team_name: name of team being viewed
+        :return: return error message if team not found,
+                otherwise return team information
+        """
+        try:
+            team = self.facade.retrieve(Team, team_name)
+            return jsonify({'attachments': [team.get_attachment()]}), 200
+        except LookupError:
+            return self.lookup_error, 200
         
     def create_helper(self, param_list, user_id):
         """
@@ -228,7 +242,7 @@ class TeamCommand:
             command_user = self.facade.retrieve(User, user_id)
             if not check_credentials(command_user, None):
                 return self.permission_error, 200
-            msg = f"new team: {param_list['team_name']}, "
+            msg = f"New team created: {param_list['team_name']}, "
             team_id = self.gh.org_create_team()
             team = Team(team_id, param_list['team_name'], "")
             if param_list["name"] is not None:
@@ -238,7 +252,7 @@ class TeamCommand:
                 msg += f"platform: {param_list['platform']}, "
                 team.platform = param_list['platform']
             if param_list["channel"] is not None:
-                msg += "add channel"
+                msg += "added channel, "
                 for member_id in self.sc.get_channel_users(
                         param_list["channel"]):
                     member = self.facade.retrieve(User, member_id)
@@ -246,6 +260,7 @@ class TeamCommand:
             else:
                 self.gh.add_team_member(command_user.github_username, team_id)
             if param_list["lead"] is not None:
+                msg += "added lead"
                 lead_user = self.facade.retrieve(User, param_list["lead"])
                 team.add_team_lead(lead_user.github_id)
                 if not self.gh.has_team_member(lead_user.github_username,
@@ -258,7 +273,7 @@ class TeamCommand:
             return msg, 200
         except GithubAPIException as e:
             logging.error("team creation unsuccessful")
-            return "Team creation unsuccessful with the following error" \
+            return "Team creation unsuccessful with the following error: "\
                    + e.data, 200
         except LookupError:
             return self.lookup_error, 200
@@ -278,20 +293,23 @@ class TeamCommand:
         try:
             command_user = self.facade.retrieve(User, user_id)
             team = self.facade.retrieve(Team, param_list['team_name'])
-            if not check_credentials(command_user, None):
+            if not check_credentials(command_user, team):
                 return self.permission_error, 200
 
             user = self.facade.retrieve(User, param_list['slack_id'])
             team.add_member(user.github_id)
             self.gh.add_team_member(user.github_username, team.github_team_id)
             self.facade.store(team)
+            msg = "Added User to " + param_list['team_name']
+            ret = {'attachments': [team.get_attachment()], 'text': msg}
+            return jsonify(ret), 200
+
         except LookupError:
             return self.lookup_error, 200
         except GithubAPIException as e:
             logging.error("user added unsuccessfully to team")
-            return "User added unsuccessfully with the following error"\
+            return "User added unsuccessfully with the following error: "\
                    + e.data, 200
-        return "Added User to " + param_list['team_name'], 200
 
     def remove_helper(self, param_list, user_id):
         """
@@ -310,26 +328,28 @@ class TeamCommand:
         try:
             command_user = self.facade.retrieve(User, user_id)
             team = self.facade.retrieve(Team, param_list['team_name'])
-            if not check_credentials(command_user, None):
+            if not check_credentials(command_user, team):
                 return self.permission_error, 200
 
             user = self.facade.retrieve(User, param_list['slack_id'])
             if not self.gh.has_team_member(user.github_username,
                                            team.github_team_id):
                 return "User not in team!", 200
-            team.remove_member(user.github_id)
+            team.discard_member(user.github_id)
             team.remove_team_lead(user.github_id)
             self.gh.remove_team_member(user.github_username,
                                        team.github_team_id)
             self.facade.store(team)
+            msg = "Removed User from " + param_list['team_name']
+            ret = {'attachments': [team.get_attachment()], 'text': msg}
+            return jsonify(ret), 200
 
         except LookupError:
             return self.lookup_error, 200
         except GithubAPIException as e:
             logging.error("user removed unsuccessfully from team")
-            return "User removed unsuccessfully with the following error"\
+            return "User removed unsuccessfully with the following error: "\
                    + e.data, 200
-        return "Removed User from " + param_list['team_name'], 200
 
     def edit_helper(self, param_list, user_id):
         """
@@ -346,23 +366,20 @@ class TeamCommand:
         try:
             command_user = self.facade.retrieve(User, user_id)
             team = self.facade.retrieve(Team, param_list['team_name'])
-            if not check_credentials(command_user, None):
+            if not check_credentials(command_user, team):
                 return self.permission_error, 200
-            msg = f"team edited: {param_list['team_name']}, "
+            msg = f"Team edited: {param_list['team_name']}, "
             if param_list['name'] is not None:
                 msg += f"name: {param_list['name']}, "
                 team.display_name = param_list['name']
             if param_list['platform'] is not None:
-                msg += f"platform: {param_list['platform']}, "
+                msg += f"platform: {param_list['platform']}"
                 team.platform = param_list['platform']
             self.facade.store(team)
+            ret = {'attachments': [team.get_attachment()], 'text': msg}
+            return jsonify(ret), 200
         except LookupError:
             return self.lookup_error, 200
-        except GithubAPIException as e:
-            logging.error("team edit unsuccessful")
-            return "Edit team was unsuccessful with the following error: "\
-                   + e.data, 200
-        return msg, 200
 
     def lead_helper(self, param_list, user_id):
         """
@@ -379,16 +396,17 @@ class TeamCommand:
         try:
             command_user = self.facade.retrieve(User, user_id)
             team = self.facade.retrieve(Team, param_list['team_name'])
-            if not check_credentials(command_user, None):
+            if not check_credentials(command_user, team):
                 return self.permission_error, 200
             user = self.facade.retrieve(User, param_list["slack_id"])
+            msg = ""
             if param_list["remove"]:
                 if not team.has_member(user.github_id):
                     return "User not in team!", 200
                 team.remove_team_lead(user.github_id)
                 self.facade.store(team)
-                return f"User removed as team lead from" \
-                       f" {param_list['team_name']}", 200
+                msg = f"User removed as team lead from" \
+                      f" {param_list['team_name']}"
             else:
                 if not team.has_member(user.github_id):
                     team.add_member(user.github_id)
@@ -396,8 +414,10 @@ class TeamCommand:
                                             team.github_team_id)
                 team.add_team_lead(user.github_id)
                 self.facade.store(team)
-                return f"User added as team lead to" \
-                       f" {param_list['team_name']}", 200
+                msg = f"User added as team lead to" \
+                      f" {param_list['team_name']}"
+            ret = {'attachments': [team.get_attachment()], 'text': msg}
+            return jsonify(ret), 200
         except LookupError:
                 return self.lookup_error, 200
         except GithubAPIException as e:
@@ -418,10 +438,11 @@ class TeamCommand:
         try:
             command_user = self.facade.retrieve(User, user_id)
             team = self.facade.retrieve(Team, team_name)
-            if not check_credentials(command_user, None):
+            if not check_credentials(command_user, team):
                 return self.permission_error, 200
             self.facade.delete(Team, team)
             self.gh.org_delete_team(team.github_team_id)
+            return f"Team {team_name} deleted", 200
         except LookupError:
                 return self.lookup_error, 200
         except GithubAPIException as e:

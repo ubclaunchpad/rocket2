@@ -1,5 +1,8 @@
 """Some tests for utility functions in commands utility."""
 import command.util as util
+from model.user import User
+from model.team import Team
+from model.permissions import Permissions
 
 
 def test_regularize_char_standard():
@@ -29,3 +32,38 @@ def test_escaped_id_conversion():
 
     for inp, expect in CMDS:
         assert util.escaped_id_to_id(inp) == expect
+
+
+def test_check_credentials_admin():
+    """Test checking to see if user is admin."""
+    user = User("USFAS689")
+    user.permissions_level = Permissions.admin
+    assert util.check_credentials(user, None)
+
+
+def test_check_credentials_not_admin():
+    """Test checking to see if user is not admin."""
+    user = User("USFAS689")
+    user.permissions_level = Permissions.member
+    assert not util.check_credentials(user, None)
+
+
+def test_check_credentials_lead():
+    """Test checking to see if user is lead for certain team."""
+    user = User("USFAS689")
+    user.github_id = "IDGithub"
+    team = Team("brussels", "team", "id")
+    team.add_member(user.github_id)
+    team.add_team_lead(user.github_id)
+    user.permissions_level = Permissions.team_lead
+    assert util.check_credentials(user, team)
+
+
+def test_check_credentials_not_lead():
+    """Test checking to see if user is lead for certain team."""
+    user = User("USFAS689")
+    user.github_id = "IDGithub"
+    team = Team("brussels", "team", "id")
+    team.add_member(user.github_id)
+    user.permissions_level = Permissions.team_lead
+    assert not util.check_credentials(user, team)
