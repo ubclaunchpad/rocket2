@@ -1,18 +1,42 @@
 """Contain all the logic for handling webhooks in a class."""
 import logging
-
-from command import ResponseTuple
+import hmac
+import hashlib
+from model.user import User
+from model.team import Team
 from db.facade import DBFacade
 from model import User, Team
 from typing import Dict, Any, cast, List
+from command import ResponseTuple
+from config import Credentials
 
 
 class WebhookHandler:
     """Encapsulate methods for GitHub webhook triggered events."""
 
-    def __init__(self, db_facade: DBFacade) -> None:
+    def __init__(self, db_facade: DBFacade, credentials: Credentials) -> None:
         """Give handler access to the database."""
         self.__facade = db_facade
+        self.__secret = credentials.github_webhook_secret
+
+    def verify_hash(self, request_body, xhub_signature):
+        """
+        Verify if a webhook event comes from GitHub.
+
+        :param request_body: Byte string of the request body
+        :param xhub_signature: Hashed signature to validate
+        :return: Return True if the signature is valid, False otherwise
+        """
+        h = hmac.new(bytes(self.__secret, encoding='utf8'),
+                     request_body, hashlib.sha1)
+        verified = hmac.compare_digest(
+            bytes("sha1=" + h.hexdigest(), encoding='utf8'),
+            bytes(xhub_signature, encoding='utf8'))
+        if verified:
+            logging.info("Webhook signature verified")
+        else:
+            logging.warning("Webhook signature not verified")
+        return verified
 
     def handle_organization_event(self,
                                   payload: Dict[str, Any]) -> ResponseTuple:

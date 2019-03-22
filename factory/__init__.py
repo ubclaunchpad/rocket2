@@ -59,7 +59,7 @@ def make_webhook_handler(config: Dict[str, Any],
     :return: a new ``WebhookHandler`` object, freshly initialized
     """
     facade = DBFacade(DynamoDB(config, credentials))
-    return WebhookHandler(facade)
+    return WebhookHandler(facade, credentials)
 
 
 def create_signing_token() -> str:
