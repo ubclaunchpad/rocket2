@@ -29,6 +29,11 @@ def test_load_aws_secret_access_key(complete_credentials):
     assert complete_credentials.aws_secret_access_key == 'secret_access_key'
 
 
+def test_load_github_webhook_secret(complete_credentials):
+    """Assert that the github webhook secret can be loaded correctly."""
+    assert complete_credentials.github_webhook_secret == 'webhook_secret'
+
+
 def test_load_github_signing_key_path(complete_credentials):
     """Assert that the github signing key path can be loaded correctly."""
     assert complete_credentials.github_signing_key_path == \
