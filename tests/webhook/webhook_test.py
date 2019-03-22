@@ -746,3 +746,28 @@ def test_handle_mem_event_empty_action(mock_logging, mem_empty_payload,
                                                 .format(mem_empty_payload)))
     assert rsp == "invalid membership webhook triggered"
     assert code == 405
+
+
+@mock.patch('webhook.webhook.logging')
+@mock.patch('webhook.webhook.hmac.new')
+def test_verify_correct_hash(mock_hmac_new, mock_logging, credentials):
+    """Test that correct hash signatures can be properly verified."""
+    mock_facade = mock.MagicMock(DBFacade)
+    webhook_handler = WebhookHandler(mock_facade, credentials)
+    test_signature = "signature"
+    mock_hmac_new.return_value.hexdigest.return_value = test_signature
+    assert webhook_handler.verify_hash(b'body', "sha1=" + test_signature)
+    mock_logging.info.assert_called_once_with("Webhook signature verified")
+
+
+@mock.patch('webhook.webhook.logging')
+@mock.patch('webhook.webhook.hmac.new')
+def test_verify_incorrect_hash(mock_hmac_new, mock_logging, credentials):
+    """Test that incorrect hash signaures can be properly ignored."""
+    mock_facade = mock.MagicMock(DBFacade)
+    webhook_handler = WebhookHandler(mock_facade, credentials)
+    test_signature = "signature"
+    mock_hmac_new.return_value.hexdigest.return_value = test_signature
+    assert not webhook_handler.verify_hash(b'body', "sha1=helloworld")
+    mock_logging.warning.assert_called_once_with(
+        "Webhook signature not verified")
