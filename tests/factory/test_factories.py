@@ -1,10 +1,9 @@
 """Tests for factories."""
-from factory import *
-from db.facade import DBFacade
-from command.core import Core
 import pytest
-from unittest import mock
+
+from factory import *
 from interface.github import GithubInterface
+from unittest import mock
 
 
 @pytest.mark.db

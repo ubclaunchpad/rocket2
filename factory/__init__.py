@@ -8,7 +8,7 @@ import toml
 from command.core import Core
 from command.commands.token import TokenCommandConfig
 from datetime import timedelta
-from db.facade import DBFacade
+from db import DBFacade
 from db.dynamodb import DynamoDB
 from interface.github import GithubInterface, DefaultGithubFactory
 from interface.slack import Bot

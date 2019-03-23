@@ -1,5 +1,5 @@
 """Test the data model for a team."""
-from model.team import Team
+from model import Team
 from tests.util import create_test_team
 
 

@@ -1,16 +1,17 @@
 """Calls the appropriate handler depending on the event data."""
+import command.util as util
+import logging
+
 from command import ResponseTuple
 from command.commands import UnionCommands
 from command.commands.user import UserCommand
 from command.commands.token import TokenCommand, TokenCommandConfig
 from db.facade import DBFacade
-from model.user import User
+from flask import jsonify, Response
 from interface.slack import Bot, SlackAPIError
 from interface.github import GithubInterface
-from flask import jsonify, Response
+from model import User
 from typing import Dict, Any, cast
-import logging
-import command.util as util
 
 
 class Core:
@@ -99,5 +100,5 @@ class Core:
             cmd_text = f"*{cmd_name}:* {cmd.desc}"
             attachment = {"text": cmd_text, "mrkdwn_in": ["text"]}
             attachments.append(attachment)
-        message["attachments"] = attachments    # type: ignore
+        message["attachments"] = attachments  # type: ignore
         return cast(Response, jsonify(message))
