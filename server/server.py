@@ -88,7 +88,7 @@ def handle_organization_webhook():
     request_data = request.get_data()
     request_json = request.get_json()
     logging.debug(f"organization payload: {str(request_json)}")
-    if webhook_handler.verify_hash(request_data, xhub_signature) is True:
+    if webhook_handler.verify_hash(request_data, xhub_signature):
         return webhook_handler.handle_organization_event(request_json)
     else:
         return "Hashed signature is not valid", 403
@@ -102,7 +102,7 @@ def handle_team_webhook():
     request_data = request.get_data()
     request_json = request.get_json()
     logging.debug(f"team payload: {str(request.get_json())}")
-    if webhook_handler.verify_hash(request_data, xhub_signature) is True:
+    if webhook_handler.verify_hash(request_data, xhub_signature):
         msg = webhook_handler.handle_team_event(request.get_json())
     else:
         msg = "Hashed signature is not valid", 403
