@@ -18,6 +18,43 @@ class WebhookHandler:
         """Give handler access to the database."""
         self.__facade = db_facade
         self.__secret = credentials.github_webhook_secret
+        self.__organization_action_list = [
+            "member_removed",
+            "member_added",
+            "member_invited"
+        ]
+        self.__team_action_list = [
+            "created",
+            "deleted",
+            "edited",
+            "added_to_repository",
+            "removed_from_repository"
+        ]
+
+    def handle(self,
+               request_body: bytes,
+               xhub_signature: str,
+               payload: Dict[str, Any]) -> ResponseTuple:
+        """
+        Verify and handle the webhook event.
+
+        :param request_body: Byte string of the request body
+        :param xhub_signature: Hashed signature to validate
+        :return: appropriate ResponseTuple depending on the validity and type
+                 of webhook
+        """
+        if self.verify_hash(request_body, xhub_signature):
+            # handle
+            action = payload["action"]
+            if action in self.__organization_action_list:
+                return self.handle_organization_event(payload)
+            elif action in self.__team_action_list:
+                return self.handle_team_event(payload)
+            else:
+                logging.error("Unsupported payload received")
+                return "Unsupported payload received", 500
+        else:
+            return "Hashed signature is not valid", 403
 
     def verify_hash(self, request_body: bytes, xhub_signature: str):
         """
