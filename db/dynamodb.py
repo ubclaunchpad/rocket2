@@ -245,6 +245,32 @@ class DynamoDB:
             logging.info(err_msg)
             raise LookupError(err_msg)
 
+    def bulk_retrieve(self, Model: Type[T], ks: List[str]) -> List[T]:
+        """
+        Retrieve a list of models from the database.
+
+        Keys not found in the database will be skipped.
+
+        :param Model: the actual class you want to retrieve
+        :param ks: retrieve based on this key (or ID)
+        :return: a list of models ``Model``
+        """
+        table_name = self.CONST.get_table_name(Model)
+        table = self.ddb.Table(table_name)
+        resp = self.ddb.batch_get_item(
+            RequestItems={
+                table_name: {
+                    'Keys': [{self.CONST.get_key(table_name): k} for k in ks]
+                }
+            }
+        )
+
+        if 'Responses' not in resp:
+            return []
+
+        resp_models = resp['Responses'].get(table_name, [])
+        return list(map(Model.from_dict, resp_models))
+
     def query(self,
               Model: Type[T],
               params: List[Tuple[str, str]] = []) -> List[T]:

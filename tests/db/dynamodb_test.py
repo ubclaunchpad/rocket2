@@ -205,6 +205,22 @@ def test_store_retrieve_team(ddb):
 
 
 @pytest.mark.db
+def test_bulk_retrieve_users(ddb):
+    """Test to see if we can store and bulk retrieve."""
+    uids = list(map(str, range(10)))
+    users = [create_test_admin(i) for i in uids]
+    for user in users:
+        assert ddb.store(user)
+
+    retrieved_users = ddb.bulk_retrieve(User, list(uids))
+    for user in retrieved_users:
+        assert user in users
+
+    for i in uids:
+        ddb.delete(User, i)
+
+
+@pytest.mark.db
 def test_query_team(ddb):
     """Test to see if we can store and query the same team."""
     team = create_test_team('1', 'rocket2.0', 'Rocket 2.0')
