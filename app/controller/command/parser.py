@@ -2,12 +2,15 @@
 from command.commands.user import UserCommand
 from command.commands.kudos import KudosCommand
 import command.util as util
+from command.commands.token import TokenCommand, TokenCommandConfig
+from command.commands.karma import KarmaCommand
+from command.commands.mention import MentionCommand
+from db.facade import DBFacade
 from model.user import User
 from interface.slack import SlackAPIError
 import logging
-from flask import jsonify
+import command.util as util
 import re
-
 class Core:
     """Encapsulate methods for handling events."""
 
@@ -18,7 +21,9 @@ class Core:
         self.__bot = bot
         self.__github = gh_interface
         self.__commands["user"] = UserCommand(self.__facade, self.__github)
-        self.__commands["kudos"] = KudosCommand(self.__facade)
+        self.__commands["token"] = TokenCommand(self.__facade, token_config)
+        self.__commands["karma"] = KarmaCommand(self.__facade)
+        self.__commands["mention"] = MentionCommand(self.__facade)
 
     def handle_app_command(self, cmd_txt, user):
         """
@@ -42,8 +47,8 @@ class Core:
         if s[0] in self.__commands:
             return self.__commands[s[0]].handle(cmd_txt, user)
         elif re.match("^[UW][A-Z0-9]{8}$", s[0]):
-            logging.info("kudos command activated")
-            return self.__commands['kudos'].handle(cmd_txt, user)
+            logging.info("mention command activated")
+            return self.__commands["mention"].handle(cmd_txt, user)
         else:
             logging.error("app command triggered incorrectly")
             return 'Please enter a valid command', 200
