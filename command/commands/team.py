@@ -214,3 +214,41 @@ class TeamCommand:
             logging.error("team creation unsuccessful")
             return "Team creation unsuccessful with the following error" \
                    + e.data, 200
+
+    def refresh_helper(self):
+        """
+        Ensures the local team database is the same as GitHub's.
+
+        In the event that our local team database is outdated compared to
+        the teams on GitHub, this command can be called to fix things.
+        :return: return error message if something failed,
+                 otherwise returns success messages with # of teams changed
+        """
+        try:
+            local_teams = self.facade.query(Team)
+            remote_teams = self.gh.org_get_teams()
+            local_ids = dict((Team.to_dict(team).get('github_team_id'), team)
+                         for team in local_teams)
+            remote_ids = dict((Team.to_dict(team).get('github_team_id'), team)
+                          for team in remote_teams)
+
+            # remove teams not in github anymore
+            for local_id in local_ids:
+                if local_id not in remote_ids:
+                    self.gh.org_delete_team(local_ids[local_id])
+
+            # add teams to db that are in github but not in local database,
+            # AND re-store (aka update) all other local teams
+            for remote_id in remote_ids:
+                if remote_id not in local_ids:
+                    self.facade.store(remote_ids[remote_id])
+                else:
+                    if local_ids[remote_id] != remote_ids[remote_id]:
+                        self.facade.store(remote_ids[remote_id])
+        except GithubAPIException as e:
+            logging.error("team refresh unsuccessful due to github error")
+            return "Team refresh unsuccessful with GithubAPI error "\
+                   + e.data
+        except LookupError:
+            logging.error("team refresh unsuccessful due to lookup error")
+            return "Team refresh unsuccessful with database lookup error."
