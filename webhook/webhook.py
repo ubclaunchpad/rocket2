@@ -1,10 +1,10 @@
 """Contain all the logic for handling webhooks in a class."""
 import logging
-from model.user import User
-from model.team import Team
-from db.facade import DBFacade
-from typing import Dict, Any, cast, List
+
 from command import ResponseTuple
+from db.facade import DBFacade
+from model import User, Team
+from typing import Dict, Any, cast, List
 
 
 class WebhookHandler:
@@ -29,7 +29,7 @@ class WebhookHandler:
         github_id = github_user["id"]
         github_username = github_user["login"]
         organization = payload["organization"]["login"]
-        member_list = self.__facade.\
+        member_list = self.__facade. \
             query(User, [('github_id', github_id)])
         if action == "member_removed":
             return self.org_remove(member_list, github_id, github_username)

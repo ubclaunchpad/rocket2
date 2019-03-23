@@ -1,10 +1,10 @@
 """Test the webhook handler."""
 import pytest
+
+from db import DBFacade
+from model import User, Team
 from unittest import mock
-from model.user import User
-from model.team import Team
 from webhook.webhook import WebhookHandler
-from db.facade import DBFacade
 
 
 @pytest.fixture

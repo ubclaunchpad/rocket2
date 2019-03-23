@@ -1,5 +1,5 @@
 """Test the data model for a project."""
-from model.project import Project
+from model import Project
 
 
 def test_valid_project():

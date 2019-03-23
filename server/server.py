@@ -1,17 +1,17 @@
 """Flask server instance."""
-from factory import make_core, make_webhook_handler
-from flask import Flask, request
-from logging.config import dictConfig
-from slackeventsapi import SlackEventAdapter
 import logging
+import structlog
 import sys
 import toml
-import structlog
+
+from config import Credentials
+from factory import make_core, make_webhook_handler
+from flask import Flask, request
 from flask_talisman import Talisman
 from interface.slack import SlackAPIError
-from config import Credentials
+from logging.config import dictConfig
+from slackeventsapi import SlackEventAdapter
 from typing import cast, Dict, Any
-
 
 dictConfig({
     'version': 1,

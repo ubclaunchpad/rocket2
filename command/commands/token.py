@@ -2,12 +2,11 @@
 import jwt
 import logging
 
-from typing import cast
-from datetime import datetime, timedelta
 from command import ResponseTuple
-from model.permissions import Permissions
-from model.user import User
+from datetime import datetime, timedelta
 from db.facade import DBFacade
+from model import User, Permissions
+from typing import cast
 
 
 class TokenCommand:

@@ -3,7 +3,7 @@ from command.core import Core
 from command.commands.user import UserCommand
 from command.commands.token import TokenCommandConfig
 from datetime import datetime
-from db.facade import DBFacade
+from db import DBFacade
 from flask import jsonify, json, Flask
 from interface.slack import Bot, SlackAPIError
 from interface.github import GithubInterface
