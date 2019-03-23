@@ -176,6 +176,7 @@ end. For the actual command, anything will work, though the final app will use
 `/rocket`.
 
 Select the checkbox titled "Escape channels, users, and links sent to your app"
+if you wish to escape usernames, channels, and links.
 
 ## 8: Testing
 
