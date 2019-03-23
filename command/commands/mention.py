@@ -43,6 +43,6 @@ class MentionCommand:
             user = cast(User, self.facade.retrieve(User, reciever))
             user.karma += amount
             self.facade.store(user)
-            return f"gave 1 karma to {user.name}", 200
+            return "gave 1 karma to " + user.name, 200
         except:
             return self.lookup_error, 200

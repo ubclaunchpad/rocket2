@@ -1,17 +1,17 @@
 """Calls the appropriate handler depending on the event data."""
 from command.commands.user import UserCommand
-from command.commands.kudos import KudosCommand
-import command.util as util
 from command.commands.token import TokenCommand, TokenCommandConfig
 from command.commands.karma import KarmaCommand
 from command.commands.mention import MentionCommand
 from db.facade import DBFacade
 from model.user import User
-from interface.slack import SlackAPIError
+from interface.slack import Bot, SlackAPIError
+from interface.github import GithubInterface
+from flask import jsonify, Response
+from typing import Dict, Any, cast
 import logging
-from flask import jsonify
+import command.util as util
 import re
-
 class Core:
     """Encapsulate methods for handling events."""
 
