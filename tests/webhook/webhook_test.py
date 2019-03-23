@@ -5,6 +5,7 @@ from db import DBFacade
 from model import User, Team
 from unittest import mock
 from webhook.webhook import WebhookHandler
+from config import Credentials
 
 
 @pytest.fixture

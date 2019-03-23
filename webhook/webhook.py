@@ -2,8 +2,6 @@
 import logging
 import hmac
 import hashlib
-from model.user import User
-from model.team import Team
 from db.facade import DBFacade
 from model import User, Team
 from typing import Dict, Any, cast, List
