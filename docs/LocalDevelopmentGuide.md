@@ -175,6 +175,8 @@ Request URL, submit the ngrok HTTPS URL with `/slack/commands` appended to the
 end. For the actual command, anything will work, though the final app will use
 `/rocket`.
 
+Select the checkbox titled "Escape channels, users, and links sent to your app"
+
 ## 8: Testing
 
 This is the final and most important part: testing if it actually works or not.
