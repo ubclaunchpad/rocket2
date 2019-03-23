@@ -1,12 +1,10 @@
 """Test user command parsing."""
-from flask import jsonify, json, Flask
 from command.commands.user import UserCommand
-from unittest import mock, TestCase
-from model.user import User
-from db.facade import DBFacade
-from model.permissions import Permissions
-from interface.slack import Bot
+from db import DBFacade
+from flask import jsonify, json, Flask
 from interface.github import GithubInterface, GithubAPIException
+from model import User, Permissions
+from unittest import mock, TestCase
 
 
 class TestUserCommand(TestCase):
@@ -48,7 +46,7 @@ class TestUserCommand(TestCase):
         """Test user command add method."""
         user_id = "U0G9QF9C6"
         user = User(user_id)
-        lookup_error = LookupError('User "{}" not found'.format(user_id))
+        lookup_error = LookupError(f'User "{user_id}" not found')
         self.mock_facade.retrieve.side_effect = lookup_error
         self.assertTupleEqual(self.testcommand.handle('user add', user_id),
                               ('User added!', 200))
@@ -109,7 +107,7 @@ class TestUserCommand(TestCase):
             resp = json.loads(resp.data)
             self.assertDictEqual(resp, expect)
             self.assertEqual(code, 200)
-        self.mock_facade.retrieve.\
+        self.mock_facade.retrieve. \
             assert_called_once_with(User, "ABCDE8FA9")
 
     def test_handle_view_lookup_error(self):
@@ -193,26 +191,6 @@ class TestUserCommand(TestCase):
         self.mock_facade.retrieve.assert_called_once_with(User, "U0G9QF9C6")
         self.mock_facade.store.assert_called_once_with(user)
         self.mock_github.org_add_member.assert_called_once_with("rob")
-
-    def test_handle_edit_github_error(self):
-        """Test that editing github username sends request to interface."""
-        user = User("U0G9QF9C6")
-        self.mock_facade.retrieve.return_value = user
-        self.mock_github.org_add_member.side_effect = GithubAPIException("")
-        user_attaches = [user.get_attachment()]
-        with self.app.app_context():
-            resp, code = self.testcommand.handle("user edit --github rob",
-                                                 "U0G9QF9C6")
-            expect = {
-                'attachments': user_attaches,
-                'text': "\nError adding user rob to GitHub organization"
-            }
-            expect = json.loads(jsonify(expect).data)
-            resp = json.loads(resp.data)
-            self.assertDictEqual(resp, expect)
-            self.assertEqual(code, 200)
-        self.mock_facade.retrieve.assert_called_once_with(User, "U0G9QF9C6")
-        self.mock_facade.store.assert_called_once_with(user)
 
     def test_handle_edit_github_error(self):
         """Test that editing github username sends request to interface."""

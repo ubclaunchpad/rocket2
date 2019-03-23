@@ -1,8 +1,9 @@
 """Interface to Github App API."""
-from datetime import datetime, timedelta
-from interface.exceptions.github import GithubAPIException
 import jwt
 import requests
+
+from datetime import datetime, timedelta
+from interface.exceptions.github import GithubAPIException
 
 
 class GithubAppInterface:

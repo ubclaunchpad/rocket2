@@ -39,6 +39,7 @@ release = '0.0.0-alpha'
 # ones.
 extensions = [
     'sphinx.ext.autodoc',
+    'sphinx_autodoc_typehints',
     'm2r',
 ]
 

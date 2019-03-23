@@ -9,6 +9,6 @@ class Permissions(Enum):
     team_lead = 2
     admin = 3
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Return the string without 'Permissions.' prepended."""
         return self.name

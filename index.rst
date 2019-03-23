@@ -31,6 +31,8 @@
 
     docs/UserCommands.md
     docs/TeamCommands.md
+    docs/ProjectCommands.md
+    docs/KarmaCommands.md
 
 .. toctree::
     :caption: API Documentation

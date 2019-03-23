@@ -1,9 +1,8 @@
 """Test the dynamodb interface (requires dynamodb running)."""
-from tests.util import *
-from model.user import User
-from model.team import Team
-from model.project import Project
 import pytest
+
+from model import User, Project, Team
+from tests.util import *
 
 
 @pytest.fixture

@@ -2,9 +2,11 @@
 import jwt
 import logging
 
-from datetime import datetime
-from model.permissions import Permissions
-from model.user import User
+from command import ResponseTuple
+from datetime import datetime, timedelta
+from db.facade import DBFacade
+from model import User, Permissions
+from typing import cast
 
 
 class TokenCommand:
@@ -18,7 +20,9 @@ class TokenCommand:
     success_msg = "This is your token:\n```\n{}\n```" \
                   "\nKeep it secret! Keep it safe!\nIt will expire at {}."
 
-    def __init__(self, db_facade, config):
+    def __init__(self,
+                 db_facade: DBFacade,
+                 config: 'TokenCommandConfig') -> None:
         """
         Initialize TokenCommand.
 
@@ -30,11 +34,13 @@ class TokenCommand:
         self.expiry = config.expiry
         self.signing_key = config.signing_key
 
-    def handle(self, _command, user_id):
+    def handle(self,
+               _command: str,
+               user_id: str) -> ResponseTuple:
         """Handle request for token."""
         logging.debug("Handling token command")
         try:
-            user = self.facade.retrieve(User, user_id)
+            user = cast(User, self.facade.retrieve(User, user_id))
             if user.permissions_level == Permissions.member:
                 return self.permission_error, 403
         except LookupError:
@@ -57,7 +63,9 @@ class TokenCommand:
 class TokenCommandConfig:
     """Configuration options for TokenCommand."""
 
-    def __init__(self, expiry, signing_key):
+    def __init__(self,
+                 expiry: timedelta,
+                 signing_key: str) -> None:
         """Initialize config for TokenCommand."""
         self.expiry = expiry
         self.signing_key = signing_key
