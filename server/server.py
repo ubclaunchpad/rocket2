@@ -8,7 +8,6 @@ from config import Credentials
 from factory import make_core, make_webhook_handler
 from flask import Flask, request
 from flask_talisman import Talisman
-from flask_seasurf import SeaSurf
 from interface.slack import SlackAPIError
 from logging.config import dictConfig
 from slackeventsapi import SlackEventAdapter
