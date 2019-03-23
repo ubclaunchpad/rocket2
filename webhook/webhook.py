@@ -33,9 +33,10 @@ class WebhookHandler:
             bytes("sha1=" + h.hexdigest(), encoding='utf8'),
             bytes(xhub_signature, encoding='utf8'))
         if verified:
-            logging.info("Webhook signature verified")
+            logging.debug("Webhook signature verified")
         else:
-            logging.warning("Webhook signature not verified")
+            logging.warning(
+                f"Webhook not from GitHub; signature: {xhub_signature}")
         return verified
 
     def handle_organization_event(self,
