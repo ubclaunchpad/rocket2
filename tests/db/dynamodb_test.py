@@ -221,6 +221,32 @@ def test_bulk_retrieve_users(ddb):
 
 
 @pytest.mark.db
+def test_query_or_users(ddb):
+    """Test to see if we can query users using union of parameters."""
+    uids = list(map(str, range(10)))
+    users = [create_test_admin(i) for i in uids]
+
+    for user in users[:5]:
+        user.permissions_level = Permissions.member
+
+    for user in users:
+        assert ddb.store(user)
+
+    params = [('slack_id', str(uid)) for uid in uids]
+    queried_users = ddb.query_or(User, params)
+    for user in queried_users:
+        assert user in users
+
+    params = [('permissions_level', lvl) for lvl in ['admin', 'member']]
+    queried_users = ddb.query_or(User, params)
+    for user in queried_users:
+        assert user in users
+
+    for i in uids:
+        ddb.delete(User, i)
+
+
+@pytest.mark.db
 def test_query_team(ddb):
     """Test to see if we can store and query the same team."""
     team = create_test_team('1', 'rocket2.0', 'Rocket 2.0')

@@ -321,6 +321,57 @@ class DynamoDB:
 
         return list(map(Model.from_dict, resp['Items']))
 
+    def query_or(self,
+                 Model: Type[T],
+                 params: List[Tuple[str, str]] = []) -> List[T]:
+        """
+        Query a table using a list of parameters.
+
+        Returns a list of ``Model`` that have **one** of the attributes
+        specified in the parameters. Some might say that this is a **union** of
+        the parameters. Every item in parameters is a tuple, where
+        the first element is the user attribute, and the second is the value.
+
+        Example::
+
+            ddb = DynamoDb(config)
+            users = ddb.query(User, [('platform', 'slack')])
+
+        If you try to query a table without any parameters, the function will
+        return all objects of that table.::
+
+            projects = ddb.query(Project)
+
+        Attributes that are sets (e.g. ``team.member``,
+        ``project.github_urls``) would be treated differently. This function
+        would check to see if the entry **contains** a certain element. You can
+        specify multiple elements, but they must be in different parameters
+        (one element per tuple).::
+
+            teams = ddb.query(Team, [('members', 'abc123'),
+                                     ('members', '231abc')])
+
+        :param Model: type of list elements you'd want
+        :param params: list of tuples to match
+        :return: a list of ``Model`` that fit the query parameters
+        """
+        table_name = self.CONST.get_table_name(Model)
+        table = self.ddb.Table(table_name)
+        set_attrs = self.CONST.get_set_attrs(table_name)
+        if len(params) > 0:
+            def f(x):
+                if x[0] in set_attrs:
+                    return Attr(x[0]).contains(x[1])
+                else:
+                    return Attr(x[0]).eq(x[1])
+
+            filter_expr = reduce(lambda a, x: a | x, map(f, params))
+            resp = table.scan(FilterExpression=filter_expr)
+        else:
+            resp = table.scan()
+
+        return list(map(Model.from_dict, resp['Items']))
+
     def delete(self,
                Model: Type[T],
                k: str) -> None:
