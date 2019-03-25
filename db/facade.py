@@ -126,12 +126,12 @@ class DBFacade:
         Example::
 
             ddb = DynamoDb(config)
-            users = ddb.query(User, [('platform', 'slack')])
+            users = ddb.query_or(User, [('platform', 'slack')])
 
         If you try to query a table without any parameters, the function will
         return all objects of that table.::
 
-            projects = ddb.query(Project)
+            projects = ddb.query_or(Project)
 
         Attributes that are sets (e.g. ``team.member``,
         ``project.github_urls``) would be treated differently. This function
@@ -139,8 +139,11 @@ class DBFacade:
         specify multiple elements, but they must be in different parameters
         (one element per tuple).::
 
-            teams = ddb.query(Team, [('members', 'abc123'),
-                                     ('members', '231abc')])
+            teams = ddb.query_or(Team, [('members', 'abc123'),
+                                        ('members', '231abc')])
+
+        The above would get you the teams that contain either member ``abc123``
+        or ``231abc``.
 
         :param Model: type of list elements you'd want
         :param params: list of tuples to match
