@@ -43,7 +43,8 @@ class UserCommand:
         parser_view.set_defaults(which="view",
                                  help="View information about a given user.")
         parser_view. \
-            add_argument("--slack_id", type=str, action='store',
+            add_argument("--slack-id", metavar="SLACK-ID",
+                         type=str, action='store',
                          help="Use if using slack id instead of username.")
 
         """Parser for add command."""
@@ -59,7 +60,8 @@ class UserCommand:
         parser_delete.set_defaults(which="delete",
                                    help="(Admin only) permanently delete "
                                         "member's profile.")
-        parser_delete.add_argument("slack_id", type=str, action='store',
+        parser_delete.add_argument("slack_id", metavar="slack-id",
+                                   type=str, action='store',
                                    help="Slack id of member to delete.")
 
         """Parser for edit command."""
