@@ -62,6 +62,19 @@ class DBFacade:
         logging.info(f"Retrieving {Model.__name__}(id={k})")
         return self.ddb.retrieve(Model, k)
 
+    def bulk_retrieve(self, Model: Type[T], ks: List[str]) -> List[T]:
+        """
+        Retrieve a list of models from the database.
+
+        Keys not found in the database will be skipped.
+
+        :param Model: the actual class you want to retrieve
+        :param ks: retrieve based on this key (or ID)
+        :return: a list of models ``Model``
+        """
+        logging.info(f"Bulk retrieving {len(ks)} {Model.__name__}(s)")
+        return self.ddb.bulk_retrieve(Model, ks)
+
     def query(self,
               Model: Type[T],
               params: List[Tuple[str, str]] = []) -> List[T]:
@@ -98,6 +111,47 @@ class DBFacade:
         logging.info(f"Querying {Model.__name__} matching "
                      f"parameters: {params}")
         return self.ddb.query(Model, params)
+
+    def query_or(self,
+                 Model: Type[T],
+                 params: List[Tuple[str, str]] = []) -> List[T]:
+        """
+        Query a table using a list of parameters.
+
+        Returns a list of ``Model`` that have **one** of the attributes
+        specified in the parameters. Some might say that this is a **union** of
+        the parameters. Every item in parameters is a tuple, where
+        the first element is the user attribute, and the second is the value.
+
+        Example::
+
+            ddb = DynamoDb(config)
+            users = ddb.query_or(User, [('platform', 'slack')])
+
+        If you try to query a table without any parameters, the function will
+        return all objects of that table.::
+
+            projects = ddb.query_or(Project)
+
+        Attributes that are sets (e.g. ``team.member``,
+        ``project.github_urls``) would be treated differently. This function
+        would check to see if the entry **contains** a certain element. You can
+        specify multiple elements, but they must be in different parameters
+        (one element per tuple).::
+
+            teams = ddb.query_or(Team, [('members', 'abc123'),
+                                        ('members', '231abc')])
+
+        The above would get you the teams that contain either member ``abc123``
+        or ``231abc``.
+
+        :param Model: type of list elements you'd want
+        :param params: list of tuples to match
+        :return: a list of ``Model`` that fit the query parameters
+        """
+        logging.info(f"Querying {Model.__name__} matching "
+                     f"parameters: {params}")
+        return self.ddb.query_or(Model, params)
 
     def delete(self,
                Model: Type[T],

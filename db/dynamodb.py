@@ -245,6 +245,32 @@ class DynamoDB:
             logging.info(err_msg)
             raise LookupError(err_msg)
 
+    def bulk_retrieve(self, Model: Type[T], ks: List[str]) -> List[T]:
+        """
+        Retrieve a list of models from the database.
+
+        Keys not found in the database will be skipped.
+
+        :param Model: the actual class you want to retrieve
+        :param ks: retrieve based on this key (or ID)
+        :return: a list of models ``Model``
+        """
+        table_name = self.CONST.get_table_name(Model)
+        table = self.ddb.Table(table_name)
+        resp = self.ddb.batch_get_item(
+            RequestItems={
+                table_name: {
+                    'Keys': [{self.CONST.get_key(table_name): k} for k in ks]
+                }
+            }
+        )
+
+        if 'Responses' not in resp:
+            return []
+
+        resp_models = resp['Responses'].get(table_name, [])
+        return list(map(Model.from_dict, resp_models))
+
     def query(self,
               Model: Type[T],
               params: List[Tuple[str, str]] = []) -> List[T]:
@@ -289,6 +315,60 @@ class DynamoDB:
                     return Attr(x[0]).eq(x[1])
 
             filter_expr = reduce(lambda a, x: a & x, map(f, params))
+            resp = table.scan(FilterExpression=filter_expr)
+        else:
+            resp = table.scan()
+
+        return list(map(Model.from_dict, resp['Items']))
+
+    def query_or(self,
+                 Model: Type[T],
+                 params: List[Tuple[str, str]] = []) -> List[T]:
+        """
+        Query a table using a list of parameters.
+
+        Returns a list of ``Model`` that have **one** of the attributes
+        specified in the parameters. Some might say that this is a **union** of
+        the parameters. Every item in parameters is a tuple, where
+        the first element is the user attribute, and the second is the value.
+
+        Example::
+
+            ddb = DynamoDb(config)
+            users = ddb.query_or(User, [('platform', 'slack')])
+
+        If you try to query a table without any parameters, the function will
+        return all objects of that table.::
+
+            projects = ddb.query_or(Project)
+
+        Attributes that are sets (e.g. ``team.member``,
+        ``project.github_urls``) would be treated differently. This function
+        would check to see if the entry **contains** a certain element. You can
+        specify multiple elements, but they must be in different parameters
+        (one element per tuple).::
+
+            teams = ddb.query_or(Team, [('members', 'abc123'),
+                                        ('members', '231abc')])
+
+        The above would get you the teams that contain either member ``abc123``
+        or ``231abc``.
+
+        :param Model: type of list elements you'd want
+        :param params: list of tuples to match
+        :return: a list of ``Model`` that fit the query parameters
+        """
+        table_name = self.CONST.get_table_name(Model)
+        table = self.ddb.Table(table_name)
+        set_attrs = self.CONST.get_set_attrs(table_name)
+        if len(params) > 0:
+            def f(x):
+                if x[0] in set_attrs:
+                    return Attr(x[0]).contains(x[1])
+                else:
+                    return Attr(x[0]).eq(x[1])
+
+            filter_expr = reduce(lambda a, x: a | x, map(f, params))
             resp = table.scan(FilterExpression=filter_expr)
         else:
             resp = table.scan()
