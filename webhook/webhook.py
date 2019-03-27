@@ -1,18 +1,78 @@
 """Contain all the logic for handling webhooks in a class."""
 import logging
-
-from command import ResponseTuple
+import hmac
+import hashlib
 from db.facade import DBFacade
 from model import User, Team
 from typing import Dict, Any, cast, List
+from command import ResponseTuple
+from config import Credentials
 
 
 class WebhookHandler:
     """Encapsulate methods for GitHub webhook triggered events."""
 
-    def __init__(self, db_facade: DBFacade) -> None:
+    def __init__(self, db_facade: DBFacade, credentials: Credentials) -> None:
         """Give handler access to the database."""
         self.__facade = db_facade
+        self.__secret = credentials.github_webhook_secret
+        self.__organization_action_list = [
+            "member_removed",
+            "member_added",
+            "member_invited"
+        ]
+        self.__team_action_list = [
+            "created",
+            "deleted",
+            "edited",
+            "added_to_repository",
+            "removed_from_repository"
+        ]
+
+    def handle(self,
+               request_body: bytes,
+               xhub_signature: str,
+               payload: Dict[str, Any]) -> ResponseTuple:
+        """
+        Verify and handle the webhook event.
+
+        :param request_body: Byte string of the request body
+        :param xhub_signature: Hashed signature to validate
+        :return: appropriate ResponseTuple depending on the validity and type
+                 of webhook
+        """
+        if self.verify_hash(request_body, xhub_signature):
+            # handle
+            action = payload["action"]
+            if action in self.__organization_action_list:
+                return self.handle_organization_event(payload)
+            elif action in self.__team_action_list:
+                return self.handle_team_event(payload)
+            else:
+                logging.error("Unsupported payload received")
+                return "Unsupported payload received", 500
+        else:
+            return "Hashed signature is not valid", 403
+
+    def verify_hash(self, request_body: bytes, xhub_signature: str):
+        """
+        Verify if a webhook event comes from GitHub.
+
+        :param request_body: Byte string of the request body
+        :param xhub_signature: Hashed signature to validate
+        :return: Return True if the signature is valid, False otherwise
+        """
+        h = hmac.new(bytes(self.__secret, encoding='utf8'),
+                     request_body, hashlib.sha1)
+        verified = hmac.compare_digest(
+            bytes("sha1=" + h.hexdigest(), encoding='utf8'),
+            bytes(xhub_signature, encoding='utf8'))
+        if verified:
+            logging.debug("Webhook signature verified")
+        else:
+            logging.warning(
+                f"Webhook not from GitHub; signature: {xhub_signature}")
+        return verified
 
     def handle_organization_event(self,
                                   payload: Dict[str, Any]) -> ResponseTuple:
