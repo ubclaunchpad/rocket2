@@ -1,17 +1,17 @@
 """Flask server instance."""
-import logging
-import structlog
-import sys
-import toml
-
-from config import Credentials
 from factory import make_core, make_webhook_handler
 from flask import Flask, request
-from flask_talisman import Talisman
-from interface.slack import SlackAPIError
 from logging.config import dictConfig
 from slackeventsapi import SlackEventAdapter
+import logging
+import sys
+import toml
+import structlog
+from flask_talisman import Talisman
+from interface.slack import SlackAPIError
+from config import Credentials
 from typing import cast, Dict, Any
+
 
 dictConfig({
     'version': 1,
@@ -84,16 +84,22 @@ def handle_commands():
 def handle_organization_webhook():
     """Handle GitHub organization webhooks."""
     logging.info("organization webhook triggered")
-    logging.debug(f"organization payload: {str(request.get_json())}")
-    return webhook_handler.handle_organization_event(request.get_json())
+    xhub_signature = request.headers.get('X-Hub-Signature')
+    request_data = request.get_data()
+    request_json = request.get_json()
+    logging.debug(f"organization payload: {str(request_json)}")
+    return webhook_handler.handle(request_data, xhub_signature, request_json)
 
 
 @app.route('/webhook/team', methods=['POST'])
 def handle_team_webhook():
     """Handle GitHub team webhooks."""
     logging.info("team webhook triggered")
-    logging.debug(f"team payload: {str(request.get_json())}")
-    msg = webhook_handler.handle_team_event(request.get_json())
+    xhub_signature = request.headers.get('X-Hub-Signature')
+    request_data = request.get_data()
+    request_json = request.get_json()
+    logging.debug(f"team payload: {str(request_json)}")
+    msg = webhook_handler.handle(request_data, xhub_signature, request_json)
     core.send_event_notif(msg[0].capitalize())
     return msg
 

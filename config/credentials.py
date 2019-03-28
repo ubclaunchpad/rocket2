@@ -37,6 +37,14 @@ class Credentials:
         except IOError:
             self.missing_cred_files.append('aws.toml')
 
+        github_toml_path = join(credentials_path, 'github.toml')
+        try:
+            github_toml = toml.load(github_toml_path)
+            self.github_webhook_secret = self.attempt_toml_read(
+                github_toml, 'webhook_secret', 'github')
+        except IOError:
+            self.missing_cred_files.append('github.toml')
+
         github_signing_key_path = join(
             credentials_path, 'github_signing_key.pem')
         if isfile(github_signing_key_path):
