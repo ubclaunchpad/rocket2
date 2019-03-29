@@ -56,14 +56,16 @@ class TeamCommand:
         parser_view.set_defaults(which="view",
                                  help="View information and members of "
                                       "a team.")
-        parser_view.add_argument("team_name", type=str, action='store')
+        parser_view.add_argument("team_name", metavar='team-name',
+                                 type=str, action='store')
 
         """Parser for delete command."""
         parser_delete = subparsers.add_parser("delete")
         parser_delete.set_defaults(which="delete",
                                    help="(Admin only) Permanently delete "
                                         "specified team.")
-        parser_delete.add_argument("team_name", type=str, action='store')
+        parser_delete.add_argument("team_name", metavar='team-name',
+                                   type=str, action='store')
 
         """Parser for create command."""
         parser_create = subparsers.add_parser("create")
@@ -73,7 +75,8 @@ class TeamCommand:
                                         "Github team name and provided "
                                         "optional parameters. NOTE: "
                                         "you will be added to this team.")
-        parser_create.add_argument("team_name", type=str, action='store',
+        parser_create.add_argument("team_name", metavar='team-name',
+                                   type=str, action='store',
                                    help="Github name of your team (required).")
         parser_create.add_argument("--name", type=str, action='store',
                                    help="Display name of your team.")
@@ -90,7 +93,8 @@ class TeamCommand:
         parser_add = subparsers.add_parser("add")
         parser_add.set_defaults(which="add",
                                 help="Add a user to a given team.")
-        parser_add.add_argument("team_name", type=str, action='store',
+        parser_add.add_argument("team_name", metavar='team-name',
+                                type=str, action='store',
                                 help="Team to add the user to.")
         parser_add.add_argument("slack_id", type=str, action='store',
                                 help="User to be added to team.")
@@ -99,9 +103,11 @@ class TeamCommand:
         parser_remove = subparsers.add_parser("remove")
         parser_remove.set_defaults(which="remove",
                                    help="Remove a user from given team.")
-        parser_remove.add_argument("team_name", type=str, action='store',
+        parser_remove.add_argument("team_name", metavar='team-name',
+                                   type=str, action='store',
                                    help="Team to remove user from.")
-        parser_remove.add_argument("slack_id", type=str, action='store',
+        parser_remove.add_argument("slack_id", metavar='slack-id',
+                                   type=str, action='store',
                                    help="User to be removed from team.")
 
         """Parser for edit command."""
@@ -109,7 +115,8 @@ class TeamCommand:
         parser_edit.set_defaults(which='edit',
                                  help="(Admin only)"
                                       "Edit properties of specified team.")
-        parser_edit.add_argument("team_name", type=str, action='store',
+        parser_edit.add_argument("team_name", metavar='team-name',
+                                 type=str, action='store',
                                  help="Name of team to edit.")
         parser_edit.add_argument("--name", type=str, action='store',
                                  help="Display name the team should have.")
@@ -120,9 +127,11 @@ class TeamCommand:
         parser_lead = subparsers.add_parser("lead")
         parser_lead.set_defaults(which='lead',
                                  help="Edit leads of specified team.")
-        parser_lead.add_argument("team_name", type=str, action='store',
+        parser_lead.add_argument("team_name", metavar='team-name',
+                                 type=str, action='store',
                                  help="Name of team to edit.")
-        parser_lead.add_argument("slack_id", type=str, action='store',
+        parser_lead.add_argument("slack_id", metavar='slack-id',
+                                 type=str, action='store',
                                  help="User to be added/removed as lead.")
         parser_lead.add_argument("--remove", action='store_true',
                                  help="Remove the user as team lead.")
