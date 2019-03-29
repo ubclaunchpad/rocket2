@@ -103,6 +103,7 @@ Replace the `...` values for both fields with the appropriate values noted
 in section 4.
 
 ### 5.3: Set Up Github App and organization
+
 Register Rocket 2 as a Github App under an appropriate testing organization
 (our team has one of these set up already). Make sure to install the Github App
 to the organization in addition to registering it.
@@ -129,7 +130,7 @@ Create the file `credentials/github.toml` and input the following:
 webhook_secret = "..."
 ```
 
-Replace the `...` with the Rocket 2 organization's webhook secret, or 
+Replace the `...` with the Rocket 2 organization's webhook secret, or
 that of your test organization's.
 
 Note: if you are in the `brussel-sprouts` Github team, you should already have
