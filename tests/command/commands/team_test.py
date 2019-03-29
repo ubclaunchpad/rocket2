@@ -244,12 +244,14 @@ class TestTeamCommand(TestCase):
             self.testcommand.handle("team add brs ID", user)
             resp, code = self.testcommand.handle("team remove brs ID", user)
             expect = json.loads(jsonify({'attachments': team_attach,
-                                         'text': 'Removed User from brs'}).data)
+                                         'text': 'Removed '
+                                                 'User from brs'}).data)
             resp = json.loads(resp.data)
             self.assertDictEqual(resp, expect)
             self.assertEqual(code, 200)
         self.db.store.assert_called_with(team)
-        self.gh.remove_team_member.assert_called_once_with("myuser", "githubid")
+        self.gh.remove_team_member.assert_called_once_with("myuser",
+                                                           "githubid")
 
     def test_handle_remove_not_in_team(self):
         """Test team command remove parser when user is not in team."""
@@ -263,7 +265,8 @@ class TestTeamCommand(TestCase):
         self.db.retrieve.side_effect = [test_user, team, other_user]
         self.gh.has_team_member.return_value = False
         with self.app.app_context():
-            self.assertTupleEqual(self.testcommand.handle("team remove brs ID", user),
+            self.assertTupleEqual(self.testcommand.handle("team remove"
+                                                          " brs ID", user),
                                   ("User not in team!", 200))
         self.gh.has_team_member.assert_called_once_with("myuser", "githubid")
         self.db.store.assert_not_called()
@@ -275,7 +278,8 @@ class TestTeamCommand(TestCase):
         team = Team("BRS", "brs", "web")
         self.db.retrieve.side_effect = [test_user, team]
         with self.app.app_context():
-            self.assertTupleEqual(self.testcommand.handle("team remove brs ID", user),
+            self.assertTupleEqual(self.testcommand.handle("team remove"
+                                                          " brs ID", user),
                                   (self.testcommand.permission_error, 200))
         self.db.store.assert_not_called()
         self.gh.remove_team_member.assert_not_called()
@@ -287,7 +291,8 @@ class TestTeamCommand(TestCase):
         team = Team("BRS", "brs", "web")
         self.db.retrieve.side_effect = LookupError
         with self.app.app_context():
-            self.assertTupleEqual(self.testcommand.handle("team remove brs ID", user),
+            self.assertTupleEqual(self.testcommand.handle("team remove"
+                                                          " brs ID", user),
                                   (self.testcommand.lookup_error, 200))
         self.db.store.assert_not_called()
         self.gh.remove_team_member.assert_not_called()
@@ -303,7 +308,8 @@ class TestTeamCommand(TestCase):
         self.db.retrieve.side_effect = [test_user, team, other_user]
         self.gh.has_team_member.side_effect = GithubAPIException("error")
         with self.app.app_context():
-            self.assertTupleEqual(self.testcommand.handle("team remove brs ID", user),
+            self.assertTupleEqual(self.testcommand.handle("team remove"
+                                                          " brs ID", user),
                                   ("User removed unsuccessfully with the "
                                    "following error: error", 200))
         self.db.store.assert_not_called()
@@ -329,14 +335,17 @@ class TestTeamCommand(TestCase):
         with self.app.app_context():
             resp, code = self.testcommand.handle("team lead brs ID", user)
             expect = json.loads(jsonify({'attachments': team_attach,
-                                         'text': 'User added as team lead to brs'}).data)
+                                         'text': 'User added '
+                                                 'as team lead to brs'}).data)
             resp = json.loads(resp.data)
             self.assertDictEqual(resp, expect)
             self.assertEqual(code, 200)
             assert team.has_member("githubID")
-            self.gh.add_team_member.assert_called_once_with("myuser", "githubid")
+            self.gh.add_team_member.assert_called_once_with("myuser",
+                                                            "githubid")
             self.db.store.assert_called()
-            resp, code = self.testcommand.handle("team lead  --remove brs ID", user)
+            resp, code = self.testcommand.handle("team lead  "
+                                                 "--remove brs ID", user)
             expect = json.loads(jsonify({'attachments': team_before_attach,
                                          'text': 'User removed as team lead'
                                                  ' from brs'}).data)
@@ -352,7 +361,8 @@ class TestTeamCommand(TestCase):
         team = Team("BRS", "brs", "web")
         self.db.retrieve.side_effect = [test_user, team]
         with self.app.app_context():
-            self.assertTupleEqual(self.testcommand.handle("team lead brs ID", user),
+            self.assertTupleEqual(self.testcommand.handle("team "
+                                                          "lead brs ID", user),
                                   (self.testcommand.permission_error, 200))
         self.db.store.assert_not_called()
 
@@ -362,7 +372,8 @@ class TestTeamCommand(TestCase):
         team = Team("BRS", "brs", "web")
         self.db.retrieve.side_effect = LookupError
         with self.app.app_context():
-            self.assertTupleEqual(self.testcommand.handle("team lead brs ID", user),
+            self.assertTupleEqual(self.testcommand.handle("team lead"
+                                                          " brs ID", user),
                                   (self.testcommand.lookup_error, 200))
         self.db.store.assert_not_called()
 
@@ -374,7 +385,8 @@ class TestTeamCommand(TestCase):
         self.db.retrieve.side_effect = [test_user, team, test_user]
         self.gh.add_team_member.side_effect = GithubAPIException("error")
         with self.app.app_context():
-            self.assertTupleEqual(self.testcommand.handle("team lead brs ID", user),
+            self.assertTupleEqual(self.testcommand.handle("team lead brs ID",
+                                                          user),
                                   ("Edit team lead was unsuccessful with the "
                                    "following error: error", 200))
         self.db.store.assert_not_called()
@@ -386,7 +398,9 @@ class TestTeamCommand(TestCase):
         team = Team("BRS", "brs", "web")
         self.db.retrieve.side_effect = [test_user, team, test_user]
         with self.app.app_context():
-            self.assertTupleEqual(self.testcommand.handle("team lead --remove brs ID", user),
+            self.assertTupleEqual(self.testcommand.handle("team lead "
+                                                          "--remove brs"
+                                                          " ID", user),
                                   ("User not in team!", 200))
         self.db.store.assert_not_called()
 
@@ -402,10 +416,12 @@ class TestTeamCommand(TestCase):
         self.db.retrieve.side_effect = [test_user, team]
         with self.app.app_context():
             resp, code = self.testcommand.handle("team edit brs "
-                                                 "--name brS --platform web", user)
+                                                 "--name brS "
+                                                 "--platform web", user)
             expect = json.loads(jsonify({'attachments': team_attach,
                                          'text': 'Team edited: brs, '
-                                                 'name: brS, platform: web'}).data)
+                                                 'name: brS, '
+                                                 'platform: web'}).data)
             resp = json.loads(resp.data)
             self.assertDictEqual(resp, expect)
             self.assertEqual(code, 200)
@@ -417,7 +433,8 @@ class TestTeamCommand(TestCase):
         team = Team("BRS", "brs", "brS")
         self.db.retrieve.side_effect = [test_user, team]
         with self.app.app_context():
-            self.assertTupleEqual(self.testcommand.handle("team edit brs", user),
+            self.assertTupleEqual(self.testcommand.handle("team "
+                                                          "edit brs", user),
                                   (self.testcommand.permission_error, 200))
         self.db.store.assert_not_called()
 
@@ -427,6 +444,7 @@ class TestTeamCommand(TestCase):
         team = Team("BRS", "brs", "brS")
         self.db.retrieve.side_effect = LookupError
         with self.app.app_context():
-            self.assertTupleEqual(self.testcommand.handle("team edit brs", user),
+            self.assertTupleEqual(self.testcommand.handle("team "
+                                                          "edit brs", user),
                                   (self.testcommand.lookup_error, 200))
         self.db.store.assert_not_called()

@@ -18,7 +18,7 @@ class TeamCommand:
     desc = "for dealing with " + command_name + "s"
     permission_error = "You do not have the sufficient " \
                        "permission level for this command!"
-    lookup_error = "Lookup error! User not found!"
+    lookup_error = "Lookup error: User not found!"
 
     def __init__(self,
                  db_facade: DBFacade,
@@ -213,7 +213,7 @@ class TeamCommand:
 
     def view_helper(self, team_name):
         """
-        Returns display information and members of specified team.
+        Return display information and members of specified team.
 
         :param team_name: name of team being viewed
         :return: return error message if team not found,
@@ -257,8 +257,10 @@ class TeamCommand:
                         param_list["channel"]):
                     member = self.facade.retrieve(User, member_id)
                     self.gh.add_team_member(member.github_username, team_id)
+                    team.add_member(member.github_id)
             else:
                 self.gh.add_team_member(command_user.github_username, team_id)
+                team.add_member(command_user.github_id)
             if param_list["lead"] is not None:
                 msg += "added lead"
                 lead_user = self.facade.retrieve(User, param_list["lead"])
@@ -273,8 +275,8 @@ class TeamCommand:
             return msg, 200
         except GithubAPIException as e:
             logging.error("team creation unsuccessful")
-            return "Team creation unsuccessful with the following error: "\
-                   + e.data, 200
+            return f"Team creation unsuccessful with the" \
+                   f" following error: {e.data}", 200
         except LookupError:
             return self.lookup_error, 200
 
@@ -308,8 +310,8 @@ class TeamCommand:
             return self.lookup_error, 200
         except GithubAPIException as e:
             logging.error("user added unsuccessfully to team")
-            return "User added unsuccessfully with the following error: "\
-                   + e.data, 200
+            return f"User added unsuccessfully with the " \
+                   f"following error: {e.data}", 200
 
     def remove_helper(self, param_list, user_id):
         """
@@ -336,7 +338,8 @@ class TeamCommand:
                                            team.github_team_id):
                 return "User not in team!", 200
             team.discard_member(user.github_id)
-            team.remove_team_lead(user.github_id)
+            if team.has_team_lead(user.github_id):
+                team.discard_team_lead(user.github_id)
             self.gh.remove_team_member(user.github_username,
                                        team.github_team_id)
             self.facade.store(team)
@@ -348,8 +351,8 @@ class TeamCommand:
             return self.lookup_error, 200
         except GithubAPIException as e:
             logging.error("user removed unsuccessfully from team")
-            return "User removed unsuccessfully with the following error: "\
-                   + e.data, 200
+            return f"User removed unsuccessfully with " \
+                   f"the following error: {e.data}", 200
 
     def edit_helper(self, param_list, user_id):
         """
@@ -403,7 +406,8 @@ class TeamCommand:
             if param_list["remove"]:
                 if not team.has_member(user.github_id):
                     return "User not in team!", 200
-                team.remove_team_lead(user.github_id)
+                if team.has_team_lead(user.github_id):
+                    team.discard_team_lead(user.github_id)
                 self.facade.store(team)
                 msg = f"User removed as team lead from" \
                       f" {param_list['team_name']}"
@@ -422,8 +426,8 @@ class TeamCommand:
                 return self.lookup_error, 200
         except GithubAPIException as e:
             logging.error("team lead edit unsuccessful")
-            return "Edit team lead was unsuccessful with " \
-                   "the following error: " + e.data, 200
+            return f"Edit team lead was unsuccessful " \
+                   f"with the following error: {e.data}", 200
 
     def delete_helper(self, team_name, user_id):
         """
@@ -447,5 +451,5 @@ class TeamCommand:
                 return self.lookup_error, 200
         except GithubAPIException as e:
             logging.error("team delete unsuccessful")
-            return "Team delete was unsuccessful with the following error: "\
-                   + e.data, 200
+            return f"Team delete was unsuccessful with " \
+                   f"the following error: {e.data}", 200

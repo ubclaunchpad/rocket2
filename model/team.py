@@ -28,10 +28,8 @@ class Team:
             ('Github Team Name', self.github_team_name),
             ('Display Name', self.display_name),
             ('Platform', self.platform),
-            ('Team Leads', '\n'.join(self.team_leads)
-                           if self.team_leads != set() else 'n/a'),
-            ('Members', '\n'.join(self.members)
-                        if self.members != set() else 'n/a')
+            ('Team Leads', '\n'.join(self.team_leads)),
+            ('Members', '\n'.join(self.members))
         ]
         fields = [{'title': t, 'value': v if v else 'n/a', 'short': True}
                   for t, v in text_pairs]
@@ -46,8 +44,6 @@ class Team:
             ('Github Team Name', self.github_team_name),
             ('Display Name', self.display_name),
             ('Platform', self.platform),
-            ('Team Leads' '\n'.join(self.team_leads)),
-            ('Members', '\n'.join(self.members))
         ]
         fields = [{'title': t, 'value': v if v else 'n/a', 'short': True}
                   for t, v in text_pairs]
@@ -154,10 +150,9 @@ class Team:
         """Identify if user with given ID is a team lead."""
         return github_user_id in self.team_leads
 
-    def remove_team_lead(self, github_user_id):
+    def discard_team_lead(self, github_user_id):
         """Remove a user's Github ID to the team's set of team lead IDs."""
-        if self.has_team_lead(github_user_id):
-            self.team_leads.remove(github_user_id)
+        self.team_leads.remove(github_user_id)
 
     def __str__(self):
 >>>>>>> added add, remove, edit, lead, and helper command implementations

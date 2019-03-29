@@ -46,8 +46,9 @@ def check_credentials(user, team):
         """
         Check if given user is admin or team lead.
 
-        If team is specified and user is not admin, checks if user is
-        team lead in team.
+        If team is specified and user is not admin, check if user is
+        team lead in team. If team is not specified, check if user
+        is team lead.
         :param user: user who's permission needs to be checked
         :param team: team you want to check has user as team lead
         :return: true if proper permission level, false otherwise
