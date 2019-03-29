@@ -435,7 +435,7 @@ class TeamCommand:
             ret = {'attachments': [team.get_attachment()], 'text': msg}
             return jsonify(ret), 200
         except LookupError:
-                return self.lookup_error, 200
+            return self.lookup_error, 200
         except GithubAPIException as e:
             logging.error("team lead edit unsuccessful")
             return f"Edit team lead was unsuccessful " \
@@ -460,7 +460,7 @@ class TeamCommand:
             self.gh.org_delete_team(team.github_team_id)
             return f"Team {team_name} deleted", 200
         except LookupError:
-                return self.lookup_error, 200
+            return self.lookup_error, 200
         except GithubAPIException as e:
             logging.error("team delete unsuccessful")
             return f"Team delete was unsuccessful with " \

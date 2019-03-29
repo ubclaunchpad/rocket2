@@ -43,19 +43,19 @@ def escaped_id_to_id(s: str) -> str:
 
 
 def check_credentials(user, team):
-        """
-        Check if given user is admin or team lead.
+    """
+    Check if given user is admin or team lead.
 
-        If team is specified and user is not admin, check if user is
-        team lead in team. If team is not specified, check if user
-        is team lead.
-        :param user: user who's permission needs to be checked
-        :param team: team you want to check has user as team lead
-        :return: true if proper permission level, false otherwise
-        """
-        if user.permissions_level == Permissions.admin:
-            return True
-        if team is None:
-            return user.permissions_level == Permissions.team_lead
-        else:
-            return team.has_team_lead(user.github_id)
+    If team is specified and user is not admin, check if user is
+    team lead in team. If team is not specified, check if user
+    is team lead.
+    :param user: user who's permission needs to be checked
+    :param team: team you want to check has user as team lead
+    :return: true if proper permission level, false otherwise
+    """
+    if user.permissions_level == Permissions.admin:
+        return True
+    if team is None:
+        return user.permissions_level == Permissions.team_lead
+    else:
+        return team.has_team_lead(user.github_id)
