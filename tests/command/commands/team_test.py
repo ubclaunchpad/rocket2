@@ -40,8 +40,25 @@ class TestTeamCommand(TestCase):
 
     def test_handle_list(self):
         """Test team command list parser."""
+        team = Team("BRS", "brs", "web")
+        team2 = Team("OTEAM", "other team", "android")
+        self.db.query.return_value = [team, team2]
+        attach = team.get_basic_attachment()
+        attach2 = team2.get_basic_attachment()
+        with self.app.app_context():
+            resp, code = self.testcommand.handle("team list", user)
+            expect = json.loads(jsonify({'attachments':
+                                         [attach, attach2]}).data)
+            resp = json.loads(resp.data)
+            self.assertDictEqual(resp, expect)
+            self.assertEqual(code, 200)
+        self.db.query.assert_called_once_with(Team)
+
+    def test_handle_list_lookup_error(self):
+        """Test team command list with lookup error."""
+        self.db.query.side_effect = LookupError
         self.assertTupleEqual(self.testcommand.handle("team list", user),
-                              ("listing all teams", 200))
+                              (self.testcommand.lookup_error, 200))
 
     def test_handle_view(self):
         """Test team command view parser."""
@@ -55,6 +72,12 @@ class TestTeamCommand(TestCase):
             self.assertDictEqual(resp, expect)
             self.assertEqual(code, 200)
         self.db.retrieve.assert_called_once_with(Team, "brs")
+
+    def test_handle_view_lookup_error(self):
+        """Test team command view parser with lookup error."""
+        self.db.retrieve.side_effect = LookupError
+        self.assertTupleEqual(self.testcommand.handle("team view brs", user),
+                              (self.testcommand.lookup_error, 200))
 
     def test_handle_delete_not_admin(self):
         """Test team command delete parser with improper permission."""

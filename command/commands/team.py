@@ -29,7 +29,7 @@ class TeamCommand:
 
         :param db_facade: Given Dynamo_DB Facade
         :param gh: Given Github Interface
-        :param sc: GIven Slack Client Interface
+        :param sc: Given Slack Client Interface
         """
         logging.info("Initializing TeamCommand instance")
         self.facade = db_facade
@@ -159,8 +159,7 @@ class TeamCommand:
             return self.get_help(), 200
 
         if args.which == "list":
-            # stub
-            return "listing all teams", 200
+            return self.list_helper()
 
         elif args.which == "view":
             return self.view_helper(args.team_name)
@@ -210,6 +209,19 @@ class TeamCommand:
 
         else:
             return self.get_help(), 200
+
+    def list_helper(self):
+        """
+        Return display information of all teams.
+
+        :return: return error message if lookup error,
+                 otherwise return teams' information
+        """
+        try:
+            return jsonify({'attachments': [team.get_basic_attachment() for
+                                            team in self.facade.query(Team)]})
+        except LookupError:
+            return self.lookup_error, 200
 
     def view_helper(self, team_name):
         """
