@@ -9,6 +9,7 @@ from model import Team, User
 from flask import jsonify
 from command.util import check_permissions
 from typing import Any, Dict, Optional
+from flask import jsonify
 
 
 class TeamCommand:
