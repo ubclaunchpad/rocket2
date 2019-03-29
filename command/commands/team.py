@@ -218,8 +218,8 @@ class TeamCommand:
                  otherwise return teams' information
         """
         try:
-            return jsonify({'attachments': [team.get_basic_attachment() for
-                                            team in self.facade.query(Team)]})
+            attachment = [team.get_basic_attachment() for team in self.facade.query(Team)]
+            return jsonify({'attachments': attachment}), 200
         except LookupError:
             return self.lookup_error, 200
 

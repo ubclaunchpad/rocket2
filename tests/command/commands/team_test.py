@@ -45,10 +45,10 @@ class TestTeamCommand(TestCase):
         self.db.query.return_value = [team, team2]
         attach = team.get_basic_attachment()
         attach2 = team2.get_basic_attachment()
+        attachment = [attach, attach2]
         with self.app.app_context():
             resp, code = self.testcommand.handle("team list", user)
-            expect = json.loads(jsonify({'attachments':
-                                         [attach, attach2]}).data)
+            expect = json.loads(jsonify({'attachments': attachment}).data)
             resp = json.loads(resp.data)
             self.assertDictEqual(resp, expect)
             self.assertEqual(code, 200)
