@@ -117,7 +117,7 @@ class TestTeamCommand(TestCase):
         self.db.retrieve.side_effect = [test_user, team]
         self.assertTupleEqual(self.testcommand.handle("team delete brs", user),
                               (f"Team brs deleted", 200))
-        self.db.delete.assert_called_once_with(Team, team)
+        self.db.delete.assert_called_once_with(Team, "brs")
         self.gh.org_delete_team.assert_called_once_with("githubid")
 
     def test_handle_create(self):
