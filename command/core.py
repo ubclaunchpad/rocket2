@@ -12,6 +12,7 @@ from interface.slack import Bot, SlackAPIError
 from interface.github import GithubInterface
 from model import User
 from typing import Dict, Any, cast
+from utils.slack_msg_fmt import wrap_slack_code
 
 
 class Core:
@@ -90,7 +91,7 @@ class Core:
         """
         message = {"text": "Displaying all available commands. "
                            "To read about a specific command, use "
-                           "\n`/rocket [command] help`\n"
+                           f"\n{wrap_slack_code('/rocket [command] help')}\n"
                            "For arguments containing spaces, "
                            "please enclose them with quotations.\n",
                    "mrkdwn": "true"}
