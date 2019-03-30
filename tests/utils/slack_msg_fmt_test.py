@@ -7,7 +7,7 @@ class TestGithubInterface(TestCase):
     """Unittest TestCase for testing SlackMsgFmt."""
 
     def setUp(self):
-        """Setup testing environment."""
+        """Set up the test case environment."""
         self.sfmt = SlackMsgFmt()
 
     def test_code(self):
