@@ -220,7 +220,7 @@ class TeamCommand:
         else:
             return self.get_help(), 200
 
-    def list_helper(self):
+    def list_helper(self) -> ResponseTuple:
         """
         Return display information of all teams.
 
@@ -234,7 +234,7 @@ class TeamCommand:
         except LookupError:
             return self.lookup_error, 200
 
-    def view_helper(self, team_name):
+    def view_helper(self, team_name) -> ResponseTuple:
         """
         Return display information and members of specified team.
 
@@ -248,7 +248,7 @@ class TeamCommand:
         except LookupError:
             return self.lookup_error, 200
 
-    def create_helper(self, param_list, user_id):
+    def create_helper(self, param_list, user_id) -> ResponseTuple:
         """
         Create Team and calls GitHub API to create in GitHub.
 
@@ -303,7 +303,7 @@ class TeamCommand:
         except LookupError:
             return self.lookup_error, 200
 
-    def add_helper(self, param_list, user_id):
+    def add_helper(self, param_list, user_id) -> ResponseTuple:
         """
         Add User to Team.
 
@@ -336,7 +336,7 @@ class TeamCommand:
             return f"User added unsuccessfully with the " \
                    f"following error: {e.data}", 200
 
-    def remove_helper(self, param_list, user_id):
+    def remove_helper(self, param_list, user_id) -> ResponseTuple:
         """
         Remove Specified User from Team.
 
@@ -377,7 +377,7 @@ class TeamCommand:
             return f"User removed unsuccessfully with " \
                    f"the following error: {e.data}", 200
 
-    def edit_helper(self, param_list, user_id):
+    def edit_helper(self, param_list, user_id) -> ResponseTuple:
         """
         Edit the properties of a specific team.
 
@@ -407,7 +407,7 @@ class TeamCommand:
         except LookupError:
             return self.lookup_error, 200
 
-    def lead_helper(self, param_list, user_id):
+    def lead_helper(self, param_list, user_id) -> ResponseTuple:
         """
         Add a user as Team Lead, and adds them to team if not already added.
 
@@ -452,7 +452,7 @@ class TeamCommand:
             return f"Edit team lead was unsuccessful " \
                    f"with the following error: {e.data}", 200
 
-    def delete_helper(self, team_name, user_id):
+    def delete_helper(self, team_name, user_id) -> ResponseTuple:
         """
         Permanently delete a team.
 

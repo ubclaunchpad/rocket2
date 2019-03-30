@@ -256,7 +256,7 @@ class WebhookHandler:
         slack_ids_string = ""
         if len(member_list) == 1:
             slack_id = member_list[0].slack_id
-            if selected_team.is_member(github_id):
+            if selected_team.has_member(github_id):
                 selected_team.discard_member(github_id)
                 logging.info(f"deleted slack user {slack_id} "
                              f"from {team_name}")
