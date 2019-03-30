@@ -662,7 +662,7 @@ def test_handle_mem_event_rm_single_member(mock_logging, mem_rm_payload,
         .assert_called_once_with(Team, "2723476")
     mock_logging.info.assert_called_once_with("deleted slack user SLACKID"
                                               " from rocket")
-    assert not return_team.is_member("21031067")
+    assert not return_team.has_member("21031067")
     assert rsp == "deleted slack ID SLACKID from rocket"
     assert code == 200
 

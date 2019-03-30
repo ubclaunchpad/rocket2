@@ -61,6 +61,8 @@ def test_handle_help(mock_logging):
                      "attachments": [
                          {"text": "*user:* for dealing with users",
                           "mrkdwn_in": ["text"]},
+                         {"text": "*team:* for dealing with teams",
+                          'mrkdwn_in': ['text']},
                          {"text": "*token:* Generate a signed "
                                   "token for use with the HTTP API",
                           "mrkdwn_in": ["text"]}]}).data)

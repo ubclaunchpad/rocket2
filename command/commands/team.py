@@ -35,7 +35,7 @@ class TeamCommand:
         self.facade = db_facade
         self.gh = gh
         self.sc = sc
-        self.desc = ""
+        self.desc = "for dealing with teams"
         self.parser = ArgumentParser(prog="/rocket")
         self.parser.add_argument("team")
         self.subparser = self.init_subparsers()
