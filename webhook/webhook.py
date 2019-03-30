@@ -90,7 +90,7 @@ class WebhookHandler:
         github_username = github_user["login"]
         organization = payload["organization"]["login"]
         member_list = self.__facade. \
-            query(User, [('github_id', github_id)])
+            query(User, [('github_user_id', github_id)])
         if action == "member_removed":
             return self.org_remove(member_list, github_id, github_username)
         elif action == "member_added":
@@ -234,13 +234,11 @@ class WebhookHandler:
         team_id = team["id"]
         team_name = team["name"]
         selected_team = self.__facade.retrieve(Team, team_id)
-        if action == "member_removed":
+        if action == "removed":
             return self.mem_remove(github_id, selected_team, team_name)
-        elif action == "member_added":
+        elif action == "added":
             return self.mem_added(github_id, selected_team, team_name,
                                   github_username)
-        elif action == "member_invited":
-            return self.mem_invited(github_username, team_name)
         else:
             logging.error("membership webhook triggered,"
                           f" invalid action specified: {str(payload)}")
@@ -252,7 +250,7 @@ class WebhookHandler:
                    team_name: str) -> ResponseTuple:
         """Help membership function if payload action is removal."""
         member_list = self.__facade. \
-            query(User, [('github_id', github_id)])
+            query(User, [('github_user_id', github_id)])
         slack_ids_string = ""
         if len(member_list) == 1:
             slack_id = member_list[0].slack_id
@@ -281,7 +279,7 @@ class WebhookHandler:
                   team_name: str,
                   github_username: str) -> ResponseTuple:
         """Help membership function if payload action is added."""
-        member_list = self.__facade.query(User, [('github_id', github_id)])
+        member_list = self.__facade.query(User, [('github_user_id', github_id)])
         slack_ids_string = ""
         if len(member_list) > 0:
             selected_team.add_member(github_id)
@@ -293,10 +291,3 @@ class WebhookHandler:
         else:
             logging.error(f"could not find user {github_id}")
             return f"could not find user {github_username}", 404
-
-    def mem_invited(self,
-                    github_username: str,
-                    team_name: str) -> ResponseTuple:
-        """Help membership function if payload action is invited."""
-        logging.info(f"user {github_username} invited to {team_name}")
-        return f"user {github_username} invited to {team_name}", 200
