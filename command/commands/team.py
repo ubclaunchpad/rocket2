@@ -247,7 +247,7 @@ class TeamCommand:
             return jsonify({'attachments': [team.get_attachment()]}), 200
         except LookupError:
             return self.lookup_error, 200
-        
+
     def create_helper(self, param_list, user_id):
         """
         Create Team and calls GitHub API to create in GitHub.

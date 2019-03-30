@@ -4,7 +4,8 @@ Some utility functions.
 The following are a few function to help in command handling.
 """
 import re
-from model.permissions import Permissions
+from model import Permissions
+
 
 def regularize_char(c: str) -> str:
     """

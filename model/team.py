@@ -127,11 +127,7 @@ class Team:
         """Discard the member of the team with Github ID in the argument."""
         self.members.discard(github_user_id)
 
-<<<<<<< HEAD
-    def is_member(self, github_user_id: str) -> bool:
-=======
     def has_member(self, github_user_id):
->>>>>>> added add, remove, edit, lead, and helper command implementations
         """Identify if any member has the ID specified in the argument."""
         return github_user_id in self.members
 
@@ -139,13 +135,10 @@ class Team:
         """Add a user's Github ID to the team's set of team lead IDs."""
         self.team_leads.add(github_user_id)
 
-<<<<<<< HEAD
     def is_team_lead(self, github_user_id: str) -> bool:
         """Identify if user with given ID is a team lead."""
         return github_user_id in self.team_leads
 
-    def __str__(self) -> str:
-=======
     def has_team_lead(self, github_user_id):
         """Identify if user with given ID is a team lead."""
         return github_user_id in self.team_leads
@@ -155,6 +148,5 @@ class Team:
         self.team_leads.remove(github_user_id)
 
     def __str__(self):
->>>>>>> added add, remove, edit, lead, and helper command implementations
         """Print information on the team class."""
         return str(self.__dict__)
