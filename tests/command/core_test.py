@@ -8,6 +8,7 @@ from flask import jsonify, json, Flask
 from interface.slack import Bot, SlackAPIError
 from interface.github import GithubInterface
 from unittest import mock
+from utils.slack_msg_fmt import wrap_slack_code
 
 
 @mock.patch('command.core.logging')
@@ -54,7 +55,9 @@ def test_handle_help(mock_logging):
         expect = json.loads(
             jsonify({"text": "Displaying all available commands. "
                              "To read about a specific command, "
-                             "use \n`/rocket [command] help`\n"
+                             f"use \n"
+                             f"{wrap_slack_code('/rocket [command] help')}"
+                             "\n"
                              "For arguments containing spaces, "
                              "please enclose them with quotations.\n",
                      "mrkdwn": "true",
