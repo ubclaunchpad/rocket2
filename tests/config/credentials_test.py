@@ -1,6 +1,7 @@
 """Test the loading of credentials."""
 import pytest
 from config import Credentials, MissingCredentialsError
+from os.path import normpath
 
 
 @pytest.fixture
@@ -37,7 +38,7 @@ def test_load_github_webhook_secret(complete_credentials):
 def test_load_github_signing_key_path(complete_credentials):
     """Assert that the github signing key path can be loaded correctly."""
     assert complete_credentials.github_signing_key_path == \
-        'tests/credentials/complete/github_signing_key.pem'
+        normpath('tests/credentials/complete/github_signing_key.pem')
 
 
 def test_exception_raised_on_missing_fields():
