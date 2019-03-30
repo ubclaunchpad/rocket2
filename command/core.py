@@ -12,6 +12,7 @@ from interface.slack import Bot, SlackAPIError
 from interface.github import GithubInterface
 from model import User
 from typing import Dict, Any, cast
+from utils.slack_msg_fmt import SlackMsgFmt
 
 
 class Core:
@@ -88,9 +89,10 @@ class Core:
         :return: Preformatted ``flask.Response`` object containing help
                  messages
         """
+        sfmt = SlackMsgFmt()
         message = {"text": "Displaying all available commands. "
                            "To read about a specific command, use "
-                           "\n`/rocket [command] help`\n"
+                           f"\n{sfmt.code('/rocket [command] help')}\n"
                            "For arguments containing spaces, "
                            "please enclose them with quotations.\n",
                    "mrkdwn": "true"}

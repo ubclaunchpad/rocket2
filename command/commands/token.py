@@ -7,17 +7,19 @@ from datetime import datetime, timedelta
 from db.facade import DBFacade
 from model import User, Permissions
 from typing import cast
+from utils.slack_msg_fmt import SlackMsgFmt
 
 
 class TokenCommand:
     """Token command model class."""
 
+    sfmt = SlackMsgFmt()
     command_name = "token"
     desc = "Generate a signed token for use with the HTTP API"
     permission_error = "You do not have the sufficient " \
                        "permission level for this command!"
     lookup_error = "Requesting user not found!"
-    success_msg = "This is your token:\n```\n{}\n```" \
+    success_msg = f"This is your token:\n{sfmt.code_block('{}')}" \
                   "\nKeep it secret! Keep it safe!\nIt will expire at {}."
 
     def __init__(self,
