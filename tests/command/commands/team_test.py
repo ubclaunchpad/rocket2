@@ -471,3 +471,42 @@ class TestTeamCommand(TestCase):
                                                           "edit brs", user),
                                   (self.testcommand.lookup_error, 200))
         self.db.store.assert_not_called()
+
+    def test_handle_refresh_not_admin(self):
+        """Test team command refresh parser with insufficient permission."""
+        test_user = User("userid")
+        team = Team("BRS", "brs", "brS")
+        self.db.retrieve.side_effect = [test_user, team]
+        with self.app.app_context():
+            self.assertTupleEqual(self.testcommand.handle("team refresh", user),
+                                  (self.testcommand.permission_error, 200))
+        self.db.store.assert_not_called()
+
+    def test_handle_refresh_deletion(self):
+        """
+        Test team command refresh parser when local has more teams than github.
+        """
+        test_user = User("userid")
+        test_user.permissions_level = Permissions.admin
+        team = Team("TeamID", "TeamName", "DisplayName")
+        team2 = Team("OTEAM", "other team", "android")
+        self.db.retrieve.return_value = test_user
+        self.db.query.return_value = [team, team2]
+
+        # In this case, github does not have team2!
+        self.gh.org_get_teams.return_value = [team]
+        attach = team.get_attachment()
+        attach2 = team2.get_attachment()
+        attachment = [attach, attach2]
+
+        status = f"0 teams changed, " \
+            f"0 added, " \
+            f"1 deleted. Wonderful."
+        with self.app.app_context():
+            resp, code = self.testcommand.handle("team refresh", "userid")
+            expect = json.loads(jsonify({'attachments': [attach2],
+                                         'text': status}).data)
+            resp = json.loads(resp.data)
+            self.assertDictEqual(resp, expect)
+            self.assertEqual(code, 200)
+        self.db.query.assert_called_once_with(Team)

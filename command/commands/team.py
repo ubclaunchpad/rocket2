@@ -225,7 +225,7 @@ class TeamCommand:
             return self.lead_helper(param_list, user_id)
 
         elif args.which == "refresh":
-            return self.refresh_helper()
+            return self.refresh_helper(user_id)
 
         else:
             return self.get_help(), 200
@@ -487,13 +487,13 @@ class TeamCommand:
             return f"Team delete was unsuccessful with " \
                    f"the following error: {e.data}", 200
 
-    def refresh_helper(self):
+    def refresh_helper(self, user_id) -> ResponseTuple:
         """
         Ensure that the local team database is the same as GitHub's.
 
         In the event that our local team database is outdated compared to
         the teams on GitHub, this command can be called to fix things.
-        :return: return error message if something failed,
+        :return: return error message if user has insufficient permission level
                  otherwise returns success messages with # of teams changed
         """
         num_changed = 0
@@ -501,11 +501,14 @@ class TeamCommand:
         num_deleted = 0
         modified = []
         try:
+            command_user = self.facade.retrieve(User, user_id)
+            if not check_permissions(command_user, None):
+                return self.permission_error, 200
             local_teams = self.facade.query(Team)
             remote_teams = self.gh.org_get_teams()
-            local_ids = dict((Team.to_dict(team).get('github_team_id'), team)
+            local_ids = dict((team.github_team_id, team)
                              for team in local_teams)
-            remote_ids = dict((Team.to_dict(team).get('github_team_id'), team)
+            remote_ids = dict((team.github_team_id, team)
                               for team in remote_teams)
 
             # remove teams not in github anymore
@@ -534,8 +537,6 @@ class TeamCommand:
         except LookupError:
             logging.error("team refresh unsuccessful due to lookup error")
             return "Team refresh unsuccessful with database lookup error.", 200
-        # TODO: This return is temporary. We can use the get_attachment team
-        # method currently being made in jacques-senpai's branch
         status = f"{num_changed} teams changed, " \
             f"{num_added} added, " \
             f"{num_deleted} deleted. Wonderful."
