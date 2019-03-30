@@ -102,11 +102,11 @@ secret_access_key = "..."
 Replace the `...` values for both fields with the appropriate values noted
 in section 4.
 
-### 5.3: Set Up Github App
+### 5.3: Set Up Github App and organization
 
 Register Rocket 2 as a Github App under an appropriate testing organization
 (our team has one of these set up already). Make sure to install the Github App
-to the organization in addition to regsitering it.
+to the organization in addition to registering it.
 
 Under ''Private keys'', click ''Generate a new private key''. This will generate
 and allow you to download a new secret key for Rocket 2. Save this to the
@@ -121,6 +121,23 @@ the PEM file format, bracketed by:
 
 Authenticating Rocket 2 as a Github App and obtaining an access token for the
 Github API should be automated, once the signing key is available.
+
+### 5.31: Set Up Github Credentials
+
+Create the file `credentials/github.toml` and input the following:
+
+```
+webhook_secret = "..."
+```
+
+Replace the `...` with the Rocket 2 organization's webhook secret, or
+that of your test organization's.
+
+Note: if you are in the `brussel-sprouts` Github team, you should already have
+a test organization, along with its own `webhook_secret`.
+
+In the `github` section of `config.toml`, ensure `app_id` and `organization` are
+set to their relevant entries from the organization.
 
 ## 6: Build and Run Container
 

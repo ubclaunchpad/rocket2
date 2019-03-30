@@ -1,6 +1,6 @@
 """Contain the dictionaries of credentials for all needed services."""
 from os import listdir
-from os.path import isfile, join
+from os.path import isfile, join, normpath
 import toml
 
 
@@ -16,6 +16,7 @@ class Credentials:
         """
         self.missing_cred_files = []
         self.missing_cred_fields = {}
+        credentials_path = normpath(credentials_path)
 
         slack_toml_path = join(credentials_path, 'slack.toml')
         try:
