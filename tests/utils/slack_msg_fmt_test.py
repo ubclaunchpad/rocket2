@@ -1,8 +1,6 @@
 """Test slack message formatting utility class."""
-from utils.slack_msg_fmt import wrap_slack_code
-from utils.slack_msg_fmt import wrap_code_block
-from utils.slack_msg_fmt import wrap_quote
-from utils.slack_msg_fmt import wrap_emph
+from utils.slack_msg_fmt import \
+    wrap_slack_code, wrap_code_block, wrap_quote, wrap_emph
 from unittest import TestCase
 
 
