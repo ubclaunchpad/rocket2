@@ -7,7 +7,7 @@ from db.facade import DBFacade
 from interface.github import GithubAPIException, GithubInterface
 from model import Team, User
 from flask import jsonify
-from command.util import check_credentials
+from command.util import check_permissions
 from typing import Any, Dict, Optional
 
 
@@ -96,7 +96,8 @@ class TeamCommand:
         parser_add.add_argument("team_name", metavar='team-name',
                                 type=str, action='store',
                                 help="Team to add the user to.")
-        parser_add.add_argument("slack_id", type=str, action='store',
+        parser_add.add_argument("slack_id", metavar='slack-id',
+                                type=str, action='store',
                                 help="User to be added to team.")
 
         """Parser for remove command."""
@@ -262,7 +263,7 @@ class TeamCommand:
         """
         try:
             command_user = self.facade.retrieve(User, user_id)
-            if not check_credentials(command_user, None):
+            if not check_permissions(command_user, None):
                 return self.permission_error, 200
             msg = f"New team created: {param_list['team_name']}, "
             team_id = self.gh.org_create_team()
@@ -317,7 +318,7 @@ class TeamCommand:
         try:
             command_user = self.facade.retrieve(User, user_id)
             team = self.facade.retrieve(Team, param_list['team_name'])
-            if not check_credentials(command_user, team):
+            if not check_permissions(command_user, team):
                 return self.permission_error, 200
 
             user = self.facade.retrieve(User, param_list['slack_id'])
@@ -352,7 +353,7 @@ class TeamCommand:
         try:
             command_user = self.facade.retrieve(User, user_id)
             team = self.facade.retrieve(Team, param_list['team_name'])
-            if not check_credentials(command_user, team):
+            if not check_permissions(command_user, team):
                 return self.permission_error, 200
 
             user = self.facade.retrieve(User, param_list['slack_id'])
@@ -391,7 +392,7 @@ class TeamCommand:
         try:
             command_user = self.facade.retrieve(User, user_id)
             team = self.facade.retrieve(Team, param_list['team_name'])
-            if not check_credentials(command_user, team):
+            if not check_permissions(command_user, team):
                 return self.permission_error, 200
             msg = f"Team edited: {param_list['team_name']}, "
             if param_list['name'] is not None:
@@ -421,7 +422,7 @@ class TeamCommand:
         try:
             command_user = self.facade.retrieve(User, user_id)
             team = self.facade.retrieve(Team, param_list['team_name'])
-            if not check_credentials(command_user, team):
+            if not check_permissions(command_user, team):
                 return self.permission_error, 200
             user = self.facade.retrieve(User, param_list["slack_id"])
             msg = ""
@@ -464,7 +465,7 @@ class TeamCommand:
         try:
             command_user = self.facade.retrieve(User, user_id)
             team = self.facade.retrieve(Team, team_name)
-            if not check_credentials(command_user, team):
+            if not check_permissions(command_user, team):
                 return self.permission_error, 200
             self.facade.delete(Team, team)
             self.gh.org_delete_team(team.github_team_id)

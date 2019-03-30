@@ -42,7 +42,7 @@ def escaped_id_to_id(s: str) -> str:
                   s)
 
 
-def check_credentials(user, team):
+def check_permissions(user, team):
     """
     Check if given user is admin or team lead.
 

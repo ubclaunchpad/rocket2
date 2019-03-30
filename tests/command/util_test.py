@@ -38,14 +38,14 @@ def test_check_credentials_admin():
     """Test checking to see if user is admin."""
     user = User("USFAS689")
     user.permissions_level = Permissions.admin
-    assert util.check_credentials(user, None)
+    assert util.check_permissions(user, None)
 
 
 def test_check_credentials_not_admin():
     """Test checking to see if user is not admin."""
     user = User("USFAS689")
     user.permissions_level = Permissions.member
-    assert not util.check_credentials(user, None)
+    assert not util.check_permissions(user, None)
 
 
 def test_check_credentials_lead():
@@ -56,7 +56,7 @@ def test_check_credentials_lead():
     team.add_member(user.github_id)
     team.add_team_lead(user.github_id)
     user.permissions_level = Permissions.team_lead
-    assert util.check_credentials(user, team)
+    assert util.check_permissions(user, team)
 
 
 def test_check_credentials_not_lead():
@@ -66,4 +66,4 @@ def test_check_credentials_not_lead():
     team = Team("brussels", "team", "id")
     team.add_member(user.github_id)
     user.permissions_level = Permissions.team_lead
-    assert not util.check_credentials(user, team)
+    assert not util.check_permissions(user, team)
