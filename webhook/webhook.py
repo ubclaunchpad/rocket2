@@ -279,7 +279,8 @@ class WebhookHandler:
                   team_name: str,
                   github_username: str) -> ResponseTuple:
         """Help membership function if payload action is added."""
-        member_list = self.__facade.query(User, [('github_user_id', github_id)])
+        member_list = self.__facade.query(User,
+                                          [('github_user_id', github_id)])
         slack_ids_string = ""
         if len(member_list) > 0:
             selected_team.add_member(github_id)
