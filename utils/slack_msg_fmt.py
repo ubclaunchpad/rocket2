@@ -1,21 +1,21 @@
 """Utility class for formatting Slack Messages."""
 
 
-class SlackMsgFmt():
-    """Utils class for Slack Message Format."""
+def wrap_slack_code(str):
+    """Format code."""
+    return f"`{str}`"
 
-    def code(self, str):
-        """Format code."""
-        return f"`{str}`"
 
-    def code_block(self, str):
-        """Format code block."""
-        return f"```\n{str}\n```"
+def wrap_code_block(str):
+    """Format code block."""
+    return f"```\n{str}\n```"
 
-    def quote(self, str):
-        """Format quote."""
-        return f"> {str}\n"
 
-    def emph(self, str):
-        """Format emph."""
-        return f"*{str}*"
+def wrap_quote(str):
+    """Format quote."""
+    return f"> {str}\n"
+
+
+def wrap_emph(str):
+    """Format emph."""
+    return f"*{str}*"

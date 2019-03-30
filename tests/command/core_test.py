@@ -8,7 +8,7 @@ from flask import jsonify, json, Flask
 from interface.slack import Bot, SlackAPIError
 from interface.github import GithubInterface
 from unittest import mock
-from utils.slack_msg_fmt import SlackMsgFmt
+from utils.slack_msg_fmt import wrap_slack_code
 
 
 @mock.patch('command.core.logging')
@@ -50,13 +50,14 @@ def test_handle_help(mock_logging):
     mock_gh = mock.MagicMock(GithubInterface)
     mock_token_config = TokenCommandConfig(datetime.utcnow(), '')
     core = Core(mock_facade, mock_bot, mock_gh, mock_token_config)
-    sfmt = SlackMsgFmt()
     with app.app_context():
         resp, code = core.handle_app_command("help", "U061F7AUR")
         expect = json.loads(
             jsonify({"text": "Displaying all available commands. "
                              "To read about a specific command, "
-                             f"use \n{sfmt.code('/rocket [command] help')}\n"
+                             f"use \n"
+                             f"{wrap_slack_code('/rocket [command] help')}"
+                             "\n"
                              "For arguments containing spaces, "
                              "please enclose them with quotations.\n",
                      "mrkdwn": "true",
