@@ -137,6 +137,12 @@ class TeamCommand:
                                  help="User to be added/removed as lead.")
         parser_lead.add_argument("--remove", action='store_true',
                                  help="Remove the user as team lead.")
+
+        """Parser for refresh command."""
+        parser_refresh = subparsers.add_parser("refresh")
+        parser_refresh.set_defaults(which='refresh',
+                                    help="(Admin only)"
+                                         "Refresh local team database.")
         return subparsers
 
     def get_name(self) -> str:
@@ -217,6 +223,9 @@ class TeamCommand:
                 "remove": args.remove
             }
             return self.lead_helper(param_list, user_id)
+
+        elif args.which == "refresh":
+            return self.refresh_helper()
 
         else:
             return self.get_help(), 200
@@ -477,3 +486,58 @@ class TeamCommand:
             logging.error("team delete unsuccessful")
             return f"Team delete was unsuccessful with " \
                    f"the following error: {e.data}", 200
+
+    def refresh_helper(self):
+        """
+        Ensure that the local team database is the same as GitHub's.
+
+        In the event that our local team database is outdated compared to
+        the teams on GitHub, this command can be called to fix things.
+        :return: return error message if something failed,
+                 otherwise returns success messages with # of teams changed
+        """
+        num_changed = 0
+        num_added = 0
+        num_deleted = 0
+        modified = []
+        try:
+            local_teams = self.facade.query(Team)
+            remote_teams = self.gh.org_get_teams()
+            local_ids = dict((Team.to_dict(team).get('github_team_id'), team)
+                             for team in local_teams)
+            remote_ids = dict((Team.to_dict(team).get('github_team_id'), team)
+                              for team in remote_teams)
+
+            # remove teams not in github anymore
+            for local_id in local_ids:
+                if local_id not in remote_ids:
+                    self.gh.org_delete_team(local_id)
+                    num_deleted += 1
+                    modified.append(local_ids[local_id].get_attachment())
+
+            # add teams to db that are in github but not in local database,
+            # AND re-store (aka update) all other local teams
+            for remote_id in remote_ids:
+                if remote_id not in local_ids:
+                    self.facade.store(remote_ids[remote_id])
+                    num_added += 1
+                    modified.append(remote_ids[remote_id].get_attachment())
+                else:
+                    if local_ids[remote_id] != remote_ids[remote_id]:
+                        self.facade.store(remote_ids[remote_id])
+                        num_changed += 1
+                        modified.append(remote_ids[remote_id].get_attachment())
+        except GithubAPIException as e:
+            logging.error("team refresh unsuccessful due to github error")
+            return "Team refresh unsuccessful with GithubAPI error " \
+                   + e.data, 200
+        except LookupError:
+            logging.error("team refresh unsuccessful due to lookup error")
+            return "Team refresh unsuccessful with database lookup error.", 200
+        # TODO: This return is temporary. We can use the get_attachment team
+        # method currently being made in jacques-senpai's branch
+        status = f"{num_changed} teams changed, " \
+            f"{num_added} added, " \
+            f"{num_deleted} deleted. Wonderful."
+        ret = {'attachments': modified, 'text': status}
+        return jsonify(ret), 200
