@@ -146,6 +146,13 @@ class GithubInterface:
         team.add_membership(new_member)
 
     @handle_github_error
+    def has_team_member(self, username, team_id):
+        """Check if team with team_id contains user with username."""
+        team = self.github.get_team(team_id)
+        member = self.github.get_user(username)
+        return team.has_in_members(member)
+
+    @handle_github_error
     def remove_team_member(self, username, team_id):
         """Remove user with given username from team with id team_id."""
         team = self.github.get_team(team_id)

@@ -17,7 +17,7 @@ class UserCommand:
     command_name = "user"
     permission_error = "You do not have the sufficient " \
                        "permission level for this command!"
-    lookup_error = "User not found!"
+    lookup_error = "Lookup error! User not found!"
     delete_text = "Deleted user with Slack ID: "
     desc = f"for dealing with {command_name}s"
 
