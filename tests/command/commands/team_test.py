@@ -512,10 +512,7 @@ class TestTeamCommand(TestCase):
         self.db.store.assert_not_called()
 
     def test_handle_refresh_changed(self):
-        """
-        Test team command refresh parser if a team
-        has been edited in github.
-        """
+        """Test team command refresh parser if team edited in github."""
         test_user = User(user)
         test_user.permissions_level = Permissions.admin
         team = Team("TeamID", "TeamName", "DisplayName")
@@ -541,10 +538,7 @@ class TestTeamCommand(TestCase):
         self.db.query.assert_called_once_with(Team)
 
     def test_handle_refresh_addition_and_deletion(self):
-        """
-        Test team command refresh parser when local teams
-        differ from github's.
-        """
+        """Test team command refresh parser if local differs from github."""
         test_user = User(user)
         test_user.permissions_level = Permissions.admin
         team = Team("TeamID", "TeamName", "DisplayName")
