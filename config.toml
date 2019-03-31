@@ -1,4 +1,4 @@
-testing = true
+testing = false
 creds_path = "credentials/"
 
 [slack]
