@@ -94,10 +94,10 @@ class TestUserCommand(TestCase):
         self.mock_facade.retrieve.assert_called_once_with(User, "U0G9QF9C6")
 
     def test_handle_view_other_user(self):
-        """Test user command view handle with slack_id parameter."""
+        """Test user command view handle with slack-id parameter."""
         user_id = "U0G9QF9C6"
         user = User("ABCDE8FA9")
-        command = 'user view --slack_id ' + user.slack_id
+        command = 'user view --slack-id ' + user.slack_id
         self.mock_facade.retrieve.return_value = user
         user_attaches = [user.get_attachment()]
         with self.app.app_context():
@@ -113,7 +113,7 @@ class TestUserCommand(TestCase):
     def test_handle_view_lookup_error(self):
         """Test user command view handle with user not in database."""
         user_id = "U0G9QF9C6"
-        command = 'user view --slack_id ABCDE8FA9'
+        command = 'user view --slack-id ABCDE8FA9'
         self.mock_facade.retrieve.side_effect = LookupError
         self.assertTupleEqual(self.testcommand.handle(command, user_id),
                               (UserCommand.lookup_error, 200))
