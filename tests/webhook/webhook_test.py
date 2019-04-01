@@ -341,7 +341,7 @@ def test_handle_org_event_rm_single_member(mock_logging, org_rm_payload,
     webhook_handler = WebhookHandler(mock_facade, credentials)
     rsp, code = webhook_handler.handle_organization_event(org_rm_payload)
     mock_facade.query\
-        .assert_called_once_with(User, [('github_id', "39652351")])
+        .assert_called_once_with(User, [('github_user_id', "39652351")])
     mock_facade.delete.assert_called_once_with(User, "SLACKID")
     mock_logging.info.assert_called_once_with("deleted slack user SLACKID")
     assert rsp == "deleted slack ID SLACKID"
@@ -357,7 +357,7 @@ def test_handle_org_event_rm_member_missing(mock_logging, org_rm_payload,
     webhook_handler = WebhookHandler(mock_facade, credentials)
     rsp, code = webhook_handler.handle_organization_event(org_rm_payload)
     mock_facade.query\
-        .assert_called_once_with(User, [('github_id', "39652351")])
+        .assert_called_once_with(User, [('github_user_id', "39652351")])
     mock_logging.error.assert_called_once_with("could not find user 39652351")
     assert rsp == "could not find user hacktocat"
     assert code == 404
@@ -375,7 +375,7 @@ def test_handle_org_event_rm_mult_members(mock_logging, org_rm_payload,
     webhook_handler = WebhookHandler(mock_facade, credentials)
     rsp, code = webhook_handler.handle_organization_event(org_rm_payload)
     mock_facade.query\
-        .assert_called_once_with(User, [('github_id', "39652351")])
+        .assert_called_once_with(User, [('github_user_id', "39652351")])
     mock_logging.error.assert_called_once_with("Error: found github ID "
                                                "connected to multiple"
                                                " slack IDs")
@@ -588,7 +588,7 @@ def mem_default_payload():
 def mem_add_payload(mem_default_payload, credentials):
     """Provide a membership payload for adding a member."""
     add_payload = mem_default_payload
-    add_payload["action"] = "member_added"
+    add_payload["action"] = "added"
     return add_payload
 
 
@@ -596,16 +596,8 @@ def mem_add_payload(mem_default_payload, credentials):
 def mem_rm_payload(mem_default_payload, credentials):
     """Provide a membership payload for removing a member."""
     rm_payload = mem_default_payload
-    rm_payload["action"] = "member_removed"
+    rm_payload["action"] = "removed"
     return rm_payload
-
-
-@pytest.fixture
-def mem_inv_payload(mem_default_payload, credentials):
-    """Provide a membership payload for inviting a member."""
-    inv_payload = mem_default_payload
-    inv_payload["action"] = "member_invited"
-    return inv_payload
 
 
 @pytest.fixture
@@ -657,7 +649,7 @@ def test_handle_mem_event_rm_single_member(mock_logging, mem_rm_payload,
     webhook_handler = WebhookHandler(mock_facade, credentials)
     (rsp, code) = webhook_handler.handle_membership_event(mem_rm_payload)
     mock_facade.query\
-        .assert_called_once_with(User, [('github_id', "21031067")])
+        .assert_called_once_with(User, [('github_user_id', "21031067")])
     mock_facade.retrieve \
         .assert_called_once_with(Team, "2723476")
     mock_logging.info.assert_called_once_with("deleted slack user SLACKID"
@@ -679,7 +671,7 @@ def test_handle_mem_event_rm_member_missing(mock_logging, mem_rm_payload,
     webhook_handler = WebhookHandler(mock_facade, credentials)
     rsp, code = webhook_handler.handle_membership_event(mem_rm_payload)
     mock_facade.query\
-        .assert_called_once_with(User, [('github_id', "21031067")])
+        .assert_called_once_with(User, [('github_user_id', "21031067")])
     mock_logging.error.assert_called_once_with("slack user SLACKID "
                                                "not in rocket")
     assert rsp == "slack user SLACKID not in rocket"
@@ -695,7 +687,7 @@ def test_handle_mem_event_rm_member_wrong_team(mock_logging, mem_rm_payload,
     webhook_handler = WebhookHandler(mock_facade, credentials)
     rsp, code = webhook_handler.handle_membership_event(mem_rm_payload)
     mock_facade.query\
-        .assert_called_once_with(User, [('github_id', "21031067")])
+        .assert_called_once_with(User, [('github_user_id', "21031067")])
     mock_logging.error.assert_called_once_with("could not find user 21031067")
     assert rsp == "could not find user 21031067"
     assert code == 404
@@ -713,25 +705,12 @@ def test_handle_mem_event_rm_mult_members(mock_logging, mem_rm_payload,
     webhook_handler = WebhookHandler(mock_facade, credentials)
     rsp, code = webhook_handler.handle_membership_event(mem_rm_payload)
     mock_facade.query\
-        .assert_called_once_with(User, [('github_id', "21031067")])
+        .assert_called_once_with(User, [('github_user_id', "21031067")])
     mock_logging.error.assert_called_once_with("Error: found github ID "
                                                "connected to multiple"
                                                " slack IDs")
     assert rsp == "Error: found github ID connected to multiple slack IDs"
     assert code == 412
-
-
-@mock.patch('webhook.webhook.logging')
-def test_handle_mem_event_inv_member(mock_logging, mem_inv_payload,
-                                     credentials):
-    """Test that instances when members are added to the mem are logged."""
-    mock_facade = mock.MagicMock(DBFacade)
-    webhook_handler = WebhookHandler(mock_facade, credentials)
-    rsp, code = webhook_handler.handle_membership_event(mem_inv_payload)
-    mock_logging.info.assert_called_once_with(("user Codertocat invited "
-                                               "to rocket"))
-    assert rsp == "user Codertocat invited to rocket"
-    assert code == 200
 
 
 @mock.patch('webhook.webhook.logging')
