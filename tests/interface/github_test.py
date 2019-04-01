@@ -239,9 +239,9 @@ class TestGithubInterface(TestCase):
             'brussels-sprouts') is self.test_user
 
     def test_tmem_get_nonexistent_team_member(self):
-        """Test if raises GithubException when memeber does not exist."""
+        """Test if raises GithubException when member does not exist."""
         with self.assertRaises(GithubAPIException):
-            self.test_interface.get_team_member('inexistent_username',
+            self.test_interface.get_team_member('nonexistent_username',
                                                 'brussels-sprouts')
 
     def test_tmem_add_team_member(self):
@@ -260,3 +260,11 @@ class TestGithubInterface(TestCase):
                                                'brussels-sprouts')
         self.mock_team.remove_membership. \
             assert_called_once_with(self.test_user)
+
+    def test_tmem_has_team_member(self):
+        """Test if has_team_member method."""
+        self.mock_github.get_user = MagicMock(return_value=self.test_user)
+        self.mock_team.has_in_members = MagicMock()
+        self.test_interface.has_team_member('member_username',
+                                            'brussels-sprouts')
+        self.mock_team.has_in_members.assert_called_once_with(self.test_user)
