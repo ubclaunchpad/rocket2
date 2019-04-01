@@ -216,16 +216,7 @@ class WebhookHandler:
 
     def handle_membership_event(self,
                                 payload: Dict[str, Any]) -> ResponseTuple:
-        """
-        Handle when a user is added, removed, or invited to team.
-
-        If the member is removed, they are removed as a user from rocket's db
-        if they have not been removed already.
-
-        If the member is added, they are added to rocket's db
-
-        If invited, do nothing.
-        """
+        """Handle the event where a user is added or removed from a team."""
         action = payload["action"]
         github_user = payload["member"]
         github_username = github_user["login"]
