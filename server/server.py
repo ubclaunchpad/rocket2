@@ -4,11 +4,9 @@ from flask import Flask, request
 from logging.config import dictConfig
 from slackeventsapi import SlackEventAdapter
 import logging
-import sys
 import toml
 import structlog
 from flask_talisman import Talisman
-from interface.slack import SlackAPIError
 from config import Credentials
 from typing import cast, Dict, Any
 

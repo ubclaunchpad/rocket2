@@ -8,7 +8,7 @@ from interface.github import GithubAPIException, GithubInterface
 from model import Team, User
 from flask import jsonify
 from command.util import check_permissions
-from typing import Any, Dict, Optional
+from typing import Any
 
 
 class TeamCommand:

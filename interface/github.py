@@ -4,8 +4,7 @@ from interface.exceptions.github import GithubAPIException
 from interface.github_app import GithubAppInterface, \
     DefaultGithubAppAuthFactory
 from github.Team import Team
-from github.NamedUser import NamedUser
-from typing import List, cast, Optional, Iterable
+from typing import cast
 
 
 def handle_github_error(func):

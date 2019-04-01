@@ -1,5 +1,5 @@
 """Represent a team project."""
-from typing import List, Mapping, Dict, Any
+from typing import List, Dict, Any
 import uuid
 
 
