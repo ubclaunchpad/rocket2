@@ -1,7 +1,8 @@
 """Test the facade for the database."""
 from db import DBFacade
 from unittest import mock
-from tests.util import *
+from model import Team, User, Project
+from tests.util import create_test_admin, create_test_team, create_test_project
 
 
 @mock.patch('db.dynamodb.DynamoDB', autospec=True)

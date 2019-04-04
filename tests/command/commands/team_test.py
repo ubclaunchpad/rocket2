@@ -311,7 +311,6 @@ class TestTeamCommand(TestCase):
         """Test team command remove parser with lookup error."""
         test_user = User("userid")
         test_user.permissions_level = Permissions.admin
-        team = Team("BRS", "brs", "web")
         self.db.retrieve.side_effect = LookupError
         with self.app.app_context():
             self.assertTupleEqual(self.testcommand.handle("team remove"
@@ -391,8 +390,6 @@ class TestTeamCommand(TestCase):
 
     def test_handle_lead_lookup_error(self):
         """Test team command laed parser with lookup error."""
-        test_user = User("userid")
-        team = Team("BRS", "brs", "web")
         self.db.retrieve.side_effect = LookupError
         with self.app.app_context():
             self.assertTupleEqual(self.testcommand.handle("team lead"
@@ -463,8 +460,6 @@ class TestTeamCommand(TestCase):
 
     def test_handle_edit_lookup_error(self):
         """Test team command edit parser with lookup error."""
-        test_user = User("userid")
-        team = Team("BRS", "brs", "brS")
         self.db.retrieve.side_effect = LookupError
         with self.app.app_context():
             self.assertTupleEqual(self.testcommand.handle("team "

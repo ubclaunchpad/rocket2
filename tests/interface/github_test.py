@@ -115,9 +115,9 @@ class TestGithubInterface(TestCase):
         self.mock_github. \
             get_organization.side_effect = GithubException("status", "data")
         try:
-            test_bot = GithubInterface(self.mock_factory, "ubclaunchpad")
+            GithubInterface(self.mock_factory, "ubclaunchpad")
             assert False
-        except GithubAPIException as e:
+        except GithubAPIException:
             pass
 
     def test_org_add_member_exception(self):
@@ -129,7 +129,7 @@ class TestGithubInterface(TestCase):
             self.mock_github.get_user.return_value = mock_user
             self.test_interface.org_add_member("user@email.com")
             assert False
-        except GithubAPIException as e:
+        except GithubAPIException:
             pass
 
     def test_org_add_admin_exception(self):
@@ -141,7 +141,7 @@ class TestGithubInterface(TestCase):
             self.mock_github.get_user.return_value = mock_user
             self.test_interface.org_add_admin("user@email.com")
             assert False
-        except GithubAPIException as e:
+        except GithubAPIException:
             pass
 
     def test_org_remove_member_exception(self):
@@ -153,7 +153,7 @@ class TestGithubInterface(TestCase):
             self.mock_github.get_user.return_value = mock_user
             self.test_interface.org_remove_member("user@email.com")
             assert False
-        except GithubAPIException as e:
+        except GithubAPIException:
             pass
 
     def test_org_has_member_exception(self):
@@ -165,7 +165,7 @@ class TestGithubInterface(TestCase):
             self.mock_github.get_user.return_value = mock_user
             self.test_interface.org_has_member("user@email.com")
             assert False
-        except GithubAPIException as e:
+        except GithubAPIException:
             pass
 
     def test_org_get_team_exception(self):
@@ -174,7 +174,7 @@ class TestGithubInterface(TestCase):
         try:
             self.test_interface.org_get_team(2321313)
             assert False
-        except GithubAPIException as e:
+        except GithubAPIException:
             pass
 
     def test_org_create_team_exception(self):
@@ -184,7 +184,7 @@ class TestGithubInterface(TestCase):
         try:
             self.test_interface.org_create_team("brussel sprouts")
             assert False
-        except GithubAPIException as e:
+        except GithubAPIException:
             pass
 
     def test_org_delete_team_exception(self):
@@ -196,7 +196,7 @@ class TestGithubInterface(TestCase):
                 side_effect = GithubException("status", "data")
             self.test_interface.org_delete_team(234111)
             assert False
-        except GithubAPIException as e:
+        except GithubAPIException:
             pass
 
     def test_org_edit_team_exception(self):
@@ -207,7 +207,7 @@ class TestGithubInterface(TestCase):
             self.mock_org.get_team.return_value = mock_team
             self.test_interface.org_edit_team(234111, "brussels", "web team")
             assert False
-        except GithubAPIException as e:
+        except GithubAPIException:
             pass
 
     def test_org_get_teams_exception(self):
@@ -216,7 +216,7 @@ class TestGithubInterface(TestCase):
         try:
             self.test_interface.org_get_teams()
             assert False
-        except GithubAPIException as e:
+        except GithubAPIException:
             pass
 
     # -------------------------------------------------------------

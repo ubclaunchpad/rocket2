@@ -1,8 +1,8 @@
 """Test the dynamodb interface (requires dynamodb running)."""
 import pytest
 
-from model import User, Project, Team
-from tests.util import *
+from model import User, Project, Team, Permissions
+from tests.util import create_test_team, create_test_admin, create_test_project
 
 
 @pytest.fixture
@@ -98,7 +98,7 @@ def test_store_retrieve_project(ddb):
 def test_retrieve_invalid_user(ddb):
     """Test to see if we can retrieve a non-existant user."""
     try:
-        user = ddb.retrieve(User, 'abc_123')
+        ddb.retrieve(User, 'abc_123')
         assert False
     except LookupError as e:
         assert str(e) == 'User(id=abc_123) not found'
@@ -108,7 +108,7 @@ def test_retrieve_invalid_user(ddb):
 def test_retrieve_invalid_project(ddb):
     """Test to see if we can retrieve a non-existant user."""
     try:
-        project = ddb.retrieve(Project, 'abc_123')
+        ddb.retrieve(Project, 'abc_123')
 
         assert False
     except LookupError as e:
@@ -154,8 +154,7 @@ def test_retrieve_invalid_team(ddb):
     """Test to see if we can retrieve a non-existent team."""
     ddb = ddb
     try:
-        team = ddb.retrieve(Team, '1')
-
+        ddb.retrieve(Team, '1')
         assert False
     except LookupError as e:
         assert str(e) == 'Team(id=1) not found'

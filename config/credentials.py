@@ -1,5 +1,4 @@
 """Contain the dictionaries of credentials for all needed services."""
-from os import listdir
 from os.path import isfile, join, normpath
 import toml
 
@@ -94,4 +93,4 @@ class MissingCredentialsError(Exception):
         : param missing_cred_files: List of missing files of credentials.
         """
         self.error = f'Missing files: {str(missing_cred_files)}\n' \
-            f'Missing fields: {str(missing_cred_fields)}'
+                     f'Missing fields: {str(missing_cred_fields)}'
