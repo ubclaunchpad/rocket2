@@ -6,9 +6,8 @@ from command import ResponseTuple
 from db.facade import DBFacade
 from interface.github import GithubAPIException, GithubInterface
 from model import Team, User
-from flask import jsonify
 from command.util import check_permissions
-from typing import Any, Dict, Optional
+from typing import Any
 from flask import jsonify
 
 

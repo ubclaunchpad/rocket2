@@ -470,7 +470,6 @@ class TestTeamCommand(TestCase):
     def test_handle_refresh_not_admin(self):
         """Test team command refresh parser with insufficient permission."""
         test_user = User(user)
-        team = Team("BRS", "brs", "brS")
         self.db.retrieve.return_value = test_user
         with self.app.app_context():
             self.assertTupleEqual(self.testcommand.handle("team refresh",
@@ -495,7 +494,6 @@ class TestTeamCommand(TestCase):
     def test_handle_refresh_github_error(self):
         """Test team command refresh parser with github error."""
         test_user = User(user)
-        team = Team("BRS", "brs", "brS")
         test_user.permissions_level = Permissions.admin
         self.db.retrieve.return_value = test_user
         self.gh.org_get_teams.side_effect = GithubAPIException("error")
