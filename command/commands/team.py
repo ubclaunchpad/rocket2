@@ -6,8 +6,9 @@ from command import ResponseTuple
 from db.facade import DBFacade
 from interface.github import GithubAPIException, GithubInterface
 from model import Team, User
+from github import Team as GithubTeam
 from command.util import check_permissions
-from typing import Any
+from typing import Any, List
 from flask import jsonify
 
 
@@ -503,11 +504,12 @@ class TeamCommand:
             command_user = self.facade.retrieve(User, user_id)
             if not check_permissions(command_user, None):
                 return self.permission_error, 200
-            local_teams = self.facade.query(Team)
-            remote_teams = self.gh.org_get_teams()
+            local_teams: List[Team] = self.facade.query(Team)
+            remote_teams: List[GithubTeam.Team] = self.gh.org_get_teams()
             local_ids = dict((team.github_team_id, team)
                              for team in local_teams)
-            remote_ids = dict((team.github_team_id, team)
+            remote_ids = dict((str(team.id),
+                               Team(str(team.id), team.name, ""))
                               for team in remote_teams)
 
             # remove teams not in github anymore
@@ -517,7 +519,7 @@ class TeamCommand:
                     num_deleted += 1
                     modified.append(local_ids[local_id].get_attachment())
 
-            # add teams to db that are in github but not in local database,
+            # add teams to db that are in github but not in local database
             for remote_id in remote_ids:
                 if remote_id not in local_ids:
                     self.facade.store(remote_ids[remote_id])
@@ -525,10 +527,17 @@ class TeamCommand:
                     modified.append(remote_ids[remote_id].get_attachment())
                 else:
                     # and finally, if a local team differs, update it
-                    if local_ids[remote_id] != remote_ids[remote_id]:
-                        self.facade.store(remote_ids[remote_id])
+                    old_team = local_ids[remote_id]
+                    new_team = remote_ids[remote_id]
+                    if old_team.github_team_name != new_team.github_team_name\
+                            or old_team.members != new_team.members:
+
+                        # update the old team, to retain additional parameters
+                        old_team.github_team_name = new_team.github_team_name
+                        old_team.members = new_team.members
+                        self.facade.store(old_team)
                         num_changed += 1
-                        modified.append(remote_ids[remote_id].get_attachment())
+                        modified.append(old_team.get_attachment())
         except GithubAPIException as e:
             logging.error("team refresh unsuccessful due to github error")
             return "Refresh teams was unsuccessful with " \

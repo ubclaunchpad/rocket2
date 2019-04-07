@@ -2,6 +2,7 @@
 from command.commands.team import TeamCommand
 from unittest import TestCase, mock
 from model.team import Team
+from github import Team as GithubTeam
 from model.user import User
 from model.permissions import Permissions
 from interface.exceptions.github import GithubAPIException
@@ -508,14 +509,23 @@ class TestTeamCommand(TestCase):
         """Test team command refresh parser if team edited in github."""
         test_user = User(user)
         test_user.permissions_level = Permissions.admin
-        team = Team("TeamID", "TeamName", "DisplayName")
-        team_update = Team("TeamID", "other team", "android")
-        team2 = Team("OTEAM", "other team", "android")
+        team = Team("TeamID", "TeamName", "android")
+        team_update = Team("TeamID", "new team name", "android")
+        team2 = Team("OTEAM", "other team2", "ios")
+
         self.db.retrieve.return_value = test_user
         self.db.query.return_value = [team, team2]
 
         # In this case, github has an updated version of team!
-        self.gh.org_get_teams.return_value = [team_update, team2]
+        remote_team_update = mock.Mock(GithubTeam.Team)
+        remote_team_update.id = team_update.github_team_id
+        remote_team_update.name = team_update.github_team_name
+
+        # This test will grow based on how many things we add to the team model
+        remote_team2 = mock.Mock(GithubTeam.Team)
+        remote_team2.id = team2.github_team_id
+        remote_team2.name = team2.github_team_name
+        self.gh.org_get_teams.return_value = [remote_team_update, remote_team2]
         attach = team_update.get_attachment()
 
         status = f"1 teams changed, " \
@@ -534,13 +544,17 @@ class TestTeamCommand(TestCase):
         """Test team command refresh parser if local differs from github."""
         test_user = User(user)
         test_user.permissions_level = Permissions.admin
-        team = Team("TeamID", "TeamName", "DisplayName")
+        team = Team("TeamID", "TeamName", "")
         team2 = Team("OTEAM", "other team", "android")
+
         self.db.retrieve.return_value = test_user
         self.db.query.return_value = [team2]
 
         # In this case, github does not have team2!
-        self.gh.org_get_teams.return_value = [team]
+        remote_team = mock.Mock(GithubTeam.Team)
+        remote_team.id = "TeamID"
+        remote_team.name = "TeamName"
+        self.gh.org_get_teams.return_value = [remote_team]
         attach = team.get_attachment()
         attach2 = team2.get_attachment()
 
