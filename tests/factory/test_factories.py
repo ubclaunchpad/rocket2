@@ -1,7 +1,7 @@
 """Tests for factories."""
 import pytest
 
-from factory import *
+from factory import make_core, Core
 from interface.github import GithubInterface
 from unittest import mock
 

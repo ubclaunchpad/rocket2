@@ -1,5 +1,5 @@
 """Represent a data model for a team."""
-from typing import Mapping, Set, Dict, Any
+from typing import Set, Dict, Any
 
 
 class Team:

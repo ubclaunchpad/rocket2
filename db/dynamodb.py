@@ -1,12 +1,11 @@
 """DynamoDB."""
 import boto3
 import logging
-import toml
 
 from boto3.dynamodb.conditions import Attr
 from functools import reduce
-from model import User, Team, Project, Permissions
-from typing import Dict, Optional, Any, Tuple, List, Type, Sequence, TypeVar
+from model import User, Team, Project
+from typing import Dict, Optional, Any, Tuple, List, Type, TypeVar
 
 T = TypeVar('T', User, Team, Project)
 
@@ -256,7 +255,6 @@ class DynamoDB:
         :return: a list of models ``Model``
         """
         table_name = self.CONST.get_table_name(Model)
-        table = self.ddb.Table(table_name)
         resp = self.ddb.batch_get_item(
             RequestItems={
                 table_name: {

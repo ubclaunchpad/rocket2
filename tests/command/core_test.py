@@ -25,8 +25,7 @@ def test_handle_invalid_mention(mock_logging):
 
 
 @mock.patch('command.core.UserCommand')
-@mock.patch('command.core.logging')
-def test_handle_invalid_command(mock_logging, mock_usercommand):
+def test_handle_invalid_command(mock_usercommand):
     """Test that invalid commands are being handled appropriately."""
     mock_facade = mock.MagicMock(DBFacade)
     mock_bot = mock.MagicMock(Bot)
@@ -36,11 +35,9 @@ def test_handle_invalid_command(mock_logging, mock_usercommand):
     user = 'U061F7AUR'
     core = Core(mock_facade, mock_bot, mock_gh, mock_token_config)
     core.handle_app_command('fake command', user)
-    error_txt = "Please enter a valid command."
 
 
-@mock.patch('command.core.logging')
-def test_handle_help(mock_logging):
+def test_handle_help():
     """Test that a '/rocket help' brings up help."""
     app = Flask(__name__)
     mock_usercommand = mock.MagicMock(UserCommand)
@@ -74,8 +71,7 @@ def test_handle_help(mock_logging):
 
 
 @mock.patch('command.core.UserCommand')
-@mock.patch('command.core.logging')
-def test_handle_user_command(mock_logging, mock_usercommand):
+def test_handle_user_command(mock_usercommand):
     """Test that UserCommand.handle is called appropriately."""
     mock_facade = mock.MagicMock(DBFacade)
     mock_bot = mock.MagicMock(Bot)
