@@ -511,21 +511,12 @@ class TestTeamCommand(TestCase):
         test_user.permissions_level = Permissions.admin
         team = Team("TeamID", "TeamName", "android")
         team_update = Team("TeamID", "new team name", "android")
+        team_update.add_member(test_user.github_id)
         team2 = Team("OTEAM", "other team2", "ios")
 
         self.db.retrieve.return_value = test_user
         self.db.query.return_value = [team, team2]
-
-        # In this case, github has an updated version of team!
-        remote_team_update = mock.Mock(GithubTeam.Team)
-        remote_team_update.id = team_update.github_team_id
-        remote_team_update.name = team_update.github_team_name
-
-        # This test will grow based on how many things we add to the team model
-        remote_team2 = mock.Mock(GithubTeam.Team)
-        remote_team2.id = team2.github_team_id
-        remote_team2.name = team2.github_team_name
-        self.gh.org_get_teams.return_value = [remote_team_update, remote_team2]
+        self.gh.org_get_teams.return_value = [team_update, team2]
         attach = team_update.get_attachment()
 
         status = f"1 teams changed, " \
@@ -551,10 +542,7 @@ class TestTeamCommand(TestCase):
         self.db.query.return_value = [team2]
 
         # In this case, github does not have team2!
-        remote_team = mock.Mock(GithubTeam.Team)
-        remote_team.id = "TeamID"
-        remote_team.name = "TeamName"
-        self.gh.org_get_teams.return_value = [remote_team]
+        self.gh.org_get_teams.return_value = [team]
         attach = team.get_attachment()
         attach2 = team2.get_attachment()
 

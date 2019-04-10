@@ -6,7 +6,6 @@ from command import ResponseTuple
 from db.facade import DBFacade
 from interface.github import GithubAPIException, GithubInterface
 from model import Team, User
-from github import Team as GithubTeam
 from command.util import check_permissions
 from typing import Any, List
 from flask import jsonify
@@ -505,11 +504,10 @@ class TeamCommand:
             if not check_permissions(command_user, None):
                 return self.permission_error, 200
             local_teams: List[Team] = self.facade.query(Team)
-            remote_teams: List[GithubTeam.Team] = self.gh.org_get_teams()
+            remote_teams: List[Team] = self.gh.org_get_teams()
             local_ids = dict((team.github_team_id, team)
                              for team in local_teams)
-            remote_ids = dict((str(team.id),
-                               Team(str(team.id), team.name, ""))
+            remote_ids = dict((team.github_team_id, team)
                               for team in remote_teams)
 
             # remove teams not in github anymore
