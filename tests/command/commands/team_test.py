@@ -2,7 +2,6 @@
 from command.commands.team import TeamCommand
 from unittest import TestCase, mock
 from model.team import Team
-from github import Team as GithubTeam
 from model.user import User
 from model.permissions import Permissions
 from interface.exceptions.github import GithubAPIException
