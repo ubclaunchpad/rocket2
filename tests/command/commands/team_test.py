@@ -466,3 +466,93 @@ class TestTeamCommand(TestCase):
                                                           "edit brs", user),
                                   (self.testcommand.lookup_error, 200))
         self.db.store.assert_not_called()
+
+    def test_handle_refresh_not_admin(self):
+        """Test team command refresh parser with insufficient permission."""
+        test_user = User(user)
+        self.db.retrieve.return_value = test_user
+        with self.app.app_context():
+            self.assertTupleEqual(self.testcommand.handle("team refresh",
+                                                          user),
+                                  (self.testcommand.permission_error, 200))
+        self.db.store.assert_not_called()
+
+    def test_handle_refresh_lookup_error(self):
+        """Test team command refresh parser with lookup error."""
+        test_user = User(user)
+        team = Team("BRS", "brs", "brS")
+        test_user.permissions_level = Permissions.admin
+        self.db.retrieve.return_value = None
+        self.db.retrieve.side_effect = LookupError
+        self.gh.org_get_teams.return_value = [team]
+        with self.app.app_context():
+            self.assertTupleEqual(self.testcommand.handle("team refresh",
+                                                          user),
+                                  (self.testcommand.lookup_error, 200))
+        self.db.store.assert_not_called()
+
+    def test_handle_refresh_github_error(self):
+        """Test team command refresh parser with github error."""
+        test_user = User(user)
+        test_user.permissions_level = Permissions.admin
+        self.db.retrieve.return_value = test_user
+        self.gh.org_get_teams.side_effect = GithubAPIException("error")
+        with self.app.app_context():
+            self.assertTupleEqual(self.testcommand.handle("team refresh",
+                                                          user),
+                                  ("Refresh teams was unsuccessful with "
+                                   "the following error: error", 200))
+        self.db.store.assert_not_called()
+
+    def test_handle_refresh_changed(self):
+        """Test team command refresh parser if team edited in github."""
+        test_user = User(user)
+        test_user.permissions_level = Permissions.admin
+        team = Team("TeamID", "TeamName", "android")
+        team_update = Team("TeamID", "new team name", "android")
+        team_update.add_member(test_user.github_id)
+        team2 = Team("OTEAM", "other team2", "ios")
+
+        self.db.retrieve.return_value = test_user
+        self.db.query.return_value = [team, team2]
+        self.gh.org_get_teams.return_value = [team_update, team2]
+        attach = team_update.get_attachment()
+
+        status = f"1 teams changed, " \
+            f"0 added, " \
+            f"0 deleted. Wonderful."
+        with self.app.app_context():
+            resp, code = self.testcommand.handle("team refresh", user)
+            expect = json.loads(jsonify({'attachments': [attach],
+                                         'text': status}).data)
+            resp = json.loads(resp.data)
+            self.assertDictEqual(resp, expect)
+            self.assertEqual(code, 200)
+        self.db.query.assert_called_once_with(Team)
+
+    def test_handle_refresh_addition_and_deletion(self):
+        """Test team command refresh parser if local differs from github."""
+        test_user = User(user)
+        test_user.permissions_level = Permissions.admin
+        team = Team("TeamID", "TeamName", "")
+        team2 = Team("OTEAM", "other team", "android")
+
+        self.db.retrieve.return_value = test_user
+        self.db.query.return_value = [team2]
+
+        # In this case, github does not have team2!
+        self.gh.org_get_teams.return_value = [team]
+        attach = team.get_attachment()
+        attach2 = team2.get_attachment()
+
+        status = f"0 teams changed, " \
+            f"1 added, " \
+            f"1 deleted. Wonderful."
+        with self.app.app_context():
+            resp, code = self.testcommand.handle("team refresh", user)
+            expect = json.loads(jsonify({'attachments': [attach2, attach],
+                                         'text': status}).data)
+            resp = json.loads(resp.data)
+            self.assertDictEqual(resp, expect)
+            self.assertEqual(code, 200)
+        self.db.query.assert_called_once_with(Team)

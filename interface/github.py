@@ -4,6 +4,7 @@ from interface.exceptions.github import GithubAPIException
 from interface.github_app import GithubAppInterface, \
     DefaultGithubAppAuthFactory
 from github.Team import Team
+from model.team import Team as ModelTeam
 from typing import cast
 
 
@@ -111,7 +112,11 @@ class GithubInterface:
         team_array = []
         for team in teams:
             # convert PaginatedList to List
-            team_array.append(team)
+            team_model = ModelTeam(str(team.id), team.name, "")
+            team_model.members = set(str(user.id)
+                                     for user in
+                                     self.list_team_members(team.id))
+            team_array.append(team_model)
         return team_array
 
     # ---------------------------------------------------------------

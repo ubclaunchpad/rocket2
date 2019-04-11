@@ -6,9 +6,9 @@ from command import ResponseTuple
 from db.facade import DBFacade
 from interface.github import GithubAPIException, GithubInterface
 from model import Team, User
-from flask import jsonify
 from command.util import check_permissions
-from typing import Any
+from typing import Any, List
+from flask import jsonify
 
 
 class TeamCommand:
@@ -18,7 +18,7 @@ class TeamCommand:
     desc = "for dealing with " + command_name + "s"
     permission_error = "You do not have the sufficient " \
                        "permission level for this command!"
-    lookup_error = "Lookup error: User not found!"
+    lookup_error = "Lookup error: Object not found!"
 
     def __init__(self,
                  db_facade: DBFacade,
@@ -136,6 +136,12 @@ class TeamCommand:
                                  help="User to be added/removed as lead.")
         parser_lead.add_argument("--remove", action='store_true',
                                  help="Remove the user as team lead.")
+
+        """Parser for refresh command."""
+        parser_refresh = subparsers.add_parser("refresh")
+        parser_refresh.set_defaults(which='refresh',
+                                    help="(Admin only)"
+                                         "Refresh local team database.")
         return subparsers
 
     def get_name(self) -> str:
@@ -216,6 +222,9 @@ class TeamCommand:
                 "remove": args.remove
             }
             return self.lead_helper(param_list, user_id)
+
+        elif args.which == "refresh":
+            return self.refresh_helper(user_id)
 
         else:
             return self.get_help(), 200
@@ -476,3 +485,67 @@ class TeamCommand:
             logging.error("team delete unsuccessful")
             return f"Team delete was unsuccessful with " \
                    f"the following error: {e.data}", 200
+
+    def refresh_helper(self, user_id) -> ResponseTuple:
+        """
+        Ensure that the local team database is the same as GitHub's.
+
+        In the event that our local team database is outdated compared to
+        the teams on GitHub, this command can be called to fix things.
+        :return: return error message if user has insufficient permission level
+                 otherwise returns success messages with # of teams changed
+        """
+        num_changed = 0
+        num_added = 0
+        num_deleted = 0
+        modified = []
+        try:
+            command_user = self.facade.retrieve(User, user_id)
+            if not check_permissions(command_user, None):
+                return self.permission_error, 200
+            local_teams: List[Team] = self.facade.query(Team)
+            remote_teams: List[Team] = self.gh.org_get_teams()
+            local_team_dict = dict((team.github_team_id, team)
+                                   for team in local_teams)
+            remote_team_dict = dict((team.github_team_id, team)
+                                    for team in remote_teams)
+
+            # remove teams not in github anymore
+            for local_id in local_team_dict:
+                if local_id not in remote_team_dict:
+                    self.gh.org_delete_team(local_id)
+                    num_deleted += 1
+                    modified.append(local_team_dict[local_id].get_attachment())
+
+            # add teams to db that are in github but not in local database
+            for remote_id in remote_team_dict:
+                if remote_id not in local_team_dict:
+                    self.facade.store(remote_team_dict[remote_id])
+                    num_added += 1
+                    modified.append(remote_team_dict[remote_id]
+                                    .get_attachment())
+                else:
+                    # and finally, if a local team differs, update it
+                    old_team = local_team_dict[remote_id]
+                    new_team = remote_team_dict[remote_id]
+                    if old_team.github_team_name != new_team.github_team_name\
+                            or old_team.members != new_team.members:
+
+                        # update the old team, to retain additional parameters
+                        old_team.github_team_name = new_team.github_team_name
+                        old_team.members = new_team.members
+                        self.facade.store(old_team)
+                        num_changed += 1
+                        modified.append(old_team.get_attachment())
+        except GithubAPIException as e:
+            logging.error("team refresh unsuccessful due to github error")
+            return "Refresh teams was unsuccessful with " \
+                   f"the following error: {e.data}", 200
+        except LookupError:
+            logging.error("team refresh unsuccessful due to lookup error")
+            return self.lookup_error, 200
+        status = f"{num_changed} teams changed, " \
+            f"{num_added} added, " \
+            f"{num_deleted} deleted. Wonderful."
+        ret = {'attachments': modified, 'text': status}
+        return jsonify(ret), 200
