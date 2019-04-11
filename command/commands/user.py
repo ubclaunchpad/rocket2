@@ -155,8 +155,8 @@ class UserCommand:
         """
         Edit user from database.
 
-        If ``param_list['member']`` is not ``None``, this function edits using
-        the ID from ``param_list['member']`` (must be an admin to do so).
+        If ``param_list['member'] is not None``, this function edits using the
+        ID from ``param_list['member']`` (must be an admin to do so).
         Otherwise, edits the user that called the function.
 
         :param user_id: Slack ID of user who is calling the command
@@ -169,19 +169,18 @@ class UserCommand:
         msg = ""
         if param_list["member"] is not None:
             try:
-                admin_user = cast(User, self.facade.retrieve(User, user_id))
+                admin_user = self.facade.retrieve(User, user_id)
                 if admin_user.permissions_level != Permissions.admin:
                     return self.permission_error, 200
                 else:
                     is_admin = True
                     edited_id = param_list["member"]
-                    edited_user = cast(User, self.facade.retrieve(User,
-                                                                  edited_id))
+                    edited_user = self.facade.retrieve(User, edited_id)
             except LookupError:
                 return self.lookup_error, 200
         else:
             try:
-                edited_user = cast(User, self.facade.retrieve(User, user_id))
+                edited_user = self.facade.retrieve(User, user_id)
             except LookupError:
                 return self.lookup_error, 200
 
@@ -237,7 +236,7 @@ class UserCommand:
                  deletion message if user is deleted.
         """
         try:
-            user_command = cast(User, self.facade.retrieve(User, user_id))
+            user_command = self.facade.retrieve(User, user_id)
             if user_command.permissions_level == Permissions.admin:
                 self.facade.delete(User, slack_id)
                 return self.delete_text + slack_id, 200
@@ -262,9 +261,9 @@ class UserCommand:
         """
         try:
             if slack_id is None:
-                user = cast(User, self.facade.retrieve(User, user_id))
+                user = self.facade.retrieve(User, user_id)
             else:
-                user = cast(User, self.facade.retrieve(User, slack_id))
+                user = self.facade.retrieve(User, slack_id)
 
             return jsonify({'attachments': [user.get_attachment()]}), 200
         except LookupError:
@@ -279,7 +278,7 @@ class UserCommand:
         :param user_id: Slack ID of user to be added
         :param use_force: If this is set, we store the user even if they are
                           already added in the database
-        :return: ``"User added!", 200``
+        :return: ``"User added!", 200`` or error message if user exists in db
         """
         # Try to look up and avoid overwriting if we are not using force
         if not use_force:

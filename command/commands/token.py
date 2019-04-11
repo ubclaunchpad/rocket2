@@ -6,7 +6,6 @@ from command import ResponseTuple
 from datetime import datetime, timedelta
 from db.facade import DBFacade
 from model import User, Permissions
-from typing import cast
 from utils.slack_msg_fmt import wrap_code_block
 
 
@@ -41,7 +40,7 @@ class TokenCommand:
         """Handle request for token."""
         logging.debug("Handling token command")
         try:
-            user = cast(User, self.facade.retrieve(User, user_id))
+            user = self.facade.retrieve(User, user_id)
             if user.permissions_level == Permissions.member:
                 return self.permission_error, 403
         except LookupError:

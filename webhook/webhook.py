@@ -4,7 +4,7 @@ import hmac
 import hashlib
 from db.facade import DBFacade
 from model import User, Team
-from typing import Dict, Any, cast, List
+from typing import Dict, Any, List
 from command import ResponseTuple
 from config import Credentials
 
@@ -187,7 +187,7 @@ class WebhookHandler:
         elif action == "edited":
             logging.debug(f"team edited event triggered: {str(payload)}")
             try:
-                team = cast(Team, self.__facade.retrieve(Team, github_id))
+                team = self.__facade.retrieve(Team, github_id)
                 team.github_team_name = github_team_name
                 logging.info(f"changed team's name with id {github_id} from "
                              f"{github_team_name} to {team.github_team_name}")
