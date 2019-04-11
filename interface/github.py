@@ -112,8 +112,10 @@ class GithubInterface:
         team_array = []
         for team in teams:
             # convert PaginatedList to List
-            team_model = ModelTeam(team.id, team.name, "")
-            team_model.members = set(self.list_team_members(team.id))
+            team_model = ModelTeam(str(team.id), team.name, "")
+            team_model.members = set(str(user.id)
+                                     for user in
+                                     self.list_team_members(team.id))
             team_array.append(team_model)
         return team_array
 

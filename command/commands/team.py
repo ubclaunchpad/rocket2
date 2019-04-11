@@ -505,28 +505,29 @@ class TeamCommand:
                 return self.permission_error, 200
             local_teams: List[Team] = self.facade.query(Team)
             remote_teams: List[Team] = self.gh.org_get_teams()
-            local_ids = dict((team.github_team_id, team)
-                             for team in local_teams)
-            remote_ids = dict((team.github_team_id, team)
-                              for team in remote_teams)
+            local_team_dict = dict((team.github_team_id, team)
+                                   for team in local_teams)
+            remote_team_dict = dict((team.github_team_id, team)
+                                    for team in remote_teams)
 
             # remove teams not in github anymore
-            for local_id in local_ids:
-                if local_id not in remote_ids:
+            for local_id in local_team_dict:
+                if local_id not in remote_team_dict:
                     self.gh.org_delete_team(local_id)
                     num_deleted += 1
-                    modified.append(local_ids[local_id].get_attachment())
+                    modified.append(local_team_dict[local_id].get_attachment())
 
             # add teams to db that are in github but not in local database
-            for remote_id in remote_ids:
-                if remote_id not in local_ids:
-                    self.facade.store(remote_ids[remote_id])
+            for remote_id in remote_team_dict:
+                if remote_id not in local_team_dict:
+                    self.facade.store(remote_team_dict[remote_id])
                     num_added += 1
-                    modified.append(remote_ids[remote_id].get_attachment())
+                    modified.append(remote_team_dict[remote_id]
+                                    .get_attachment())
                 else:
                     # and finally, if a local team differs, update it
-                    old_team = local_ids[remote_id]
-                    new_team = remote_ids[remote_id]
+                    old_team = local_team_dict[remote_id]
+                    new_team = remote_team_dict[remote_id]
                     if old_team.github_team_name != new_team.github_team_name\
                             or old_team.members != new_team.members:
 
