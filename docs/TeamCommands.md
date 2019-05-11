@@ -48,6 +48,8 @@ who runs the command will be automatically added to team as Team Lead. If the
 instead. If the `--channel` flag is used, all members in specified
 channel will be added. 'SLACK_ID' is the `@`-name, for easy slack autocomplete.
 
+We use Github API to create the team on Github.
+
 The Github team name cannot contain spaces.
 
 ```sh
@@ -73,6 +75,8 @@ Add a user to the team. Team Leads can only add users into teams that they are a
 part of, but admins can add users to any team. `SLACK_ID` is the `@`-name, for
 easy slack autocomplete.
 
+Users will be added to the teams on Github as well.
+
 ```sh
 /rocket team add struddle-bouts @s_universe
 ```
@@ -83,10 +87,12 @@ easy slack autocomplete.
 /rocket team remove GITHUB_TEAM_NAME SLACK_ID
 ```
 
-Remove a user from a team, removes them as Team Lead if they were one.
-Team Leads can only remove users from teams that they
-are a part of, but admins can remove users from any team. `SLACK_ID` is the
-`@`-name, for easy slack autocomplete.
+Remove a user from a team, removes them as Team Lead if they were one.  Team
+Leads can only remove users from teams that they are a part of, but admins can
+remove users from any team. `SLACK_ID` is the `@`-name, for easy slack
+autocomplete.
+
+Users will be removed from the teams on Github as well.
 
 ### Lead (Team Lead\* and Admin only)
 
