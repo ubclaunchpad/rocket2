@@ -32,7 +32,7 @@ class TestTokenCommand(TestCase):
         self.mock_facade.retrieve.side_effect = LookupError
         ret_val, ret_code = self.testcommand.handle("", "nonexistent")
         assert ret_val == "Requesting user not found!"
-        assert ret_code == 404
+        assert ret_code == 200
 
     def test_handle_member(self):
         """Test handle() when given a user with member permissions."""
@@ -42,7 +42,7 @@ class TestTokenCommand(TestCase):
         ret_val, ret_code = self.testcommand.handle("", user.slack_id)
         assert ret_val == "You do not have the sufficient " \
                           "permission level for this command!"
-        assert ret_code == 403
+        assert ret_code == 200
 
     def test_handle_team_lead(self):
         """Test handle() when given a user with team lead permissions."""
