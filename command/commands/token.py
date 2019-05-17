@@ -43,9 +43,9 @@ class TokenCommand:
         try:
             user = cast(User, self.facade.retrieve(User, user_id))
             if user.permissions_level == Permissions.member:
-                return self.permission_error, 403
+                return self.permission_error, 200
         except LookupError:
-            return self.lookup_error, 404
+            return self.lookup_error, 200
         expiry = datetime.utcnow() + self.expiry
         payload = {
             'nbf': datetime.utcnow(),
