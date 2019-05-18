@@ -32,6 +32,9 @@ Allows user to edit their Launch Pad profile. Admins and team leads can edit
 another user's Launch Pad profile by using `[--member SLACKID]` option.
 `SLACK_ID` is the `@`-name, for easy slack autocomplete.
 
+If a user edits their Github handle, rocket will also add the handle to Launch
+Pad's Github organization.
+
 ```sh
 # Normal use
 /rocket user edit --name "Steven Universe" --email "su@gmail.com"
