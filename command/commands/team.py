@@ -233,7 +233,7 @@ class TeamCommand:
         """
         Return display information of all teams.
 
-        :return: return error message if lookup error,
+        :return: error message if lookup error,
                  otherwise return teams' information
         """
         try:
@@ -248,8 +248,8 @@ class TeamCommand:
         Return display information and members of specified team.
 
         :param team_name: name of team being viewed
-        :return: return error message if team not found,
-                otherwise return team information
+        :return: error message if team not found,
+                 otherwise return team information
         """
         try:
             team = self.facade.retrieve(Team, team_name)
@@ -259,16 +259,16 @@ class TeamCommand:
 
     def create_helper(self, param_list, user_id) -> ResponseTuple:
         """
-        Create Team and calls GitHub API to create in GitHub.
+        Create team and calls GitHub API to create the team in GitHub.
 
-        If ``param_list[name]`` is not ``None``, will
-        add a display name. If ``param_list[channel] is not
-        ``None``, will add all members of channel in which the
-        command was called into the team.
+        If ``param_list[name] is not None``, will add a display name. If
+        ``param_list[channel] is not None``, will add all members of channel in
+        which the command was called into the team.
+
         :param param_list: List of parameters for creating team
         :param user_id: Slack ID of user who called command
-        :return: return error message if team created unsuccessfully
-                 otherwise returns success message
+        :return: error message if team created unsuccessfully otherwise returns
+                 success message
         """
         try:
             command_user = self.facade.retrieve(User, user_id)
@@ -314,10 +314,11 @@ class TeamCommand:
 
     def add_helper(self, param_list, user_id) -> ResponseTuple:
         """
-        Add User to Team.
+        Add user to team.
 
-        If User with user_id is not admin or team lead of specified Team,
-        User will not be added and return error message.
+        If user is not admin or team lead of specified team, the user will not
+        be added and an error message is returned.
+
         :param param_list: List of parameters for adding user
         :param user_id: Slack ID of user who called command
         :return: return error message if user added unsuccessfully
@@ -347,17 +348,17 @@ class TeamCommand:
 
     def remove_helper(self, param_list, user_id) -> ResponseTuple:
         """
-        Remove Specified User from Team.
+        Remove specified user from a team.
 
-        If User is also a team lead, removes team lead status from Team.
-        If User with user_id is not admin or team lead of specified Team,
-        User will not be removed and return error message.
+        If the user is also a team lead, removes team lead status from Team. If
+        user is not admin or team lead of specified team, user will not be
+        removed and an error message is returned.
+
         :param param_list: List of parameters for removing user
         :param user_id: Slack ID of user who called command
-        :return: return error message if user removed unsuccessfully,
-                 if user is not in team, or if user has
-                 insufficient permission level, otherwise returns
-                 success message
+        :return: error message if user removed unsuccessfully, if user is not
+                 in team, or if user has insufficient permission level,
+                 otherwise returns success message
         """
         try:
             command_user = self.facade.retrieve(User, user_id)
@@ -390,13 +391,13 @@ class TeamCommand:
         """
         Edit the properties of a specific team.
 
-        Team Leads can only edit the
-        teams that they are a part of, but admins can edit any teams.
+        Team leads can only edit the teams that they are a part of, but admins
+        can edit any teams.
+
         :param param_list: List of parameters for editing team
         :param user_id: Slack ID of user who called command
-        :return: return error message if user has insufficient permission level
-                 or team edited unsuccessfully,
-                 otherwise return success message
+        :return: error message if user has insufficient permission level or
+                 team edited unsuccessfully, otherwise return success message
         """
         try:
             command_user = self.facade.retrieve(User, user_id)
@@ -418,15 +419,15 @@ class TeamCommand:
 
     def lead_helper(self, param_list, user_id) -> ResponseTuple:
         """
-        Add a user as Team Lead, and adds them to team if not already added.
+        Add a user as team lead, and add them to team if not already added.
 
-        If `--remove` flag is used, will remove user as Team Lead,
-        but not from the team.
+        If ``--remove`` flag is used, user is instead demoted from being a team
+        lead, but not from the team.
+
         :param param_list: List of parameters for editing leads
         :param user_id: Slack ID of user who called command
-        :return: return error message if user has insufficient permission level
-                 or lead demoted unsuccessfully, otherwise return
-                 success message
+        :return: error message if user has insufficient permission level or
+                 lead demoted unsuccessfully, otherwise return success message
         """
         try:
             command_user = self.facade.retrieve(User, user_id)
