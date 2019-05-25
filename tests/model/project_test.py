@@ -1,5 +1,5 @@
 """Test the data model for a project."""
-from model.project import Project
+from model import Project
 
 
 def test_valid_project():
@@ -13,7 +13,6 @@ def test_project_getters_and_setters():
     p = Project('12345', ['http://www.github.com/ubclaunchpad/rocket'])
 
     assert isinstance(p.project_id, str)
-    assert p.project_id.isalnum()
     assert p.github_team_id == '12345'
     assert p.github_urls == ['http://www.github.com/ubclaunchpad/rocket']
 

@@ -1,5 +1,5 @@
 """Test the data model for a team."""
-from model.team import Team
+from model import Team
 from tests.util import create_test_team
 
 
@@ -92,9 +92,9 @@ def test_is_member():
     """Test the Team class method is_member(github_id)."""
     team = Team("1", "brussel-sprouts", "Brussel Sprouts")
     new_github_id = "U0G9QF9C6"
-    assert team.is_member(new_github_id) is False
+    assert team.has_member(new_github_id) is False
     team.add_member(new_github_id)
-    assert team.is_member(new_github_id)
+    assert team.has_member(new_github_id)
 
 
 def test_add_lead():
@@ -109,9 +109,9 @@ def test_is_lead():
     """Test the Team class method is_team_lead(github_id)."""
     team = Team("1", "brussel-sprouts", "Brussel Sprouts")
     new_github_id = "U0G9QF9C6"
-    assert team.is_team_lead(new_github_id) is False
+    assert team.has_team_lead(new_github_id) is False
     team.add_team_lead(new_github_id)
-    assert team.is_team_lead(new_github_id) is True
+    assert team.has_team_lead(new_github_id) is True
 
 
 def test_print():

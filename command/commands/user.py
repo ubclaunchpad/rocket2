@@ -1,11 +1,14 @@
 """Command parsing for user events."""
-import argparse
 import logging
 import shlex
+
+from argparse import ArgumentParser, _SubParsersAction
+from command import ResponseTuple
+from db.facade import DBFacade
 from flask import jsonify
-from model.permissions import Permissions
-from model.user import User
-from interface.github import GithubAPIException
+from interface.github import GithubAPIException, GithubInterface
+from model import User, Permissions
+from typing import Dict, cast
 
 
 class UserCommand:
@@ -14,21 +17,23 @@ class UserCommand:
     command_name = "user"
     permission_error = "You do not have the sufficient " \
                        "permission level for this command!"
-    lookup_error = "User not found!"
+    lookup_error = "Lookup error! User not found!"
     delete_text = "Deleted user with Slack ID: "
-    desc = "for dealing with " + command_name + "s"
+    desc = f"for dealing with {command_name}s"
 
-    def __init__(self, db_facade, github_interface):
+    def __init__(self,
+                 db_facade: DBFacade,
+                 github_interface: GithubInterface) -> None:
         """Initialize user command."""
         logging.info("Initializing UserCommand instance")
-        self.parser = argparse.ArgumentParser(prog="/rocket")
+        self.parser = ArgumentParser(prog="/rocket")
         self.parser.add_argument("user")
         self.subparser = self.init_subparsers()
         self.help = self.get_help()
         self.facade = db_facade
         self.github = github_interface
 
-    def init_subparsers(self):
+    def init_subparsers(self) -> _SubParsersAction:
         """Initialize subparsers for user command."""
         subparsers = self.parser.add_subparsers(dest="which")
 
@@ -38,7 +43,8 @@ class UserCommand:
         parser_view.set_defaults(which="view",
                                  help="View information about a given user.")
         parser_view. \
-            add_argument("--slack_id", type=str, action='store',
+            add_argument("--slack-id", metavar="SLACK-ID",
+                         type=str, action='store',
                          help="Use if using slack id instead of username.")
 
         """Parser for add command."""
@@ -54,7 +60,8 @@ class UserCommand:
         parser_delete.set_defaults(which="delete",
                                    help="(Admin only) permanently delete "
                                         "member's profile.")
-        parser_delete.add_argument("slack_id", type=str, action='store',
+        parser_delete.add_argument("slack_id", metavar="slack-id",
+                                   type=str, action='store',
                                    help="Slack id of member to delete.")
 
         """Parser for edit command."""
@@ -79,30 +86,33 @@ class UserCommand:
         parser_edit.add_argument("--member", type=str, action='store',
                                  help="(Admin only) Add to edit properties "
                                       "of another user.")
-        parser_edit.add_argument("--permission", type=lambda x: Permissions[x],
+        parser_edit.add_argument("--permission",
+                                 type=lambda x: Permissions.__getitem__(x),
                                  help="(Admin only) Add to edit permission "
                                       "level of a user.",
                                  action='store', choices=list(Permissions))
         return subparsers
 
-    def get_name(self):
+    def get_name(self) -> str:
         """Return the command type."""
         return self.command_name
 
-    def get_help(self):
+    def get_help(self) -> str:
         """Return command options for user events."""
-        res = "\n*" + self.command_name + " commands:*```"
+        res = f"\n*{self.command_name} commands:*```"
         for argument in self.subparser.choices:
             name = argument.capitalize()
-            res += "\n*" + name + "*\n"
+            res += f"\n*{name}*\n"
             res += self.subparser.choices[argument].format_help()
         return res + "```"
 
-    def get_desc(self):
+    def get_desc(self) -> str:
         """Return the description of this command."""
         return self.desc
 
-    def handle(self, command, user_id):
+    def handle(self,
+               command: str,
+               user_id: str) -> ResponseTuple:
         """Handle command by splitting into substrings and giving to parser."""
         logging.debug("Handling UserCommand")
         command_arg = shlex.split(command)
@@ -139,12 +149,14 @@ class UserCommand:
         else:
             return self.get_help(), 200
 
-    def edit_helper(self, user_id, param_list):
+    def edit_helper(self,
+                    user_id: str,
+                    param_list: Dict[str, str]) -> ResponseTuple:
         """
         Edit user from database.
 
-        If ``param_list['member']`` is not ``None``, this function edits using
-        the ID from ``param_list['member']`` (must be an admin to do so).
+        If ``param_list['member'] is not None``, this function edits using the
+        ID from ``param_list['member']`` (must be an admin to do so).
         Otherwise, edits the user that called the function.
 
         :param user_id: Slack ID of user who is calling the command
@@ -182,28 +194,34 @@ class UserCommand:
             try:
                 self.github.org_add_member(param_list["github"])
                 edited_user.github_username = param_list["github"]
-            except GithubAPIException as e:
-                msg = "\nError adding user {} to GitHub organization".format(
-                    param_list['github'])
+            except GithubAPIException:
+                msg = f"\nError adding user {param_list['github']} to " \
+                      "GitHub organization"
                 logging.error(msg)
         if param_list["major"]:
             edited_user.major = param_list["major"]
         if param_list["bio"]:
             edited_user.biography = param_list["bio"]
         if param_list["permission"] and is_admin:
-            edited_user.permissions_level = param_list["permission"]
+            edited_user.permissions_level = cast(Permissions,
+                                                 param_list["permission"])
         elif param_list["permission"] and not is_admin:
             msg += "\nCannot change own permission: user isn't admin."
-            logging.warn("User {} tried to elevate permissions level."
-                         .format(user_id))
+            logging.warning(f"User {user_id} tried to elevate permissions"
+                            " level.")
 
         self.facade.store(edited_user)
         ret = {'attachments': [edited_user.get_attachment()]}
         if msg != "":
-            ret['text'] = msg
+            # mypy doesn't like the fact that there could be different types
+            # for the values of the dict ret, so we have to ignore this line
+            # for now
+            ret['text'] = msg  # type: ignore
         return jsonify(ret), 200
 
-    def delete_helper(self, user_id, slack_id):
+    def delete_helper(self,
+                      user_id: str,
+                      slack_id: str) -> ResponseTuple:
         """
         Delete user from database.
 
@@ -227,7 +245,9 @@ class UserCommand:
         except LookupError:
             return self.lookup_error, 200
 
-    def view_helper(self, user_id, slack_id):
+    def view_helper(self,
+                    user_id: str,
+                    slack_id: str) -> ResponseTuple:
         """
         View user info from database.
 
@@ -249,14 +269,16 @@ class UserCommand:
         except LookupError:
             return self.lookup_error, 200
 
-    def add_helper(self, user_id, use_force):
+    def add_helper(self,
+                   user_id: str,
+                   use_force: bool) -> ResponseTuple:
         """
         Add the user to the database via user id.
 
         :param user_id: Slack ID of user to be added
         :param use_force: If this is set, we store the user even if they are
                           already added in the database
-        :return: ``"User added!", 200``
+        :return: ``"User added!", 200`` or error message if user exists in db
         """
         # Try to look up and avoid overwriting if we are not using force
         if not use_force:

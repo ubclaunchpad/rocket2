@@ -1,11 +1,9 @@
 """Some important (and often-used) utility functions."""
-from model.user import User
-from model.team import Team
-from model.project import Project
-from model.permissions import Permissions
+from model import User, Team, Project, Permissions
+from typing import List
 
 
-def create_test_admin(slack_id):
+def create_test_admin(slack_id: str) -> User:
     """
     Create a test admin user with slack id, and with all other attributes set.
 
@@ -35,10 +33,13 @@ def create_test_admin(slack_id):
     u.major = 'Computer Science'
     u.permissions_level = Permissions.admin
     u.position = 'Adrenaline Junkie'
+    u.karma = 1
     return u
 
 
-def create_test_team(tid, team_name, display_name):
+def create_test_team(tid: str,
+                     team_name: str,
+                     display_name: str) -> Team:
     """
     Create a test team with team name, and with all other attributes the same.
 
@@ -63,24 +64,25 @@ def create_test_team(tid, team_name, display_name):
     return t
 
 
-def create_test_project(github_team_id, github_urls):
+def create_test_project(github_team_id: str,
+                        github_urls: List[str]) -> Project:
     r"""
     Create a test project with project ID, URLs, and all other attributes set.
 
-    ==========      =============================
-    Property        Preset
-    ==========      =============================
-    ID              ``SHA1(github_urls[0], time.time())``
-    Team ID         ``github_team_id``
-    Github URLs     ``github_urls``
-    Display Name    Rocket2
-    Short Descrip.  Slack bot, team management, and onboarding system for...
-    Long Descrip.   Slack bot, team management, and onboarding system for...
-    Tags            python, docker, pipenv, waterboarding
-    Website         https://github.com/ubclaunchpad/rocket2
-    Appstore URL    ¯\_(ツ)_/¯
-    Playstore URL   ¯\_(ツ)_/¯
-    ==========      =============================
+    ===============   =============================
+    Property          Preset
+    ===============   =============================
+    ID                ``SHA1(github_urls[0], time.time())``
+    Team ID           ``github_team_id``
+    Github URLs       ``github_urls``
+    Display Name      Rocket2
+    Short Descrip.    Slack bot, team management, and onboarding system for...
+    Long Descrip.     Slack bot, team management, and onboarding system for...
+    Tags              python, docker, pipenv, waterboarding
+    Website           https://github.com/ubclaunchpad/rocket2
+    Appstore URL      ¯\\_(ツ)_/¯
+    Playstore URL     ¯\\_(ツ)_/¯
+    ===============   =============================
 
     :param github_team_id: The Github team ID
     :param github_urls: The URLs to all connected projects

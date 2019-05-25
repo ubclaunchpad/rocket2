@@ -1,11 +1,12 @@
 """Data model to represent an individual user."""
+from typing import Dict, Any
 from model.permissions import Permissions
 
 
 class User:
     """Represent a user with related fields and methods."""
 
-    def __init__(self, slack_id):
+    def __init__(self, slack_id: str) -> None:
         """Initialize the user with a given Slack ID."""
         self.slack_id = slack_id
         self.name = ""
@@ -17,8 +18,9 @@ class User:
         self.biography = ""
         self.image_url = ""
         self.permissions_level = Permissions.member
+        self.karma = 1
 
-    def get_attachment(self):
+    def get_attachment(self) -> Dict[str, Any]:
         """Return slack-formatted attachment (dictionary) for user."""
         # TODO: Refactor into another file to preserve purity
         text_pairs = [
@@ -31,7 +33,8 @@ class User:
             ('Position', self.position),
             ('Biography', self.biography),
             ('Image URL', self.image_url),
-            ('Permissions Level', str(self.permissions_level))
+            ('Permissions Level', str(self.permissions_level)),
+            ('Karma', self.karma)
         ]
 
         fields = [{'title': t, 'value': v if v else 'n/a', 'short': True}
@@ -41,7 +44,7 @@ class User:
         return {'fallback': fallback, 'fields': fields}
 
     @staticmethod
-    def to_dict(user):
+    def to_dict(user: 'User') -> Dict[str, Any]:
         """
         Convert user object to dict object.
 
@@ -51,7 +54,7 @@ class User:
         :param user: the user object
         :return: the dictionary representing the user
         """
-        def place_if_filled(name, field):
+        def place_if_filled(name: str, field: Any) -> None:
             """Populate ``udict`` if ``field`` isn't empty."""
             if field:
                 udict[name] = field
@@ -68,11 +71,12 @@ class User:
         place_if_filled('position', user.position)
         place_if_filled('bio', user.biography)
         place_if_filled('image_url', user.image_url)
+        place_if_filled('karma', user.karma)
 
         return udict
 
     @staticmethod
-    def from_dict(d):
+    def from_dict(d: Dict[str, Any]) -> 'User':
         """
         Convert dict response object to user model.
 
@@ -90,30 +94,32 @@ class User:
         user.image_url = d.get('image_url', '')
         user.permissions_level = Permissions[d.get('permission_level',
                                                    'member')]
+        user.karma = int(d.get('karma', 1))
         return user
 
     @staticmethod
-    def is_valid(user):
+    def is_valid(user: 'User') -> bool:
         """
         Return true if this user has no missing required fields.
 
         Required fields for database to accept:
-        - ``slack_id``
-        - ``permissions_level``
+            - ``slack_id``
+            - ``permissions_level``
 
         :param user: user to check
         :return: return true if this user has no missing required fields
         """
         return len(user.slack_id) > 0
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         """Return true if this user has the same attributes as the other."""
-        return str(self.__dict__) == str(other.__dict__)
+        return isinstance(other, User) and\
+            str(self.__dict__) == str(other.__dict__)
 
-    def __ne__(self, other):
+    def __ne__(self, other: object) -> bool:
         """Return the opposite of what is returned in self.__eq__(other)."""
         return not self == other
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Print information on the user class."""
         return str(self.__dict__)

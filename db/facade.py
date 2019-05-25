@@ -1,5 +1,13 @@
 """Database Facade."""
+from model.user import User
+from model.team import Team
+from model.project import Project
+from typing import List, Tuple, TypeVar, Type
+from db.dynamodb import DynamoDB
 import logging
+
+
+T = TypeVar('T', User, Team, Project)
 
 
 class DBFacade:
@@ -12,7 +20,7 @@ class DBFacade:
     would stay the same.
     """
 
-    def __init__(self, db):
+    def __init__(self, db: DynamoDB) -> None:
         """
         Initialize facade using a given class.
 
@@ -23,11 +31,11 @@ class DBFacade:
         logging.info("Initializing database facade")
         self.ddb = db
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Return a string representing this class."""
         return "Database Facade"
 
-    def store(self, obj):
+    def store(self, obj: T) -> bool:
         """
         Store object into the correct table.
 
@@ -37,10 +45,12 @@ class DBFacade:
         :param obj: Object to store in database
         :return: True if object was stored, and false otherwise
         """
-        logging.info("Storing object {}".format(obj))
-        self.ddb.store(obj)
+        logging.info(f"Storing object {obj}")
+        return self.ddb.store(obj)
 
-    def retrieve(self, Model, k):
+    def retrieve(self,
+                 Model: Type[T],
+                 k: str) -> T:
         """
         Retrieve a model from the database.
 
@@ -49,10 +59,25 @@ class DBFacade:
         :raise: LookupError if key is not found
         :return: a model ``Model`` if key is found
         """
-        logging.info("Retrieving {}(id={})".format(Model.__name__, k))
+        logging.info(f"Retrieving {Model.__name__}(id={k})")
         return self.ddb.retrieve(Model, k)
 
-    def query(self, Model, params=[]):
+    def bulk_retrieve(self, Model: Type[T], ks: List[str]) -> List[T]:
+        """
+        Retrieve a list of models from the database.
+
+        Keys not found in the database will be skipped.
+
+        :param Model: the actual class you want to retrieve
+        :param ks: retrieve based on this key (or ID)
+        :return: a list of models ``Model``
+        """
+        logging.info(f"Bulk retrieving {len(ks)} {Model.__name__}(s)")
+        return self.ddb.bulk_retrieve(Model, ks)
+
+    def query(self,
+              Model: Type[T],
+              params: List[Tuple[str, str]] = []) -> List[T]:
         """
         Query a table using a list of parameters.
 
@@ -80,18 +105,62 @@ class DBFacade:
                                      ('members', '231abc')])
 
         :param Model: type of list elements you'd want
+        :param params: list of tuples to match
         :return: a list of ``Model`` that fit the query parameters
         """
-        logging.info("Querying {} matching parameters: {}".
-                     format(Model.__name__, params))
+        logging.info(f"Querying {Model.__name__} matching "
+                     f"parameters: {params}")
         return self.ddb.query(Model, params)
 
-    def delete(self, Model, k):
+    def query_or(self,
+                 Model: Type[T],
+                 params: List[Tuple[str, str]] = []) -> List[T]:
+        """
+        Query a table using a list of parameters.
+
+        Returns a list of ``Model`` that have **one** of the attributes
+        specified in the parameters. Some might say that this is a **union** of
+        the parameters. Every item in parameters is a tuple, where
+        the first element is the user attribute, and the second is the value.
+
+        Example::
+
+            ddb = DynamoDb(config)
+            users = ddb.query_or(User, [('platform', 'slack')])
+
+        If you try to query a table without any parameters, the function will
+        return all objects of that table.::
+
+            projects = ddb.query_or(Project)
+
+        Attributes that are sets (e.g. ``team.member``,
+        ``project.github_urls``) would be treated differently. This function
+        would check to see if the entry **contains** a certain element. You can
+        specify multiple elements, but they must be in different parameters
+        (one element per tuple).::
+
+            teams = ddb.query_or(Team, [('members', 'abc123'),
+                                        ('members', '231abc')])
+
+        The above would get you the teams that contain either member ``abc123``
+        or ``231abc``.
+
+        :param Model: type of list elements you'd want
+        :param params: list of tuples to match
+        :return: a list of ``Model`` that fit the query parameters
+        """
+        logging.info(f"Querying {Model.__name__} matching "
+                     f"parameters: {params}")
+        return self.ddb.query_or(Model, params)
+
+    def delete(self,
+               Model: Type[T],
+               k: str) -> None:
         """
         Remove an object from a table.
 
         :param Model: table type to remove the object from
         :param k: ID or key of the object to remove (must be primary key)
         """
-        logging.info("Deleting {}(id={})".format(Model.__name__, k))
+        logging.info(f"Deleting {Model.__name__}(id={k})")
         self.ddb.delete(Model, k)

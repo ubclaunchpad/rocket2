@@ -1,17 +1,17 @@
 testing = false
+creds_path = "credentials/"
 
 [slack]
-creds_path = "credentials/slack.toml"
+bot_channel = "#rocket2"
 
 [aws]
-creds_path = "credentials/aws.toml"
 users_table = "users"
 teams_table = "teams"
 projects_table = "projects"
 region = "us-west-2"
 
 [github]
-creds_path = "credentials/github.toml"
+app_id = 26418
 organization = "ubclaunchpad"
 
 [auth]
