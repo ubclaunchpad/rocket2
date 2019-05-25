@@ -3,7 +3,6 @@ import os
 import pem
 import random
 import string
-import toml
 
 from command.core import Core
 from command.commands.token import TokenCommandConfig
@@ -16,7 +15,7 @@ from slackclient import SlackClient
 from webhook.webhook import WebhookHandler
 from config import Credentials
 
-from typing import MutableMapping, Dict, Any, Optional, cast
+from typing import Dict, Any, Optional, cast
 
 
 def make_core(config: Dict[str, Any],
@@ -59,7 +58,7 @@ def make_webhook_handler(config: Dict[str, Any],
     :return: a new ``WebhookHandler`` object, freshly initialized
     """
     facade = DBFacade(DynamoDB(config, credentials))
-    return WebhookHandler(facade)
+    return WebhookHandler(facade, credentials)
 
 
 def create_signing_token() -> str:

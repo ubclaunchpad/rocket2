@@ -1,5 +1,5 @@
 """Represent a data model for a team."""
-from typing import Mapping, Set, Dict, Any
+from typing import Set, Dict, Any
 
 
 class Team:
@@ -20,6 +20,36 @@ class Team:
         self.platform = ""
         self.team_leads: Set[str] = set()
         self.members: Set[str] = set()
+
+    def get_attachment(self):
+        """Return slack-formatted attachment (dictionary) for team."""
+        text_pairs = [
+            ('Github ID', self.github_team_id),
+            ('Github Team Name', self.github_team_name),
+            ('Display Name', self.display_name),
+            ('Platform', self.platform),
+            ('Team Leads', '\n'.join(self.team_leads)),
+            ('Members', '\n'.join(self.members))
+        ]
+        fields = [{'title': t, 'value': v if v else 'n/a', 'short': True}
+                  for t, v in text_pairs]
+        fallback = str('\n'.join(map(str, text_pairs)))
+
+        return {'fallback': fallback, 'fields': fields}
+
+    def get_basic_attachment(self):
+        """Return basic slack-formatted attachment (dictionary) for team."""
+        text_pairs = [
+            ('Github ID', self.github_team_id),
+            ('Github Team Name', self.github_team_name),
+            ('Display Name', self.display_name),
+            ('Platform', self.platform),
+        ]
+        fields = [{'title': t, 'value': v if v else 'n/a', 'short': True}
+                  for t, v in text_pairs]
+        fallback = str('\n'.join(map(str, text_pairs)))
+
+        return {'fallback': fallback, 'fields': fields}
 
     @staticmethod
     def from_dict(d: Dict[str, Any]) -> 'Team':
@@ -72,8 +102,8 @@ class Team:
         Return true if this team has no missing required fields.
 
         Required fields for database to accept:
-        - ``github_team_name``
-        - ``github_team_id``
+            - ``github_team_name``
+            - ``github_team_id``
 
         :param team: team to check
         :return: returns true if this team has no missing required fields
@@ -97,7 +127,7 @@ class Team:
         """Discard the member of the team with Github ID in the argument."""
         self.members.discard(github_user_id)
 
-    def is_member(self, github_user_id: str) -> bool:
+    def has_member(self, github_user_id: str) -> bool:
         """Identify if any member has the ID specified in the argument."""
         return github_user_id in self.members
 
@@ -108,6 +138,14 @@ class Team:
     def is_team_lead(self, github_user_id: str) -> bool:
         """Identify if user with given ID is a team lead."""
         return github_user_id in self.team_leads
+
+    def has_team_lead(self, github_user_id: str) -> bool:
+        """Identify if user with given ID is a team lead."""
+        return github_user_id in self.team_leads
+
+    def discard_team_lead(self, github_user_id: str) -> None:
+        """Remove a user's Github ID to the team's set of team lead IDs."""
+        self.team_leads.remove(github_user_id)
 
     def __str__(self) -> str:
         """Print information on the team class."""

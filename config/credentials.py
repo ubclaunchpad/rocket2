@@ -1,6 +1,5 @@
 """Contain the dictionaries of credentials for all needed services."""
-from os import listdir
-from os.path import isfile, join
+from os.path import isfile, join, normpath
 import toml
 
 
@@ -16,6 +15,7 @@ class Credentials:
         """
         self.missing_cred_files = []
         self.missing_cred_fields = {}
+        credentials_path = normpath(credentials_path)
 
         slack_toml_path = join(credentials_path, 'slack.toml')
         try:
@@ -36,6 +36,14 @@ class Credentials:
                 aws_toml, 'secret_access_key', 'aws')
         except IOError:
             self.missing_cred_files.append('aws.toml')
+
+        github_toml_path = join(credentials_path, 'github.toml')
+        try:
+            github_toml = toml.load(github_toml_path)
+            self.github_webhook_secret = self.attempt_toml_read(
+                github_toml, 'webhook_secret', 'github')
+        except IOError:
+            self.missing_cred_files.append('github.toml')
 
         github_signing_key_path = join(
             credentials_path, 'github_signing_key.pem')
@@ -85,4 +93,4 @@ class MissingCredentialsError(Exception):
         : param missing_cred_files: List of missing files of credentials.
         """
         self.error = f'Missing files: {str(missing_cred_files)}\n' \
-            f'Missing fields: {str(missing_cred_fields)}'
+                     f'Missing fields: {str(missing_cred_fields)}'

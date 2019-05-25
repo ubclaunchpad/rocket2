@@ -1,9 +1,7 @@
-"""
-Some utility functions.
-
-The following are a few function to help in command handling.
-"""
+"""The following are a few functions to help in handling command."""
 import re
+from model import Permissions, User, Team
+from typing import Optional
 
 
 def regularize_char(c: str) -> str:
@@ -40,3 +38,22 @@ def escaped_id_to_id(s: str) -> str:
     return re.sub(r"<@(\w+)\|[^>]+>",
                   r"\1",
                   s)
+
+
+def check_permissions(user: User, team: Optional[Team]) -> bool:
+    """
+    Check if given user is admin or team lead.
+
+    If team is specified and user is not admin, check if user is team lead in
+    team. If team is not specified, check if user is team lead.
+
+    :param user: user who's permission needs to be checked
+    :param team: team you want to check that has user as team lead
+    :return: true if user is admin or a team lead, false otherwise
+    """
+    if user.permissions_level == Permissions.admin:
+        return True
+    if team is None:
+        return user.permissions_level == Permissions.team_lead
+    else:
+        return team.has_team_lead(user.github_id)

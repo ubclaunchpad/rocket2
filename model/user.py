@@ -103,8 +103,8 @@ class User:
         Return true if this user has no missing required fields.
 
         Required fields for database to accept:
-        - ``slack_id``
-        - ``permissions_level``
+            - ``slack_id``
+            - ``permissions_level``
 
         :param user: user to check
         :return: return true if this user has no missing required fields

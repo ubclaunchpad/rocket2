@@ -1,7 +1,8 @@
 """Test the facade for the database."""
 from db import DBFacade
 from unittest import mock
-from tests.util import *
+from model import Team, User, Project
+from tests.util import create_test_admin, create_test_team, create_test_project
 
 
 @mock.patch('db.dynamodb.DynamoDB', autospec=True)
@@ -52,6 +53,24 @@ def test_retrieve_team(ddb):
     team_name = 'brussel-sprouts'
     dbf.retrieve(Team, team_name)
     ddb.retrieve.assert_called_with(Team, team_name)
+
+
+@mock.patch('db.dynamodb.DynamoDB', autospec=True)
+def test_bulk_retrieve_team(ddb):
+    """Test bulk retrieving teams."""
+    dbf = DBFacade(ddb)
+    team_ids = list(map(str, range(10)))
+    dbf.bulk_retrieve(Team, team_ids)
+    ddb.bulk_retrieve.assert_called_with(Team, team_ids)
+
+
+@mock.patch('db.dynamodb.DynamoDB', autospec=True)
+def test_query_or_team(ddb):
+    """Test querying teams."""
+    dbf = DBFacade(ddb)
+    params = [('github_team_id', str(team_id)) for team_id in range(10)]
+    dbf.query_or(Team, params)
+    ddb.query_or.assert_called_with(Team, params)
 
 
 @mock.patch('db.dynamodb.DynamoDB', autospec=True)

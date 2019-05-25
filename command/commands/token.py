@@ -6,7 +6,7 @@ from command import ResponseTuple
 from datetime import datetime, timedelta
 from db.facade import DBFacade
 from model import User, Permissions
-from typing import cast
+from utils.slack_msg_fmt import wrap_code_block
 
 
 class TokenCommand:
@@ -17,7 +17,7 @@ class TokenCommand:
     permission_error = "You do not have the sufficient " \
                        "permission level for this command!"
     lookup_error = "Requesting user not found!"
-    success_msg = "This is your token:\n```\n{}\n```" \
+    success_msg = f"This is your token:\n{wrap_code_block('{}')}" \
                   "\nKeep it secret! Keep it safe!\nIt will expire at {}."
 
     def __init__(self,
@@ -40,11 +40,11 @@ class TokenCommand:
         """Handle request for token."""
         logging.debug("Handling token command")
         try:
-            user = cast(User, self.facade.retrieve(User, user_id))
+            user = self.facade.retrieve(User, user_id)
             if user.permissions_level == Permissions.member:
-                return self.permission_error, 403
+                return self.permission_error, 200
         except LookupError:
-            return self.lookup_error, 404
+            return self.lookup_error, 200
         expiry = datetime.utcnow() + self.expiry
         payload = {
             'nbf': datetime.utcnow(),

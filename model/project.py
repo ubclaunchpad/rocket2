@@ -1,5 +1,5 @@
 """Represent a team project."""
-from typing import List, Mapping, Dict, Any
+from typing import List, Dict, Any
 import uuid
 
 
@@ -88,8 +88,8 @@ class Project:
         Return true if this project has no missing fields.
 
         Required fields for database to accept:
-        - ``__project_id``
-        - ``__github_urls``
+            - ``__project_id``
+            - ``__github_urls``
 
         :param project: project to check
         :return: true if this project has no missing fields

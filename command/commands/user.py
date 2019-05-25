@@ -17,7 +17,7 @@ class UserCommand:
     command_name = "user"
     permission_error = "You do not have the sufficient " \
                        "permission level for this command!"
-    lookup_error = "User not found!"
+    lookup_error = "Lookup error! User not found!"
     delete_text = "Deleted user with Slack ID: "
     desc = f"for dealing with {command_name}s"
 
@@ -43,7 +43,8 @@ class UserCommand:
         parser_view.set_defaults(which="view",
                                  help="View information about a given user.")
         parser_view. \
-            add_argument("--slack_id", type=str, action='store',
+            add_argument("--slack-id", metavar="SLACK-ID",
+                         type=str, action='store',
                          help="Use if using slack id instead of username.")
 
         """Parser for add command."""
@@ -59,7 +60,8 @@ class UserCommand:
         parser_delete.set_defaults(which="delete",
                                    help="(Admin only) permanently delete "
                                         "member's profile.")
-        parser_delete.add_argument("slack_id", type=str, action='store',
+        parser_delete.add_argument("slack_id", metavar="slack-id",
+                                   type=str, action='store',
                                    help="Slack id of member to delete.")
 
         """Parser for edit command."""
@@ -153,8 +155,8 @@ class UserCommand:
         """
         Edit user from database.
 
-        If ``param_list['member']`` is not ``None``, this function edits using
-        the ID from ``param_list['member']`` (must be an admin to do so).
+        If ``param_list['member'] is not None``, this function edits using the
+        ID from ``param_list['member']`` (must be an admin to do so).
         Otherwise, edits the user that called the function.
 
         :param user_id: Slack ID of user who is calling the command
@@ -167,19 +169,18 @@ class UserCommand:
         msg = ""
         if param_list["member"] is not None:
             try:
-                admin_user = cast(User, self.facade.retrieve(User, user_id))
+                admin_user = self.facade.retrieve(User, user_id)
                 if admin_user.permissions_level != Permissions.admin:
                     return self.permission_error, 200
                 else:
                     is_admin = True
                     edited_id = param_list["member"]
-                    edited_user = cast(User, self.facade.retrieve(User,
-                                                                  edited_id))
+                    edited_user = self.facade.retrieve(User, edited_id)
             except LookupError:
                 return self.lookup_error, 200
         else:
             try:
-                edited_user = cast(User, self.facade.retrieve(User, user_id))
+                edited_user = self.facade.retrieve(User, user_id)
             except LookupError:
                 return self.lookup_error, 200
 
@@ -193,7 +194,7 @@ class UserCommand:
             try:
                 self.github.org_add_member(param_list["github"])
                 edited_user.github_username = param_list["github"]
-            except GithubAPIException as e:
+            except GithubAPIException:
                 msg = f"\nError adding user {param_list['github']} to " \
                       "GitHub organization"
                 logging.error(msg)
@@ -235,7 +236,7 @@ class UserCommand:
                  deletion message if user is deleted.
         """
         try:
-            user_command = cast(User, self.facade.retrieve(User, user_id))
+            user_command = self.facade.retrieve(User, user_id)
             if user_command.permissions_level == Permissions.admin:
                 self.facade.delete(User, slack_id)
                 return self.delete_text + slack_id, 200
@@ -260,9 +261,9 @@ class UserCommand:
         """
         try:
             if slack_id is None:
-                user = cast(User, self.facade.retrieve(User, user_id))
+                user = self.facade.retrieve(User, user_id)
             else:
-                user = cast(User, self.facade.retrieve(User, slack_id))
+                user = self.facade.retrieve(User, slack_id)
 
             return jsonify({'attachments': [user.get_attachment()]}), 200
         except LookupError:
@@ -277,7 +278,7 @@ class UserCommand:
         :param user_id: Slack ID of user to be added
         :param use_force: If this is set, we store the user even if they are
                           already added in the database
-        :return: ``"User added!", 200``
+        :return: ``"User added!", 200`` or error message if user exists in db
         """
         # Try to look up and avoid overwriting if we are not using force
         if not use_force:

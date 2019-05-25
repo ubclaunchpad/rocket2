@@ -1,10 +1,8 @@
 """Calls the appropriate handler depending on the event data."""
-import command.util as util
-import logging
-
 from command import ResponseTuple
 from command.commands import UnionCommands
 from command.commands.user import UserCommand
+from command.commands.team import TeamCommand
 from command.commands.token import TokenCommand, TokenCommandConfig
 from db.facade import DBFacade
 from flask import jsonify, Response
@@ -12,6 +10,9 @@ from interface.slack import Bot, SlackAPIError
 from interface.github import GithubInterface
 from model import User
 from typing import Dict, Any, cast
+import command.util as util
+import logging
+from utils.slack_msg_fmt import wrap_slack_code
 
 
 class Core:
@@ -28,6 +29,8 @@ class Core:
         self.__bot = bot
         self.__github = gh_interface
         self.__commands["user"] = UserCommand(self.__facade, self.__github)
+        self.__commands["team"] = TeamCommand(self.__facade,
+                                              self.__github, self.__bot)
         self.__commands["token"] = TokenCommand(self.__facade, token_config)
 
     def handle_app_command(self,
@@ -90,7 +93,7 @@ class Core:
         """
         message = {"text": "Displaying all available commands. "
                            "To read about a specific command, use "
-                           "\n`/rocket [command] help`\n"
+                           f"\n{wrap_slack_code('/rocket [command] help')}\n"
                            "For arguments containing spaces, "
                            "please enclose them with quotations.\n",
                    "mrkdwn": "true"}

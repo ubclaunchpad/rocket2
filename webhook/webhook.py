@@ -1,18 +1,78 @@
 """Contain all the logic for handling webhooks in a class."""
 import logging
-
-from command import ResponseTuple
+import hmac
+import hashlib
 from db.facade import DBFacade
 from model import User, Team
-from typing import Dict, Any, cast, List
+from typing import Dict, Any, List
+from command import ResponseTuple
+from config import Credentials
 
 
 class WebhookHandler:
     """Encapsulate methods for GitHub webhook triggered events."""
 
-    def __init__(self, db_facade: DBFacade) -> None:
+    def __init__(self, db_facade: DBFacade, credentials: Credentials) -> None:
         """Give handler access to the database."""
         self.__facade = db_facade
+        self.__secret = credentials.github_webhook_secret
+        self.__organization_action_list = [
+            "member_removed",
+            "member_added",
+            "member_invited"
+        ]
+        self.__team_action_list = [
+            "created",
+            "deleted",
+            "edited",
+            "added_to_repository",
+            "removed_from_repository"
+        ]
+
+    def handle(self,
+               request_body: bytes,
+               xhub_signature: str,
+               payload: Dict[str, Any]) -> ResponseTuple:
+        """
+        Verify and handle the webhook event.
+
+        :param request_body: Byte string of the request body
+        :param xhub_signature: Hashed signature to validate
+        :return: appropriate ResponseTuple depending on the validity and type
+                 of webhook
+        """
+        if self.verify_hash(request_body, xhub_signature):
+            # handle
+            action = payload["action"]
+            if action in self.__organization_action_list:
+                return self.handle_organization_event(payload)
+            elif action in self.__team_action_list:
+                return self.handle_team_event(payload)
+            else:
+                logging.error("Unsupported payload received")
+                return "Unsupported payload received", 500
+        else:
+            return "Hashed signature is not valid", 403
+
+    def verify_hash(self, request_body: bytes, xhub_signature: str):
+        """
+        Verify if a webhook event comes from GitHub.
+
+        :param request_body: Byte string of the request body
+        :param xhub_signature: Hashed signature to validate
+        :return: Return True if the signature is valid, False otherwise
+        """
+        h = hmac.new(bytes(self.__secret, encoding='utf8'),
+                     request_body, hashlib.sha1)
+        verified = hmac.compare_digest(
+            bytes("sha1=" + h.hexdigest(), encoding='utf8'),
+            bytes(xhub_signature, encoding='utf8'))
+        if verified:
+            logging.debug("Webhook signature verified")
+        else:
+            logging.warning(
+                f"Webhook not from GitHub; signature: {xhub_signature}")
+        return verified
 
     def handle_organization_event(self,
                                   payload: Dict[str, Any]) -> ResponseTuple:
@@ -30,7 +90,7 @@ class WebhookHandler:
         github_username = github_user["login"]
         organization = payload["organization"]["login"]
         member_list = self.__facade. \
-            query(User, [('github_id', github_id)])
+            query(User, [('github_user_id', github_id)])
         if action == "member_removed":
             return self.org_remove(member_list, github_id, github_username)
         elif action == "member_added":
@@ -127,7 +187,7 @@ class WebhookHandler:
         elif action == "edited":
             logging.debug(f"team edited event triggered: {str(payload)}")
             try:
-                team = cast(Team, self.__facade.retrieve(Team, github_id))
+                team = self.__facade.retrieve(Team, github_id)
                 team.github_team_name = github_team_name
                 logging.info(f"changed team's name with id {github_id} from "
                              f"{github_team_name} to {team.github_team_name}")
@@ -156,16 +216,7 @@ class WebhookHandler:
 
     def handle_membership_event(self,
                                 payload: Dict[str, Any]) -> ResponseTuple:
-        """
-        Handle when a user is added, removed, or invited to team.
-
-        If the member is removed, they are removed as a user from rocket's db
-        if they have not been removed already.
-
-        If the member is added, they are added to rocket's db
-
-        If invited, do nothing.
-        """
+        """Handle the event where a user is added or removed from a team."""
         action = payload["action"]
         github_user = payload["member"]
         github_username = github_user["login"]
@@ -174,13 +225,11 @@ class WebhookHandler:
         team_id = team["id"]
         team_name = team["name"]
         selected_team = self.__facade.retrieve(Team, team_id)
-        if action == "member_removed":
+        if action == "removed":
             return self.mem_remove(github_id, selected_team, team_name)
-        elif action == "member_added":
+        elif action == "added":
             return self.mem_added(github_id, selected_team, team_name,
                                   github_username)
-        elif action == "member_invited":
-            return self.mem_invited(github_username, team_name)
         else:
             logging.error("membership webhook triggered,"
                           f" invalid action specified: {str(payload)}")
@@ -192,11 +241,11 @@ class WebhookHandler:
                    team_name: str) -> ResponseTuple:
         """Help membership function if payload action is removal."""
         member_list = self.__facade. \
-            query(User, [('github_id', github_id)])
+            query(User, [('github_user_id', github_id)])
         slack_ids_string = ""
         if len(member_list) == 1:
             slack_id = member_list[0].slack_id
-            if selected_team.is_member(github_id):
+            if selected_team.has_member(github_id):
                 selected_team.discard_member(github_id)
                 logging.info(f"deleted slack user {slack_id} "
                              f"from {team_name}")
@@ -221,7 +270,8 @@ class WebhookHandler:
                   team_name: str,
                   github_username: str) -> ResponseTuple:
         """Help membership function if payload action is added."""
-        member_list = self.__facade.query(User, [('github_id', github_id)])
+        member_list = self.__facade.query(User,
+                                          [('github_user_id', github_id)])
         slack_ids_string = ""
         if len(member_list) > 0:
             selected_team.add_member(github_id)
@@ -233,10 +283,3 @@ class WebhookHandler:
         else:
             logging.error(f"could not find user {github_id}")
             return f"could not find user {github_username}", 404
-
-    def mem_invited(self,
-                    github_username: str,
-                    team_name: str) -> ResponseTuple:
-        """Help membership function if payload action is invited."""
-        logging.info(f"user {github_username} invited to {team_name}")
-        return f"user {github_username} invited to {team_name}", 200
