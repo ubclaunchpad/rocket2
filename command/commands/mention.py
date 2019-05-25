@@ -13,7 +13,7 @@ from model.user import User
 class MentionCommand:
     """Mention command parser"""
 
-    command_name = "Mention"
+    command_name = "mention"
     help = "Mention command reference:\n\n /rocket Mention"\
         "\n\nOptions:\n\n" \
         "user"

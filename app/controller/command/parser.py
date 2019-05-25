@@ -1,5 +1,6 @@
 """Calls the appropriate handler depending on the event data."""
 from command.commands.user import UserCommand
+from command.commands.team import TeamCommand
 from command.commands.token import TokenCommand, TokenCommandConfig
 from command.commands.karma import KarmaCommand
 from command.commands.mention import MentionCommand
@@ -12,6 +13,7 @@ from typing import Dict, Any, cast
 import logging
 import command.util as util
 import re
+from utils.slack_msg_fmt import wrap_slack_code
 class Core:
     """Encapsulate methods for handling events."""
 
@@ -22,9 +24,11 @@ class Core:
         self.__bot = bot
         self.__github = gh_interface
         self.__commands["user"] = UserCommand(self.__facade, self.__github)
-        self.__commands["token"] = TokenCommand(self.__facade, token_config)
         self.__commands["karma"] = KarmaCommand(self.__facade)
         self.__commands["mention"] = MentionCommand(self.__facade)
+        self.__commands["team"] = TeamCommand(self.__facade,
+                                              self.__github, self.__bot)
+        self.__commands["token"] = TokenCommand(self.__facade, token_config)
 
     def handle_app_command(self, cmd_txt, user):
         """
