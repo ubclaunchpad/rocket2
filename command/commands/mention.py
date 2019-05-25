@@ -35,12 +35,12 @@ class MentionCommand:
         elif(command_arg[1] == '++'):
             return self.karma_mention_helper(user_id, command_arg[0], self.karma_add_amount)
 
-    def karma_mention_helper(self, giver, reciever, amount):
-        logging.info("giving karma to " + reciever)
-        if(giver == reciever):
+    def karma_mention_helper(self, giver, receiver, amount):
+        logging.info("giving karma to " + receiver)
+        if(giver == receiver):
             return "cannot give karma to self", 200
         try:
-            user = cast(User, self.facade.retrieve(User, reciever))
+            user = self.facade.retrieve(User, receiver)
             user.karma += amount
             self.facade.store(user)
             return f"gave 1 karma to {user.name}", 200

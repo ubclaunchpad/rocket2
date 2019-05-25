@@ -7,33 +7,33 @@ class User:
 
     def __init__(self, slack_id):
         """Initialize the user with a given Slack ID."""
-        self.__slack_id = slack_id
-        self.__name = ""
-        self.__email = ""
-        self.__github_username = ""
-        self.__github_id = ""
-        self.__major = ""
-        self.__position = ""
-        self.__biography = ""
-        self.__image_url = ""
-        self.__permissions_level = Permissions.member
-        self.__karma = 1
+        self.slack_id = slack_id
+        self.name = ""
+        self.email = ""
+        self.github_username = ""
+        self.github_id = ""
+        self.major = ""
+        self.position = ""
+        self.biography = ""
+        self.image_url = ""
+        self.permissions_level = Permissions.member
+        self.karma = 1
 
-    def get_attachment(self):
+    def get_attachment(self) -> Dict[str, Any]:
         """Return slack-formatted attachment (dictionary) for user."""
         # TODO: Refactor into another file to preserve purity
         text_pairs = [
-            ('Slack ID', self.__slack_id),
-            ('Name', self.__name),
-            ('Email', self.__email),
-            ('Github Username', self.__github_username),
-            ('Github ID', self.__github_id),
-            ('Major', self.__major),
-            ('Position', self.__position),
-            ('Biography', self.__biography),
-            ('Image URL', self.__image_url),
-            ('Permissions Level', str(self.__permissions_level)),
-            ('Karma', self.__karma)
+            ('Slack ID', self.slack_id),
+            ('Name', self.name),
+            ('Email', self.email),
+            ('Github Username', self.github_username),
+            ('Github ID', self.github_id),
+            ('Major', self.major),
+            ('Position', self.position),
+            ('Biography', self.biography),
+            ('Image URL', self.image_url),
+            ('Permissions Level', str(self.permissions_level)),
+            ('Karma', self.karma)
         ]
 
         fields = [{'title': t, 'value': v if v else 'n/a', 'short': True}
@@ -46,10 +46,8 @@ class User:
     def to_dict(user):
         """
         Convert user object to dict object.
-
         The difference with the in-built ``self.__dict__`` is that this is more
         compatible with storing into NoSQL databases like DynamoDB.
-
         :param user: the user object
         :return: the dictionary representing the user
         """
@@ -77,7 +75,6 @@ class User:
     def from_dict(d):
         """
         Convert dict response object to user model.
-
         :param d: the dictionary representing a user
         :return: returns converted user model.
         """
@@ -98,11 +95,9 @@ class User:
     def is_valid(user):
         """
         Return true if this user has no missing required fields.
-
         Required fields for database to accept:
-        - ``__slack_id``
-        - ``__permissions_level``
-
+            - ``slack_id``
+            - ``permissions_level``
         :param user: user to check
         :return: return true if this user has no missing required fields
         """
@@ -200,21 +195,3 @@ class User:
     def __str__(self):
         """Print information on the user class."""
         return str(self.__dict__)
-
-    def reset_karma(self):
-        """Resets amount of karma for a user, default is one"""
-        self.__karma = 1
-
-    def add_karma_by_amount(self, amount):
-        """Adds karma by amount"""
-        self.__karma += amount
-
-    def remove_karma_by_amount(self, amount):
-        """Removes karma by amount"""
-        self.__karma -= amount
-        if self.__karma <= 0:
-           self.reset_karma
-
-    def get_karma(self):
-        """Returns amount of karma for a User"""
-        return self.__karma
