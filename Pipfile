@@ -21,6 +21,7 @@ pem = "*"
 cryptography = "*"
 requests = "*"
 pyyaml = "*"
+apscheduler = "*"
 
 [dev-packages]
 awscli = "*"
