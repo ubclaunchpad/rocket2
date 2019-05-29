@@ -60,6 +60,12 @@ class TestTeamCommand(TestCase):
         self.assertTupleEqual(self.testcommand.handle("team list", user),
                               (self.testcommand.lookup_error, 200))
 
+    def test_handle_list_no_teams(self):
+        """Test team command list with no teams found."""
+        self.db.query.return_value = None
+        self.assertTupleEqual(self.testcommand.handle("team list", user),
+                              ("No Teams Exist!", 200))
+
     def test_handle_view(self):
         """Test team command view parser."""
         team = Team("BRS", "brs", "web")
