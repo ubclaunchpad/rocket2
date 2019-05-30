@@ -161,60 +161,103 @@ class WebhookHandler:
         github_id = github_team["id"]
         github_team_name = github_team["name"]
         if action == "created":
-            logging.debug(f"team added event triggered: {str(payload)}")
-            try:
-                team = self.__facade.retrieve(Team, github_id)
-                logging.warning(f"team {github_team_name} with "
-                                f"id {github_id} already exists.")
-                team.github_team_name = github_team_name
-            except LookupError:
-                logging.debug(f"team {github_team_name} with "
-                              f"id {github_id} added to organization.")
-                team = Team(github_id, github_team_name, "")
-            self.__facade.store(team)
-            logging.info(f"team {github_team_name} with "
-                         f"id {github_id} added to rocket db.")
-            return f"created team with github id {github_id}", 200
+            return self.team_created(github_id, github_team_name, payload)
         elif action == "deleted":
-            logging.debug(f"team deleted event triggered: {str(payload)}")
-            try:
-                self.__facade.retrieve(Team, github_id)
-                self.__facade.delete(Team, github_id)
-                logging.info(f"team {github_team_name} with github "
-                             f"id {github_id} removed from db")
-                return f"deleted team with github id {github_id}", 200
-            except LookupError:
-                logging.error(f"team with github id {github_id} not found.")
-                return f"team with github id {github_id} not found", 404
+            return self.team_deleted(github_id, github_team_name, payload)
         elif action == "edited":
-            logging.debug(f"team edited event triggered: {str(payload)}")
-            try:
-                team = self.__facade.retrieve(Team, github_id)
-                team.github_team_name = github_team_name
-                logging.info(f"changed team's name with id {github_id} from "
-                             f"{github_team_name} to {team.github_team_name}")
-                self.__facade.store(team)
-                logging.info(f"updated team with id {github_id} in"
-                             " rocket db.")
-                return f"updated team with id {github_id}", 200
-            except LookupError:
-                logging.error(f"team with github id {github_id} not found.")
-                return f"team with github id {github_id} not found", 404
+            return self.team_edited(github_id, github_team_name, payload)
         elif action == "added_to_repository":
-            repository_name = payload["repository"]["name"]
-            logging.info(f"team with id {github_id} added to repository"
-                         f" {repository_name}")
-            return (f"team with id {github_id} added to repository"
-                    f" {repository_name}", 200)
+            return self.team_added_to_repository(github_id,
+                                                 github_team_name,
+                                                 payload)
         elif action == "removed_from_repository":
-            repository_name = payload["repository"]["name"]
-            logging.info(f"team with id {github_id} from repository"
-                         f" {repository_name}")
-            return (f"team with id {github_id} removed repository "
-                    f"{repository_name}", 200)
+            return self.team_removed_from_repository(github_id,
+                                                     github_team_name,
+                                                     payload)
         else:
             logging.error(f"invalid payload received: {str(payload)}")
             return "invalid payload", 405
+
+    def team_created(self,
+                     github_id: str,
+                     github_team_name: str,
+                     payload: Dict[str, Any]) -> ResponseTuple:
+        """Help team function if payload action is created."""
+        logging.debug(f"team created event triggered: {str(payload)}")
+        try:
+            team = self.__facade.retrieve(Team, github_id)
+            logging.warning(f"team {github_team_name} with "
+                            f"id {github_id} already exists.")
+            team.github_team_name = github_team_name
+        except LookupError:
+            logging.debug(f"team {github_team_name} with "
+                          f"id {github_id} added to organization.")
+            team = Team(github_id, github_team_name, "")
+        self.__facade.store(team)
+        logging.info(f"team {github_team_name} with "
+                     f"id {github_id} added to rocket db.")
+        return f"created team with github id {github_id}", 200
+
+    def team_deleted(self,
+                     github_id: str,
+                     github_team_name: str,
+                     payload: Dict[str, Any]) -> ResponseTuple:
+        """Help team function if payload action is deleted."""
+        logging.debug(f"team deleted event triggered: {str(payload)}")
+        try:
+            self.__facade.retrieve(Team, github_id)
+            self.__facade.delete(Team, github_id)
+            logging.info(f"team {github_team_name} with github "
+                         f"id {github_id} removed from db")
+            return f"deleted team with github id {github_id}", 200
+        except LookupError:
+            logging.error(f"team with github id {github_id} not found.")
+            return f"team with github id {github_id} not found", 404
+
+    def team_edited(self,
+                    github_id: str,
+                    github_team_name: str,
+                    payload: Dict[str, Any]) -> ResponseTuple:
+        """Help team function if payload action is edited."""
+        logging.debug(f"team edited event triggered: {str(payload)}")
+        try:
+            team = self.__facade.retrieve(Team, github_id)
+            team.github_team_name = github_team_name
+            logging.info(f"changed team's name with id {github_id} from "
+                         f"{github_team_name} to {team.github_team_name}")
+            self.__facade.store(team)
+            logging.info(f"updated team with id {github_id} in"
+                         " rocket db.")
+            return f"updated team with id {github_id}", 200
+        except LookupError:
+            logging.error(f"team with github id {github_id} not found.")
+            return f"team with github id {github_id} not found", 404
+
+    def team_added_to_repository(self,
+                                 github_id: str,
+                                 github_team_name: str,
+                                 payload: Dict[str, Any]) -> ResponseTuple:
+        """Help team function if payload action is added_to_repository."""
+        logging.debug(
+            f"team added_to_repository event triggered: {str(payload)}")
+        repository_name = payload["repository"]["name"]
+        logging.info(f"team with id {github_id} added to repository"
+                     f" {repository_name}")
+        return (f"team with id {github_id} added to repository"
+                f" {repository_name}", 200)
+
+    def team_removed_from_repository(self,
+                                     github_id: str,
+                                     github_team_name: str,
+                                     payload: Dict[str, Any]) -> ResponseTuple:
+        """Help team function if payload action is removed_from_repository."""
+        logging.debug(
+            f"team removed_to_repository event triggered: {str(payload)}")
+        repository_name = payload["repository"]["name"]
+        logging.info(f"team with id {github_id} from repository"
+                     f" {repository_name}")
+        return (f"team with id {github_id} removed repository "
+                f"{repository_name}", 200)
 
     def handle_membership_event(self,
                                 payload: Dict[str, Any]) -> ResponseTuple:
