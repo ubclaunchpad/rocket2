@@ -41,8 +41,8 @@ class WebhookHandler:
         :return: appropriate ResponseTuple depending on the validity and type
                  of webhook
         """
+        logging.debug(f"payload: {str(payload)}")
         if self.verify_hash(request_body, xhub_signature):
-            # handle
             action = payload["action"]
             if action in self.__organization_action_list:
                 return self.handle_organization_event(payload)
@@ -84,6 +84,7 @@ class WebhookHandler:
 
         If the member is added or invited, do nothing.
         """
+        logging.info("organization webhook triggered")
         action = payload["action"]
         github_user = payload["membership"]["user"]
         github_id = github_user["id"]
@@ -154,6 +155,7 @@ class WebhookHandler:
 
         If the team is added or removed from a repository, do nothing for now.
         """
+        logging.info("team webhook triggered")
         action = payload["action"]
         github_team = payload["team"]
         github_id = github_team["id"]
