@@ -233,12 +233,15 @@ class TeamCommand:
         """
         Return display information of all teams.
 
-        :return: error message if lookup error,
+        :return: error message if lookup error or no teams,
                  otherwise return teams' information
         """
         try:
+            teams = self.facade.query(Team)
+            if not teams:
+                return "No Teams Exist!", 200
             attachment = [team.get_basic_attachment() for
-                          team in self.facade.query(Team)]
+                          team in teams]
             return jsonify({'attachments': attachment}), 200
         except LookupError:
             return self.lookup_error, 200
