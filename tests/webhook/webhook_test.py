@@ -325,8 +325,8 @@ def test_handle_org_event_add_member(mock_logging, org_add_payload,
     mock_facade = mock.MagicMock(DBFacade)
     webhook_handler = WebhookHandler(mock_facade, credentials)
     rsp, code = webhook_handler.handle_organization_event(org_add_payload)
-    mock_logging.info.assert_called_once_with(("user hacktocat added "
-                                               "to Octocoders"))
+    mock_logging.info.assert_called_with(("user hacktocat added "
+                                          "to Octocoders"))
     assert rsp == "user hacktocat added to Octocoders"
     assert code == 200
 
@@ -343,7 +343,7 @@ def test_handle_org_event_rm_single_member(mock_logging, org_rm_payload,
     mock_facade.query\
         .assert_called_once_with(User, [('github_user_id', "39652351")])
     mock_facade.delete.assert_called_once_with(User, "SLACKID")
-    mock_logging.info.assert_called_once_with("deleted slack user SLACKID")
+    mock_logging.info.assert_called_with("deleted slack user SLACKID")
     assert rsp == "deleted slack ID SLACKID"
     assert code == 200
 
@@ -390,8 +390,8 @@ def test_handle_org_event_inv_member(mock_logging, org_inv_payload,
     mock_facade = mock.MagicMock(DBFacade)
     webhook_handler = WebhookHandler(mock_facade, credentials)
     rsp, code = webhook_handler.handle_organization_event(org_inv_payload)
-    mock_logging.info.assert_called_once_with(("user hacktocat invited "
-                                               "to Octocoders"))
+    mock_logging.info.assert_called_with(("user hacktocat invited "
+                                          "to Octocoders"))
     assert rsp == "user hacktocat invited to Octocoders"
     assert code == 200
 
