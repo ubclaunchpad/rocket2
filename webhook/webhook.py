@@ -28,6 +28,10 @@ class WebhookHandler:
             "added_to_repository",
             "removed_from_repository"
         ]
+        self.__membership_action_list = [
+            "added",
+            "removed"
+        ]
 
     def handle(self,
                request_body: bytes,
@@ -48,6 +52,8 @@ class WebhookHandler:
                 return self.handle_organization_event(payload)
             elif action in self.__team_action_list:
                 return self.handle_team_event(payload)
+            elif action in self.__membership_action_list:
+                return self.handle_membership_event(payload)
             else:
                 logging.error("Unsupported payload received")
                 return "Unsupported payload received", 500

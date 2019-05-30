@@ -795,6 +795,24 @@ def test_verify_and_handle_team_event(mock_handle_team_event, mock_verify_hash,
 
 
 @mock.patch('webhook.webhook.WebhookHandler.verify_hash')
+@mock.patch('webhook.webhook.WebhookHandler.handle_membership_event')
+def test_verify_and_handle_membership_event(mock_handle_mem_event,
+                                            mock_verify_hash,
+                                            credentials, mem_add_payload,
+                                            mem_rm_payload):
+    """Test that the handle function can handle membership events."""
+    mock_verify_hash.return_value = True
+    mock_handle_mem_event.return_value = ("rsp", 0)
+    mock_facade = mock.MagicMock(DBFacade)
+    webhook_handler = WebhookHandler(mock_facade, credentials)
+    rsp, code = webhook_handler.handle(None, None, mem_add_payload)
+    webhook_handler.handle(None, None, mem_rm_payload)
+    assert mock_handle_mem_event.call_count == 2
+    assert rsp == "rsp"
+    assert code == 0
+
+
+@mock.patch('webhook.webhook.WebhookHandler.verify_hash')
 def test_verify_and_handle_unknown_event(mock_verify_hash, credentials,
                                          org_empty_payload):
     """Test that the handle function can handle invalid signatures."""
