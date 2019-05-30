@@ -79,7 +79,7 @@ def handle_commands():
 
 
 @app.route(config['github']['webhook_url'], methods=['POST'])
-def handle_webhook():
+def handle_github_webhook():
     """Handle GitHub webhooks."""
     xhub_signature = request.headers.get('X-Hub-Signature')
     request_data = request.get_data()
