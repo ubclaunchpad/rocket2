@@ -62,7 +62,7 @@ class TestTeamCommand(TestCase):
 
     def test_handle_list_no_teams(self):
         """Test team command list with no teams found."""
-        self.db.query.return_value = None
+        self.db.query.return_value = []
         self.assertTupleEqual(self.testcommand.handle("team list", user),
                               ("No Teams Exist!", 200))
 
