@@ -13,6 +13,7 @@ region = "us-west-2"
 [github]
 app_id = 26418
 organization = "ubclaunchpad"
+webhook_url = "/webhook"
 
 [auth]
 signing_key_path = "credentials/signing_key"

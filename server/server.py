@@ -78,26 +78,14 @@ def handle_commands():
     return core.handle_app_command(txt, uid)
 
 
-@app.route('/webhook/organization', methods=['POST'])
-def handle_organization_webhook():
-    """Handle GitHub organization webhooks."""
-    logging.info("organization webhook triggered")
+@app.route(config['github']['webhook_url'], methods=['POST'])
+def handle_github_webhook():
+    """Handle GitHub webhooks."""
     xhub_signature = request.headers.get('X-Hub-Signature')
     request_data = request.get_data()
     request_json = request.get_json()
-    logging.debug(f"organization payload: {str(request_json)}")
-    return webhook_handler.handle(request_data, xhub_signature, request_json)
-
-
-@app.route('/webhook/team', methods=['POST'])
-def handle_team_webhook():
-    """Handle GitHub team webhooks."""
-    logging.info("team webhook triggered")
-    xhub_signature = request.headers.get('X-Hub-Signature')
-    request_data = request.get_data()
-    request_json = request.get_json()
-    logging.debug(f"team payload: {str(request_json)}")
     msg = webhook_handler.handle(request_data, xhub_signature, request_json)
+    # TODO: conditionally send notifications to Slack for unsupported webhooks
     core.send_event_notif(msg[0].capitalize())
     return msg
 

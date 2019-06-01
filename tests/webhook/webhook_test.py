@@ -325,8 +325,8 @@ def test_handle_org_event_add_member(mock_logging, org_add_payload,
     mock_facade = mock.MagicMock(DBFacade)
     webhook_handler = WebhookHandler(mock_facade, credentials)
     rsp, code = webhook_handler.handle_organization_event(org_add_payload)
-    mock_logging.info.assert_called_once_with(("user hacktocat added "
-                                               "to Octocoders"))
+    mock_logging.info.assert_called_with(("user hacktocat added "
+                                          "to Octocoders"))
     assert rsp == "user hacktocat added to Octocoders"
     assert code == 200
 
@@ -343,7 +343,7 @@ def test_handle_org_event_rm_single_member(mock_logging, org_rm_payload,
     mock_facade.query\
         .assert_called_once_with(User, [('github_user_id', "39652351")])
     mock_facade.delete.assert_called_once_with(User, "SLACKID")
-    mock_logging.info.assert_called_once_with("deleted slack user SLACKID")
+    mock_logging.info.assert_called_with("deleted slack user SLACKID")
     assert rsp == "deleted slack ID SLACKID"
     assert code == 200
 
@@ -390,8 +390,8 @@ def test_handle_org_event_inv_member(mock_logging, org_inv_payload,
     mock_facade = mock.MagicMock(DBFacade)
     webhook_handler = WebhookHandler(mock_facade, credentials)
     rsp, code = webhook_handler.handle_organization_event(org_inv_payload)
-    mock_logging.info.assert_called_once_with(("user hacktocat invited "
-                                               "to Octocoders"))
+    mock_logging.info.assert_called_with(("user hacktocat invited "
+                                          "to Octocoders"))
     assert rsp == "user hacktocat invited to Octocoders"
     assert code == 200
 
@@ -790,6 +790,24 @@ def test_verify_and_handle_team_event(mock_handle_team_event, mock_verify_hash,
     webhook_handler.handle(None, None, team_added_to_repository_payload)
     webhook_handler.handle(None, None, team_rm_from_repository_payload)
     assert mock_handle_team_event.call_count == 5
+    assert rsp == "rsp"
+    assert code == 0
+
+
+@mock.patch('webhook.webhook.WebhookHandler.verify_hash')
+@mock.patch('webhook.webhook.WebhookHandler.handle_membership_event')
+def test_verify_and_handle_membership_event(mock_handle_mem_event,
+                                            mock_verify_hash,
+                                            credentials, mem_add_payload,
+                                            mem_rm_payload):
+    """Test that the handle function can handle membership events."""
+    mock_verify_hash.return_value = True
+    mock_handle_mem_event.return_value = ("rsp", 0)
+    mock_facade = mock.MagicMock(DBFacade)
+    webhook_handler = WebhookHandler(mock_facade, credentials)
+    rsp, code = webhook_handler.handle(None, None, mem_add_payload)
+    webhook_handler.handle(None, None, mem_rm_payload)
+    assert mock_handle_mem_event.call_count == 2
     assert rsp == "rsp"
     assert code == 0
 
