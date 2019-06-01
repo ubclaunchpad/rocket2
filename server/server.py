@@ -73,9 +73,19 @@ def check():
 @app.route('/slack/commands', methods=['POST'])
 def handle_commands():
     """Handle rocket slash commands."""
-    txt = request.form['text']
-    uid = request.form['user_id']
-    return core.handle_app_command(txt, uid)
+    logging.info("Slash command received")
+    timestamp = request.headers.get("X-Slack-Request-Timestamp")
+    slack_signature = request.headers.get("X-Slack-Signature")
+    verified = slack_events_adapter.server.verify_signature(
+        timestamp, slack_signature)
+    if verified:
+        logging.info("Slack signature verified")
+        txt = request.form['text']
+        uid = request.form['user_id']
+        return core.handle_app_command(txt, uid)
+    else:
+        logging.error("Slack signature could not be verified")
+        return "Slack signature could not be verified", 200
 
 
 @app.route(config['github']['webhook_url'], methods=['POST'])
@@ -90,15 +100,16 @@ def handle_github_webhook():
     return msg
 
 
-@slack_events_adapter.on("app_mention")
-def handle_app_mention(event):
-    """Handle a mention to @rocket."""
-    logging.info("Handled 'app_mention' event")
-    core.handle_app_mention(event)
-
-
 @slack_events_adapter.on("team_join")
 def handle_team_join(event):
     """Handle instances when user joins the Launchpad slack workspace."""
     logging.info("Handled 'team_join' event")
-    core.handle_team_join(event)
+    timestamp = request.headers.get("X-Slack-Request-Timestamp")
+    slack_signature = request.headers.get("X-Slack-Signature")
+    verified = slack_events_adapter.server.verify_signature(
+        timestamp, slack_signature)
+    if verified:
+        logging.info("Slack signature verified")
+        core.handle_team_join(event)
+    else:
+        logging.error("Slack signature could not be verified")
