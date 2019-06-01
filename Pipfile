@@ -20,6 +20,7 @@ flask-limiter = "*"
 pem = "*"
 cryptography = "*"
 requests = "*"
+pyyaml = "*"
 
 [dev-packages]
 awscli = "*"
