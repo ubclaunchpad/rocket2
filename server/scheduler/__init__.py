@@ -1,8 +1,7 @@
 """Scheduler for scheduling."""
 import atexit
-import logging
 from apscheduler.schedulers.background import BackgroundScheduler
-from server.scheduler.modules import random_channel
+from .modules import random_channel
 
 
 class Scheduler():

@@ -1,5 +1,5 @@
 """Feature random public channels."""
-from slackclient import SlackClient
+from slack import WebClient
 from interface.slack import Bot
 from random import choice
 import logging
@@ -10,11 +10,13 @@ NAME = 'Feature random channels'
 
 def do_it(flask_app, config, credentials):
     """Select and post random channels to #general."""
-    bot = Bot(SlackClient(credentials.slack_api_token),
+    bot = Bot(WebClient(credentials.slack_api_token),
               config['slack']['bot_channel'])
     channels = bot.get_channels()
     rand_channel = choice(channels)
-    bot.send_to_channel(f'Featured channel of the week: #{rand_channel}!',
+    channel_id, channel_name = rand_channel['id'], rand_channel['name']
+    bot.send_to_channel(f'Featured channel of the week: ' +
+                        f'<#{channel_id}|{channel_name}>!',
                         '#general')
 
-    logging.info(f'Featured #{rand_channel}')
+    logging.info(f'Featured #{channel_name}')
