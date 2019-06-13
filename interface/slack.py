@@ -58,6 +58,16 @@ class Bot:
         else:
             return cast(Dict[str, Any], response["members"])
 
+    def get_channels(self) -> List[str]:
+        """Retrieve list of channel names."""
+        resp = self.sc.api_call("conversations.list")
+        if 'ok' not in resp or not resp['ok']:
+            logging.error(f"Channel names retrieval failed with "
+                          f"error: {resp['error']}")
+            raise SlackAPIError(resp['error'])
+        else:
+            return list(map(lambda c: c['name'], resp['channels']))
+
     def create_channel(self, channel_name):
         """
         Create a channel with the given name.
