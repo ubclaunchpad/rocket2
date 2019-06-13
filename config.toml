@@ -1,4 +1,4 @@
-testing = true
+testing = false
 creds_path = "credentials/"
 
 [slack]
@@ -11,9 +11,9 @@ projects_table = "projects"
 region = "us-west-2"
 
 [github]
-app_id = 31754
-organization = "ubclaunchpad-cytesting"
+app_id = 26418
+organization = "ubclaunchpad"
 webhook_url = "/webhook"
 
 [auth]
-signing_key_path = "credentials/github_signing_key.pem"
+signing_key_path = "credentials/signing_key"

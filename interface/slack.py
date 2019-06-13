@@ -1,5 +1,5 @@
 """Utility classes for interacting with Slack API."""
-from slackclient import SlackClient
+from slack import WebClient
 from typing import Dict, Any, List, cast
 import logging
 
@@ -7,8 +7,8 @@ import logging
 class Bot:
     """Utility class for calling Slack APIs."""
 
-    def __init__(self, sc: SlackClient, slack_channel: str = '') -> None:
-        """Initialize Bot by creating a SlackClient Object."""
+    def __init__(self, sc: WebClient, slack_channel: str = '') -> None:
+        """Initialize Bot by creating a WebClient Object."""
         logging.info("Initializing Slack client interface")
         self.sc = sc
         self.slack_channel = slack_channel
@@ -16,12 +16,11 @@ class Bot:
     def send_dm(self, message: str, slack_user_id: str) -> None:
         """Send direct message to user with id of slack_user_id."""
         logging.debug(f"Sending direct message to {slack_user_id}")
-        response = self.sc.api_call(
-            "chat.postMessage",
+        response = self.sc.chat_postMessage(
             channel=slack_user_id,
             text=message
         )
-        if 'ok' not in response or not response['ok']:
+        if not response['ok']:
             logging.error(f"Direct message to {slack_user_id} failed with "
                           f"error: {response['error']}")
             raise SlackAPIError(response['error'])
@@ -32,13 +31,12 @@ class Bot:
                         attachments: List[Any] = []) -> None:
         """Send message to channel with name channel_name."""
         logging.debug(f"Sending message to channel {channel_name}")
-        response = self.sc.api_call(
-            "chat.postMessage",
+        response = self.sc.chat_postMessage(
             channel=channel_name,
             attachments=attachments,
             text=message
         )
-        if 'ok' not in response or not response['ok']:
+        if not response['ok']:
             logging.error(f"Message to channel {channel_name} failed with "
                           f"error: {response['error']}")
             raise SlackAPIError(response['error'])
@@ -46,11 +44,10 @@ class Bot:
     def get_channel_users(self, channel_id: str) -> Dict[str, Any]:
         """Retrieve list of user IDs from channel with channel_id."""
         logging.debug(f"Retrieving user IDs from channel {channel_id}")
-        response = self.sc.api_call(
-            "conversation.members",
+        response = self.sc.conversations_members(
             channel=channel_id
         )
-        if 'ok' not in response or not response['ok']:
+        if not response['ok']:
             logging.error("User retrieval "
                           f"from channel {channel_id} failed with "
                           f"error: {response['error']}")
@@ -58,15 +55,19 @@ class Bot:
         else:
             return cast(Dict[str, Any], response["members"])
 
-    def get_channels(self) -> List[str]:
+    def get_channel_names(self) -> List[str]:
         """Retrieve list of channel names."""
-        resp = self.sc.api_call("conversations.list")
-        if 'ok' not in resp or not resp['ok']:
-            logging.error(f"Channel names retrieval failed with "
+        return list(map(lambda c: str(c['name']), self.get_channels()))
+
+    def get_channels(self) -> List[Any]:
+        """Retrieve list of channel objects."""
+        resp = self.sc.conversations_list()
+        if not resp['ok']:
+            logging.error(f"Channel retrieval failed with "
                           f"error: {resp['error']}")
             raise SlackAPIError(resp['error'])
         else:
-            return list(map(lambda c: c['name'], resp['channels']))
+            return resp['channels']
 
     def create_channel(self, channel_name):
         """
@@ -76,12 +77,11 @@ class Bot:
         """
         logging.debug("Attempting to create channel with name {}".
                       format(channel_name))
-        response = self.sc.api_call(
-            "channels.create",
+        response = self.sc.channels_create(
             name=channel_name,
             validate=True
         )
-        if 'ok' not in response or not response['ok']:
+        if not response['ok']:
             if response['error'] == "name_taken":
                 logging.warning("Channel with name {} "
                                 "already exists!".

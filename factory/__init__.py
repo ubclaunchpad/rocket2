@@ -11,7 +11,7 @@ from db import DBFacade
 from db.dynamodb import DynamoDB
 from interface.github import GithubInterface, DefaultGithubFactory
 from interface.slack import Bot
-from slackclient import SlackClient
+from slack import WebClient
 from webhook.webhook import WebhookHandler
 from config import Credentials
 
@@ -44,7 +44,7 @@ def make_core(config: Dict[str, Any],
             signing_key = create_signing_token()
             open(config['auth']['signing_key_path'], 'w+').write(signing_key)
     facade = DBFacade(DynamoDB(config, credentials))
-    bot = Bot(SlackClient(slack_api_token), slack_bot_channel)
+    bot = Bot(WebClient(slack_api_token), slack_bot_channel)
     # TODO: make token config expiry configurable
     token_config = TokenCommandConfig(timedelta(days=7), signing_key)
     return Core(facade, bot, cast(GithubInterface, gh), token_config)
