@@ -4,14 +4,17 @@ from db.facade import DBFacade
 from model import User, Team
 from command import ResponseTuple
 from typing import Dict, Any, List
+from .base import GitHubEventHandler
 
 
-class MembershipEventHandler:
+class MembershipEventHandler(GitHubEventHandler):
     """Encapsulate the handler methods for GitHub membership events."""
 
-    def __init__(self, db_facade: DBFacade) -> None:
-        """Give handler access to the database facade."""
-        self.__facade = db_facade
+    @property
+    def supported_action_list(self) -> List[str]:
+        """Provide a list of all actions this handler can handle."""
+        return ["removed",
+                "added"]
 
     def handle(self,
                payload: Dict[str, Any]) -> ResponseTuple:
@@ -23,7 +26,7 @@ class MembershipEventHandler:
         team = payload["team"]
         team_id = team["id"]
         team_name = team["name"]
-        selected_team = self.__facade.retrieve(Team, team_id)
+        selected_team = self._facade.retrieve(Team, team_id)
         if action == "removed":
             return self.mem_remove(github_id, selected_team, team_name)
         elif action == "added":
@@ -39,7 +42,7 @@ class MembershipEventHandler:
                    selected_team: Team,
                    team_name: str) -> ResponseTuple:
         """Help membership function if payload action is removal."""
-        member_list = self.__facade. \
+        member_list = self._facade. \
             query(User, [('github_user_id', github_id)])
         slack_ids_string = ""
         if len(member_list) == 1:
@@ -69,8 +72,8 @@ class MembershipEventHandler:
                   team_name: str,
                   github_username: str) -> ResponseTuple:
         """Help membership function if payload action is added."""
-        member_list = self.__facade.query(User,
-                                          [('github_user_id', github_id)])
+        member_list = self._facade.query(User,
+                                         [('github_user_id', github_id)])
         slack_ids_string = ""
         if len(member_list) > 0:
             selected_team.add_member(github_id)

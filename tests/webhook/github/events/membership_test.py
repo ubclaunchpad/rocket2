@@ -108,6 +108,14 @@ def mem_empty_payload(mem_default_payload):
     return empty_payload
 
 
+def test_org_supported_action_list():
+    """Confirm the supported action list of the handler."""
+    mock_facade = mock.MagicMock(DBFacade)
+    webhook_handler = MembershipEventHandler(mock_facade)
+    assert webhook_handler.supported_action_list == ["removed",
+                                                     "added"]
+
+
 @mock.patch('webhook.github.events.membership.logging')
 def test_handle_mem_event_add_member(mock_logging, mem_add_payload):
     """Test that instances when members are added to the mem are logged."""

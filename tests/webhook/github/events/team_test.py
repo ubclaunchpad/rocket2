@@ -209,6 +209,18 @@ def team_empty_payload(team_default_payload):
     return empty_payload
 
 
+def test_org_supported_action_list():
+    """Confirm the supported action list of the handler."""
+    mock_facade = mock.MagicMock(DBFacade)
+    webhook_handler = TeamEventHandler(mock_facade)
+    assert webhook_handler.supported_action_list == ["created",
+                                                     "deleted",
+                                                     "edited",
+                                                     "added_to_repository",
+                                                     "removed_from_repository"
+                                                     ]
+
+
 @mock.patch('webhook.github.events.team.logging')
 def test_handle_team_event_created_team(mock_logging, team_created_payload):
     """Test that teams can be created if they are not in the db."""

@@ -4,14 +4,18 @@ from db.facade import DBFacade
 from model import User
 from command import ResponseTuple
 from typing import Dict, Any, List
+from .base import GitHubEventHandler
 
 
-class OrganizationEventHandler:
+class OrganizationEventHandler(GitHubEventHandler):
     """Encapsulate the handler methods for GitHub organization events."""
 
-    def __init__(self, db_facade: DBFacade) -> None:
-        """Give handler access to the database facade."""
-        self.__facade = db_facade
+    @property
+    def supported_action_list(self) -> List[str]:
+        """Provide a list of all actions this handler can handle."""
+        return ["member_removed",
+                "member_added",
+                "member_invited"]
 
     def handle(self, payload: Dict[str, Any]) -> ResponseTuple:
         """
@@ -28,7 +32,7 @@ class OrganizationEventHandler:
         github_id = github_user["id"]
         github_username = github_user["login"]
         organization = payload["organization"]["login"]
-        member_list = self.__facade. \
+        member_list = self._facade. \
             query(User, [('github_user_id', github_id)])
         if action == "member_removed":
             return self.handle_remove(member_list, github_id, github_username)
@@ -50,7 +54,7 @@ class OrganizationEventHandler:
             slack_ids_string = ""
             for member in member_list:
                 slack_id = member.slack_id
-                self.__facade.delete(User, slack_id)
+                self._facade.delete(User, slack_id)
                 logging.info(f"deleted slack user {slack_id}")
                 slack_ids_string += f" {slack_id}"
             return f"deleted slack ID{slack_ids_string}", 200

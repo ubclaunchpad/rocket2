@@ -109,6 +109,15 @@ def org_empty_payload(org_default_payload):
     return empty_payload
 
 
+def test_org_supported_action_list():
+    """Confirm the supported action list of the handler."""
+    mock_facade = mock.MagicMock(DBFacade)
+    webhook_handler = OrganizationEventHandler(mock_facade)
+    assert webhook_handler.supported_action_list == ["member_removed",
+                                                     "member_added",
+                                                     "member_invited"]
+
+
 @mock.patch('webhook.github.events.organization.logging')
 def test_handle_org_event_add_member(mock_logging, org_add_payload):
     """Test that instances when members are added to the org are logged."""
