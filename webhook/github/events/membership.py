@@ -4,7 +4,7 @@ from db.facade import DBFacade
 from model import User, Team
 from command import ResponseTuple
 from typing import Dict, Any, List
-from .base import GitHubEventHandler
+from webhook.github.events.base import GitHubEventHandler
 
 
 class MembershipEventHandler(GitHubEventHandler):
