@@ -12,7 +12,7 @@ from db.dynamodb import DynamoDB
 from interface.github import GithubInterface, DefaultGithubFactory
 from interface.slack import Bot
 from slackclient import SlackClient
-from webhook.webhook import WebhookHandler
+from webhook.github import GitHubWebhookHandler
 from config import Credentials
 
 from typing import Dict, Any, Optional, cast
@@ -50,15 +50,16 @@ def make_core(config: Dict[str, Any],
     return Core(facade, bot, cast(GithubInterface, gh), token_config)
 
 
-def make_webhook_handler(config: Dict[str, Any],
-                         credentials: Credentials) -> WebhookHandler:
+def make_github_webhook_handler(config: Dict[str, Any],
+                                credentials:
+                                Credentials) -> GitHubWebhookHandler:
     """
-    Initialize and returns a :class:`webhook.webhook.WebhookHandler` object.
+    Initialize a :class:`webhook.github.GitHubWebhookHandler` object.
 
     :return: a new ``WebhookHandler`` object, freshly initialized
     """
     facade = DBFacade(DynamoDB(config, credentials))
-    return WebhookHandler(facade, credentials)
+    return GitHubWebhookHandler(facade, credentials)
 
 
 def create_signing_token() -> str:

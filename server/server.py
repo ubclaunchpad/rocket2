@@ -1,5 +1,5 @@
 """Flask server instance."""
-from factory import make_core, make_webhook_handler
+from factory import make_core, make_github_webhook_handler
 from flask import Flask, request
 from logging.config import dictConfig
 from slackeventsapi import SlackEventAdapter
@@ -54,7 +54,7 @@ talisman.force_https = False
 config = cast(Dict[str, Any], toml.load('config.toml'))
 credentials = Credentials(config['creds_path'])
 core = make_core(config, credentials)
-webhook_handler = make_webhook_handler(config, credentials)
+github_webhook_handler = make_github_webhook_handler(config, credentials)
 if not config['testing']:
     slack_signing_secret = credentials.slack_signing_secret
 else:
@@ -94,7 +94,8 @@ def handle_github_webhook():
     xhub_signature = request.headers.get('X-Hub-Signature')
     request_data = request.get_data()
     request_json = request.get_json()
-    msg = webhook_handler.handle(request_data, xhub_signature, request_json)
+    msg = github_webhook_handler.handle(
+        request_data, xhub_signature, request_json)
     # TODO: conditionally send notifications to Slack for unsupported webhooks
     core.send_event_notif(msg[0].capitalize())
     return msg
