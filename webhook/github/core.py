@@ -3,7 +3,7 @@ import logging
 import hmac
 import hashlib
 from db.facade import DBFacade
-from typing import Dict, Any, List, TypeVar
+from typing import Dict, Any
 from command import ResponseTuple
 from config import Credentials
 from webhook.github.events.organization import OrganizationEventHandler

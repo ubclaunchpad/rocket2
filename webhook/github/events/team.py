@@ -1,6 +1,5 @@
 """Handle GitHub team events."""
 import logging
-from db.facade import DBFacade
 from model import Team
 from command import ResponseTuple
 from typing import Dict, Any, List
