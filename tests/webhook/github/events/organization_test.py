@@ -4,7 +4,7 @@ import pytest
 from db import DBFacade
 from model import User
 from unittest import mock
-from webhook.github.events import OrganizationEventHandler
+from webhook.github.events.organization import OrganizationEventHandler
 
 
 @pytest.fixture

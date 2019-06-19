@@ -6,8 +6,9 @@ from db.facade import DBFacade
 from typing import Dict, Any, List, TypeVar
 from command import ResponseTuple
 from config import Credentials
-from webhook.github.events import OrganizationEventHandler, \
-    TeamEventHandler, MembershipEventHandler
+from webhook.github.events.organization import OrganizationEventHandler
+from webhook.github.events.team import TeamEventHandler
+from webhook.github.events.membership import MembershipEventHandler
 
 
 class GitHubWebhookHandler:
