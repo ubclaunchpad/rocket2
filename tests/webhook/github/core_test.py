@@ -3,7 +3,7 @@ import pytest
 
 from db import DBFacade
 from unittest import mock
-from webhook.github import GitHubWebhookHandler
+from webhook.github.core import GitHubWebhookHandler
 from config import Credentials
 
 
