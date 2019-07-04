@@ -3,6 +3,7 @@ import logging
 import shlex
 from argparse import ArgumentParser, _SubParsersAction
 from command import ResponseTuple
+from command.commands.base import Command
 from db.facade import DBFacade
 from interface.github import GithubAPIException, GithubInterface
 from model import Team, User
@@ -11,7 +12,7 @@ from typing import Any, List
 from flask import jsonify
 
 
-class TeamCommand:
+class TeamCommand(Command):
     """Represent Team Command Parser."""
 
     command_name = "team"

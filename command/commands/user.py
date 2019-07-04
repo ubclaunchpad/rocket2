@@ -4,6 +4,7 @@ import shlex
 
 from argparse import ArgumentParser, _SubParsersAction
 from command import ResponseTuple
+from command.commands.base import Command
 from db.facade import DBFacade
 from flask import jsonify
 from interface.github import GithubAPIException, GithubInterface
@@ -11,7 +12,7 @@ from model import User, Permissions
 from typing import Dict, cast
 
 
-class UserCommand:
+class UserCommand(Command):
     """Represent User Command Parser."""
 
     command_name = "user"
