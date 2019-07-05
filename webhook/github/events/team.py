@@ -37,7 +37,7 @@ class TeamEventHandler(GitHubEventHandler):
         logging.info("team webhook triggered")
         action = payload["action"]
         github_team = payload["team"]
-        github_id = github_team["id"]
+        github_id = str(github_team["id"])
         github_team_name = github_team["name"]
         if action == "created":
             return self.team_created(github_id, github_team_name, payload)

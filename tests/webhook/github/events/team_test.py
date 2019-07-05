@@ -253,7 +253,7 @@ def test_handle_team_event_delete_team(team_deleted_payload):
     mock_facade = mock.MagicMock(DBFacade)
     webhook_handler = TeamEventHandler(mock_facade)
     rsp, code = webhook_handler.handle(team_deleted_payload)
-    mock_facade.delete.assert_called_once_with(Team, 2723476)
+    mock_facade.delete.assert_called_once_with(Team, "2723476")
     assert rsp == "deleted team with github id 2723476"
     assert code == 200
 

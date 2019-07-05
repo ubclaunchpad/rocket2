@@ -21,9 +21,9 @@ class MembershipEventHandler(GitHubEventHandler):
         action = payload["action"]
         github_user = payload["member"]
         github_username = github_user["login"]
-        github_id = github_user["id"]
+        github_id = str(github_user["id"])
         team = payload["team"]
-        team_id = team["id"]
+        team_id = str(team["id"])
         team_name = team["name"]
         selected_team = self._facade.retrieve(Team, team_id)
         if action == "removed":
