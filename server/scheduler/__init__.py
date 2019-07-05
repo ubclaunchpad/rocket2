@@ -1,27 +1,37 @@
 """Scheduler for scheduling."""
 import atexit
+from flask import Flask
 from apscheduler.schedulers.background import BackgroundScheduler
-from .modules import random_channel
+from .modules.random_channel import RandomChannelPromoter
+from .modules.base import ModuleBase
+from typing import Tuple, Dict, List, Any
+from config import Credentials
 
 
 class Scheduler():
     """The scheduler class for scheduling everything."""
 
-    def __init__(self, flask_app, config, credentials):
+    def __init__(self,
+                 scheduler: BackgroundScheduler,
+                 args: Tuple[Flask, Dict[str, Any], Credentials]):
         """Initialize scheduler class."""
-        self.__scheduler = BackgroundScheduler()
-        self.__args = (flask_app, config, credentials)
+        self.scheduler = scheduler
+        self.args = args
+        self.modules: List[ModuleBase] = []
 
         self.__init_periodic_tasks()
 
-        atexit.register(self.__scheduler.shutdown)
+        atexit.register(self.scheduler.shutdown)
 
     def start(self):
         """Start the scheduler, officially."""
-        self.__scheduler.start()
+        self.scheduler.start()
+
+    def __add_job(self, module: ModuleBase):
+        """Add module as a job."""
+        self.scheduler.add_job(func=module.do_it, **module.get_job_args())
+        self.modules.append(module)
 
     def __init_periodic_tasks(self):
         """Add jobs that fire every interval."""
-        self.__scheduler.add_job(func=random_channel.do_it, trigger='cron',
-                                 args=self.__args, day_of_week='sat',
-                                 hour=12, name=random_channel.NAME)
+        self.__add_job(RandomChannelPromoter(*self.args))
