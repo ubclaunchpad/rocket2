@@ -3,12 +3,14 @@ from factory import make_core, make_github_webhook_handler
 from flask import Flask, request
 from logging.config import dictConfig
 from slackeventsapi import SlackEventAdapter
+from apscheduler.schedulers.background import BackgroundScheduler
 import logging
 import toml
 import structlog
 from flask_talisman import Talisman
 from config import Credentials
 from typing import cast, Dict, Any
+from server.scheduler import Scheduler
 
 
 dictConfig({
@@ -61,6 +63,8 @@ else:
     slack_signing_secret = ""
 slack_events_adapter = SlackEventAdapter(slack_signing_secret,
                                          "/slack/events", app)
+sched = Scheduler(BackgroundScheduler(), (app, config, credentials))
+sched.start()
 
 
 @app.route('/')
