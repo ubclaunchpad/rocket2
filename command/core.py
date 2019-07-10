@@ -8,7 +8,7 @@ from db.facade import DBFacade
 from flask import jsonify, Response
 from interface.slack import Bot, SlackAPIError
 from interface.github import GithubInterface
-from model import User
+from app.model import User
 from typing import Dict, Any, cast
 import command.util as util
 import logging

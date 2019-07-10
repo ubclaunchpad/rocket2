@@ -1,6 +1,6 @@
 """Handle GitHub team events."""
 import logging
-from model import Team
+from app.model import Team
 from command import ResponseTuple
 from typing import Dict, Any, List
 from webhook.github.events.base import GitHubEventHandler

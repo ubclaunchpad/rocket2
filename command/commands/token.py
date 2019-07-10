@@ -6,7 +6,7 @@ from command import ResponseTuple
 from command.commands.base import Command
 from datetime import datetime, timedelta
 from db.facade import DBFacade
-from model import User, Permissions
+from app.model import User, Permissions
 from utils.slack_msg_fmt import wrap_code_block
 
 

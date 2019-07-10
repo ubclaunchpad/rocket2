@@ -1,7 +1,7 @@
 """Test the facade for the database."""
 from db import DBFacade
 from unittest import mock
-from model import Team, User, Project
+from app.model import Team, User, Project
 from tests.util import create_test_admin, create_test_team, create_test_project
 
 

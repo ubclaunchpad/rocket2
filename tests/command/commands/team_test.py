@@ -1,9 +1,9 @@
 """Test team command parsing."""
 from command.commands.team import TeamCommand
 from unittest import TestCase, mock
-from model.team import Team
-from model.user import User
-from model.permissions import Permissions
+from app.model.team import Team
+from app.model.user import User
+from app.model.permissions import Permissions
 from interface.exceptions.github import GithubAPIException
 from flask import jsonify, json, Flask
 

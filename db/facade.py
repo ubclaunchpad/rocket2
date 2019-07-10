@@ -1,7 +1,7 @@
 """Database Facade."""
-from model.user import User
-from model.team import Team
-from model.project import Project
+from app.model.user import User
+from app.model.team import Team
+from app.model.project import Project
 from typing import List, Tuple, TypeVar, Type
 from db.dynamodb import DynamoDB
 import logging

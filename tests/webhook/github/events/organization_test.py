@@ -2,7 +2,7 @@
 import pytest
 
 from db import DBFacade
-from model import User
+from app.model import User
 from unittest import mock
 from webhook.github.events.organization import OrganizationEventHandler
 

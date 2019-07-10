@@ -1,5 +1,5 @@
 """Test the data model for a user."""
-from model import User, Permissions
+from app.model import User, Permissions
 from tests.util import create_test_admin
 
 

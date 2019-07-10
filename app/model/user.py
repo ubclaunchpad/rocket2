@@ -1,6 +1,6 @@
 """Data model to represent an individual user."""
 from typing import Dict, Any
-from model.permissions import Permissions
+from app.model.permissions import Permissions
 
 
 class User:

@@ -8,7 +8,7 @@ from command.commands.base import Command
 from db.facade import DBFacade
 from flask import jsonify
 from interface.github import GithubAPIException, GithubInterface
-from model import User, Permissions
+from app.model import User, Permissions
 from typing import Dict, cast
 
 

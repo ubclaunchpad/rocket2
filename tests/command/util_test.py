@@ -1,8 +1,8 @@
 """Some tests for utility functions in commands utility."""
 import command.util as util
-from model.user import User
-from model.team import Team
-from model.permissions import Permissions
+from app.model.user import User
+from app.model.team import Team
+from app.model.permissions import Permissions
 
 
 def test_regularize_char_standard():

@@ -1,6 +1,6 @@
 """The following are a few functions to help in handling command."""
 import re
-from model import Permissions, User, Team
+from app.model import Permissions, User, Team
 from typing import Optional
 
 

@@ -3,7 +3,7 @@ from command.commands.user import UserCommand
 from db import DBFacade
 from flask import jsonify, json, Flask
 from interface.github import GithubInterface, GithubAPIException
-from model import User, Permissions
+from app.model import User, Permissions
 from unittest import mock, TestCase
 
 
