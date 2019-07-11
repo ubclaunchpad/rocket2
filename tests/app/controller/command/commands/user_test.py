@@ -1,5 +1,5 @@
 """Test user command parsing."""
-from command.commands.user import UserCommand
+from app.controller.command.commands import UserCommand
 from db import DBFacade
 from flask import jsonify, json, Flask
 from interface.github import GithubInterface, GithubAPIException

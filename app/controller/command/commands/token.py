@@ -3,7 +3,7 @@ import jwt
 import logging
 
 from app.controller import ResponseTuple
-from command.commands.base import Command
+from app.controller.command.commands.base import Command
 from datetime import datetime, timedelta
 from db.facade import DBFacade
 from app.model import User, Permissions
@@ -28,7 +28,8 @@ class TokenCommand(Command):
         Initialize TokenCommand.
 
         :param db_facade: Database connection
-        :param config: :class:`command.commands.TokenCommandConfig` object
+        :param config: :class:`app.controller.command.commands
+                               .TokenCommandConfig` object
         """
         logging.info("Initializing TokenCommand instance")
         self.facade = db_facade

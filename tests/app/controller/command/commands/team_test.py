@@ -1,5 +1,5 @@
 """Test team command parsing."""
-from command.commands.team import TeamCommand
+from app.controller.command.commands import TeamCommand
 from unittest import TestCase, mock
 from app.model.team import Team
 from app.model.user import User

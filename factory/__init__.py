@@ -5,7 +5,7 @@ import random
 import string
 
 from command.core import Core
-from command.commands.token import TokenCommandConfig
+from app.controller.command.commands.token import TokenCommandConfig
 from datetime import timedelta
 from db import DBFacade
 from db.dynamodb import DynamoDB

@@ -1,7 +1,7 @@
 """Test the core event handler."""
 from command.core import Core
-from command.commands.user import UserCommand
-from command.commands.token import TokenCommandConfig
+from app.controller.command.commands import UserCommand
+from app.controller.command.commands.token import TokenCommandConfig
 from datetime import datetime
 from db import DBFacade
 from flask import jsonify, json, Flask

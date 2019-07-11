@@ -1,9 +1,8 @@
 """Calls the appropriate handler depending on the event data."""
 from app.controller import ResponseTuple
-from command.commands import UnionCommands
-from command.commands.user import UserCommand
-from command.commands.team import TeamCommand
-from command.commands.token import TokenCommand, TokenCommandConfig
+from app.controller.command.commands import UnionCommands, \
+    UserCommand, TeamCommand, TokenCommand
+from app.controller.command.commands.token import TokenCommandConfig
 from db.facade import DBFacade
 from flask import jsonify, Response
 from interface.slack import Bot, SlackAPIError

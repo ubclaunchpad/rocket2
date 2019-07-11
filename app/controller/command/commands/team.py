@@ -3,7 +3,7 @@ import logging
 import shlex
 from argparse import ArgumentParser, _SubParsersAction
 from app.controller import ResponseTuple
-from command.commands.base import Command
+from app.controller.command.commands.base import Command
 from db.facade import DBFacade
 from interface.github import GithubAPIException, GithubInterface
 from app.model import Team, User

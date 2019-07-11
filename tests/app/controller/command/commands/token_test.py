@@ -1,7 +1,8 @@
 """Test token command parsing."""
 import jwt
 
-from command.commands.token import TokenCommand, TokenCommandConfig
+from app.controller.command.commands import TokenCommand
+from app.controller.command.commands.token import TokenCommandConfig
 from datetime import timedelta
 from db import DBFacade
 from app.model import User, Permissions
