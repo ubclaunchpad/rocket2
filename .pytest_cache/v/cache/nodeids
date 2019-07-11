@@ -1,0 +1,9 @@
+[
+  "tests/interface/slack_test.py::TestBot::test_create_same_channel_thrice",
+  "tests/interface/slack_test.py::TestBot::test_get_channel_users",
+  "tests/interface/slack_test.py::TestBot::test_get_channel_users_failure",
+  "tests/interface/slack_test.py::TestBot::test_send_dm",
+  "tests/interface/slack_test.py::TestBot::test_send_dm_failure",
+  "tests/interface/slack_test.py::TestBot::test_send_to_channel",
+  "tests/interface/slack_test.py::TestBot::test_send_to_channel_failure"
+]

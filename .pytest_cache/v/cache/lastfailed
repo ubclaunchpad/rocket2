@@ -1,0 +1,4 @@
+{
+  "tests/interface/slack_test.py::TestBot": true,
+  "tests/interface/slack_test.py::TestCase": true
+}

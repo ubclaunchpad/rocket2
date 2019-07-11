@@ -47,7 +47,7 @@ class TestBot(TestCase):
         self.bot.send_to_channel("Hahahaha", "#random")
         self.mock_sc.chat_postMessage.assert_called_with(
             text="Hahahaha",
-            attachments=[],
+            blocks=[],
             channel="#random"
         )
 
@@ -62,7 +62,7 @@ class TestBot(TestCase):
         finally:
             self.mock_sc.chat_postMessage.assert_called_with(
                 text="Hahahaha",
-                attachments=[],
+                blocks=[],
                 channel="#random"
             )
 
