@@ -7,7 +7,7 @@ from app.controller.command.commands.base import Command
 from db.facade import DBFacade
 from interface.github import GithubAPIException, GithubInterface
 from app.model import Team, User
-from command.util import check_permissions
+from utils.slack_parse import check_permissions
 from typing import Any, List
 from flask import jsonify
 

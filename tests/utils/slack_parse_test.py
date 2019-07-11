@@ -1,5 +1,5 @@
-"""Some tests for utility functions in commands utility."""
-import command.util as util
+"""Some tests for utility functions in slack parsing utility."""
+import utils.slack_parse as util
 from app.model.user import User
 from app.model.team import Team
 from app.model.permissions import Permissions

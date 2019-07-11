@@ -9,7 +9,7 @@ from interface.slack import Bot, SlackAPIError
 from interface.github import GithubInterface
 from app.model import User
 from typing import Dict, Any, cast
-import command.util as util
+import utils.slack_parse as util
 import logging
 from utils.slack_msg_fmt import wrap_slack_code
 
