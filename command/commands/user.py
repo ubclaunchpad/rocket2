@@ -3,7 +3,7 @@ import logging
 import shlex
 
 from argparse import ArgumentParser, _SubParsersAction
-from command import ResponseTuple
+from app.controller import ResponseTuple
 from command.commands.base import Command
 from db.facade import DBFacade
 from flask import jsonify

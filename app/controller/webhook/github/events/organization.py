@@ -1,7 +1,7 @@
 """Handle GitHub organization events."""
 import logging
 from app.model import User
-from command import ResponseTuple
+from app.controller import ResponseTuple
 from typing import Dict, Any, List
 from app.controller.webhook.github.events.base import GitHubEventHandler
 

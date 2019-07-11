@@ -1,5 +1,5 @@
 """Calls the appropriate handler depending on the event data."""
-from command import ResponseTuple
+from app.controller import ResponseTuple
 from command.commands import UnionCommands
 from command.commands.user import UserCommand
 from command.commands.team import TeamCommand

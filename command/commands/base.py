@@ -1,6 +1,6 @@
 """Define the abstract base class for a command parser."""
 from abc import ABC, abstractmethod
-from command import ResponseTuple
+from app.controller import ResponseTuple
 
 
 class Command(ABC):

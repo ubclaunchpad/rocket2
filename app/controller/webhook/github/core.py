@@ -4,7 +4,7 @@ import hmac
 import hashlib
 from db.facade import DBFacade
 from typing import Dict, Any
-from command import ResponseTuple
+from app.controller import ResponseTuple
 from config import Credentials
 from app.controller.webhook.github.events import MembershipEventHandler, \
     OrganizationEventHandler, TeamEventHandler

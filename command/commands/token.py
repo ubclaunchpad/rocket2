@@ -2,7 +2,7 @@
 import jwt
 import logging
 
-from command import ResponseTuple
+from app.controller import ResponseTuple
 from command.commands.base import Command
 from datetime import datetime, timedelta
 from db.facade import DBFacade

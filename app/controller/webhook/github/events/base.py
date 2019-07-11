@@ -1,7 +1,7 @@
 """Define the abstract base class for a GitHub event handler."""
 from abc import ABC, abstractmethod
 from db.facade import DBFacade
-from command import ResponseTuple
+from app.controller import ResponseTuple
 from typing import Dict, Any, List
 
 
