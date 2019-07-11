@@ -1,1 +1,1 @@
-"""Pack the modules contained in the tests/model directory."""
+"""Pack the modules contained in the tests/app/model directory."""

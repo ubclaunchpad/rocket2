@@ -3,7 +3,7 @@ import pytest
 
 from db import DBFacade
 from unittest import mock
-from webhook.github.core import GitHubWebhookHandler
+from app.controller.webhook.github.core import GitHubWebhookHandler
 from config import Credentials
 
 
@@ -13,8 +13,8 @@ def credentials():
     return Credentials('tests/credentials/complete')
 
 
-@mock.patch('webhook.github.core.logging')
-@mock.patch('webhook.github.core.hmac.new')
+@mock.patch('app.controller.webhook.github.core.logging')
+@mock.patch('app.controller.webhook.github.core.hmac.new')
 def test_verify_correct_hash(mock_hmac_new, mock_logging, credentials):
     """Test that correct hash signatures can be properly verified."""
     mock_facade = mock.MagicMock(DBFacade)
@@ -25,8 +25,8 @@ def test_verify_correct_hash(mock_hmac_new, mock_logging, credentials):
     mock_logging.debug.assert_called_once_with("Webhook signature verified")
 
 
-@mock.patch('webhook.github.core.logging')
-@mock.patch('webhook.github.core.hmac.new')
+@mock.patch('app.controller.webhook.github.core.logging')
+@mock.patch('app.controller.webhook.github.core.hmac.new')
 def test_verify_incorrect_hash(mock_hmac_new, mock_logging, credentials):
     """Test that incorrect hash signaures can be properly ignored."""
     mock_facade = mock.MagicMock(DBFacade)
@@ -38,8 +38,10 @@ def test_verify_incorrect_hash(mock_hmac_new, mock_logging, credentials):
         "Webhook not from GitHub; signature: sha1=helloworld")
 
 
-@mock.patch('webhook.github.core.GitHubWebhookHandler.verify_hash')
-@mock.patch('webhook.github.core.OrganizationEventHandler.handle')
+@mock.patch('app.controller.webhook.github.'
+            'core.GitHubWebhookHandler.verify_hash')
+@mock.patch('app.controller.webhook.github.'
+            'core.OrganizationEventHandler.handle')
 def test_verify_and_handle_org_event(mock_handle_org_event, mock_verify_hash,
                                      credentials):
     """Test that the handle function can handle organization events."""
@@ -55,8 +57,10 @@ def test_verify_and_handle_org_event(mock_handle_org_event, mock_verify_hash,
     assert code == 0
 
 
-@mock.patch('webhook.github.core.GitHubWebhookHandler.verify_hash')
-@mock.patch('webhook.github.core.TeamEventHandler.handle')
+@mock.patch('app.controller.webhook.github.'
+            'core.GitHubWebhookHandler.verify_hash')
+@mock.patch('app.controller.webhook.github.'
+            'core.TeamEventHandler.handle')
 def test_verify_and_handle_team_event(mock_handle_team_event,
                                       mock_verify_hash,
                                       credentials):
@@ -75,8 +79,10 @@ def test_verify_and_handle_team_event(mock_handle_team_event,
     assert code == 0
 
 
-@mock.patch('webhook.github.core.GitHubWebhookHandler.verify_hash')
-@mock.patch('webhook.github.core.MembershipEventHandler.handle')
+@mock.patch('app.controller.webhook.github.'
+            'core.GitHubWebhookHandler.verify_hash')
+@mock.patch('app.controller.webhook.github.'
+            'core.MembershipEventHandler.handle')
 def test_verify_and_handle_membership_event(mock_handle_mem_event,
                                             mock_verify_hash,
                                             credentials):
@@ -92,7 +98,8 @@ def test_verify_and_handle_membership_event(mock_handle_mem_event,
     assert code == 0
 
 
-@mock.patch('webhook.github.core.GitHubWebhookHandler.verify_hash')
+@mock.patch('app.controller.webhook.github.'
+            'core.GitHubWebhookHandler.verify_hash')
 def test_verify_and_handle_unknown_event(mock_verify_hash, credentials):
     """Test that the handle function can handle unknown events."""
     mock_verify_hash.return_value = True
@@ -103,7 +110,8 @@ def test_verify_and_handle_unknown_event(mock_verify_hash, credentials):
     assert code == 500
 
 
-@mock.patch('webhook.github.core.GitHubWebhookHandler.verify_hash')
+@mock.patch('app.controller.webhook.github.'
+            'core.GitHubWebhookHandler.verify_hash')
 def test_handle_unverified_event(mock_verify_hash, credentials):
     """Test that the handle function can handle invalid signatures."""
     mock_verify_hash.return_value = False

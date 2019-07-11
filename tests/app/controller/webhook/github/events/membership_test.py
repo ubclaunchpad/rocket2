@@ -4,7 +4,8 @@ import pytest
 from db import DBFacade
 from app.model import User, Team
 from unittest import mock
-from webhook.github.events.membership import MembershipEventHandler
+from app.controller.webhook.github.events.membership \
+    import MembershipEventHandler
 
 
 @pytest.fixture
@@ -116,7 +117,7 @@ def test_org_supported_action_list():
                                                      "added"]
 
 
-@mock.patch('webhook.github.events.membership.logging')
+@mock.patch('app.controller.webhook.github.events.membership.logging')
 def test_handle_mem_event_add_member(mock_logging, mem_add_payload):
     """Test that instances when members are added to the mem are logged."""
     mock_facade = mock.MagicMock(DBFacade)
@@ -130,7 +131,7 @@ def test_handle_mem_event_add_member(mock_logging, mem_add_payload):
     assert code == 200
 
 
-@mock.patch('webhook.github.events.membership.logging')
+@mock.patch('app.controller.webhook.github.events.membership.logging')
 def test_handle_mem_event_add_missing_member(mock_logging, mem_add_payload):
     """Test that instances when members are added to the mem are logged."""
     mock_facade = mock.MagicMock(DBFacade)
@@ -142,7 +143,7 @@ def test_handle_mem_event_add_missing_member(mock_logging, mem_add_payload):
     assert code == 404
 
 
-@mock.patch('webhook.github.events.membership.logging')
+@mock.patch('app.controller.webhook.github.events.membership.logging')
 def test_handle_mem_event_rm_single_member(mock_logging, mem_rm_payload):
     """Test that members removed from the mem are deleted from rocket's db."""
     mock_facade = mock.MagicMock(DBFacade)
@@ -164,7 +165,7 @@ def test_handle_mem_event_rm_single_member(mock_logging, mem_rm_payload):
     assert code == 200
 
 
-@mock.patch('webhook.github.events.membership.logging')
+@mock.patch('app.controller.webhook.github.events.membership.logging')
 def test_handle_mem_event_rm_member_missing(mock_logging, mem_rm_payload):
     """Test that members not in rocket db are handled correctly."""
     mock_facade = mock.MagicMock(DBFacade)
@@ -182,7 +183,7 @@ def test_handle_mem_event_rm_member_missing(mock_logging, mem_rm_payload):
     assert code == 404
 
 
-@mock.patch('webhook.github.events.membership.logging')
+@mock.patch('app.controller.webhook.github.events.membership.logging')
 def test_handle_mem_event_rm_member_wrong_team(mock_logging, mem_rm_payload):
     """Test what happens when member removed from a team they are not in."""
     mock_facade = mock.MagicMock(DBFacade)
@@ -196,7 +197,7 @@ def test_handle_mem_event_rm_member_wrong_team(mock_logging, mem_rm_payload):
     assert code == 404
 
 
-@mock.patch('webhook.github.events.membership.logging')
+@mock.patch('app.controller.webhook.github.events.membership.logging')
 def test_handle_mem_event_rm_mult_members(mock_logging, mem_rm_payload):
     """Test that multiple members with the same github name can be deleted."""
     mock_facade = mock.MagicMock(DBFacade)
@@ -215,7 +216,7 @@ def test_handle_mem_event_rm_mult_members(mock_logging, mem_rm_payload):
     assert code == 412
 
 
-@mock.patch('webhook.github.events.membership.logging')
+@mock.patch('app.controller.webhook.github.events.membership.logging')
 def test_handle_mem_event_empty_action(mock_logging, mem_empty_payload):
     """Test that instances where there is no/invalid action are logged."""
     mock_facade = mock.MagicMock(DBFacade)

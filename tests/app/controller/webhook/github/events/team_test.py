@@ -4,7 +4,7 @@ import pytest
 from db import DBFacade
 from app.model import Team
 from unittest import mock
-from webhook.github.events.team import TeamEventHandler
+from app.controller.webhook.github.events.team import TeamEventHandler
 
 
 @pytest.fixture
@@ -221,7 +221,7 @@ def test_org_supported_action_list():
                                                      ]
 
 
-@mock.patch('webhook.github.events.team.logging')
+@mock.patch('app.controller.webhook.github.events.team.logging')
 def test_handle_team_event_created_team(mock_logging, team_created_payload):
     """Test that teams can be created if they are not in the db."""
     mock_facade = mock.MagicMock(DBFacade)
@@ -235,7 +235,7 @@ def test_handle_team_event_created_team(mock_logging, team_created_payload):
     assert code == 200
 
 
-@mock.patch('webhook.github.events.team.logging')
+@mock.patch('app.controller.webhook.github.events.team.logging')
 def test_handle_team_event_create_update(mock_logging, team_created_payload):
     """Test that teams can be updated if they are in the db."""
     mock_facade = mock.MagicMock(DBFacade)

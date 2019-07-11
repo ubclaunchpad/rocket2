@@ -3,7 +3,7 @@ import logging
 from app.model import User, Team
 from command import ResponseTuple
 from typing import Dict, Any, List
-from webhook.github.events.base import GitHubEventHandler
+from app.controller.webhook.github.events.base import GitHubEventHandler
 
 
 class MembershipEventHandler(GitHubEventHandler):

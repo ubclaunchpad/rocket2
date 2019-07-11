@@ -12,7 +12,7 @@ from db.dynamodb import DynamoDB
 from interface.github import GithubInterface, DefaultGithubFactory
 from interface.slack import Bot
 from slack import WebClient
-from webhook.github.core import GitHubWebhookHandler
+from app.controller.webhook.github.core import GitHubWebhookHandler
 from config import Credentials
 
 from typing import Dict, Any, Optional, cast
