@@ -122,6 +122,20 @@ the PEM file format, bracketed by:
 Authenticating Rocket 2 as a Github App and obtaining an access token for the
 Github API should be automated, once the signing key is available.
 
+After doing this, remember to put your ngrok HTTPS URL with `/webhook` appended
+at the end, into the "Webhook URL" box. After doing this, you must go to the
+app's "Permissions & Events" tab and set the following as read-only:
+
+- Organization hooks
+- Organization members
+
+After doing so, please check the checkboxes below:
+
+- Membership
+- Organization
+- Team
+- Team add
+
 ### 5.31: Set Up Github Credentials
 
 Create the file `credentials/github.toml` and input the following:

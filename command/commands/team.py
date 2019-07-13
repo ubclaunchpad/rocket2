@@ -325,9 +325,9 @@ class TeamCommand(Command):
 
         :param param_list: List of parameters for adding user
         :param user_id: Slack ID of user who called command
-        :return: return error message if user added unsuccessfully
-                 or if user has insufficient permission level,
-                 otherwise returns success message
+        :return: error message if user added unsuccessfully or if user has
+                 insufficient permission level, otherwise returns success
+                 message
         """
         try:
             command_user = self.facade.retrieve(User, user_id)
@@ -472,9 +472,8 @@ class TeamCommand(Command):
 
         :param team_name: Name of team to be deleted
         :param user_id: Slack ID of user who called command
-        :return: return error message if user has insufficient permission level
-                 or team deleted unsuccessfully, otherwise return
-                 success message
+        :return: error message if user has insufficient permission level or
+                 team deleted unsuccessfully, otherwise return success message
         """
         try:
             command_user = self.facade.retrieve(User, user_id)
@@ -497,7 +496,8 @@ class TeamCommand(Command):
 
         In the event that our local team database is outdated compared to
         the teams on GitHub, this command can be called to fix things.
-        :return: return error message if user has insufficient permission level
+
+        :return: error message if user has insufficient permission level
                  otherwise returns success messages with # of teams changed
         """
         num_changed = 0
