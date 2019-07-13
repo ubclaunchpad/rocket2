@@ -1,6 +1,7 @@
 # Contributing
 
 This document contains important details for anyone contributing to Rocket 2.
+If you are on the Rocket 2 team, please read [your first pull request][prs].
 
 ## Opening an Issue
 
@@ -66,3 +67,5 @@ use an editor to fix the conflicts, then stage the formerly-conflicting files
 with `git add FILE`. Finally, use `git rebase --continue` to apply the fix and
 continue rebasing. Note that you may have to fix conflicts multiple times
 in a single rebase.
+
+[prs]: https://rocket2.rtfd.io/en/latest/docs/MyFirstPullRequest.html
