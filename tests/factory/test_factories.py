@@ -1,11 +1,11 @@
 """Tests for factories."""
 import pytest
 
-from factory import make_command_parser, CommandParser
+from factory import make_command_parser, CommandParser, \
+    make_github_webhook_handler, GitHubWebhookHandler, \
+    make_slack_events_handler, SlackEventsHandler
 from unittest import mock
 from config import Credentials
-from app.controller.webhook.github import GitHubWebhookHandler
-from app.controller.webhook.slack import SlackEventsHandler
 
 
 @pytest.mark.db
@@ -34,14 +34,14 @@ def test_make_github_webhook_handler():
             'projects_table': 'projects_test'
         }
     }
-    handler = make_command_github_webhook_handler(test_config,
-                                                  mock.MagicMock(Credentials))
+    handler = make_github_webhook_handler(test_config,
+                                          mock.MagicMock(Credentials))
     assert isinstance(handler, GitHubWebhookHandler)
 
 
 @pytest.mark.db
-def test_make_github_webhook_handler():
-    """Test the make_command_github_webhook_handler function."""
+def test_make_slack_events_handler():
+    """Test the make_command_slack_events_handler function."""
     test_config = {
         'testing': True,
         'aws': {
@@ -50,6 +50,6 @@ def test_make_github_webhook_handler():
             'projects_table': 'projects_test'
         }
     }
-    handler = make_command_github_slack_handler(test_config,
-                                                mock.MagicMock(Credentials))
+    handler = make_slack_events_handler(test_config,
+                                        mock.MagicMock(Credentials))
     assert isinstance(handler, SlackEventsHandler)
