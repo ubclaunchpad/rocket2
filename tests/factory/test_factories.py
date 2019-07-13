@@ -24,7 +24,7 @@ def test_make_command_parser():
 
 
 @pytest.mark.db
-@mock.patch('factory.credentials')
+@mock.patch('factory.Credentials')
 def test_make_github_webhook_handler(mock_creds):
     """Test the make_command_github_webhook_handler function."""
     test_config = {
