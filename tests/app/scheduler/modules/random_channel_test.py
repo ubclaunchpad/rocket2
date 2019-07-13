@@ -1,6 +1,6 @@
 """Test how random channels would work."""
 from unittest import mock
-from server.scheduler.modules.random_channel import RandomChannelPromoter
+from app.scheduler.modules.random_channel import RandomChannelPromoter
 
 
 @mock.patch('flask.Flask')

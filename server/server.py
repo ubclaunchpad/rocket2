@@ -10,7 +10,7 @@ import structlog
 from flask_talisman import Talisman
 from config import Credentials
 from typing import cast, Dict, Any
-from server.scheduler import Scheduler
+from app.scheduler import Scheduler
 
 
 dictConfig({
