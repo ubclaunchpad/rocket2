@@ -5,9 +5,9 @@ from app.controller.command.commands import UnionCommands, \
 from app.controller.command.commands.token import TokenCommandConfig
 from db.facade import DBFacade
 from flask import jsonify, Response
-from interface.slack import Bot, SlackAPIError
+from interface.slack import Bot
 from interface.github import GithubInterface
-from typing import Dict, Any, cast
+from typing import Dict, cast
 import utils.slack_parse as util
 import logging
 from utils.slack_msg_fmt import wrap_slack_code

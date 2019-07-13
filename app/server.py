@@ -12,7 +12,6 @@ from flask_talisman import Talisman
 from config import Credentials
 from typing import cast, Dict, Any
 from app.scheduler import Scheduler
-from datetime import tzinfo
 
 
 dictConfig({
