@@ -24,7 +24,8 @@ def test_make_command_parser():
 
 
 @pytest.mark.db
-def test_make_github_webhook_handler():
+@mock.patch('factory.credentials')
+def test_make_github_webhook_handler(mock_creds):
     """Test the make_command_github_webhook_handler function."""
     test_config = {
         'testing': True,
@@ -34,8 +35,9 @@ def test_make_github_webhook_handler():
             'projects_table': 'projects_test'
         }
     }
+    mock_creds.github_webhook_secret = "secret"
     handler = make_github_webhook_handler(test_config,
-                                          mock.MagicMock(Credentials))
+                                          mock_creds)
     assert isinstance(handler, GitHubWebhookHandler)
 
 

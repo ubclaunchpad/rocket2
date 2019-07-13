@@ -195,9 +195,9 @@ class UserCommand(Command):
             try:
                 self.github.org_add_member(param_list["github"])
                 edited_user.github_username = param_list["github"]
-            except GithubAPIException as e:
+            except GithubAPIException:
                 msg = f"\nError adding user {param_list['github']} to " \
-                      f"GitHub organization: {e}"
+                      f"GitHub organization"
                 logging.error(msg)
         if param_list["major"]:
             edited_user.major = param_list["major"]
