@@ -20,7 +20,7 @@ Github
    :members:
 
 Slack
-------
+-----
 
 .. automodule:: app.controller.webhook.slack.core
    :members:
