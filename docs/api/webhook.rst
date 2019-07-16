@@ -4,18 +4,23 @@ Webhooks
 Github
 ------
 
-.. automodule:: webhook.github.core
+.. automodule:: app.controller.webhook.github.core
    :members:
 
-.. automodule:: webhook.github.events.base
+.. automodule:: app.controller.webhook.github.events.base
    :members:
 
-.. automodule:: webhook.github.events.membership
+.. automodule:: app.controller.webhook.github.events.membership
    :members:
 
-.. automodule:: webhook.github.events.organization
+.. automodule:: app.controller.webhook.github.events.organization
    :members:
 
-.. automodule:: webhook.github.events.team
+.. automodule:: app.controller.webhook.github.events.team
    :members:
 
+Slack
+-----
+
+.. automodule:: app.controller.webhook.slack.core
+   :members:

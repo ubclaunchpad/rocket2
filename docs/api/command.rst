@@ -4,20 +4,17 @@ Commands
 Commands Core
 -------------
 
-.. automodule:: command.core
-   :members:
-
-.. automodule:: command.util
+.. automodule:: app.controller.command.parser
    :members:
 
 User
 ----
 
-.. automodule:: command.commands.user
+.. automodule:: app.controller.command.commands.user
    :members:
 
 Team
 ----
 
-.. automodule:: command.commands.team
+.. automodule:: app.controller.command.commands.team
    :members:
