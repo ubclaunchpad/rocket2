@@ -1,5 +1,5 @@
 """Some important (and often-used) utility functions."""
-from model import User, Team, Project, Permissions
+from app.model import User, Team, Project, Permissions
 from typing import List
 
 

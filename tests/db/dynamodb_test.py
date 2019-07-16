@@ -1,7 +1,7 @@
 """Test the dynamodb interface (requires dynamodb running)."""
 import pytest
 
-from model import User, Project, Team, Permissions
+from app.model import User, Project, Team, Permissions
 from tests.util import create_test_team, create_test_admin, create_test_project
 
 

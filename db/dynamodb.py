@@ -4,7 +4,7 @@ import logging
 
 from boto3.dynamodb.conditions import Attr
 from functools import reduce
-from model import User, Team, Project
+from app.model import User, Team, Project
 from typing import Dict, Optional, Any, Tuple, List, Type, TypeVar
 
 T = TypeVar('T', User, Team, Project)
