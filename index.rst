@@ -14,7 +14,6 @@
     docs/GettingStarted.md
     docs/Testing.md
     docs/LocalDevelopmentGuide.md
-    docs/MyFirstPullRequest.md
 
 .. toctree::
     :caption: How Everything Works
