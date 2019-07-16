@@ -4,7 +4,7 @@ Commands
 Commands Core
 -------------
 
-.. automodule:: app.controller.command.core
+.. automodule:: app.controller.command.parser
    :members:
 
 User
