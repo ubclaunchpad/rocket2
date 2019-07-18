@@ -179,8 +179,10 @@ class TestUserCommand(TestCase):
         """Test that editing github username sends request to interface."""
         user = User("U0G9QF9C6")
         user.github_username = "rob"
+        user.github_id = "123"
         user_attaches = [user.get_attachment()]
         self.mock_facade.retrieve.return_value = user
+        self.mock_github.org_add_member.return_value = "123"
         with self.app.app_context():
             resp, code = self.testcommand.handle("user edit --github rob",
                                                  "U0G9QF9C6")
@@ -223,11 +225,13 @@ class TestUserCommand(TestCase):
         user.email = "rob@rob.com"
         user.position = "dev"
         user.github_username = "rob@.github.com"
+        user.github_id = "123"
         user.major = "Computer Science"
         user.biography = "Im a human"
         user.permissions_level = Permissions.admin
         user_attaches = [user.get_attachment()]
         self.mock_facade.retrieve.return_value = user
+        self.mock_github.org_add_member.return_value = "123"
         with self.app.app_context():
             resp, code = self.testcommand.handle(
                 "user edit --member U0G9QF9C6 "
