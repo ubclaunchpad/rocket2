@@ -34,10 +34,12 @@ class TestGithubInterface(TestCase):
     def test_org_add_member(self):
         """Test GithubInterface method org_add_member."""
         mock_user: MagicMock = MagicMock(NamedUser.NamedUser)
+        mock_user.id = 1
         self.mock_github.get_user.return_value = mock_user
-        self.test_interface.org_add_member("user@email.com")
+        github_id = self.test_interface.org_add_member("user@email.com")
         self.mock_org.add_to_members. \
             assert_called_once_with(mock_user, "member")
+        self.assertEqual(github_id, str(mock_user.id))
 
     def test_org_add_admin(self):
         """Test GithubInterface method org_add_admin."""

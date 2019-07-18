@@ -63,10 +63,11 @@ class GithubInterface:
             raise GithubAPIException(e.data)
 
     @handle_github_error
-    def org_add_member(self, username: str) -> None:
+    def org_add_member(self, username: str) -> str:
         """Add/update to member with given username to organization."""
         user = self.github.get_user(username)
         self.org.add_to_members(user, "member")
+        return str(user.id)
 
     @handle_github_error
     def org_add_admin(self, username: str) -> None:

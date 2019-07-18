@@ -193,8 +193,9 @@ class UserCommand(Command):
             edited_user.position = param_list["pos"]
         if param_list["github"]:
             try:
-                self.github.org_add_member(param_list["github"])
+                github_id = self.github.org_add_member(param_list["github"])
                 edited_user.github_username = param_list["github"]
+                edited_user.github_id = github_id
             except GithubAPIException:
                 msg = f"\nError adding user {param_list['github']} to " \
                       f"GitHub organization"
