@@ -14,6 +14,7 @@ import logging
 import command.util as util
 import re
 from utils.slack_msg_fmt import wrap_slack_code
+
 class Core:
     """Encapsulate methods for handling events."""
 
