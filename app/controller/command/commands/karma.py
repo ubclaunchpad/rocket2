@@ -87,7 +87,7 @@ class KarmaCommand:
                                 help="Manually sets a user's karma")
         parser_set.add_argument("slack_id", metavar="SLACK-ID",
                                 type=str, action='store',
-                                help="Use if using slack id instead of username.")
+                                help="slack id of kuser's karma to set")
         parser_set.add_argument("amount", metavar="amount",
                                  type=int, action='store',
                                 help="Amount of karma to set into user")
@@ -103,7 +103,7 @@ class KarmaCommand:
                                 help="view a user's karma amount")
         parser_set.add_argument("slack_id", metavar="SLACK-ID",
                                 type=str, action='store',
-                                help="Use if using slack id instead of username")
+                                help="slack id of user karma to view")
         return subparsers
 
     def set_helper(self,
@@ -153,6 +153,6 @@ class KarmaCommand:
         """
         try:
             user = self.facade.retrieve(User, slack_id)
-            return f"{user.name} has {user.karma} amount of karma"
+            return f"{user.name} has {user.karma} amount of karma", 200
         except LookupError:
             return self.lookup_error, 200

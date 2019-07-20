@@ -65,7 +65,11 @@ def test_handle_help():
                           'mrkdwn_in': ['text']},
                          {"text": "*token:* Generate a signed "
                                   "token for use with the HTTP API",
-                          "mrkdwn_in": ["text"]}]}).data)
+                          "mrkdwn_in": ["text"]},
+                          {"text": "*karma:* for dealing with karma",
+                           'mrkdwn_in': ['text']},
+                          {"text": "*mention:* for dealing with mention",
+                           'mrkdwn_in': ["text"]}]}).data)
         resp = json.loads(resp.data)
     assert resp == expect
 
@@ -82,3 +86,18 @@ def test_handle_user_command(mock_usercommand):
     mock_usercommand. \
         return_value.handle. \
         assert_called_once_with("user name", "U061F7AUR")
+
+
+@mock.patch('app.controller.command.parser.MentionCommand')
+def test_handle_mention_command(mock_mentioncommand):
+    """Test that MentionCommand was handled successfully"""
+    mock_facade = mock.MagicMock(DBFacade)
+    mock_bot = mock.MagicMock(Bot)
+    mock_gh = mock.MagicMock(GithubInterface)
+    mock_token_config = TokenCommandConfig(datetime.utcnow(), '')
+    parser = CommandParser(mock_facade, mock_bot, mock_gh, mock_token_config)
+    parser.handle_app_command('U061F7AUR ++', 'UFJ42EU67')
+    mock_mentioncommand
+    mock_mentioncommand. \
+        return_value.handle. \
+        assert_called_once_with('U061F7AUR ++', 'UFJ42EU67')
