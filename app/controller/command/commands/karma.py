@@ -119,7 +119,7 @@ class KarmaCommand:
                 user = self.facade.retrieve(User, slack_id)
                 user.karma = amount
                 self.facade.store(user)
-                return f"set user's karma to {amount}", 200
+                return f"set {user.name}'s karma to {amount}", 200
             else:
                 return self.permission_error, 200
         except LookupError:
