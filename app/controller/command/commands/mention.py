@@ -12,8 +12,8 @@ class MentionCommand:
 
     command_name = "mention"
     help = "Mention command reference:\n\n /rocket Mention"\
-        "\n\nOptions:\n\n" \
-        "user"
+           "\n\nOptions:\n\n" \
+           "user"
     lookup_error = "User doesn't exist"
     desc = "for dealing with " + command_name
 
@@ -34,6 +34,8 @@ class MentionCommand:
             return self.help, 200
         elif(command_arg[1] == '++'):
             return self.karma_mention_helper(user_id, command_arg[0])
+        else:
+            return self.help, 200
 
     def karma_mention_helper(self,
                              giver_id: str,
