@@ -1,3 +1,4 @@
+"""Command for parsing karma."""
 import argparse
 import logging
 import shlex
@@ -7,7 +8,7 @@ from app.controller import ResponseTuple
 
 
 class KarmaCommand:
-    """karma command parser"""
+    """karma command parser."""
 
     command_name = "karma"
     help = "karma command reference:\n\n /rocket karma"\
@@ -21,7 +22,7 @@ class KarmaCommand:
     karma_default_amount = 1
 
     def __init__(self, db_facade):
-        """Initialize karma command"""
+        """Initialize karma command."""
         logging.info("Starting karma command initializer")
         self.parser = argparse.ArgumentParser(prog="/rocket")
         self.parser.add_argument("karma")
@@ -30,7 +31,7 @@ class KarmaCommand:
         self.help = self.get_help()
 
     def handle(self, command, user_id):
-        """Handle command by splitting into substrings"""
+        """Handle command by splitting into substrings."""
         logging.info('Handling karma Command')
         command_arg = shlex.split(command)
         args = None
@@ -50,7 +51,7 @@ class KarmaCommand:
             return self.get_help(), 200
 
     def add_karma(self, giver_id, receiver_id) -> ResponseTuple:
-        """Gives karma from giver_id to receiver_id"""
+        """Give karma from giver_id to receiver_id."""
         logging.info("giving karma to " + receiver_id)
         if(giver_id == receiver_id):
             return "cannot give karma to self", 200
@@ -104,9 +105,7 @@ class KarmaCommand:
                    user_id: str,
                    slack_id: str,
                    amount: int) -> ResponseTuple:
-        """
-        Manually sets a user's karma
-        """
+        """Manually sets a user's karma."""
         try:
             user_command = self.facade.retrieve(User, user_id)
             if user_command.permissions_level == Permissions.admin:
@@ -122,9 +121,7 @@ class KarmaCommand:
     def reset_helper(self,
                      user_id: str,
                      reset_all: bool) -> ResponseTuple:
-        """
-        Resets all user's karma
-        """
+        """Reset all user's karma."""
         try:
             user_command = self.facade.retrieve(User, user_id)
             if user_command.permissions_level == Permissions.admin:
@@ -146,9 +143,7 @@ class KarmaCommand:
     def view_helper(self,
                     user_id: str,
                     slack_id: str) -> ResponseTuple:
-        """
-        Allows user to view how much karma someone has
-        """
+        """Allow user to view how much karma someone has."""
         try:
             user = self.facade.retrieve(User, slack_id)
             return f"{user.name} has {user.karma} karma", 200

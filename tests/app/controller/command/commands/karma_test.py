@@ -7,8 +7,10 @@ from unittest import mock, TestCase
 
 
 class MentionCommandTest(TestCase):
+    """Test cases for using the karma command."""
+
     def setUp(self):
-        """Set up test environment"""
+        """Set up test environment."""
         self.app = Flask(__name__)
         self.mock_facade = mock.MagicMock(DBFacade)
         self.testcommand = KarmaCommand(self.mock_facade)
@@ -44,7 +46,7 @@ class MentionCommandTest(TestCase):
         self.mock_facade.retrieve.assert_called_once_with(User, "ABCDE8FA9")
 
     def test_handle_reset_as_admin(self):
-        """Test karma command resets all users"""
+        """Test karma command resets all users."""
         user = User("ABCDEFG2F")
         user.permissions_level = Permissions.admin
         self.mock_facade.retrieve.return_value = user
@@ -63,7 +65,7 @@ class MentionCommandTest(TestCase):
         self.mock_facade.store.assert_has_calls(store_calls)
 
     def test_handle_reset_not_as_admin(self):
-        """Test karma command resets all users"""
+        """Test karma command resets all users."""
         user = User("ABCDEFG2F")
         user.permissions_level = Permissions.member
         self.mock_facade.retrieve.return_value = user
@@ -75,7 +77,7 @@ class MentionCommandTest(TestCase):
         self.mock_facade.assert_not_called()
 
     def test_handle_set_as_admin(self):
-        """"Test setting karma as admin"""
+        """Test setting karma as admin."""
         user = User("ABCDEFG2F")
         destuser = User("MMMM1234")
         user.permissions_level = Permissions.admin
@@ -87,7 +89,7 @@ class MentionCommandTest(TestCase):
         self.mock_facade.store.assert_called_once_with(destuser)
 
     def test_handle_set_as_non_admin(self):
-        """Test setting karma as non admin"""
+        """Test setting karma as non admin."""
         user = User("ABCDEFG2F")
         destuser = User("MMMM1234")
         user.permissions_level = Permissions.member
@@ -98,7 +100,7 @@ class MentionCommandTest(TestCase):
         self.mock_facade.retrieve.assert_called_once_with(User, "ABCDEFG2F")
 
     def test_handle_set_lookup_error(self):
-        """Test setting karma with lookup error"""
+        """Test setting karma with lookup error."""
         user = User("ABCDEFG2F")
         user.permissions_level = Permissions.admin
         self.mock_facade.retrieve.side_effect = [user, LookupError]
@@ -111,7 +113,7 @@ class MentionCommandTest(TestCase):
         self.mock_facade.store.asser_not_called()
 
     def test_add_karma_to_another_person(self):
-        """Test to give karma to someone else"""
+        """Test to give karma to someone else."""
         recieveuser = User("SAKURA19")
         self.mock_facade.retrieve.return_value = recieveuser
         self.testcommand.add_karma("NARUTO19", "SAKURA19")
@@ -119,7 +121,7 @@ class MentionCommandTest(TestCase):
         self.mock_facade.store.assert_called_with(recieveuser)
 
     def test_add_karma_to_self(self):
-        """Testing if adding karma to yourself is possible"""
+        """Testing if adding karma to yourself is possible."""
         self.assertEqual(
             self.testcommand.add_karma("NARUTO19", "NARUTO19"),
             ("cannot give karma to self", 200))
@@ -127,7 +129,7 @@ class MentionCommandTest(TestCase):
         self.mock_facade.retrieve.assert_not_called()
 
     def test_add_karma_to_not_found_person(self):
-        """Testing to add karma to person not found"""
+        """Testing to add karma to person not found."""
         self.mock_facade.retrieve.side_effect = LookupError
         self.assertEqual(
             self.testcommand.add_karma("NARUTO19", "SAKURA19"),

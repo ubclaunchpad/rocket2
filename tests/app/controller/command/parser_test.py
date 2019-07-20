@@ -90,7 +90,7 @@ def test_handle_user_command(mock_usercommand):
 
 @mock.patch('app.controller.command.parser.MentionCommand')
 def test_handle_mention_command(mock_mentioncommand):
-    """Test that MentionCommand was handled successfully"""
+    """Test that MentionCommand was handled successfully."""
     mock_facade = mock.MagicMock(DBFacade)
     mock_bot = mock.MagicMock(Bot)
     mock_gh = mock.MagicMock(GithubInterface)

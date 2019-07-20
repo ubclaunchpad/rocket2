@@ -39,6 +39,7 @@ class CommandParser:
                            user: str) -> ResponseTuple:
         """
         Handle a command call to rocket.
+
         :param cmd_txt: the command itself
         :param user: slack ID of user who executed the command
         :return: tuple where first element is the response text (or a
@@ -65,6 +66,7 @@ class CommandParser:
     def get_help(self) -> Response:
         """
         Get help messages and return a formatted string for messaging.
+
         :return: Preformatted ``flask.Response`` object containing help
                  messages
         """
