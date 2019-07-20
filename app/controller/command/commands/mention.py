@@ -1,9 +1,6 @@
 import argparse
 import logging
-import pdb
-import re
 import shlex
-from typing import Dict, cast
 from app.controller import ResponseTuple
 from app.controller.command.commands.karma import KarmaCommand
 from db.facade import DBFacade

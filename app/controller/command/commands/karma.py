@@ -1,9 +1,7 @@
 import argparse
 import logging
-import pdb
-import re
 import shlex
-from argparse import ArgumentParser, _SubParsersAction
+from argparse import _SubParsersAction
 from app.model import User, Permissions
 from app.controller import ResponseTuple
 

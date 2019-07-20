@@ -1,8 +1,7 @@
 """Test karma command parsing."""
 from app.controller.command.commands.karma import KarmaCommand
 from db import DBFacade
-from flask import jsonify, json, Flask
-from interface.github import GithubInterface, GithubAPIException
+from flask import Flask
 from app.model import User, Permissions
 from unittest import mock, TestCase
 
@@ -101,7 +100,6 @@ class MentionCommandTest(TestCase):
     def test_handle_set_lookup_error(self):
         """Test setting karma with lookup error"""
         user = User("ABCDEFG2F")
-        destuser = User("MMMM1234")
         user.permissions_level = Permissions.admin
         self.mock_facade.retrieve.side_effect = [user, LookupError]
         self.assertEqual(self.testcommand.handle("karma set MMMM1234 10",
@@ -114,7 +112,6 @@ class MentionCommandTest(TestCase):
 
     def test_add_karma_to_another_person(self):
         """Test to give karma to someone else"""
-        giveuser = User("NARUTO19")
         recieveuser = User("SAKURA19")
         self.mock_facade.retrieve.return_value = recieveuser
         self.testcommand.add_karma("NARUTO19", "SAKURA19")
@@ -131,7 +128,6 @@ class MentionCommandTest(TestCase):
 
     def test_add_karma_to_not_found_person(self):
         """Testing to add karma to person not found"""
-        recieveuser = User("SAKURA19")
         self.mock_facade.retrieve.side_effect = LookupError
         self.assertEqual(
             self.testcommand.add_karma("NARUTO19", "SAKURA19"),

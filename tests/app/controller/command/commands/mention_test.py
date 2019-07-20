@@ -1,9 +1,8 @@
 """Test mention command parsing."""
 from app.controller.command.commands.mention import MentionCommand
 from db import DBFacade
-from flask import jsonify, json, Flask
-from interface.github import GithubInterface, GithubAPIException
-from app.model import User, Permissions
+from flask import Flask
+from app.model import User
 from unittest import mock, TestCase
 
 user = 'U123456789'
