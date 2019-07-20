@@ -4,10 +4,9 @@ import pdb
 import re
 import shlex
 from typing import Dict, cast
-from command import ResponseTuple
-from command.commands.karma import KarmaCommand
+from app.controller import ResponseTuple
+from app.controller.command.commands.karma import KarmaCommand
 from db.facade import DBFacade
-from model.user import User
 
 
 class MentionCommand:

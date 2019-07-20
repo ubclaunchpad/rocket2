@@ -4,9 +4,8 @@ import pdb
 import re
 import shlex
 from argparse import ArgumentParser, _SubParsersAction
-from model import User, Permissions
-from command import ResponseTuple
-from model.user import User
+from app.model import User, Permissions
+from app.controller import ResponseTuple
 
 
 class KarmaCommand:
