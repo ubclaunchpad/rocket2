@@ -41,7 +41,7 @@ class KarmaCommand:
             args = self.parser.parse_args(command_arg)
         except SystemExit:
             return self.get_help(), 200
-        
+
         if args.which == "set":
             return self.set_helper(user_id, args.slack_id, args.amount)
         elif args.which == "reset":
@@ -61,11 +61,8 @@ class KarmaCommand:
             user.karma += self.karma_add_amount
             self.facade.store(user)
             return f"gave 1 karma to {user.name}", 200
-        except:
+        except LookupError:
             return self.lookup_error, 200
-    
-    def is_user(self, id) -> bool:
-        return re.match("^[UW][A-Z0-9]{8}$", id)
 
     def get_help(self) -> str:
         """Return command options for team events."""
@@ -75,7 +72,6 @@ class KarmaCommand:
             res += "\n*" + name + "*\n"
             res += self.subparser.choices[argument].format_help()
         return res + "```"
-
 
     def init_subparsers(self) -> _SubParsersAction:
         """Initialize subparsers for team command."""
@@ -89,9 +85,9 @@ class KarmaCommand:
                                 type=str, action='store',
                                 help="slack id of kuser's karma to set")
         parser_set.add_argument("amount", metavar="amount",
-                                 type=int, action='store',
+                                type=int, action='store',
                                 help="Amount of karma to set into user")
-        
+
         parser_set = subparsers.add_parser("reset")
         parser_set.set_defaults(which="reset",
                                 help="resets users id")
@@ -139,7 +135,11 @@ class KarmaCommand:
                     for user in user_list:
                         user.karma = self.karma_default_amount
                         self.facade.store(user)
-                    return f"reset all user's karma to {self.karma_default_amount}", 200
+                    return (
+                        "reset all users karma to"
+                        f"{self.karma_default_amount}",
+                        200
+                    )
             else:
                 return self.permission_error, 200
         except LookupError:
@@ -153,6 +153,6 @@ class KarmaCommand:
         """
         try:
             user = self.facade.retrieve(User, slack_id)
-            return f"{user.name} has {user.karma} amount of karma", 200
+            return f"{user.name} has {user.karma} karma", 200
         except LookupError:
             return self.lookup_error, 200

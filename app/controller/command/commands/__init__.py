@@ -7,4 +7,5 @@ from app.controller.command.commands.karma import KarmaCommand
 from app.controller.command.commands.mention import MentionCommand
 
 UnionCommands = Union[TeamCommand, UserCommand,
-                      TokenCommand, KarmaCommand, MentionCommand]
+                      TokenCommand, KarmaCommand,
+                      MentionCommand]

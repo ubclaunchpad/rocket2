@@ -37,5 +37,7 @@ class MentionCommand:
         elif(command_arg[1] == '++'):
             return self.karma_mention_helper(user_id, command_arg[0])
 
-    def karma_mention_helper(self, giver_id: str, receiver_id: str) -> ResponseTuple:
-      return KarmaCommand(self.facade).add_karma(giver_id, receiver_id)
+    def karma_mention_helper(self,
+                             giver_id: str,
+                             receiver_id: str) -> ResponseTuple:
+        return KarmaCommand(self.facade).add_karma(giver_id, receiver_id)
