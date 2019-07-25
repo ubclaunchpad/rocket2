@@ -5,7 +5,8 @@ import logging
 from boto3.dynamodb.conditions import Attr
 from functools import reduce
 from app.model import User, Team, Project
-from typing import Dict, Optional, Any, Tuple, List, Type, TypeVar
+from typing import Optional, Tuple, List, Type, TypeVar
+from config import Config
 
 T = TypeVar('T', User, Team, Project)
 
@@ -22,14 +23,13 @@ class DynamoDB:
     class Const:
         """A bunch of static constants and functions."""
 
-        def __init__(self, config: Dict[str, str]) -> None:
+        def __init__(self, config: Config) -> None:
             """Initialize the constants."""
-            self.users_table = config['users_table']
-            self.teams_table = config['teams_table']
-            self.projects_table = config['projects_table']
+            self.users_table: str = config.aws_users_tablename
+            self.teams_table: str = config.aws_teams_tablename
+            self.projects_table: str = config.aws_projects_tablename
 
-        def get_table_name(self,
-                           cls: Type[T]) -> str:
+        def get_table_name(self, cls: Type[T]) -> str:
             """
             Convert class into corresponding table name.
 
@@ -80,7 +80,7 @@ class DynamoDB:
             else:
                 raise TypeError('Table name does not correspond to anything')
 
-    def __init__(self, config: Dict[str, Any], credentials) -> None:
+    def __init__(self, config: Config) -> None:
         """Initialize facade using DynamoDB settings.
 
         To avoid local tests failure when the DynamoDb server is used,
@@ -96,23 +96,14 @@ class DynamoDB:
         region_name:  The name of the region associated with the client.
         A list of different regions can be obtained online.
         endpoint_url: The complete URL to use for the constructed client.
-
-        Boto3 server require environmental variables for credentials:
-        AWS_ACCESS_KEY_ID: The access key for your AWS account.
-        AWS_SECRET_ACCESS_KEY: The secret key for the AWS account
-        AWS_SESSION_TOKEN: The session key for your AWS account.
-        This is only needed when you are using temporary credentials.
         """
         logging.info("Initializing DynamoDb")
-        self.users_table = config['aws']['users_table']
-        self.teams_table = config['aws']['teams_table']
-        self.projects_table = config['aws']['projects_table']
-        testing = config['testing']
-        self.CONST = DynamoDB.Const({'users_table': self.users_table,
-                                     'teams_table': self.teams_table,
-                                     'projects_table': self.projects_table})
+        self.users_table = config.aws_users_tablename
+        self.teams_table = config.aws_teams_tablename
+        self.projects_table = config.aws_projects_tablename
+        self.CONST = DynamoDB.Const(config)
 
-        if testing:
+        if config.testing:
             logging.info("Connecting to local DynamoDb")
             self.ddb = boto3.resource(service_name="dynamodb",
                                       region_name="",
@@ -121,9 +112,9 @@ class DynamoDB:
                                       endpoint_url="http://localhost:8000")
         else:
             logging.info("Connecting to remote DynamoDb")
-            region_name = config['aws']['region']
-            access_key_id = credentials.aws_access_key_id
-            secret_access_key = credentials.aws_secret_access_key
+            region_name = config.aws_region
+            access_key_id = config.aws_access_keyid
+            secret_access_key = config.aws_secret_key
             self.ddb = boto3.resource(service_name='dynamodb',
                                       region_name=region_name,
                                       aws_access_key_id=access_key_id,

@@ -4,8 +4,8 @@ from flask import Flask
 from apscheduler.schedulers.background import BackgroundScheduler
 from .modules.random_channel import RandomChannelPromoter
 from .modules.base import ModuleBase
-from typing import Tuple, Dict, List, Any
-from config import Credentials
+from typing import Tuple, List
+from config import Config
 
 
 class Scheduler():
@@ -13,7 +13,7 @@ class Scheduler():
 
     def __init__(self,
                  scheduler: BackgroundScheduler,
-                 args: Tuple[Flask, Dict[str, Any], Credentials]):
+                 args: Tuple[Flask, Config]):
         """Initialize scheduler class."""
         self.scheduler = scheduler
         self.args = args
