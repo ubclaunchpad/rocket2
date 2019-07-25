@@ -23,6 +23,7 @@ class ProjectCommand(Command):
         self.parser = ArgumentParser(prog="/rocket")
         self.parser.add_argument("project")
         self.subparser = self.init_subparsers()
+        self.help = self.get_help()
         self.facade = db_facade
 
     def init_subparsers(self) -> _SubParsersAction:
@@ -94,14 +95,67 @@ class ProjectCommand(Command):
                                         "assigned to it.")
 
         """Parser for delete command."""
-        parser_delete = subparser.add_parser("delete")
+        parser_delete = subparsers.add_parser("delete")
         parser_delete.set_defaults(which="delete",
                                    help="Delete the project from database.")
         parser_delete.add_argument("project_id", metavar="project-id",
                                    type=str, action="store",
                                    help="Use to specify project to delete.")
-        parser_assign.add_argument("-f", "--force", action="store_true",
+        parser_delete.add_argument("-f", "--force", action="store_true",
                                    help="Set to delete project even if "
                                         "a team is already assigned to it.")
 
         return subparsers
+
+    def get_help(self) -> str:
+        """Return command options for project events."""
+        res = f"\n*{self.command_name} commands:*```"
+        for argument in self.subparser.choices:
+            name = argument.capitalize()
+            res += f"\n*{name}*\n"
+            res += self.subparser.choices[argument].format_help()
+        return res + "```"
+
+    def handle(self,
+               command: str,
+               user_id: str) -> ResponseTuple:
+        """Handle command by splitting into substrings and giving to parser."""
+        logging.debug("Handling ProjectCommand")
+        command_arg = shlex.split(command)
+        args = None
+
+        try:
+            args = self.parser.parse_args(command_arg)
+        except SystemExit:
+            return self.get_help(), 200
+
+        if args.which == "list":
+            # TODO
+            return self.get_help(), 200
+
+        elif args.which == "view":
+            # TODO
+            return self.get_help(), 200
+
+        elif args.which == "create":
+            # TODO
+            return self.get_help(), 200
+
+        elif args.which == "unassign":
+            # TODO
+            return self.get_help(), 200
+
+        elif args.which == "edit":
+            # TODO
+            return self.get_help(), 200
+
+        elif args.which == "assign":
+            # TODO
+            return self.get_help(), 200
+
+        elif args.which == "delete":
+            # TODO
+            return self.get_help(), 200
+
+        else:
+            return self.get_help(), 200
