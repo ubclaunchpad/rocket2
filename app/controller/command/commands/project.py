@@ -1,10 +1,13 @@
 """Command parsing for project events."""
 import logging
+import shlex
 
 from argparse import ArgumentParser, _SubParsersAction
 from app.controller import ResponseTuple
 from app.controller.command.commands.base import Command
 from db.facade import DBFacade
+from flask import jsonify
+from app.model import Project
 
 
 class ProjectCommand(Command):
@@ -134,8 +137,7 @@ class ProjectCommand(Command):
             return self.get_help(), 200
 
         elif args.which == "view":
-            # TODO
-            return self.get_help(), 200
+            return self.view_helper(args.project_id)
 
         elif args.which == "create":
             # TODO
@@ -159,3 +161,19 @@ class ProjectCommand(Command):
 
         else:
             return self.get_help(), 200
+
+    def view_helper(self,
+                    project_id: str) -> ResponseTuple:
+        """
+        View project info from database.
+
+        :param project_id: project ID of project to view
+        :return: error message if project not found in database, else
+                 information about the project
+        """
+        try:
+            project = self.facade.retrieve(Project, project_id)
+
+            return jsonify({'attachments': [project.get_attachment()]}), 200
+        except LookupError:
+            return self.lookup_error, 200

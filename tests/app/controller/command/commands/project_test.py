@@ -1,8 +1,11 @@
 """Test project command parsing."""
 from app.controller.command.commands import ProjectCommand
 from db import DBFacade
-from flask import Flask
+from flask import jsonify, json, Flask
 from unittest import mock, TestCase
+from app.model import Project
+
+user = 'U123456789'
 
 
 class TestProjectCommand(TestCase):
@@ -17,3 +20,24 @@ class TestProjectCommand(TestCase):
     def test_get_help(self):
         """Test project command get_help method."""
         assert self.testcommand.get_help() == self.testcommand.help
+
+    def test_handle_view(self):
+        """Test project command view parser."""
+        project = Project("GTID", ["a", "b"])
+        project_id = project.project_id
+        project_attach = [project.get_attachment()]
+        self.mock_facade.retrieve.return_value = project
+        with self.app.app_context():
+            resp, code = self.testcommand.handle(
+                "project view %s" % project_id, user)
+            expect = json.loads(jsonify({'attachments': project_attach}).data)
+            resp = json.loads(resp.data)
+            self.assertDictEqual(resp, expect)
+            self.assertEqual(code, 200)
+        self.mock_facade.retrieve.assert_called_once_with(Project, project_id)
+
+    def test_handle_view_lookup_error(self):
+        """Test project command view parser with lookup error."""
+        self.mock_facade.retrieve.side_effect = LookupError
+        self.assertTupleEqual(self.testcommand.handle("project view id", user),
+                              (self.testcommand.lookup_error, 200))

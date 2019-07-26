@@ -30,6 +30,28 @@ class Project:
         self.appstore_url = ''
         self.playstore_url = ''
 
+    def get_attachment(self) -> Dict[str, Any]:
+        """Return slack-formatted attachment (dictionary) for project."""
+        text_pairs = [
+            ('Project ID', self.project_id),
+            ('Github Team ID', self.github_team_id),
+            ('GitHub URLs', '\n'.join(self.github_urls)),
+            ('Display Name', self.display_name),
+            ('Short Description', self.short_description),
+            ('Long Description', self.long_description),
+            ('Tags', '\n'.join(self.tags)),
+            ('Website URL', self.website_url),
+            ('Medium URL', self.medium_url),
+            ('App Store URL', self.appstore_url),
+            ('Play Store URL', self.playstore_url)
+        ]
+
+        fields = [{'title': t, 'value': v if v else 'n/a', 'short': True}
+                  for t, v in text_pairs]
+        fallback = str('\n'.join(map(str, text_pairs)))
+
+        return {'fallback': fallback, 'fields': fields}
+
     @staticmethod
     def from_dict(d: Dict[str, Any]) -> 'Project':
         """
