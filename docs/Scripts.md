@@ -62,30 +62,6 @@ instance of DynamoDB. Only should be run once by users (though running it
 multiple times would not hurt too too much). It requires `aws` to be installed
 through `pipenv`.
 
-## setup\_credentials.sh
-
-```sh
-scripts/setup_credentials.sh
-```
-
-This script automatically sets up all credentials in the `credentials/` folder.
-Files that are set up include:
-
-- aws.toml
-- github.toml
-- slack.toml
-- signing\_key
-
-Note that none of the files will automatically set up the actual ids, keys, or
-signing keys; you have to set them up yourself.
-
-If there is nothing missing, this script won't do anything and will output:
-
-```
-We found no problems with your credentials.
-No missing fields or files.
-```
-
 ## docker\_build.sh
 
 ```sh
