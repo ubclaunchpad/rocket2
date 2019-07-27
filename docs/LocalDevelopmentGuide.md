@@ -61,54 +61,25 @@ policy. Finally, copy the provided access key ID and secret access key after
 creating the new user.
 
 Note: if you are in the `brussel-sprouts` Github team, you should already have
-AWS credentials.
+AWS credentials. Just ask.
 
 ## 5: Set Up Config
 
-Our repo already contains `config.toml`, the main configuration file for the
-entire app, as well as the `credentials/` directory, where you will put the
-credentials you noted above.
+Our repo already contains `sample-env`, the main environmental configuration
+file for the entire app, as well as the `credentials/` directory, where you
+will put credential files like the Github app private key. The file is split
+into section. There is a general section (which should be the top bit), a
+section on everything slack related, a section on Github and Github apps,
+and a section on AWS. [Please read the section about the configuration
+system.][config]
 
-In `config.toml`, ensure that `testing` is set to `false` - this setting is
-intended for automated testing, like Github CI. In the `aws` section,
-change the value for `users_tables` and `teams_table`, or you may conflict
-with other users testing on the same AWS account. You can also change the
-AWS region, if necessary, though the default value of `us-west-2` should be
-good for most purposes.
-
-### 5.1: Set Up Slack Credentials
-
-Create the file `credentials/slack.toml` and input the following:
-
-```
-signing_secret = "..."
-api_token = "..."
-```
-
-Replace the `...` value for `signing_secret` with the signing secret from
-section 3, and replace the `...` value for `api_token` with the bot user
-OAuth token from section 3. In both cases, maintain the quotation marks around
-the values.
-
-### 5.2: Set Up AWS Credentials
-
-Create the file `credentials/aws.toml` and input the following:
-
-```
-access_key_id = "..."
-secret_access_key = "..."
-```
-
-Replace the `...` values for both fields with the appropriate values noted
-in section 4.
-
-### 5.3: Set Up Github App and organization
+### 5.1: Set up Github App and organization
 
 Register Rocket 2 as a Github App under an appropriate testing organization
 (our team has one of these set up already). Make sure to install the Github App
 to the organization in addition to registering it.
 
-Under ''Private keys'', click ''Generate a new private key''. This will generate
+Under "Private keys", click "Generate a new private key". This will generate
 and allow you to download a new secret key for Rocket 2. Save this to the
 `credentials/` directory as `github_signing_key.pem` - it should already be in
 the PEM file format, bracketed by:
@@ -135,23 +106,6 @@ After doing so, please check the checkboxes below:
 - Organization
 - Team
 - Team add
-
-### 5.31: Set Up Github Credentials
-
-Create the file `credentials/github.toml` and input the following:
-
-```
-webhook_secret = "..."
-```
-
-Replace the `...` with the Rocket 2 organization's webhook secret, or
-that of your test organization's.
-
-Note: if you are in the `brussel-sprouts` Github team, you should already have
-a test organization, along with its own `webhook_secret`.
-
-In the `github` section of `config.toml`, ensure `app_id` and `organization` are
-set to their relevant entries from the organization.
 
 ## 6: Build and Run Container
 
@@ -204,7 +158,8 @@ workspace event - ask the team for the most up-to-date list of these.
 In "Add features and functionality", add a slash command. In particular, under
 Request URL, submit the ngrok HTTPS URL with `/slack/commands` appended to the
 end. For the actual command, anything will work, though the final app will use
-`/rocket`.
+`/rocket`. Make sure you tick the box marked "Escape channels, users, and links
+sent to your app", or else none of the @ signs will work properly!
 
 ## 8: Testing
 
@@ -274,6 +229,7 @@ and permissions level.
 Now, you can continue with whatever testing you originally wanted to do.
 Remember to rebulid your Docker image every time you make a change!
 
+[config]: Config.html
 [create-workspace]: https://slack.com/create
 [make-slack-app]: https://api.slack.com/apps
 [download-ngrok]: https://ngrok.com/
