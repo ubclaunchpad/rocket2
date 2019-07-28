@@ -14,6 +14,7 @@
     docs/GettingStarted.md
     docs/Testing.md
     docs/LocalDevelopmentGuide.md
+    docs/Scheduler.md
 
 .. toctree::
     :caption: How Everything Works
