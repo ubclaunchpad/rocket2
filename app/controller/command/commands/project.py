@@ -8,6 +8,7 @@ from app.controller.command.commands.base import Command
 from db.facade import DBFacade
 from flask import jsonify
 from app.model import Project
+from typing import Dict
 
 
 class ProjectCommand(Command):
@@ -148,8 +149,10 @@ class ProjectCommand(Command):
             return self.get_help(), 200
 
         elif args.which == "edit":
-            # TODO
-            return self.get_help(), 200
+            param_list = {
+                "display_name": args.name
+            }
+            return self.edit_helper(args.project_id, param_list)
 
         elif args.which == "assign":
             # TODO
@@ -173,6 +176,29 @@ class ProjectCommand(Command):
         """
         try:
             project = self.facade.retrieve(Project, project_id)
+
+            return jsonify({'attachments': [project.get_attachment()]}), 200
+        except LookupError:
+            return self.lookup_error, 200
+
+    def edit_helper(self,
+                    project_id: str,
+                    param_list: Dict[str, str]) -> ResponseTuple:
+        """
+        Edit project from database.
+
+        :param project_id: project ID of the project in the database to edit
+        :param param_list: Dict of project parameters that are to be edited
+        :return: returns edit message if project is successfully edited, or an
+                 error message if the project was not found in the database
+        """
+        try:
+            project = self.facade.retrieve(Project, project_id)
+
+            if param_list["display_name"]:
+                project.display_name = param_list["display_name"]
+
+            self.facade.store(project)
 
             return jsonify({'attachments': [project.get_attachment()]}), 200
         except LookupError:
