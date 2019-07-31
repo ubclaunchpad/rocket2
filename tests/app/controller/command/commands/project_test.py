@@ -142,3 +142,25 @@ class TestProjectCommand(TestCase):
                                                        [("github_team_name",
                                                          "team-name")])
         self.mock_facade.store.assert_called_once_with(project)
+
+    def test_handle_list(self):
+        """Test project command list parser."""
+        project1 = Project("GTID1", ["a", "b"])
+        project2 = Project("GTID2", ["c", "d"])
+        self.mock_facade.query.return_value = [project1, project2]
+        attach1 = project1.get_basic_attachment()
+        attach2 = project2.get_basic_attachment()
+        attachment = [attach1, attach2]
+        with self.app.app_context():
+            resp, code = self.testcommand.handle("project list", user)
+            expect = json.loads(jsonify({'attachments': attachment}).data)
+            resp = json.loads(resp.data)
+            self.assertDictEqual(resp, expect)
+            self.assertEqual(code, 200)
+        self.mock_facade.query.assert_called_once_with(Project)
+
+    def test_handle_list_no_teams(self):
+        """Test project command list with no projects found."""
+        self.mock_facade.query.return_value = []
+        self.assertTupleEqual(self.testcommand.handle("project list", user),
+                              ("No Projects Exist!", 200))

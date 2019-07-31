@@ -144,8 +144,7 @@ class ProjectCommand(Command):
             return self.get_help(), 200
 
         if args.which == "list":
-            # TODO
-            return self.get_help(), 200
+            return self.list_helper()
 
         elif args.which == "view":
             return self.view_helper(args.project_id)
@@ -180,6 +179,20 @@ class ProjectCommand(Command):
         else:
             return self.get_help(), 200
 
+    def list_helper(self) -> ResponseTuple:
+        """
+        Return display information of all projects.
+
+        :return: error message if lookup error or no projects,
+                 otherwise return projects' information
+        """
+        projects = self.facade.query(Project)
+        if not projects:
+            return "No Projects Exist!", 200
+        attachment = [project.get_basic_attachment() for
+                      project in projects]
+        return jsonify({'attachments': attachment}), 200
+
     def view_helper(self,
                     project_id: str) -> ResponseTuple:
         """
@@ -210,6 +223,10 @@ class ProjectCommand(Command):
         :param param_list: Dict of project parameters that are to
                            be initialized
         :param user_id: user ID of the calling user
+        :return: lookup error if the specified GitHub team name does not match
+                 a team in the database, else permission error if the calling
+                 user is not a team lead of the team to initially assign the
+                 project to, else information about the project
         """
         team_list = self.facade.query(Team,
                                       [("github_team_name",
