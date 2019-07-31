@@ -159,8 +159,7 @@ class ProjectCommand(Command):
                                       user_id)
 
         elif args.which == "unassign":
-            # TODO
-            return self.get_help(), 200
+            return self.unassign_helper(args.project_id, user_id)
 
         elif args.which == "edit":
             param_list = {
@@ -247,6 +246,34 @@ class ProjectCommand(Command):
         self.facade.store(project)
 
         return jsonify({'attachments': [project.get_attachment()]}), 200
+
+    def unassign_helper(self,
+                        project_id: str,
+                        user_id: str) -> ResponseTuple:
+        """
+        Unassign the team attached to a project from the project specified.
+
+        :param project_id: project ID of project to unassign team from
+        :param user_id: user ID of the calling user
+        :return: returns lookup error if the project could not be found, else
+                 permission error if calling user is not a team lead
+                 of the team to unassign, otherwise success message
+        """
+        try:
+            project = self.facade.retrieve(Project, project_id)
+            try:
+                team = self.facade.retrieve(Team, project.github_team_id)
+
+                if user_id not in team.team_leads:
+                    return self.permission_error, 200
+                else:
+                    project.github_team_id = ""
+                    self.facade.store(project)
+                    return "Project successfully unassigned!", 200
+            except LookupError:
+                return self.team_lookup_error, 200
+        except LookupError:
+            return self.project_lookup_error, 200
 
     def edit_helper(self,
                     project_id: str,

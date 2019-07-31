@@ -49,6 +49,7 @@ Fails if the caller is not the team lead of the specified team.
 ```
 
 Unassigns the given project.
+Fails if the caller is not the team lead of the team assigned to the project.
 
 ### Edit
 

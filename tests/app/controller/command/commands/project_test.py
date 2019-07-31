@@ -108,10 +108,8 @@ class TestProjectCommand(TestCase):
                                     user),
             (self.testcommand.team_lookup_error, 200))
 
-    @mock.patch('app.model.project.uuid')
-    def test_handle_create_permission_error(self, mock_uuid):
+    def test_handle_create_permission_error(self):
         """Test project command create parser with permission error."""
-        mock_uuid.uuid4.return_value = "1"
         team = Team("GTID", "team-name", "name")
         self.mock_facade.query.return_value = [team]
         self.assertTupleEqual(
@@ -164,3 +162,52 @@ class TestProjectCommand(TestCase):
         self.mock_facade.query.return_value = []
         self.assertTupleEqual(self.testcommand.handle("project list", user),
                               ("No Projects Exist!", 200))
+
+    def test_handle_unassign(self):
+        """Test project command unassign parser with permission error."""
+        def facade_retrieve_side_effect(*args, **kwargs):
+            """Return a side effect for the mock facade."""
+            if args[0] == Project:
+                return Project("GTID", [])
+            else:
+                team = Team("GTID", "team-name", "display-name")
+                team.team_leads.add(user)
+                return team
+        self.mock_facade.retrieve.side_effect = facade_retrieve_side_effect
+        with self.app.app_context():
+            resp, code = \
+                self.testcommand.handle("project unassign 1",
+                                        user)
+            assert (resp, code) == ("Project successfully unassigned!", 200)
+
+    def test_handle_unassign_project_lookup_error(self):
+        """Test project command unassign with project lookup error."""
+        self.mock_facade.retrieve.side_effect = LookupError
+        self.assertTupleEqual(self.testcommand.handle("project unassign ID", user),
+                              (self.testcommand.project_lookup_error, 200))
+
+    def test_handle_unassign_project_team_error(self):
+        """Test project command unassign with project lookup error."""
+        def facade_retrieve_side_effect(*args, **kwargs):
+            """Return a side effect for the mock facade."""
+            if args[0] == Project:
+                return Project("GTID", [])
+            else:
+                raise LookupError
+        self.mock_facade.retrieve.side_effect = facade_retrieve_side_effect
+        self.assertTupleEqual(self.testcommand.handle("project unassign ID", user),
+                              (self.testcommand.team_lookup_error, 200))
+
+    def test_handle_unassign_permission_error(self):
+        """Test project command unassign parser with permission error."""
+        def facade_retrieve_side_effect(*args, **kwargs):
+            """Return a side effect for the mock facade."""
+            if args[0] == Project:
+                return Project("GTID", [])
+            else:
+                return Team("GTID", "team-name", "display-name")
+        self.mock_facade.retrieve.side_effect = facade_retrieve_side_effect
+        self.assertTupleEqual(
+            self.testcommand.handle("project unassign 1",
+                                    user),
+            (self.testcommand.permission_error, 200))
