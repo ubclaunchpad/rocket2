@@ -7,17 +7,21 @@ from app.controller import ResponseTuple
 from app.controller.command.commands.base import Command
 from db.facade import DBFacade
 from flask import jsonify
-from app.model import Project
+from app.model import Project, Team
 from typing import Dict
 
 
 class ProjectCommand(Command):
     """Represent Project Command Parser."""
 
+    # TODO: add logging
+
     command_name = "project"
     permission_error = "You do not have the sufficient " \
                        "permission level for this command!"
-    lookup_error = "Lookup error! Project not found!"
+    project_lookup_error = "Lookup error! Project not found!"
+    user_lookup_error = "Lookup error! User not found!"
+    team_lookup_error = "Lookup error! Team not found!"
     desc = f"for dealing with {command_name}s"
 
     def __init__(self,
@@ -56,6 +60,11 @@ class ProjectCommand(Command):
                                    type=str, action="store",
                                    help="Use to specify link of the "
                                    "GitHub repository.")
+        parser_create.add_argument("github_team_name",
+                                   metavar="github-team-name",
+                                   type=str, action="store",
+                                   help="Use to specify GitHub team to "
+                                        "assign project to.")
         parser_create.add_argument("--name", metavar="DISPLAY-NAME",
                                    type=str, action="store",
                                    help="Add to set the displayed "
@@ -67,7 +76,8 @@ class ProjectCommand(Command):
                                      help="Unassigns a given project.")
         parser_unassign.add_argument("project_id", metavar="project-id",
                                      type=str, action="store",
-                                     help="Use to specify project to unassign.")
+                                     help="Use to specify project "
+                                          "to unassign.")
 
         """Parser for edit command."""
         parser_edit = subparsers.add_parser("edit")
@@ -141,8 +151,13 @@ class ProjectCommand(Command):
             return self.view_helper(args.project_id)
 
         elif args.which == "create":
-            # TODO
-            return self.get_help(), 200
+            param_list = {
+                "display_name": args.name
+            }
+            return self.create_helper(args.gh_repo,
+                                      args.github_team_name,
+                                      param_list,
+                                      user_id)
 
         elif args.which == "unassign":
             # TODO
@@ -179,7 +194,42 @@ class ProjectCommand(Command):
 
             return jsonify({'attachments': [project.get_attachment()]}), 200
         except LookupError:
-            return self.lookup_error, 200
+            return self.project_lookup_error, 200
+
+    def create_helper(self,
+                      gh_repo: str,
+                      github_team_name: str,
+                      param_list: Dict[str, str],
+                      user_id: str) -> ResponseTuple:
+        """
+        Create a project and store it in the database.
+
+        :param gh_repo: link to the GitHub repository this project describes
+        :param github_team_name: GitHub team name of the team to assign this
+                                 project to
+        :param param_list: Dict of project parameters that are to
+                           be initialized
+        :param user_id: user ID of the calling user
+        """
+        team_list = self.facade.query(Team,
+                                      [("github_team_name",
+                                        github_team_name)])
+        if len(team_list) != 1:
+            return self.team_lookup_error, 200
+
+        team = team_list[0]
+
+        if user_id not in team.team_leads:
+            return self.permission_error, 200
+
+        project = Project(team.github_team_id, [gh_repo])
+
+        if param_list["display_name"]:
+            project.display_name = param_list["display_name"]
+
+        self.facade.store(project)
+
+        return jsonify({'attachments': [project.get_attachment()]}), 200
 
     def edit_helper(self,
                     project_id: str,
@@ -202,4 +252,4 @@ class ProjectCommand(Command):
 
             return jsonify({'attachments': [project.get_attachment()]}), 200
         except LookupError:
-            return self.lookup_error, 200
+            return self.project_lookup_error, 200

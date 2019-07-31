@@ -36,10 +36,11 @@ Displays options for `project` command.
 ### Create (Team Lead and Admin only)
 
 ```sh
-/rocket project create GH_REPO [--name DISPLAY_NAME]
+/rocket project create GH_REPO GITHUB_TEAM_NAME [--name DISPLAY_NAME]
 ```
 
 Creates a new project from the given repo.
+Fails if the caller is not the team lead of the specified team.
 
 ### Unassign
 
