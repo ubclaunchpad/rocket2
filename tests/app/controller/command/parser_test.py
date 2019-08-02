@@ -65,7 +65,9 @@ def test_handle_help():
                           'mrkdwn_in': ['text']},
                          {"text": "*token:* Generate a signed "
                                   "token for use with the HTTP API",
-                          "mrkdwn_in": ["text"]}]}).data)
+                          "mrkdwn_in": ["text"]},
+                         {"text": "*project:* for dealing with projects",
+                          "mrkdwn_in": ["text"]}, ]}).data)
         resp = json.loads(resp.data)
     assert resp == expect
 

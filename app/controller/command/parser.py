@@ -1,7 +1,7 @@
 """Handle Rocket 2 commands."""
 from app.controller import ResponseTuple
 from app.controller.command.commands import UnionCommands, \
-    UserCommand, TeamCommand, TokenCommand
+    UserCommand, TeamCommand, TokenCommand, ProjectCommand
 from app.controller.command.commands.token import TokenCommandConfig
 from db.facade import DBFacade
 from flask import jsonify, Response
@@ -30,6 +30,7 @@ class CommandParser:
         self.__commands["team"] = TeamCommand(self.__facade,
                                               self.__github, self.__bot)
         self.__commands["token"] = TokenCommand(self.__facade, token_config)
+        self.__commands["project"] = ProjectCommand(self.__facade)
 
     def handle_app_command(self,
                            cmd_txt: str,
