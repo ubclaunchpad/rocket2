@@ -22,6 +22,7 @@ class ProjectCommand(Command):
     project_lookup_error = "Lookup error! Project not found!"
     user_lookup_error = "Lookup error! User not found!"
     team_lookup_error = "Lookup error! Team not found!"
+    assigned_error = "Assign error! Project already assigned to a team!"
     desc = f"for dealing with {command_name}s"
 
     def __init__(self,
@@ -168,8 +169,10 @@ class ProjectCommand(Command):
             return self.edit_helper(args.project_id, param_list)
 
         elif args.which == "assign":
-            # TODO
-            return self.get_help(), 200
+            return self.assign_helper(args.project_id,
+                                      args.github_team_name,
+                                      user_id,
+                                      args.force)
 
         elif args.which == "delete":
             # TODO
@@ -295,5 +298,47 @@ class ProjectCommand(Command):
             self.facade.store(project)
 
             return jsonify({'attachments': [project.get_attachment()]}), 200
+        except LookupError:
+            return self.project_lookup_error, 200
+
+    def assign_helper(self,
+                      project_id: str,
+                      github_team_name: str,
+                      user_id: str,
+                      force: bool) -> ResponseTuple:
+        """
+        Assign the team to a project.
+
+        :param project_id: project ID of project to assign to a team
+        :param github_team_name: GitHub team name of the team to assign this
+                                 project to
+        :param user_id: user ID of the calling user
+        :param force: specify if an error should be raised if the project
+                      is assigned to another team
+        :return: returns lookup error if the project could not be found or no
+                 team has the specified GitHub team name, else
+                 permission error if calling user is not a team lead, else
+                 an assignment error if the project is assigned to a team,
+                 otherwise success message
+        """
+        try:
+            project = self.facade.retrieve(Project, project_id)
+
+            team_list = self.facade.query(Team,
+                                          [("github_team_name",
+                                            github_team_name)])
+            if len(team_list) != 1:
+                return self.team_lookup_error, 200
+
+            team = team_list[0]
+
+            if user_id not in team.team_leads:
+                return self.permission_error, 200
+            elif project.github_team_id != "" and not force:
+                return self.assigned_error, 200
+            else:
+                project.github_team_id = team.github_team_id
+                self.facade.store(project)
+                return "Project successfully assigned!", 200
         except LookupError:
             return self.project_lookup_error, 200

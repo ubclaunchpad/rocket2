@@ -183,11 +183,12 @@ class TestProjectCommand(TestCase):
     def test_handle_unassign_project_lookup_error(self):
         """Test project command unassign with project lookup error."""
         self.mock_facade.retrieve.side_effect = LookupError
-        self.assertTupleEqual(self.testcommand.handle("project unassign ID", user),
+        self.assertTupleEqual(self.testcommand.handle("project unassign ID",
+                                                      user),
                               (self.testcommand.project_lookup_error, 200))
 
-    def test_handle_unassign_project_team_error(self):
-        """Test project command unassign with project lookup error."""
+    def test_handle_unassign_team_lookup_error(self):
+        """Test project command unassign with team lookup error."""
         def facade_retrieve_side_effect(*args, **kwargs):
             """Return a side effect for the mock facade."""
             if args[0] == Project:
@@ -195,7 +196,8 @@ class TestProjectCommand(TestCase):
             else:
                 raise LookupError
         self.mock_facade.retrieve.side_effect = facade_retrieve_side_effect
-        self.assertTupleEqual(self.testcommand.handle("project unassign ID", user),
+        self.assertTupleEqual(self.testcommand.handle("project unassign ID",
+                                                      user),
                               (self.testcommand.team_lookup_error, 200))
 
     def test_handle_unassign_permission_error(self):
@@ -211,3 +213,63 @@ class TestProjectCommand(TestCase):
             self.testcommand.handle("project unassign 1",
                                     user),
             (self.testcommand.permission_error, 200))
+
+    def test_handle_assign_assign(self):
+        """Test project command assign."""
+        self.mock_facade.retrieve.return_value = Project("", [])
+        team = Team("GTID", "team-name", "display-name")
+        team.team_leads.add(user)
+        self.mock_facade.query.return_value = [team]
+        self.assertTupleEqual(
+            self.testcommand.handle("project assign ID team-name",
+                                    user),
+            ("Project successfully assigned!", 200))
+
+    def test_handle_assign_project_lookup_error(self):
+        """Test project command assign with project lookup error."""
+        self.mock_facade.retrieve.side_effect = LookupError
+        self.assertTupleEqual(
+            self.testcommand.handle("project assign ID team-name",
+                                    user),
+            (self.testcommand.project_lookup_error, 200))
+
+    def test_handle_assign_project_team_error(self):
+        """Test project command assign with team lookup error."""
+        self.mock_facade.retrieve.return_value = Project("", [])
+        self.mock_facade.query.return_value = []
+        self.assertTupleEqual(
+            self.testcommand.handle("project assign ID team-name",
+                                    user),
+            (self.testcommand.team_lookup_error, 200))
+
+    def test_handle_assign_permission_error(self):
+        """Test project command assign with permission error."""
+        self.mock_facade.retrieve.return_value = Project("", [])
+        team = Team("GTID", "team-name", "display-name")
+        self.mock_facade.query.return_value = [team]
+        self.assertTupleEqual(
+            self.testcommand.handle("project assign ID team-name",
+                                    user),
+            (self.testcommand.permission_error, 200))
+
+    def test_handle_assign_assign_error(self):
+        """Test project command assign with assignment error."""
+        self.mock_facade.retrieve.return_value = Project("GTID", [])
+        team = Team("GTID", "team-name", "display-name")
+        team.team_leads.add(user)
+        self.mock_facade.query.return_value = [team]
+        self.assertTupleEqual(
+            self.testcommand.handle("project assign ID team-name",
+                                    user),
+            (self.testcommand.assigned_error, 200))
+
+    def test_handle_force_assign(self):
+        """Test project command force assign."""
+        self.mock_facade.retrieve.return_value = Project("GTID", [])
+        team = Team("GTID", "team-name", "display-name")
+        team.team_leads.add(user)
+        self.mock_facade.query.return_value = [team]
+        self.assertTupleEqual(
+            self.testcommand.handle("project assign ID team-name -f",
+                                    user),
+            ("Project successfully assigned!", 200))
