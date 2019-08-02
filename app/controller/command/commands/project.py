@@ -175,8 +175,8 @@ class ProjectCommand(Command):
                                       args.force)
 
         elif args.which == "delete":
-            # TODO
-            return self.get_help(), 200
+            return self.delete_helper(args.project_id,
+                                      args.force)
 
         else:
             return self.get_help(), 200
@@ -340,5 +340,30 @@ class ProjectCommand(Command):
                 project.github_team_id = team.github_team_id
                 self.facade.store(project)
                 return "Project successfully assigned!", 200
+        except LookupError:
+            return self.project_lookup_error, 200
+
+    def delete_helper(self,
+                      project_id: str,
+                      force: bool) -> ResponseTuple:
+        """
+        Delete a project from the database.
+
+        :param project_id: project ID of project to delete
+        :param force: specify if an error should be raised if the project
+                      is assigned to a team
+        :return: returns lookup error if the project could not be found, else
+                 an assignment error if the project is assigned to a team,
+                 otherwise success message
+        """
+        try:
+            project = self.facade.retrieve(Project, project_id)
+
+            if project.github_team_id != "" and not force:
+                return self.assigned_error, 200
+            else:
+                self.facade.delete(Project, project_id)
+                return "Project successfully deleted!", 200
+
         except LookupError:
             return self.project_lookup_error, 200

@@ -273,3 +273,35 @@ class TestProjectCommand(TestCase):
             self.testcommand.handle("project assign ID team-name -f",
                                     user),
             ("Project successfully assigned!", 200))
+
+    def test_handle_delete(self):
+        """Test project command delete."""
+        self.mock_facade.retrieve.return_value = Project("", [])
+        self.assertTupleEqual(
+            self.testcommand.handle("project delete ID",
+                                    user),
+            ("Project successfully deleted!", 200))
+
+    def test_handle_delete_project_lookup_error(self):
+        """Test project command delete with project lookup error."""
+        self.mock_facade.retrieve.side_effect = LookupError
+        self.assertTupleEqual(
+            self.testcommand.handle("project delete ID",
+                                    user),
+            (self.testcommand.project_lookup_error, 200))
+
+    def test_handle_delete_assign_error(self):
+        """Test project command delete with assignment error."""
+        self.mock_facade.retrieve.return_value = Project("GTID", [])
+        self.assertTupleEqual(
+            self.testcommand.handle("project delete ID",
+                                    user),
+            (self.testcommand.assigned_error, 200))
+
+    def test_handle_force_delete(self):
+        """Test project command force delete."""
+        self.mock_facade.retrieve.return_value = Project("GTID", [])
+        self.assertTupleEqual(
+            self.testcommand.handle("project delete ID -f",
+                                    user),
+            ("Project successfully deleted!", 200))
