@@ -14,8 +14,6 @@ from typing import Dict
 class ProjectCommand(Command):
     """Represent Project Command Parser."""
 
-    # TODO: add logging
-
     command_name = "project"
     permission_error = "You do not have the sufficient " \
                        "permission level for this command!"
@@ -188,8 +186,10 @@ class ProjectCommand(Command):
         :return: error message if lookup error or no projects,
                  otherwise return projects' information
         """
+        logging.debug("Handling project list subcommand")
         projects = self.facade.query(Project)
         if not projects:
+            logging.warning("No projects found in database")
             return "No Projects Exist!", 200
         attachment = [project.get_basic_attachment() for
                       project in projects]
@@ -204,11 +204,13 @@ class ProjectCommand(Command):
         :return: error message if project not found in database, else
                  information about the project
         """
+        logging.debug("Handling project view subcommand")
         try:
             project = self.facade.retrieve(Project, project_id)
 
             return jsonify({'attachments': [project.get_attachment()]}), 200
         except LookupError:
+            logging.error(f"Failed to look up project with ID {project_id}")
             return self.project_lookup_error, 200
 
     def create_helper(self,
@@ -230,15 +232,20 @@ class ProjectCommand(Command):
                  user is not a team lead of the team to initially assign the
                  project to, else information about the project
         """
+        logging.debug("Handling project create subcommand")
         team_list = self.facade.query(Team,
                                       [("github_team_name",
                                         github_team_name)])
         if len(team_list) != 1:
+            logging.error(f"{len(team_list)} teams found with "
+                          f"GitHub team name {github_team_name}")
             return self.team_lookup_error, 200
 
         team = team_list[0]
 
         if user_id not in team.team_leads:
+            logging.error(f"User with user ID {user_id} is not"
+                          " a team lead of the specified team")
             return self.permission_error, 200
 
         project = Project(team.github_team_id, [gh_repo])
@@ -262,20 +269,26 @@ class ProjectCommand(Command):
                  permission error if calling user is not a team lead
                  of the team to unassign, otherwise success message
         """
+        logging.debug("Handling project unassign subcommand")
         try:
             project = self.facade.retrieve(Project, project_id)
             try:
                 team = self.facade.retrieve(Team, project.github_team_id)
 
                 if user_id not in team.team_leads:
+                    logging.error(f"User with user ID {user_id} is not"
+                                  " a team lead of the specified team")
                     return self.permission_error, 200
                 else:
                     project.github_team_id = ""
                     self.facade.store(project)
                     return "Project successfully unassigned!", 200
             except LookupError:
+                logging.error("Failed to look up team "
+                              f"with GitHub ID {project.github_team_id}")
                 return self.team_lookup_error, 200
         except LookupError:
+            logging.error(f"Failed to look up project with ID {project_id}")
             return self.project_lookup_error, 200
 
     def edit_helper(self,
@@ -289,16 +302,20 @@ class ProjectCommand(Command):
         :return: returns edit message if project is successfully edited, or an
                  error message if the project was not found in the database
         """
+        logging.debug("Handling project edit subcommand")
         try:
             project = self.facade.retrieve(Project, project_id)
 
             if param_list["display_name"]:
                 project.display_name = param_list["display_name"]
+                logging.debug("Changed display "
+                              f"name to {project.display_name}")
 
             self.facade.store(project)
 
             return jsonify({'attachments': [project.get_attachment()]}), 200
         except LookupError:
+            logging.error(f"Failed to look up project with ID {project_id}")
             return self.project_lookup_error, 200
 
     def assign_helper(self,
@@ -321,6 +338,7 @@ class ProjectCommand(Command):
                  an assignment error if the project is assigned to a team,
                  otherwise success message
         """
+        logging.debug("Handling project assign subcommand")
         try:
             project = self.facade.retrieve(Project, project_id)
 
@@ -328,19 +346,26 @@ class ProjectCommand(Command):
                                           [("github_team_name",
                                             github_team_name)])
             if len(team_list) != 1:
+                logging.error(f"{len(team_list)} teams found with "
+                              f"GitHub team name {github_team_name}")
                 return self.team_lookup_error, 200
 
             team = team_list[0]
 
             if user_id not in team.team_leads:
+                logging.error(f"User with user ID {user_id} is not"
+                              " a team lead of the specified team")
                 return self.permission_error, 200
             elif project.github_team_id != "" and not force:
+                logging.error("Project is assigned to team with "
+                              f"GitHub team ID {project.github_team_id}")
                 return self.assigned_error, 200
             else:
                 project.github_team_id = team.github_team_id
                 self.facade.store(project)
                 return "Project successfully assigned!", 200
         except LookupError:
+            logging.error(f"Failed to look up project with ID {project_id}")
             return self.project_lookup_error, 200
 
     def delete_helper(self,
@@ -356,14 +381,18 @@ class ProjectCommand(Command):
                  an assignment error if the project is assigned to a team,
                  otherwise success message
         """
+        logging.debug("Handling project delete subcommand")
         try:
             project = self.facade.retrieve(Project, project_id)
 
             if project.github_team_id != "" and not force:
+                logging.error("Project is assigned to team with "
+                              f"GitHub team ID {project.github_team_id}")
                 return self.assigned_error, 200
             else:
                 self.facade.delete(Project, project_id)
                 return "Project successfully deleted!", 200
 
         except LookupError:
+            logging.error(f"Failed to look up project with ID {project_id}")
             return self.project_lookup_error, 200
