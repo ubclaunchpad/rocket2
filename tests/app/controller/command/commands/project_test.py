@@ -188,8 +188,8 @@ class TestProjectCommand(TestCase):
             resp, code = self.testcommand.handle("project list", user)
             expect = \
                 "*PROJECT ID : GITHUB TEAM ID : PROJECT NAME*\n" \
-                    "1 : GTID1 : project1\n" \
-                    "1 : GTID2 : project2\n"
+                "1 : GTID1 : project1\n" \
+                "1 : GTID2 : project2\n"
             self.assertEqual(resp, expect)
             self.assertEqual(code, 200)
         self.mock_facade.query.assert_called_once_with(Project)
