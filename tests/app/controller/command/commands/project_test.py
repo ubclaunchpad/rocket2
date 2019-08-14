@@ -3,7 +3,7 @@ from app.controller.command.commands import ProjectCommand
 from db import DBFacade
 from flask import jsonify, json, Flask
 from unittest import mock, TestCase
-from app.model import Project, Team
+from app.model import Project, User, Team, Permissions
 
 user = 'U123456789'
 
@@ -67,11 +67,35 @@ class TestProjectCommand(TestCase):
         self.mock_facade.store.assert_called_once_with(project)
 
     @mock.patch('app.model.project.uuid')
-    def test_handle_create(self, mock_uuid):
-        """Test project command create parser."""
+    def test_handle_create_as_team_lead(self, mock_uuid):
+        """Test project command create parser as a team lead."""
         mock_uuid.uuid4.return_value = "1"
         team = Team("GTID", "team-name", "name")
         team.team_leads.add(user)
+        self.mock_facade.query.return_value = [team]
+        project = Project("GTID", ["repo-link"])
+        project_attach = [project.get_attachment()]
+        with self.app.app_context():
+            resp, code = \
+                self.testcommand.handle("project create repo-link team-name",
+                                        user)
+            expect = json.loads(jsonify({'attachments': project_attach}).data)
+            resp = json.loads(resp.data)
+            self.assertDictEqual(resp, expect)
+            self.assertEqual(code, 200)
+        self.mock_facade.query.assert_called_once_with(Team,
+                                                       [("github_team_name",
+                                                         "team-name")])
+        self.mock_facade.store.assert_called_once_with(project)
+
+    @mock.patch('app.model.project.uuid')
+    def test_handle_create_as_admin(self, mock_uuid):
+        """Test project command create parser as an admin."""
+        mock_uuid.uuid4.return_value = "1"
+        team = Team("GTID", "team-name", "name")
+        calling_user = User(user)
+        calling_user.permissions_level = Permissions.admin
+        self.mock_facade.retrieve.return_value = calling_user
         self.mock_facade.query.return_value = [team]
         project = Project("GTID", ["repo-link"])
         project_attach = [project.get_attachment()]
@@ -116,6 +140,16 @@ class TestProjectCommand(TestCase):
             self.testcommand.handle("project create repo-link team-name",
                                     user),
             (self.testcommand.permission_error, 200))
+
+    def test_handle_create_user_lookup_error(self):
+        """Test project command create parser with no user lookup error."""
+        team = Team("GTID", "team-name", "name")
+        self.mock_facade.query.return_value = [team]
+        self.mock_facade.retrieve.side_effect = LookupError
+        self.assertTupleEqual(
+            self.testcommand.handle("project create repo-link team-name",
+                                    user),
+            (self.testcommand.user_lookup_error, 200))
 
     @mock.patch('app.model.project.uuid')
     def test_handle_create_with_display_name(self, mock_uuid):
@@ -163,16 +197,39 @@ class TestProjectCommand(TestCase):
         self.assertTupleEqual(self.testcommand.handle("project list", user),
                               ("No Projects Exist!", 200))
 
-    def test_handle_unassign(self):
-        """Test project command unassign parser with permission error."""
+    def test_handle_unassign_as_team_lead(self):
+        """Test project command unassign parseras a team lead."""
         def facade_retrieve_side_effect(*args, **kwargs):
             """Return a side effect for the mock facade."""
             if args[0] == Project:
                 return Project("GTID", [])
-            else:
+            elif args[0] == Team:
                 team = Team("GTID", "team-name", "display-name")
                 team.team_leads.add(user)
                 return team
+            else:
+                calling_user = User(user)
+                return calling_user
+        self.mock_facade.retrieve.side_effect = facade_retrieve_side_effect
+        with self.app.app_context():
+            resp, code = \
+                self.testcommand.handle("project unassign 1",
+                                        user)
+            assert (resp, code) == ("Project successfully unassigned!", 200)
+
+    def test_handle_unassign_as_admin(self):
+        """Test project command unassign parser as an admin."""
+        def facade_retrieve_side_effect(*args, **kwargs):
+            """Return a side effect for the mock facade."""
+            if args[0] == Project:
+                return Project("GTID", [])
+            elif args[0] == Team:
+                team = Team("GTID", "team-name", "display-name")
+                return team
+            else:
+                calling_user = User(user)
+                calling_user.permissions_level = Permissions.admin
+                return calling_user
         self.mock_facade.retrieve.side_effect = facade_retrieve_side_effect
         with self.app.app_context():
             resp, code = \
@@ -200,25 +257,67 @@ class TestProjectCommand(TestCase):
                                                       user),
                               (self.testcommand.team_lookup_error, 200))
 
+    def test_handle_unassign_user_lookup_error(self):
+        """Test project command unassign with team lookup error."""
+        def facade_retrieve_side_effect(*args, **kwargs):
+            """Return a side effect for the mock facade."""
+            if args[0] == Project:
+                return Project("GTID", [])
+            elif args[0] == Team:
+                return Team("GTID", "team-name", "display-name")
+            else:
+                raise LookupError
+        self.mock_facade.retrieve.side_effect = facade_retrieve_side_effect
+        self.assertTupleEqual(self.testcommand.handle("project unassign ID",
+                                                      user),
+                              (self.testcommand.user_lookup_error, 200))
+
     def test_handle_unassign_permission_error(self):
         """Test project command unassign parser with permission error."""
         def facade_retrieve_side_effect(*args, **kwargs):
             """Return a side effect for the mock facade."""
             if args[0] == Project:
                 return Project("GTID", [])
-            else:
+            elif args[0] == Team:
                 return Team("GTID", "team-name", "display-name")
+            else:
+                return User(user)
         self.mock_facade.retrieve.side_effect = facade_retrieve_side_effect
         self.assertTupleEqual(
             self.testcommand.handle("project unassign 1",
                                     user),
             (self.testcommand.permission_error, 200))
 
-    def test_handle_assign_assign(self):
-        """Test project command assign."""
-        self.mock_facade.retrieve.return_value = Project("", [])
+    def test_handle_assign_as_team_lead(self):
+        """Test project command assign as a team lead."""
+        def facade_retrieve_side_effect(*args, **kwargs):
+            """Return a side effect for the mock facade."""
+            if args[0] == Project:
+                return Project("", [])
+            else:
+                calling_user = User(user)
+                return calling_user
+        self.mock_facade.retrieve.side_effect = facade_retrieve_side_effect
         team = Team("GTID", "team-name", "display-name")
         team.team_leads.add(user)
+        self.mock_facade.query.return_value = [team]
+        self.assertTupleEqual(
+            self.testcommand.handle("project assign ID team-name",
+                                    user),
+            ("Project successfully assigned!", 200))
+
+    def test_handle_assign_as_admin(self):
+        """Test project command assign as an admin."""
+        def facade_retrieve_side_effect(*args, **kwargs):
+            """Return a side effect for the mock facade."""
+            if args[0] == Project:
+                return Project("", [])
+            else:
+                calling_user = User(user)
+                calling_user.permissions_level = Permissions.admin
+                return calling_user
+        self.mock_facade.retrieve.side_effect = facade_retrieve_side_effect
+        team = Team("GTID", "team-name", "display-name")
         self.mock_facade.query.return_value = [team]
         self.assertTupleEqual(
             self.testcommand.handle("project assign ID team-name",
@@ -244,7 +343,14 @@ class TestProjectCommand(TestCase):
 
     def test_handle_assign_permission_error(self):
         """Test project command assign with permission error."""
-        self.mock_facade.retrieve.return_value = Project("", [])
+        def facade_retrieve_side_effect(*args, **kwargs):
+            """Return a side effect for the mock facade."""
+            if args[0] == Project:
+                return Project("", [])
+            else:
+                calling_user = User(user)
+                return calling_user
+        self.mock_facade.retrieve.side_effect = facade_retrieve_side_effect
         team = Team("GTID", "team-name", "display-name")
         self.mock_facade.query.return_value = [team]
         self.assertTupleEqual(
@@ -274,9 +380,39 @@ class TestProjectCommand(TestCase):
                                     user),
             ("Project successfully assigned!", 200))
 
-    def test_handle_delete(self):
-        """Test project command delete."""
-        self.mock_facade.retrieve.return_value = Project("", [])
+    def test_handle_delete_as_team_lead(self):
+        """Test project command delete as a team lead."""
+        def facade_retrieve_side_effect(*args, **kwargs):
+            """Return a side effect for the mock facade."""
+            if args[0] == Project:
+                return Project("", [])
+            elif args[0] == Team:
+                team = Team("GTID", "team-name", "display-name")
+                team.team_leads.add(user)
+                return team
+            else:
+                calling_user = User(user)
+                return calling_user
+        self.mock_facade.retrieve.side_effect = facade_retrieve_side_effect
+        self.assertTupleEqual(
+            self.testcommand.handle("project delete ID",
+                                    user),
+            ("Project successfully deleted!", 200))
+
+    def test_handle_delete_as_admin(self):
+        """Test project command delete as an admin."""
+        def facade_retrieve_side_effect(*args, **kwargs):
+            """Return a side effect for the mock facade."""
+            if args[0] == Project:
+                return Project("", [])
+            elif args[0] == Team:
+                team = Team("GTID", "team-name", "display-name")
+                return team
+            else:
+                calling_user = User(user)
+                calling_user.permissions_level = Permissions.admin
+                return calling_user
+        self.mock_facade.retrieve.side_effect = facade_retrieve_side_effect
         self.assertTupleEqual(
             self.testcommand.handle("project delete ID",
                                     user),
@@ -290,6 +426,40 @@ class TestProjectCommand(TestCase):
                                     user),
             (self.testcommand.project_lookup_error, 200))
 
+    def test_handle_delete_team_lookup_error(self):
+        """Test project command delete with team lookup error."""
+        def facade_retrieve_side_effect(*args, **kwargs):
+            """Return a side effect for the mock facade."""
+            if args[0] == Project:
+                return Project("", [])
+            elif args[0] == Team:
+                team = Team("GTID", "team-name", "display-name")
+                return team
+            else:
+                raise LookupError
+        self.mock_facade.retrieve.side_effect = facade_retrieve_side_effect
+        self.assertTupleEqual(
+            self.testcommand.handle("project delete ID",
+                                    user),
+            (self.testcommand.user_lookup_error, 200))
+
+    def test_handle_delete_user_lookup_error(self):
+        """Test project command delete with team lookup error."""
+        def facade_retrieve_side_effect(*args, **kwargs):
+            """Return a side effect for the mock facade."""
+            if args[0] == Project:
+                return Project("", [])
+            elif args[0] == Team:
+                raise LookupError
+            else:
+                calling_user = User(user)
+                return calling_user
+        self.mock_facade.retrieve.side_effect = facade_retrieve_side_effect
+        self.assertTupleEqual(
+            self.testcommand.handle("project delete ID",
+                                    user),
+            (self.testcommand.team_lookup_error, 200))
+
     def test_handle_delete_assign_error(self):
         """Test project command delete with assignment error."""
         self.mock_facade.retrieve.return_value = Project("GTID", [])
@@ -300,7 +470,18 @@ class TestProjectCommand(TestCase):
 
     def test_handle_force_delete(self):
         """Test project command force delete."""
-        self.mock_facade.retrieve.return_value = Project("GTID", [])
+        def facade_retrieve_side_effect(*args, **kwargs):
+            """Return a side effect for the mock facade."""
+            if args[0] == Project:
+                return Project("", [])
+            elif args[0] == Team:
+                team = Team("GTID", "team-name", "display-name")
+                team.team_leads.add(user)
+                return team
+            else:
+                calling_user = User(user)
+                return calling_user
+        self.mock_facade.retrieve.side_effect = facade_retrieve_side_effect
         self.assertTupleEqual(
             self.testcommand.handle("project delete ID -f",
                                     user),

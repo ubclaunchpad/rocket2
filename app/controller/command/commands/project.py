@@ -7,7 +7,7 @@ from app.controller import ResponseTuple
 from app.controller.command.commands.base import Command
 from db.facade import DBFacade
 from flask import jsonify
-from app.model import Project, Team
+from app.model import Project, User, Team, Permissions
 from typing import Dict
 
 
@@ -174,6 +174,7 @@ class ProjectCommand(Command):
 
         elif args.which == "delete":
             return self.delete_helper(args.project_id,
+                                      user_id,
                                       args.force)
 
         else:
@@ -242,20 +243,26 @@ class ProjectCommand(Command):
             return self.team_lookup_error, 200
 
         team = team_list[0]
+        try:
+            user = self.facade.retrieve(User, user_id)
 
-        if user_id not in team.team_leads:
-            logging.error(f"User with user ID {user_id} is not"
-                          " a team lead of the specified team")
-            return self.permission_error, 200
+            if not (user_id in team.team_leads or
+                    user.permissions_level is Permissions.admin):
+                logging.error(f"User with user ID {user_id} is not "
+                              "a team lead of the specified team or an admin")
+                return self.permission_error, 200
 
-        project = Project(team.github_team_id, [gh_repo])
+            project = Project(team.github_team_id, [gh_repo])
 
-        if param_list["display_name"]:
-            project.display_name = param_list["display_name"]
+            if param_list["display_name"]:
+                project.display_name = param_list["display_name"]
 
-        self.facade.store(project)
+            self.facade.store(project)
 
-        return jsonify({'attachments': [project.get_attachment()]}), 200
+            return jsonify({'attachments': [project.get_attachment()]}), 200
+        except LookupError:
+            logging.error(f"Failed to look up user with ID {user_id}")
+            return self.user_lookup_error, 200
 
     def unassign_helper(self,
                         project_id: str,
@@ -274,19 +281,26 @@ class ProjectCommand(Command):
             project = self.facade.retrieve(Project, project_id)
             try:
                 team = self.facade.retrieve(Team, project.github_team_id)
-
-                if user_id not in team.team_leads:
-                    logging.error(f"User with user ID {user_id} is not"
-                                  " a team lead of the specified team")
-                    return self.permission_error, 200
-                else:
-                    project.github_team_id = ""
-                    self.facade.store(project)
-                    return "Project successfully unassigned!", 200
             except LookupError:
                 logging.error("Failed to look up team "
                               f"with GitHub ID {project.github_team_id}")
                 return self.team_lookup_error, 200
+            try:
+                user = self.facade.retrieve(User, user_id)
+            except LookupError:
+                logging.error("Failed to look up user "
+                              f"with ID {user_id}")
+                return self.user_lookup_error, 200
+
+            if not (user_id in team.team_leads or
+                    user.permissions_level is Permissions.admin):
+                logging.error(f"User with user ID {user_id} is not "
+                              "a team lead of the specified team or an admin")
+                return self.permission_error, 200
+            else:
+                project.github_team_id = ""
+                self.facade.store(project)
+                return "Project successfully unassigned!", 200
         except LookupError:
             logging.error(f"Failed to look up project with ID {project_id}")
             return self.project_lookup_error, 200
@@ -351,10 +365,17 @@ class ProjectCommand(Command):
                 return self.team_lookup_error, 200
 
             team = team_list[0]
+            try:
+                user = self.facade.retrieve(User, user_id)
+            except LookupError:
+                logging.error("Failed to look up user "
+                              f"with ID {user_id}")
+                return self.user_lookup_error, 200
 
-            if user_id not in team.team_leads:
-                logging.error(f"User with user ID {user_id} is not"
-                              " a team lead of the specified team")
+            if not (user_id in team.team_leads or
+                    user.permissions_level is Permissions.admin):
+                logging.error(f"User with user ID {user_id} is not "
+                              "a team lead of the specified team or an admin")
                 return self.permission_error, 200
             elif project.github_team_id != "" and not force:
                 logging.error("Project is assigned to team with "
@@ -370,11 +391,13 @@ class ProjectCommand(Command):
 
     def delete_helper(self,
                       project_id: str,
+                      user_id: str,
                       force: bool) -> ResponseTuple:
         """
         Delete a project from the database.
 
         :param project_id: project ID of project to delete
+        :param user_id: user ID of the calling user
         :param force: specify if an error should be raised if the project
                       is assigned to a team
         :return: returns lookup error if the project could not be found, else
@@ -384,11 +407,28 @@ class ProjectCommand(Command):
         logging.debug("Handling project delete subcommand")
         try:
             project = self.facade.retrieve(Project, project_id)
+            try:
+                team = self.facade.retrieve(Team, project.github_team_id)
+            except LookupError:
+                logging.error("Failed to look up team "
+                              f"with GitHub ID {project.github_team_id}")
+                return self.team_lookup_error, 200
+            try:
+                user = self.facade.retrieve(User, user_id)
+            except LookupError:
+                logging.error("Failed to look up user "
+                              f"with ID {user_id}")
+                return self.user_lookup_error, 200
 
             if project.github_team_id != "" and not force:
                 logging.error("Project is assigned to team with "
                               f"GitHub team ID {project.github_team_id}")
                 return self.assigned_error, 200
+            elif not (user_id in team.team_leads or
+                    user.permissions_level is Permissions.admin):
+                logging.error(f"User with user ID {user_id} is not "
+                              "a team lead of the specified team or an admin")
+                return self.permission_error, 200
             else:
                 self.facade.delete(Project, project_id)
                 return "Project successfully deleted!", 200

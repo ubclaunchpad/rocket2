@@ -40,16 +40,17 @@ Displays options for `project` command.
 ```
 
 Creates a new project from the given repo.
-Fails if the caller is not the team lead of the specified team.
+Fails if the caller is not the team lead of the specified team or an admin.
 
-### Unassign
+### Unassign (Team Lead and Admin only)
 
 ```sh
 /rocket project unassign PROJECT_ID
 ```
 
 Unassigns the given project.
-Fails if the caller is not the team lead of the team assigned to the project.
+Fails if the caller is not the team lead of the team assigned to the project
+or if the caller is not an admin.
 
 ### Edit
 
@@ -59,7 +60,7 @@ Fails if the caller is not the team lead of the team assigned to the project.
 
 Edit the given project.
 
-### Assign
+### Assign (Team Lead and Admin only)
 
 ```sh
 /rocket project assign PROJECT_ID GITHUB_TEAM_NAME [-f]
@@ -68,8 +69,10 @@ Edit the given project.
 Assigns the project to the team. Fails if another team is assigned the project.
 If `-f` flag is given, can reassign even if
 another team is already assigned the project.
+Fails if the caller is not the team lead of the team to assign the project to
+or if the caller is not an admin.
 
-### Delete
+### Delete (Team Lead and Admin only)
 
 ```sh
 /rocket project delete PROJECT_ID [-f]
@@ -78,3 +81,5 @@ another team is already assigned the project.
 Delete the project from database. An error occurs if the project is currently assigned.
 If `-f` flag is given, can be deleted
 even if a team is assigned.
+Fails if the caller is not the team lead project's assigned team
+or if the caller is not an admin.
