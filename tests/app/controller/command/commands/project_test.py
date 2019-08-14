@@ -175,19 +175,22 @@ class TestProjectCommand(TestCase):
                                                          "team-name")])
         self.mock_facade.store.assert_called_once_with(project)
 
-    def test_handle_list(self):
+    @mock.patch('app.model.project.uuid')
+    def test_handle_list(self, mock_uuid):
         """Test project command list parser."""
+        mock_uuid.uuid4.return_value = "1"
         project1 = Project("GTID1", ["a", "b"])
+        project1.display_name = "project1"
         project2 = Project("GTID2", ["c", "d"])
+        project2.display_name = "project2"
         self.mock_facade.query.return_value = [project1, project2]
-        attach1 = project1.get_basic_attachment()
-        attach2 = project2.get_basic_attachment()
-        attachment = [attach1, attach2]
         with self.app.app_context():
             resp, code = self.testcommand.handle("project list", user)
-            expect = json.loads(jsonify({'attachments': attachment}).data)
-            resp = json.loads(resp.data)
-            self.assertDictEqual(resp, expect)
+            expect = \
+                "*PROJECT ID : GITHUB TEAM ID : PROJECT NAME*\n" \
+                    "1 : GTID1 : project1\n" \
+                    "1 : GTID2 : project2\n"
+            self.assertEqual(resp, expect)
             self.assertEqual(code, 200)
         self.mock_facade.query.assert_called_once_with(Project)
 

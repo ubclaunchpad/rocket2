@@ -52,20 +52,6 @@ class Project:
 
         return {'fallback': fallback, 'fields': fields}
 
-    def get_basic_attachment(self) -> Dict[str, Any]:
-        """Return basic slack-formatted attachment (dictionary) for project."""
-        text_pairs = [
-            ('Project ID', self.project_id),
-            ('Github Team ID', self.github_team_id),
-            ('Display Name', self.display_name)
-        ]
-
-        fields = [{'title': t, 'value': v if v else 'n/a', 'short': True}
-                  for t, v in text_pairs]
-        fallback = str('\n'.join(map(str, text_pairs)))
-
-        return {'fallback': fallback, 'fields': fields}
-
     @staticmethod
     def from_dict(d: Dict[str, Any]) -> 'Project':
         """

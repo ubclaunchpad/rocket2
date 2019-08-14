@@ -192,9 +192,12 @@ class ProjectCommand(Command):
         if not projects:
             logging.info("No projects found in database")
             return "No Projects Exist!", 200
-        attachment = [project.get_basic_attachment() for
-                      project in projects]
-        return jsonify({'attachments': attachment}), 200
+        project_list_str = "*PROJECT ID : GITHUB TEAM ID : PROJECT NAME*\n"
+        for project in projects:
+            project_list_str += f"{project.project_id} : " \
+                f"{project.github_team_id} : " \
+                f"{project.display_name}\n"
+        return project_list_str, 200
 
     def view_helper(self,
                     project_id: str) -> ResponseTuple:
@@ -425,7 +428,7 @@ class ProjectCommand(Command):
                               f"GitHub team ID {project.github_team_id}")
                 return self.assigned_error, 200
             elif not (user_id in team.team_leads or
-                    user.permissions_level is Permissions.admin):
+                      user.permissions_level is Permissions.admin):
                 logging.error(f"User with user ID {user_id} is not "
                               "a team lead of the specified team or an admin")
                 return self.permission_error, 200
