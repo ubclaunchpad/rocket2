@@ -53,12 +53,12 @@ class ProjectCommand(Command):
         """Parser for create command."""
         parser_create = subparsers.add_parser("create")
         parser_create.set_defaults(which="create",
-                                   help="(Team Lead and Admin only) Creates "
+                                   help="(Team Lead and Admin only) Create "
                                         "a new project from a given repo.")
         parser_create.add_argument("gh_repo", metavar="gh-repo",
                                    type=str, action="store",
-                                   help="Use to specify link of the "
-                                   "GitHub repository.")
+                                   help="Use to specify link to "
+                                        "GitHub repository.")
         parser_create.add_argument("github_team_name",
                                    metavar="github-team-name",
                                    type=str, action="store",
@@ -72,7 +72,7 @@ class ProjectCommand(Command):
         """Parser for unassign command."""
         parser_unassign = subparsers.add_parser("unassign")
         parser_unassign.set_defaults(which="unassign",
-                                     help="Unassigns a given project.")
+                                     help="Unassign a given project.")
         parser_unassign.add_argument("project_id", metavar="project-id",
                                      type=str, action="store",
                                      help="Use to specify project "
@@ -189,7 +189,7 @@ class ProjectCommand(Command):
         logging.debug("Handling project list subcommand")
         projects = self.facade.query(Project)
         if not projects:
-            logging.warning("No projects found in database")
+            logging.info("No projects found in database")
             return "No Projects Exist!", 200
         attachment = [project.get_basic_attachment() for
                       project in projects]
