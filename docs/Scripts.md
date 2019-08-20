@@ -10,7 +10,7 @@ scripts/build_check.sh
 ```
 
 This is just the list of commands run to check the code for violations of Python
-style. It also runs the tests, and is the script that is run in our Travis CI.
+style. It also runs the tests, and is the script that is run in our Github CI.
 Make sure to run before submitting a pull request!
 
 This script also checks to see if the user is running DynamoDB locally, and if
@@ -48,7 +48,7 @@ This script downloads a copy of the latest local version of DynamoDB and forks
 the process. It also sets up the environment in which you should run it in using
 `scripts/setup_localaws.sh`.
 
-Please do not use this script; it is meant to be run by Travis CI. Unless you
+Please do not use this script; it is meant to be run by Github CI. Unless you
 enjoy having to download and run multiple DynamoDB processes.
 
 ## setup\_localaws.sh
