@@ -1,10 +1,9 @@
 # The Configuration System
 
-We use environmental variables for all of our configuration-related things.
-A sample `.env` file (which is what `pipenv` looks for when it tries to launch)
-can be found at `sample-env`. Here is how each variable works.
-
-**Note: all variables are strings**
+We use environmental variables for all of our configuration-related things. A
+sample `.env` file (which is what `pipenv` looks for when it tries to launch)
+can be found at `sample-env`. Here is how each variable works. **Note: all
+variables are strings**
 
 ## TESTING
 

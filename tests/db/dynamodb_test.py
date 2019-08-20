@@ -16,7 +16,8 @@ def ddb():
     test_config.aws_teams_tablename = 'teams_test'
     test_config.aws_projects_tablename = 'projects_test'
     test_config.testing = True
-    yield DynamoDB(test_config)
+    actual = DynamoDB(test_config)
+    yield actual
     ts = [User, Team, Project]
     for t in ts:
         items = actual.query(t)
