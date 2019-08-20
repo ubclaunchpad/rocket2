@@ -70,7 +70,7 @@ entire app, as well as the `credentials/` directory, where you will put the
 credentials you noted above.
 
 In `config.toml`, ensure that `testing` is set to `false` - this setting is
-intended for automated testing, like Travis CI. In the `aws` section,
+intended for automated testing, like Github CI. In the `aws` section,
 change the value for `users_tables` and `teams_table`, or you may conflict
 with other users testing on the same AWS account. You can also change the
 AWS region, if necessary, though the default value of `us-west-2` should be

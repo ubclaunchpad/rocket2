@@ -34,7 +34,7 @@ and, well, have your name and number, so to speak.
 ## Before-Pull-Request checklist
 
 - All tests and style and docs checks pass (`scripts/build_check.sh`)
-- The travis build passes (travis will build your commit when you push it)
+- The Github build passes (Github will build your commit when you push it)
 - Your code is presentable and you have **not** committed extra files (think
   your credentials, IDE config files, cached directories, build directories,
   etc.)
@@ -58,8 +58,8 @@ All pull requests must be code reviewed. Currently the code is owned by the
 [brussel-sprouts][bs] team at UBC Launch Pad; at least one member of the team
 must approve the pull request before it can be merged.
 
-All pull requests must pass our Travis build before they can be merged. The
-Travis build checks for:
+All pull requests must pass our Github build before they can be merged. The
+Github build checks for:
 
 - Passing unit tests (via [pytest](https://pytest.org))
 - Minimum code coverage of unit tests (via [Codecov.io](https://codecov.io/))
@@ -73,7 +73,7 @@ mentioned above.
 
 Remember to add the label `Ready for Review`.
 
-After your pull request has been approved and the Travis build passes, it can
+After your pull request has been approved and the Github build passes, it can
 be merged into `master`. Please do so with an ordinary merge commit, not a
 rebase or squash merge.
 
