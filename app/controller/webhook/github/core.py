@@ -5,7 +5,7 @@ import hashlib
 from db.facade import DBFacade
 from typing import Dict, Any
 from app.controller import ResponseTuple
-from config import Credentials
+from config import Config
 from app.controller.webhook.github.events import MembershipEventHandler, \
     OrganizationEventHandler, TeamEventHandler
 
@@ -13,9 +13,9 @@ from app.controller.webhook.github.events import MembershipEventHandler, \
 class GitHubWebhookHandler:
     """Encapsulate the handlers for all GitHub webhook events."""
 
-    def __init__(self, db_facade: DBFacade, credentials: Credentials) -> None:
+    def __init__(self, db_facade: DBFacade, config: Config) -> None:
         """Give handlers access to the database."""
-        self.__secret = credentials.github_webhook_secret
+        self.__secret = config.github_webhook_secret
         self.__event_handlers = [
             OrganizationEventHandler(db_facade),
             TeamEventHandler(db_facade),

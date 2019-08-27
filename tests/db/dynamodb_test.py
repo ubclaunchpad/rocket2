@@ -2,6 +2,8 @@
 import pytest
 
 from app.model import User, Project, Team, Permissions
+from config import Config
+from unittest.mock import MagicMock
 from tests.util import create_test_team, create_test_admin, create_test_project
 
 
@@ -9,15 +11,12 @@ from tests.util import create_test_team, create_test_admin, create_test_project
 def ddb():
     """Create a new DynamoDb instance."""
     from db.dynamodb import DynamoDB
-    test_config = {
-        'aws': {
-            'users_table': 'users_test',
-            'teams_table': 'teams_test',
-            'projects_table': 'projects_test'
-        },
-        'testing': True
-    }
-    actual = DynamoDB(test_config, None)
+    test_config = MagicMock(Config)
+    test_config.aws_users_tablename = 'users_test'
+    test_config.aws_teams_tablename = 'teams_test'
+    test_config.aws_projects_tablename = 'projects_test'
+    test_config.testing = True
+    actual = DynamoDB(test_config)
     yield actual
     ts = [User, Team, Project]
     for t in ts:

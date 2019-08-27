@@ -14,13 +14,12 @@ from interface.slack import Bot
 from slack import WebClient
 from app.controller.webhook.github import GitHubWebhookHandler
 from app.controller.webhook.slack import SlackEventsHandler
-from config import Credentials
+from config import Config
 
-from typing import Dict, Any, Optional, cast
+from typing import Optional, cast
 
 
-def make_command_parser(config: Dict[str, Any],
-                        credentials: Credentials,
+def make_command_parser(config: Config,
                         gh: Optional[GithubInterface] = None) \
         -> CommandParser:
     """
@@ -30,54 +29,45 @@ def make_command_parser(config: Dict[str, Any],
     """
     slack_api_token, slack_bot_channel = "", ""
     signing_key = ""
-    if not config['testing']:
-        slack_api_token = credentials.slack_api_token
-        github_auth_key = pem.parse_file(
-            credentials.github_signing_key_path)[0].as_text()
-        github_app_id = config['github']['app_id']
-        github_organization = config['github']['organization']
-        slack_bot_channel = config['slack']['bot_channel']
+    if not config.testing:
+        slack_api_token = config.slack_api_token
+        github_auth_key = pem.parse_file(config.github_key_file)[0].as_text()
+        github_app_id = config.github_app_id
+        github_organization = config.github_org_name
+        slack_bot_channel = config.slack_bot_channel
         gh = GithubInterface(DefaultGithubFactory(github_app_id,
                                                   github_auth_key),
                              github_organization)
-        if os.path.isfile(config['auth']['signing_key_path']):
-            signing_key = open(config['auth']['signing_key_path']).read()
+        if os.path.isfile(config.github_key_file):
+            signing_key = open(config.github_key_file).read()
         else:
             signing_key = create_signing_token()
-            open(config['auth']['signing_key_path'], 'w+').write(signing_key)
-    facade = DBFacade(DynamoDB(config, credentials))
+            open(config.github_key_file, 'w+').write(signing_key)
+    facade = DBFacade(DynamoDB(config))
     bot = Bot(WebClient(slack_api_token), slack_bot_channel)
     # TODO: make token config expiry configurable
     token_config = TokenCommandConfig(timedelta(days=7), signing_key)
     return CommandParser(facade, bot, cast(GithubInterface, gh), token_config)
 
 
-def make_github_webhook_handler(config: Dict[str, Any],
-                                credentials:
-                                Credentials) -> GitHubWebhookHandler:
+def make_github_webhook_handler(config: Config) -> GitHubWebhookHandler:
     """
     Initialize a :class:`GitHubWebhookHandler` object.
 
     :return: a new ``GitHubWebhookHandler`` object, freshly initialized
     """
-    facade = DBFacade(DynamoDB(config, credentials))
-    return GitHubWebhookHandler(facade, credentials)
+    facade = DBFacade(DynamoDB(config))
+    return GitHubWebhookHandler(facade, config)
 
 
-def make_slack_events_handler(config: Dict[str, Any],
-                              credentials:
-                              Credentials) -> SlackEventsHandler:
+def make_slack_events_handler(config: Config) -> SlackEventsHandler:
     """
     Initialize a :class:`SlackEventsHandler` object.
 
     :return: a new ``SlackEventsHandler`` object, freshly initialized
     """
-    slack_api_token, slack_bot_channel = "", ""
-    if not config['testing']:
-        slack_api_token = credentials.slack_api_token
-        slack_bot_channel = config['slack']['bot_channel']
-    facade = DBFacade(DynamoDB(config, credentials))
-    bot = Bot(WebClient(slack_api_token), slack_bot_channel)
+    facade = DBFacade(DynamoDB(config))
+    bot = Bot(WebClient(config.slack_api_token), config.slack_bot_channel)
     return SlackEventsHandler(facade, bot)
 
 

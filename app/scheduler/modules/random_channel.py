@@ -5,7 +5,7 @@ from random import choice
 from .base import ModuleBase
 from typing import Dict, Any
 from flask import Flask
-from config import Credentials
+from config import Config
 import logging
 
 
@@ -16,11 +16,10 @@ class RandomChannelPromoter(ModuleBase):
 
     def __init__(self,
                  flask_app: Flask,
-                 config: Dict[str, Any],
-                 credentials: Credentials):
+                 config: Config):
         """Initialize the object."""
-        self.bot = Bot(WebClient(credentials.slack_api_token),
-                       config['slack']['bot_channel'])
+        self.bot = Bot(WebClient(config.slack_api_token),
+                       config.slack_bot_channel)
 
     def get_job_args(self) -> Dict[str, Any]:
         """Get job configuration arguments for apscheduler."""

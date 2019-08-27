@@ -4,54 +4,40 @@ import pytest
 from factory import make_command_parser, CommandParser, \
     make_github_webhook_handler, GitHubWebhookHandler, \
     make_slack_events_handler, SlackEventsHandler
-from unittest import mock
-from config import Credentials
+from unittest.mock import MagicMock
+from config import Config
+
+
+@pytest.fixture
+def test_config():
+    """Create config for testing."""
+    test_config = MagicMock(Config)
+    test_config.aws_users_tablename = 'users_test'
+    test_config.aws_teams_tablename = 'teams_test'
+    test_config.aws_projects_tablename = 'projects_test'
+    test_config.github_webhook_secret = 'secret'
+    test_config.slack_api_token = 'token'
+    test_config.slack_bot_channel = 'channel'
+    test_config.testing = True
+    return test_config
 
 
 @pytest.mark.db
-def test_make_command_parser():
+def test_make_command_parser(test_config):
     """Test the make_command_parser function."""
-    test_config = {
-        'testing': True,
-        'aws': {
-            'users_table': 'users_test',
-            'teams_table': 'teams_test',
-            'projects_table': 'projects_test'
-        }
-    }
-    parser = make_command_parser(test_config, mock.MagicMock(Credentials))
+    parser = make_command_parser(test_config)
     assert isinstance(parser, CommandParser)
 
 
 @pytest.mark.db
-@mock.patch('factory.Credentials')
-def test_make_github_webhook_handler(mock_creds):
+def test_make_github_webhook_handler(test_config):
     """Test the make_command_github_webhook_handler function."""
-    test_config = {
-        'testing': True,
-        'aws': {
-            'users_table': 'users_test',
-            'teams_table': 'teams_test',
-            'projects_table': 'projects_test'
-        }
-    }
-    mock_creds.github_webhook_secret = "secret"
-    handler = make_github_webhook_handler(test_config,
-                                          mock_creds)
+    handler = make_github_webhook_handler(test_config)
     assert isinstance(handler, GitHubWebhookHandler)
 
 
 @pytest.mark.db
-def test_make_slack_events_handler():
+def test_make_slack_events_handler(test_config):
     """Test the make_command_slack_events_handler function."""
-    test_config = {
-        'testing': True,
-        'aws': {
-            'users_table': 'users_test',
-            'teams_table': 'teams_test',
-            'projects_table': 'projects_test'
-        }
-    }
-    handler = make_slack_events_handler(test_config,
-                                        mock.MagicMock(Credentials))
+    handler = make_slack_events_handler(test_config)
     assert isinstance(handler, SlackEventsHandler)
