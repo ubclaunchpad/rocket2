@@ -40,13 +40,13 @@ class TestProjectCommand(TestCase):
         """Test project command view parser with lookup error."""
         self.mock_facade.retrieve.side_effect = LookupError
         self.assertTupleEqual(self.testcommand.handle("project view id", user),
-                              (self.testcommand.project_lookup_error, 200))
+                              (self.testcommand.lookup_error, 200))
 
     def test_handle_edit_lookup_error(self):
         """Test project command edit parser with lookup error."""
         self.mock_facade.retrieve.side_effect = LookupError
         self.assertTupleEqual(self.testcommand.handle("project edit id", user),
-                              (self.testcommand.project_lookup_error, 200))
+                              (self.testcommand.lookup_error, 200))
 
     def test_handle_edit_name(self):
         """Test project command edit parser with name property."""
@@ -122,7 +122,7 @@ class TestProjectCommand(TestCase):
         self.assertTupleEqual(
             self.testcommand.handle("project create repo-link team-name",
                                     user),
-            (self.testcommand.team_lookup_error, 200))
+            (self.testcommand.lookup_error, 200))
 
     def test_handle_create_no_team_lookup_error(self):
         """Test project command create parser with no team lookup error."""
@@ -130,7 +130,7 @@ class TestProjectCommand(TestCase):
         self.assertTupleEqual(
             self.testcommand.handle("project create repo-link team-name",
                                     user),
-            (self.testcommand.team_lookup_error, 200))
+            (self.testcommand.lookup_error, 200))
 
     def test_handle_create_permission_error(self):
         """Test project command create parser with permission error."""
@@ -149,7 +149,7 @@ class TestProjectCommand(TestCase):
         self.assertTupleEqual(
             self.testcommand.handle("project create repo-link team-name",
                                     user),
-            (self.testcommand.user_lookup_error, 200))
+            (self.testcommand.lookup_error, 200))
 
     @mock.patch('app.model.project.uuid')
     def test_handle_create_with_display_name(self, mock_uuid):
@@ -245,7 +245,7 @@ class TestProjectCommand(TestCase):
         self.mock_facade.retrieve.side_effect = LookupError
         self.assertTupleEqual(self.testcommand.handle("project unassign ID",
                                                       user),
-                              (self.testcommand.project_lookup_error, 200))
+                              (self.testcommand.lookup_error, 200))
 
     def test_handle_unassign_team_lookup_error(self):
         """Test project command unassign with team lookup error."""
@@ -258,7 +258,7 @@ class TestProjectCommand(TestCase):
         self.mock_facade.retrieve.side_effect = facade_retrieve_side_effect
         self.assertTupleEqual(self.testcommand.handle("project unassign ID",
                                                       user),
-                              (self.testcommand.team_lookup_error, 200))
+                              (self.testcommand.lookup_error, 200))
 
     def test_handle_unassign_user_lookup_error(self):
         """Test project command unassign with team lookup error."""
@@ -273,7 +273,7 @@ class TestProjectCommand(TestCase):
         self.mock_facade.retrieve.side_effect = facade_retrieve_side_effect
         self.assertTupleEqual(self.testcommand.handle("project unassign ID",
                                                       user),
-                              (self.testcommand.user_lookup_error, 200))
+                              (self.testcommand.lookup_error, 200))
 
     def test_handle_unassign_permission_error(self):
         """Test project command unassign parser with permission error."""
@@ -333,7 +333,7 @@ class TestProjectCommand(TestCase):
         self.assertTupleEqual(
             self.testcommand.handle("project assign ID team-name",
                                     user),
-            (self.testcommand.project_lookup_error, 200))
+            (self.testcommand.lookup_error, 200))
 
     def test_handle_assign_project_team_error(self):
         """Test project command assign with team lookup error."""
@@ -342,7 +342,7 @@ class TestProjectCommand(TestCase):
         self.assertTupleEqual(
             self.testcommand.handle("project assign ID team-name",
                                     user),
-            (self.testcommand.team_lookup_error, 200))
+            (self.testcommand.lookup_error, 200))
 
     def test_handle_assign_permission_error(self):
         """Test project command assign with permission error."""
@@ -427,7 +427,7 @@ class TestProjectCommand(TestCase):
         self.assertTupleEqual(
             self.testcommand.handle("project delete ID",
                                     user),
-            (self.testcommand.project_lookup_error, 200))
+            (self.testcommand.lookup_error, 200))
 
     def test_handle_delete_team_lookup_error(self):
         """Test project command delete with team lookup error."""
@@ -444,7 +444,7 @@ class TestProjectCommand(TestCase):
         self.assertTupleEqual(
             self.testcommand.handle("project delete ID",
                                     user),
-            (self.testcommand.user_lookup_error, 200))
+            (self.testcommand.lookup_error, 200))
 
     def test_handle_delete_user_lookup_error(self):
         """Test project command delete with team lookup error."""
@@ -461,7 +461,7 @@ class TestProjectCommand(TestCase):
         self.assertTupleEqual(
             self.testcommand.handle("project delete ID",
                                     user),
-            (self.testcommand.team_lookup_error, 200))
+            (self.testcommand.lookup_error, 200))
 
     def test_handle_delete_assign_error(self):
         """Test project command delete with assignment error."""
