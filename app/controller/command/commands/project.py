@@ -17,7 +17,6 @@ class ProjectCommand(Command):
     command_name = "project"
     permission_error = "You do not have the sufficient " \
                        "permission level for this command!"
-    lookup_error = "Lookup error! Object not found!"
     assigned_error = "Assign error! Project already assigned to a team!"
     desc = f"for dealing with {command_name}s"
 
@@ -211,8 +210,9 @@ class ProjectCommand(Command):
             project = self.facade.retrieve(Project, project_id)
 
             return jsonify({'attachments': [project.get_attachment()]}), 200
-        except LookupError:
-            return self.lookup_error, 200
+        except LookupError as e:
+            logging.error(str(e))
+            return str(e), 200
 
     def create_helper(self,
                       gh_repo: str,
@@ -239,9 +239,10 @@ class ProjectCommand(Command):
                                       [("github_team_name",
                                         github_team_name)])
         if len(team_list) != 1:
-            logging.error(f"{len(team_list)} teams found with "
-                          f"GitHub team name {github_team_name}")
-            return self.lookup_error, 200
+            error = f"{len(team_list)} teams found with " \
+                f"GitHub team name {github_team_name}"
+            logging.error(error)
+            return error, 200
 
         team = team_list[0]
         try:
@@ -261,8 +262,9 @@ class ProjectCommand(Command):
             self.facade.store(project)
 
             return jsonify({'attachments': [project.get_attachment()]}), 200
-        except LookupError:
-            return self.lookup_error, 200
+        except LookupError as e:
+            logging.error(str(e))
+            return str(e), 200
 
     def unassign_helper(self,
                         project_id: str,
@@ -292,9 +294,9 @@ class ProjectCommand(Command):
                 project.github_team_id = ""
                 self.facade.store(project)
                 return "Project successfully unassigned!", 200
-        except LookupError:
-            logging.error(f"Failed to look up project with ID {project_id}")
-            return self.lookup_error, 200
+        except LookupError as e:
+            logging.error(str(e))
+            return str(e), 200
 
     def edit_helper(self,
                     project_id: str,
@@ -319,8 +321,9 @@ class ProjectCommand(Command):
             self.facade.store(project)
 
             return jsonify({'attachments': [project.get_attachment()]}), 200
-        except LookupError:
-            return self.lookup_error, 200
+        except LookupError as e:
+            logging.error(str(e))
+            return str(e), 200
 
     def assign_helper(self,
                       project_id: str,
@@ -350,9 +353,10 @@ class ProjectCommand(Command):
                                           [("github_team_name",
                                             github_team_name)])
             if len(team_list) != 1:
-                logging.error(f"{len(team_list)} teams found with "
-                              f"GitHub team name {github_team_name}")
-                return self.lookup_error, 200
+                error = f"{len(team_list)} teams found with " \
+                    f"GitHub team name {github_team_name}"
+                logging.error(error)
+                return error, 200
 
             team = team_list[0]
             user = self.facade.retrieve(User, user_id)
@@ -370,8 +374,9 @@ class ProjectCommand(Command):
                 project.github_team_id = team.github_team_id
                 self.facade.store(project)
                 return "Project successfully assigned!", 200
-        except LookupError:
-            return self.lookup_error, 200
+        except LookupError as e:
+            logging.error(str(e))
+            return str(e), 200
 
     def delete_helper(self,
                       project_id: str,
@@ -407,5 +412,6 @@ class ProjectCommand(Command):
                 self.facade.delete(Project, project_id)
                 return "Project successfully deleted!", 200
 
-        except LookupError:
-            return self.lookup_error, 200
+        except LookupError as e:
+            logging.error(str(e))
+            return str(e), 200
