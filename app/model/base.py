@@ -13,7 +13,7 @@ class RocketModel(ABC):
 
     @staticmethod
     @abstractmethod
-    def to_dict(model: 'Model') -> Dict[str, Any]:
+    def to_dict(model: 'RocketModel') -> Dict[str, Any]:
         """
         Convert data model object to dict object.
 
@@ -27,7 +27,7 @@ class RocketModel(ABC):
 
     @staticmethod
     @abstractmethod
-    def from_dict(d: Dict[str, Any]) -> 'Model':
+    def from_dict(d: Dict[str, Any]) -> 'RocketModel':
         """
         Convert dict response object to data model object.
 
@@ -38,7 +38,7 @@ class RocketModel(ABC):
 
     @staticmethod
     @abstractmethod
-    def is_valid(model: 'Model') -> bool:
+    def is_valid(model: 'RocketModel') -> bool:
         """
         Return true if this data model has no missing required fields.
 
