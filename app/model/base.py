@@ -13,20 +13,6 @@ class RocketModel(ABC):
 
     @staticmethod
     @abstractmethod
-    def to_dict(model: 'RocketModel') -> Dict[str, Any]:
-        """
-        Convert data model object to dict object.
-
-        The difference with the in-built ``self.__dict__`` is that this is more
-        compatible with storing into NoSQL databases like DynamoDB.
-
-        :param model: the data model object
-        :return: the dictionary representing the data model
-        """
-        pass
-
-    @staticmethod
-    @abstractmethod
     def from_dict(d: Dict[str, Any]) -> 'RocketModel':
         """
         Convert dict response object to data model object.
@@ -36,13 +22,4 @@ class RocketModel(ABC):
         """
         pass
 
-    @staticmethod
-    @abstractmethod
-    def is_valid(model: 'RocketModel') -> bool:
-        """
-        Return true if this data model has no missing required fields.
-
-        :param model: data model object to check
-        :return: return true if this data model has no missing required fields
-        """
-        pass
+    # TODO: Add to_dict and and is_valid abstract methods
