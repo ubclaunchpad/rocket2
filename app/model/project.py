@@ -1,9 +1,10 @@
 """Represent a team project."""
 from typing import List, Dict, Any
 import uuid
+from app.model.base import RocketModel
 
 
-class Project:
+class Project(RocketModel):
     """Represent a team project with team ID and related fields and methods."""
 
     def __init__(self,

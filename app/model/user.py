@@ -1,9 +1,10 @@
 """Data model to represent an individual user."""
 from typing import Dict, Any
 from app.model.permissions import Permissions
+from app.model.base import RocketModel
 
 
-class User:
+class User(RocketModel):
     """Represent a user with related fields and methods."""
 
     def __init__(self, slack_id: str) -> None:
