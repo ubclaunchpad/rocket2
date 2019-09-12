@@ -1,7 +1,8 @@
 """Handle Rocket 2 commands."""
 from app.controller import ResponseTuple
-from app.controller.command.commands import UnionCommands, \
-    UserCommand, TeamCommand, TokenCommand, ProjectCommand
+from app.controller.command.commands import UserCommand, TeamCommand, \
+    TokenCommand, ProjectCommand
+from app.controller.command.commands.base import Command
 from app.controller.command.commands.token import TokenCommandConfig
 from db.facade import DBFacade
 from flask import jsonify, Response
@@ -22,7 +23,7 @@ class CommandParser:
                  gh_interface: GithubInterface,
                  token_config: TokenCommandConfig) -> None:
         """Initialize the dictionary of command handlers."""
-        self.__commands: Dict[str, UnionCommands] = {}
+        self.__commands: Dict[str, Command] = {}
         self.__facade = db_facade
         self.__bot = bot
         self.__github = gh_interface

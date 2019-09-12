@@ -1,8 +1,10 @@
 """Pack the modules contained in the commands directory."""
-from typing import Union
-from app.controller.command.commands.team import TeamCommand
-from app.controller.command.commands.user import UserCommand
-from app.controller.command.commands.token import TokenCommand
-from app.controller.command.commands.project import ProjectCommand
+import app.controller.command.commands.team as team
+import app.controller.command.commands.user as user
+import app.controller.command.commands.token as token
+import app.controller.command.commands.project as project
 
-UnionCommands = Union[TeamCommand, UserCommand, TokenCommand, ProjectCommand]
+TeamCommand = team.TeamCommand
+UserCommand = user.UserCommand
+TokenCommand = token.TokenCommand
+ProjectCommand = project.ProjectCommand
