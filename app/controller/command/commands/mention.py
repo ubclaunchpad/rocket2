@@ -31,17 +31,11 @@ class MentionCommand(Command):
         if len(command_arg) <= 1:
             return "invalid command", 200
         elif command_arg[1] == '++':
-            return self.karma_mention_helper(user_id, command_arg[0])
+            return self.add_karma(user_id, command_arg[0])
         else:
             return "unsupported usage", 200
 
-    def karma_mention_helper(self,
-                             giver_id: str,
-                             receiver_id: str) -> ResponseTuple:
-        """Use the karma command to help add karma to a user."""
-        return self.add_karma(giver_id, receiver_id)
-
-    def add_karma(self, giver_id, receiver_id) -> ResponseTuple:
+    def add_karma(self, giver_id: str, receiver_id: str) -> ResponseTuple:
         """Give karma from giver_id to receiver_id."""
         logging.info("giving karma to " + receiver_id)
         if giver_id == receiver_id:
@@ -50,6 +44,6 @@ class MentionCommand(Command):
             user = self.facade.retrieve(User, receiver_id)
             user.karma += self.karma_add_amount
             self.facade.store(user)
-            return f"gave 1 karma to {user.name}", 200
+            return f"gave {self.karma_add_amount} karma to {user.name}", 200
         except LookupError:
             return self.lookup_error, 200

@@ -5,7 +5,7 @@ from flask import Flask
 from app.model import User
 from unittest import mock, TestCase
 
-user = 'U123456789'
+user1 = 'U123456789'
 user2 = 'U234567891'
 
 
@@ -20,30 +20,32 @@ class MentionCommandTest(TestCase):
 
     def test_handle_no_input(self):
         """Test handle command with no additional args."""
-        self.assertEqual(self.testcommand.handle('UFJ42EU67', user),
+        self.assertEqual(self.testcommand.handle(f"{user2}", user1),
                          ("invalid command", 200))
 
     def test_handle_wrong_input(self):
         """Test handle command with unsupported function."""
-        self.assertEqual(self.testcommand.handle('UFJ42EU67 --', user),
+        self.assertEqual(self.testcommand.handle(f"{user2} --", user1),
                          (self.testcommand.unsupported_error, 200))
 
     def test_handle_add_karma_to_another_user(self):
         """Test handle command with karma to another user."""
-        user = User('U123456789')
-        user.name = 'U123456789'
-        self.mock_facade.retrieve.return_value = user
-        self.assertEqual(self.testcommand.handle(('UFJ42EU67 ++'), user),
+        reciever = User('U123456789')
+        reciever.name = 'U123456789'
+        giver = 'UFJ42EU67'
+        self.mock_facade.retrieve.return_value = reciever
+        self.assertEqual(self.testcommand.handle("U123456789 ++", giver),
                          ("gave 1 karma to U123456789", 200))
-        self.mock_facade.retrieve.assert_called_once_with(User, "UFJ42EU67")
+        self.mock_facade.retrieve.assert_called_once_with(User, 'U123456789')
 
     def test_handle_add_karma_to_self(self):
         """Test handle command with karma to self."""
-        self.assertEqual(self.testcommand.handle(("U123456789 ++"), user),
+        self.mock_facade.retrieve.return_value = user1
+        self.assertEqual(self.testcommand.handle(f"{user1} ++", user1),
                          ("cannot give karma to self", 200))
 
     def test_handle_user_not_found(self):
         """Test handle command with karma to unknown user."""
         self.mock_facade.retrieve.side_effect = LookupError
-        self.assertEqual(self.testcommand.handle(f"{user2} ++", user),
+        self.assertEqual(self.testcommand.handle(f"{user2} ++", user1),
                          (self.testcommand.lookup_error, 200))
