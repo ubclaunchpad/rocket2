@@ -66,4 +66,7 @@ def is_slack_id(id: str) -> bool:
     :param id: string of the object you want to check
     :return: true if object is a slack id, false otherwise
     """
-    return None != re.match("^[UW][A-Z0-9]{8}$", id)
+    if re.match("^[UW][A-Z0-9]{8}$", id) is not None:
+        return True
+    else:
+        return False

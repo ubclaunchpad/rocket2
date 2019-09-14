@@ -67,3 +67,15 @@ def test_check_credentials_not_lead():
     team.add_member(user.github_id)
     user.permissions_level = Permissions.team_lead
     assert not util.check_permissions(user, team)
+
+
+def test_check_string_is_not_slack_id():
+    """Test checking to see if a string is not a slack id."""
+    string_to_test = "ABCDEFG"
+    assert not util.is_slack_id(string_to_test)
+
+
+def test_check_string_is_slack_id():
+    """Test checking to see if string is a slack id."""
+    string_to_test = "UFJ42EU67"
+    assert util.is_slack_id(string_to_test)
