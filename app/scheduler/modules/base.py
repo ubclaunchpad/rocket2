@@ -2,7 +2,7 @@
 from abc import ABC
 from typing import Dict, Any
 from flask import Flask
-from config import Credentials
+from config import Config
 
 
 class ModuleBase(ABC):
@@ -12,8 +12,7 @@ class ModuleBase(ABC):
 
     def __init__(self,
                  flask_app: Flask,
-                 config: Dict[str, Any],
-                 credentials: Credentials):
+                 config: Config):
         """Initialize the object."""
         pass
 

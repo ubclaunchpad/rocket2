@@ -1,7 +1,8 @@
 """Handle Rocket 2 commands."""
 from app.controller import ResponseTuple
-from app.controller.command.commands import UnionCommands, \
-    UserCommand, TeamCommand, TokenCommand, KarmaCommand, MentionCommand
+from app.controller.command.commands import UserCommand, TeamCommand, \
+    TokenCommand, ProjectCommand, KarmaCommand, MentionCommand
+from app.controller.command.commands.base import Command
 from app.controller.command.commands.token import TokenCommandConfig
 from db.facade import DBFacade
 from flask import jsonify, Response
@@ -10,7 +11,6 @@ from interface.github import GithubInterface
 from typing import Dict, cast
 import utils.slack_parse as util
 import logging
-import re
 from utils.slack_msg_fmt import wrap_slack_code
 from utils.slack_parse import is_slack_id
 
@@ -24,7 +24,7 @@ class CommandParser:
                  gh_interface: GithubInterface,
                  token_config: TokenCommandConfig) -> None:
         """Initialize the dictionary of command handlers."""
-        self.__commands: Dict[str, UnionCommands] = {}
+        self.__commands: Dict[str, Command] = {}
         self.__facade = db_facade
         self.__bot = bot
         self.__github = gh_interface
@@ -32,6 +32,7 @@ class CommandParser:
         self.__commands["team"] = TeamCommand(self.__facade,
                                               self.__github, self.__bot)
         self.__commands["token"] = TokenCommand(self.__facade, token_config)
+        self.__commands["project"] = ProjectCommand(self.__facade)
         self.__commands["karma"] = KarmaCommand(self.__facade)
         self.__commands["mention"] = MentionCommand(self.__facade)
 

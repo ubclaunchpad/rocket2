@@ -6,6 +6,9 @@ from app.controller import ResponseTuple
 class Command(ABC):
     """Define the properties and methods needed for a command parser."""
 
+    command_name = ""
+    desc = ""
+
     @abstractmethod
     def handle(self,
                _command: str,

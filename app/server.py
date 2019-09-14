@@ -6,11 +6,9 @@ from logging.config import dictConfig
 from slackeventsapi import SlackEventAdapter
 from apscheduler.schedulers.background import BackgroundScheduler
 import logging
-import toml
 import structlog
 from flask_talisman import Talisman
-from config import Credentials
-from typing import cast, Dict, Any
+from config import Config
 from app.scheduler import Scheduler
 
 
@@ -54,19 +52,15 @@ app = Flask(__name__)
 # HTTP security header middleware for Flask
 talisman = Talisman(app)
 talisman.force_https = False
-config = cast(Dict[str, Any], toml.load('config.toml'))
-credentials = Credentials(config['creds_path'])
-command_parser = make_command_parser(config, credentials)
-github_webhook_handler = make_github_webhook_handler(config, credentials)
-slack_events_handler = make_slack_events_handler(config, credentials)
-if not config['testing']:
-    slack_signing_secret = credentials.slack_signing_secret
-else:
-    slack_signing_secret = ""
-slack_events_adapter = SlackEventAdapter(slack_signing_secret,
-                                         "/slack/events", app)
+config = Config()
+command_parser = make_command_parser(config)
+github_webhook_handler = make_github_webhook_handler(config)
+slack_events_handler = make_slack_events_handler(config)
+slack_events_adapter = SlackEventAdapter(config.slack_signing_secret,
+                                         "/slack/events",
+                                         app)
 sched = Scheduler(BackgroundScheduler(timezone="America/Los_Angeles"),
-                  (app, config, credentials))
+                  (app, config))
 sched.start()
 
 
@@ -95,7 +89,7 @@ def handle_commands():
         return "Slack signature could not be verified", 200
 
 
-@app.route(config['github']['webhook_url'], methods=['POST'])
+@app.route(config.github_webhook_endpt, methods=['POST'])
 def handle_github_webhook():
     """Handle GitHub webhooks."""
     xhub_signature = request.headers.get('X-Hub-Signature')

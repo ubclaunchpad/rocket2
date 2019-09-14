@@ -38,20 +38,17 @@ localhost. This is already handled in `nginx.conf`.
 
 ## Other Build Tools
 
-### Travis CI
+### Github Actions CI
 
-[Travis CI](https://docs.travis-ci.com/user/tutorial/) is a continuous integration
-service that is used to build and test software projects hosted on Github.
-To configure Travis CI, a file  `.travis.yml` needs to be added to the
-root directory of the directory. This YAML file will contain the commands for
+[Github Actions CI](https://github.com/features/actions) is a continuous
+integration service that is used to build and test software projects hosted on
+Github.  To configure Github CI, a file  `pythonpackage.yml` needs to be added
+to `.github/workflows/`. This YAML file will contain the commands for
 the automated tests that needs to run.
 
-Every time a branch gets pushed into github, Travis CI starts a job. A job is
-where Travis clones the GitHub repository into a new virtual environment to
+Every time a branch gets pushed into github, Github CI starts a job. A job is
+where Github clones the GitHub repository into a new virtual environment to
 test the code.
-
-Travis CI can also be integrated with slack channels to notify developers
-when its processes have completed.
 
 ### Docker
 

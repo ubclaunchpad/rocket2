@@ -1,0 +1,19 @@
+TESTING='True'
+CREDS_PATH='credentials/'
+
+SLACK_BOT_CHANNEL='#rocket2'
+SLACK_SIGNING_SECRET=''
+SLACK_API_TOKEN=''
+
+GITHUB_APP_ID=''
+GITHUB_ORG_NAME='ubclaunchpad'
+GITHUB_WEBHOOK_ENDPT='/webhook'
+GITHUB_WEBHOOK_SECRET=''
+GITHUB_KEY_FILE='github_signing_key.pem'
+
+AWS_ACCESS_KEYID='53'
+AWS_SECRET_KEY='itsa secret'
+AWS_USERS_TABLE='users'
+AWS_TEAMS_TABLE='teams'
+AWS_PROJECTS_TABLE='projects'
+AWS_REGION='us-west-2'

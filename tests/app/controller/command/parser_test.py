@@ -66,13 +66,14 @@ def test_handle_help():
                          {"text": "*token:* Generate a signed "
                                   "token for use with the HTTP API",
                           "mrkdwn_in": ["text"]},
+                         {"text": "*project:* for dealing with projects",
+                          "mrkdwn_in": ["text"]},
                          {"text": "*karma:* for dealing with karma",
                           'mrkdwn_in': ['text']},
                          {"text": "*mention:* for dealing with mention",
                           'mrkdwn_in': ["text"]}]}).data)
         resp = json.loads(resp.data)
     assert resp == expect
-
 
 @mock.patch('app.controller.command.parser.UserCommand')
 def test_handle_user_command(mock_usercommand):

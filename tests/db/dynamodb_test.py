@@ -2,6 +2,8 @@
 import pytest
 
 from app.model import User, Project, Team, Permissions
+from config import Config
+from unittest.mock import MagicMock
 from tests.util import create_test_team, create_test_admin, create_test_project
 
 
@@ -9,15 +11,23 @@ from tests.util import create_test_team, create_test_admin, create_test_project
 def ddb():
     """Create a new DynamoDb instance."""
     from db.dynamodb import DynamoDB
-    test_config = {
-        'aws': {
-            'users_table': 'users_test',
-            'teams_table': 'teams_test',
-            'projects_table': 'projects_test'
-        },
-        'testing': True
-    }
-    return DynamoDB(test_config, None)
+    test_config = MagicMock(Config)
+    test_config.aws_users_tablename = 'users_test'
+    test_config.aws_teams_tablename = 'teams_test'
+    test_config.aws_projects_tablename = 'projects_test'
+    test_config.testing = True
+    actual = DynamoDB(test_config)
+    yield actual
+    ts = [User, Team, Project]
+    for t in ts:
+        items = actual.query(t)
+        for item in items:
+            if t == User:
+                actual.delete(t, item.slack_id)
+            elif t == Team:
+                actual.delete(t, item.github_team_id)
+            elif t == Project:
+                actual.delete(t, item.project_id)
 
 
 @pytest.mark.db
@@ -62,8 +72,6 @@ def test_store_same_users(ddb):
 
     assert ddb.retrieve(User, 'abc_123') == user2
 
-    ddb.delete(User, 'abc_123')
-
 
 @pytest.mark.db
 def test_store_retrieve_user(ddb):
@@ -75,8 +83,6 @@ def test_store_retrieve_user(ddb):
 
     assert success
     assert user == another_user
-
-    ddb.delete(User, 'abc_123')
 
 
 @pytest.mark.db
@@ -90,8 +96,6 @@ def test_store_retrieve_project(ddb):
 
     assert success
     assert project == another_project
-
-    ddb.delete(Project, project.project_id)
 
 
 @pytest.mark.db
@@ -128,8 +132,6 @@ def test_query_user(ddb):
     assert user == all_users[0]
     assert user == strict_users[0]
 
-    ddb.delete(User, 'abc_123')
-
 
 @pytest.mark.db
 def test_query_project(ddb):
@@ -145,8 +147,6 @@ def test_query_project(ddb):
     assert project == projects[0]
     assert project == strict_projects[0]
     assert project == all_projects[0]
-
-    ddb.delete(Project, project.project_id)
 
 
 @pytest.mark.db
@@ -172,8 +172,6 @@ def test_update_user(ddb):
 
     assert ddb.retrieve(User, 'abc_123').name == 'Steven Universe'
 
-    ddb.delete(User, 'abc_123')
-
 
 @pytest.mark.db
 def test_update_team(ddb):
@@ -188,8 +186,6 @@ def test_update_team(ddb):
 
     assert len(ddb.retrieve(Team, '1').members) == 2
 
-    ddb.delete(Team, '1')
-
 
 @pytest.mark.db
 def test_store_retrieve_team(ddb):
@@ -199,8 +195,6 @@ def test_store_retrieve_team(ddb):
     another_team = ddb.retrieve(Team, '1')
 
     assert team == another_team
-
-    ddb.delete(Team, '1')
 
 
 @pytest.mark.db
@@ -214,9 +208,6 @@ def test_bulk_retrieve_users(ddb):
     retrieved_users = ddb.bulk_retrieve(User, list(uids))
     for user in retrieved_users:
         assert user in users
-
-    for i in uids:
-        ddb.delete(User, i)
 
 
 @pytest.mark.db
@@ -241,9 +232,6 @@ def test_query_or_users(ddb):
     for user in queried_users:
         assert user in users
 
-    for i in uids:
-        ddb.delete(User, i)
-
 
 @pytest.mark.db
 def test_query_team(ddb):
@@ -267,9 +255,6 @@ def test_query_team(ddb):
     assert team == same_team[0]
     assert team == multiple_queries[0]
     assert team2 == member_team[0]
-
-    ddb.delete(Team, '1')
-    ddb.delete(Team, '2')
 
 
 @pytest.mark.db

@@ -1,6 +1,5 @@
 # 🚀 Rocket 2
 
-[![Build Status](https://travis-ci.org/ubclaunchpad/rocket2.svg?branch=master)](https://travis-ci.org/ubclaunchpad/rocket2)
 [![codecov](https://codecov.io/gh/ubclaunchpad/rocket2/branch/master/graph/badge.svg)](https://codecov.io/gh/ubclaunchpad/rocket2)
 [![Deployed with Inertia](https://img.shields.io/badge/deploying%20with-inertia-blue.svg)](https://github.com/ubclaunchpad/inertia)
 [![Documentation Status](https://readthedocs.org/projects/rocket2/badge/?version=latest)](https://rocket2.readthedocs.io/en/latest/?badge=latest)
@@ -36,9 +35,8 @@ pipenv shell
 
 and then commands like `pycodestyle` and `pytest` can be run like normal.
 
-Additionally, we use [Travis CI](https://travis-ci.org/ubclaunchpad/rocket2) as
-a CI system. To run the same checks locally, we provide `scripts/build_check.sh`;
-this can be run with:
+Additionally, we use Github Actions as a CI system. To run the same checks
+locally, we provide `scripts/build_check.sh`; this can be run with:
 
 ```bash
 ./scripts/build_check.sh
@@ -67,8 +65,8 @@ quite a bit more setup. For a full guide to developer installation, see our
 ### Running DynamoDB Locally
 
 Some tests assume the existence of a local DynamoDB database. These are
-primarily for automated testing, like on Travis CI, but if you would like to run
-them yourself or are developing new tests, you can run as follows:
+primarily for automated testing, like on Github Actions CI, but if you would
+like to run them yourself or are developing new tests, you can run as follows:
 
 ```bash
 wget https://s3-us-west-2.amazonaws.com/dynamodb-local/dynamodb_local_latest.tar.gz

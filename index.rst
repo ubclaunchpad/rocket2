@@ -14,6 +14,7 @@
     docs/GettingStarted.md
     docs/Testing.md
     docs/LocalDevelopmentGuide.md
+    docs/Scheduler.md
 
 .. toctree::
     :caption: How Everything Works
@@ -21,6 +22,7 @@
 
     docs/Scripts.md
     docs/Database.md
+    docs/Config.md
     docs/Requirements.md
     docs/Deployment.md
     docs/Qna.md

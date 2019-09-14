@@ -1,8 +1,9 @@
 """Represent a data model for a team."""
 from typing import Set, Dict, Any
+from app.model.base import RocketModel
 
 
-class Team:
+class Team(RocketModel):
     """Represent a team with related fields and methods."""
 
     def __init__(self,

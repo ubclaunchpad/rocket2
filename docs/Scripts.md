@@ -10,7 +10,7 @@ scripts/build_check.sh
 ```
 
 This is just the list of commands run to check the code for violations of Python
-style. It also runs the tests, and is the script that is run in our Travis CI.
+style. It also runs the tests, and is the script that is run in our Github CI.
 Make sure to run before submitting a pull request!
 
 This script also checks to see if the user is running DynamoDB locally, and if
@@ -48,7 +48,7 @@ This script downloads a copy of the latest local version of DynamoDB and forks
 the process. It also sets up the environment in which you should run it in using
 `scripts/setup_localaws.sh`.
 
-Please do not use this script; it is meant to be run by Travis CI. Unless you
+Please do not use this script; it is meant to be run by Github CI. Unless you
 enjoy having to download and run multiple DynamoDB processes.
 
 ## setup\_localaws.sh
@@ -61,30 +61,6 @@ This script automatically sets up your environment to better benefit a local
 instance of DynamoDB. Only should be run once by users (though running it
 multiple times would not hurt too too much). It requires `aws` to be installed
 through `pipenv`.
-
-## setup\_credentials.sh
-
-```sh
-scripts/setup_credentials.sh
-```
-
-This script automatically sets up all credentials in the `credentials/` folder.
-Files that are set up include:
-
-- aws.toml
-- github.toml
-- slack.toml
-- signing\_key
-
-Note that none of the files will automatically set up the actual ids, keys, or
-signing keys; you have to set them up yourself.
-
-If there is nothing missing, this script won't do anything and will output:
-
-```
-We found no problems with your credentials.
-No missing fields or files.
-```
 
 ## docker\_build.sh
 
