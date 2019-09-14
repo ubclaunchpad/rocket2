@@ -1,7 +1,7 @@
 """Handle Rocket 2 commands."""
 from app.controller import ResponseTuple
 from app.controller.command.commands import UserCommand, TeamCommand, \
-    TokenCommand, ProjectCommand
+    TokenCommand, ProjectCommand, KarmaCommand, MentionCommand
 from app.controller.command.commands.base import Command
 from app.controller.command.commands.token import TokenCommandConfig
 from db.facade import DBFacade
@@ -12,6 +12,7 @@ from typing import Dict, cast
 import utils.slack_parse as util
 import logging
 from utils.slack_msg_fmt import wrap_slack_code
+from utils.slack_parse import is_slack_id
 
 
 class CommandParser:
@@ -32,6 +33,8 @@ class CommandParser:
                                               self.__github, self.__bot)
         self.__commands["token"] = TokenCommand(self.__facade, token_config)
         self.__commands["project"] = ProjectCommand(self.__facade)
+        self.__commands["karma"] = KarmaCommand(self.__facade)
+        self.__commands["mention"] = MentionCommand(self.__facade)
 
     def handle_app_command(self,
                            cmd_txt: str,
@@ -55,6 +58,9 @@ class CommandParser:
             return self.get_help(), 200
         if s[0] in self.__commands:
             return self.__commands[s[0]].handle(cmd_txt, user)
+        elif is_slack_id(s[0]):
+            logging.info("mention command activated")
+            return self.__commands["mention"].handle(cmd_txt, user)
         else:
             logging.error("app command triggered incorrectly")
             return 'Please enter a valid command', 200

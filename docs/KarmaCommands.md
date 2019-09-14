@@ -9,7 +9,13 @@ Command to giveth or taketh away a user's karma
 #### Add 1 karma to user
 
 ```sh
-/rocket karma @user
+/rocket @user ++
+```
+
+#### View a user's karma
+
+```sh
+/rocket karma view @user
 ```
 
 ### For admin only
@@ -18,12 +24,6 @@ Command to giveth or taketh away a user's karma
 
 ```sh
 /rocket karma set @user {amount}
-```
-
-#### Reset user karma
-
-```sh
-/rocket karma reset @user
 ```
 
 #### Reset all user karma
@@ -36,11 +36,11 @@ Command to giveth or taketh away a user's karma
 
 ```sh
 # normal user
-/rocket karma @coolkid1 #adds 1 karma to coolkid1
+/rocket @coolkid1 ++ #adds 1 karma to coolkid1
+/rocket karma view @coolkid1 #view how much karma coolkid1 has
 
 # admin only
 /rocket karma set @coolkid1 5 #sets coolkid's karma to 5
-/rocket karma reset @coolkid1 #resets coolkid1's karma to 1
 /rocket karma reset --all #resets all users karma to 1
 ```
 

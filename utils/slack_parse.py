@@ -57,3 +57,16 @@ def check_permissions(user: User, team: Optional[Team]) -> bool:
         return user.permissions_level == Permissions.team_lead
     else:
         return team.has_team_lead(user.github_id)
+
+
+def is_slack_id(id: str) -> bool:
+    """
+    Check if id given is a valid slack id.
+
+    :param id: string of the object you want to check
+    :return: true if object is a slack id, false otherwise
+    """
+    if re.match("^[UW][A-Z0-9]{8}$", id) is not None:
+        return True
+    else:
+        return False
