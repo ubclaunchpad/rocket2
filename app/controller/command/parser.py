@@ -12,6 +12,7 @@ import utils.slack_parse as util
 import logging
 import re
 from utils.slack_msg_fmt import wrap_slack_code
+from utils.slack_parse import is_slack_id
 
 
 class CommandParser:
@@ -56,7 +57,7 @@ class CommandParser:
             return self.get_help(), 200
         if s[0] in self.__commands:
             return self.__commands[s[0]].handle(cmd_txt, user)
-        elif re.match("^[UW][A-Z0-9]{8}$", s[0]):
+        elif is_slack_id(s[0]):
             logging.info("mention command activated")
             return self.__commands["mention"].handle(cmd_txt, user)
         else:

@@ -111,29 +111,3 @@ class MentionCommandTest(TestCase):
                           mock.call(User, "MMMM1234")]
         self.mock_facade.retrieve.assert_has_calls(retrieve_calls)
         self.mock_facade.store.asser_not_called()
-
-    def test_add_karma_to_another_person(self):
-        """Test to give karma to someone else."""
-        recieveuser = User("SAKURA19")
-        self.mock_facade.retrieve.return_value = recieveuser
-        self.testcommand.add_karma("NARUTO19", "SAKURA19")
-        self.mock_facade.retrieve.assert_called_once_with(User, "SAKURA19")
-        self.mock_facade.store.assert_called_with(recieveuser)
-
-    def test_add_karma_to_self(self):
-        """Testing if adding karma to yourself is possible."""
-        self.assertEqual(
-            self.testcommand.add_karma("NARUTO19", "NARUTO19"),
-            ("cannot give karma to self", 200))
-        self.mock_facade.store.assert_not_called()
-        self.mock_facade.retrieve.assert_not_called()
-
-    def test_add_karma_to_not_found_person(self):
-        """Testing to add karma to person not found."""
-        self.mock_facade.retrieve.side_effect = LookupError
-        self.assertEqual(
-            self.testcommand.add_karma("NARUTO19", "SAKURA19"),
-            (KarmaCommand.lookup_error, 200)
-        )
-        self.mock_facade.retrieve.called_once_with(User, "SAKURA19")
-        self.mock_facade.store.assert_not_called()

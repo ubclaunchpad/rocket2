@@ -57,3 +57,9 @@ def check_permissions(user: User, team: Optional[Team]) -> bool:
         return user.permissions_level == Permissions.team_lead
     else:
         return team.has_team_lead(user.github_id)
+
+def is_slack_id(id: str) -> bool:
+    """
+    Check if the id given is a correct slack id
+    """
+    return re.match("^[UW][A-Z0-9]{8}$", id)

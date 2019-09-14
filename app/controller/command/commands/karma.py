@@ -17,7 +17,6 @@ class KarmaCommand:
     desc = "for dealing with " + command_name
     permission_error = "You do not have the sufficient " \
                        "permission level for this command!"
-    karma_add_amount = 1
     karma_default_amount = 1
 
     def __init__(self, db_facade) -> None:
@@ -80,19 +79,6 @@ class KarmaCommand:
         else:
             return self.get_help(), 200
 
-    def add_karma(self, giver_id, receiver_id) -> ResponseTuple:
-        """Give karma from giver_id to receiver_id."""
-        logging.info("giving karma to " + receiver_id)
-        if(giver_id == receiver_id):
-            return "cannot give karma to self", 200
-        try:
-            user = self.facade.retrieve(User, receiver_id)
-            user.karma += self.karma_add_amount
-            self.facade.store(user)
-            return f"gave 1 karma to {user.name}", 200
-        except LookupError:
-            return self.lookup_error, 200
-
     def get_help(self) -> str:
         """Return command options for team events."""
         res = "\n*" + self.command_name + " commands:*```"
@@ -108,8 +94,8 @@ class KarmaCommand:
                    amount: int) -> ResponseTuple:
         """Manually sets a user's karma."""
         try:
-            user_command = self.facade.retrieve(User, user_id)
-            if user_command.permissions_level == Permissions.admin:
+            user = self.facade.retrieve(User, user_id)
+            if user.permissions_level == Permissions.admin:
                 user = self.facade.retrieve(User, slack_id)
                 user.karma = amount
                 self.facade.store(user)
@@ -122,24 +108,23 @@ class KarmaCommand:
     def reset_helper(self,
                      user_id: str,
                      reset_all: bool) -> ResponseTuple:
-        """Reset all user's karma."""
+        """Reset all users' karma."""
         try:
-            user_command = self.facade.retrieve(User, user_id)
-            if user_command.permissions_level == Permissions.admin:
-                if reset_all:
-                    user_list = self.facade.query(User, [])
-                    for user in user_list:
-                        user.karma = self.karma_default_amount
-                        self.facade.store(user)
-                    return (
-                        "reset all users karma to"
-                        f"{self.karma_default_amount}",
-                        200
-                    )
-                else:
-                    return self.get_help(), 200
-            else:
+            user = self.facade.retrieve(User, user_id)
+            if not user.permissions_level == Permissions.admin:
                 return self.permission_error, 200
+            if reset_all:
+                user_list = self.facade.query(User, [])
+                for user in user_list:
+                    user.karma = self.karma_default_amount
+                    self.facade.store(user)
+                return (
+                    "reset all users karma to"
+                    f"{self.karma_default_amount}",
+                    200
+                )
+            else:
+                return self.get_help(), 200
         except LookupError:
             return self.lookup_error, 200
 
