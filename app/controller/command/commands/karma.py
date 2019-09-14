@@ -1,12 +1,13 @@
 """Command for parsing karma."""
 import logging
 import shlex
+from app.controller.command.commands.base import Command
 from argparse import ArgumentParser, _SubParsersAction
 from app.model import User, Permissions
 from app.controller import ResponseTuple
 
 
-class KarmaCommand:
+class KarmaCommand(Command):
     """karma command parser."""
 
     command_name = "karma"

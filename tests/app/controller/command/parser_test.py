@@ -75,6 +75,7 @@ def test_handle_help():
         resp = json.loads(resp.data)
     assert resp == expect
 
+
 @mock.patch('app.controller.command.parser.UserCommand')
 def test_handle_user_command(mock_usercommand):
     """Test that UserCommand.handle is called appropriately."""

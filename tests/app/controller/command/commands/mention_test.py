@@ -9,7 +9,7 @@ user = 'U123456789'
 user2 = 'U234567891'
 
 
-class MentionCommandTeset(TestCase):
+class MentionCommandTest(TestCase):
     """Test cases for mentions."""
 
     def setUp(self):
@@ -21,7 +21,12 @@ class MentionCommandTeset(TestCase):
     def test_handle_no_input(self):
         """Test handle command with no additional args."""
         self.assertEqual(self.testcommand.handle('UFJ42EU67', user),
-                         ("not supported", 200))
+                         ("invalid command", 200))
+
+    def test_handle_wrong_input(self):
+        """Test handle command with unsupported function."""
+        self.assertEqual(self.testcommand.handle('UFJ42EU67 --', user),
+                         (self.testcommand.unsupported_error, 200))
 
     def test_handle_add_karma_to_another_user(self):
         """Test handle command with karma to another user."""

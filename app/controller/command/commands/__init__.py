@@ -11,4 +11,4 @@ UserCommand = user.UserCommand
 TokenCommand = token.TokenCommand
 ProjectCommand = project.ProjectCommand
 KarmaCommand = karma.KarmaCommand
-Mention = mention.MentionCommand
+MentionCommand = mention.MentionCommand

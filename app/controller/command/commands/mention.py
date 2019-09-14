@@ -2,18 +2,20 @@
 import argparse
 import logging
 import shlex
+from app.controller.command.commands.base import Command
 from app.controller import ResponseTuple
-from app.controller.command.commands.karma import KarmaCommand
 from db.facade import DBFacade
 from app.model import User
 
-class MentionCommand:
+
+class MentionCommand(Command):
     """Mention command parser."""
 
     command_name = "mention"
     lookup_error = "User doesn't exist"
     desc = "for dealing with " + command_name
     karma_add_amount = 1
+    unsupported_error = "unsupported usage"
 
     def __init__(self, db_facade: DBFacade) -> None:
         """Initialize Mention command."""
@@ -27,9 +29,11 @@ class MentionCommand:
         logging.debug('Handling Mention Command')
         command_arg = shlex.split(command)
         if len(command_arg) <= 1:
-            return "not supported", 200
+            return "invalid command", 200
         elif command_arg[1] == '++':
             return self.karma_mention_helper(user_id, command_arg[0])
+        else:
+            return "unsupported usage", 200
 
     def karma_mention_helper(self,
                              giver_id: str,
