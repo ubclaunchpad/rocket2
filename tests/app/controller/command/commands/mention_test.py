@@ -33,10 +33,13 @@ class MentionCommandTest(TestCase):
         reciever = User('U123456789')
         reciever.name = 'U123456789'
         giver = 'UFJ42EU67'
+        reciever_initial_karma = reciever.karma
         self.mock_facade.retrieve.return_value = reciever
         self.assertEqual(self.testcommand.handle("U123456789 ++", giver),
                          ("gave 1 karma to U123456789", 200))
         self.mock_facade.retrieve.assert_called_once_with(User, 'U123456789')
+        self.assertEqual(reciever.karma, reciever_initial_karma +
+                         self.testcommand.karma_add_amount)
 
     def test_handle_add_karma_to_self(self):
         """Test handle command with karma to self."""
