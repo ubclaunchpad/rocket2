@@ -6,7 +6,7 @@ pipenv run pydocstyle .
 pipenv run mypy .
 mdl .
 
-# We use nmap to check if dynamodb is running locally
+# We use a script to check if dynamodb is running locally
 COV_OPTIONS="--mypy --cov=./ --cov-branch --cov-config .coverageac"
 PORT_BUSY="pipenv run python scripts/port_busy.py 8000"
 if ${PORT_BUSY}; then
