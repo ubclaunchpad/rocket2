@@ -1,7 +1,9 @@
 """Represent a team project."""
-from typing import List, Dict, Any
+from typing import List, Dict, Any, TypeVar, Type
 import uuid
 from app.model.base import RocketModel
+
+T = TypeVar('T', bound='Project')
 
 
 class Project(RocketModel):
@@ -53,15 +55,15 @@ class Project(RocketModel):
 
         return {'fallback': fallback, 'fields': fields}
 
-    @staticmethod
-    def from_dict(d: Dict[str, Any]) -> 'Project':
+    @classmethod
+    def from_dict(cls: Type[T], d: Dict[str, Any]) -> T:
         """
         Return a project from a dict object.
 
         :param d: the dictionary (usually from DynamoDB)
         :return: a Project object
         """
-        p = Project(d['github_team_id'], d['github_urls'])
+        p = cls(d['github_team_id'], d['github_urls'])
         p.project_id = d['project_id']
         p.display_name = d.get('display_name', '')
         p.short_description = d.get('short_description', '')
@@ -74,8 +76,8 @@ class Project(RocketModel):
 
         return p
 
-    @staticmethod
-    def to_dict(p: 'Project') -> Dict[str, Any]:
+    @classmethod
+    def to_dict(cls: Type[T], p: T) -> Dict[str, Any]:
         """
         Return a dict object representing a project.
 
@@ -105,8 +107,8 @@ class Project(RocketModel):
 
         return udict
 
-    @staticmethod
-    def is_valid(p: 'Project') -> bool:
+    @classmethod
+    def is_valid(cls: Type[T], p: T) -> bool:
         """
         Return true if this project has no missing fields.
 
