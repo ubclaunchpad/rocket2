@@ -1,5 +1,4 @@
 """All necessary class initializations."""
-import pem
 import random
 import string
 
@@ -30,7 +29,8 @@ def make_command_parser(config: Config,
     signing_key = ""
     if not config.testing:
         slack_api_token = config.slack_api_token
-        github_auth_key = pem.parse(config.github_key)[0].as_text()
+        # github_auth_key = pem.parse(config.github_key)[0].as_text()
+        github_auth_key = config.github_key
         github_app_id = config.github_app_id
         github_organization = config.github_org_name
         slack_bot_channel = config.slack_bot_channel
