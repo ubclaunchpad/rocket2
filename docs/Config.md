@@ -10,12 +10,6 @@ variables are strings**
 Denotes if we are in testing mode or not. In testing mode, we use a local
 DynamoDB instead of connecting to the server. Can either be `True` or `False`.
 
-## CREDS\_PATH
-
-Denotes the path to where credentials files are located. Defaults to
-`credentials/` (which is ignored by git by default). Should be used to store
-key files.
-
 ## SLACK\_BOT\_CHANNEL
 
 Name of the channel you want to have our rocket 2 slack bot to make
@@ -50,11 +44,11 @@ The path Github posts webhooks to.
 A random string of characters you provide to Github to help further obfuscate
 and verify that the webhook is indeed coming from Github.
 
-## GITHUB\_KEY\_FILE
+## GITHUB\_KEY
 
 The Github app signing key (can be found under Github organization settings ->
 Developer Settings -> Github Apps -> Edit (at the bottom you generate and
-download the key)).
+download the key)). Paste the contents of the file as a string.
 
 ## AWS\_ACCESS\_KEYID
 

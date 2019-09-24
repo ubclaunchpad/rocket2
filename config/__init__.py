@@ -14,7 +14,6 @@ class Config:
     # Map name of env variable to python variable
     ENV_NAMES = {
         'TESTING': 'testing',
-        'CREDS_PATH': 'creds_path',
 
         'SLACK_BOT_CHANNEL': 'slack_bot_channel',
         'SLACK_SIGNING_SECRET': 'slack_signing_secret',
@@ -24,7 +23,7 @@ class Config:
         'GITHUB_ORG_NAME': 'github_org_name',
         'GITHUB_WEBHOOK_ENDPT': 'github_webhook_endpt',
         'GITHUB_WEBHOOK_SECRET': 'github_webhook_secret',
-        'GITHUB_KEY_FILE': 'github_key_file',
+        'GITHUB_KEY': 'github_key',
 
         'AWS_ACCESS_KEYID': 'aws_access_keyid',
         'AWS_SECRET_KEY': 'aws_secret_key',
@@ -55,8 +54,6 @@ class Config:
             raise MissingConfigError(missing_config_fields)
 
         self.testing = self.testing == 'True'
-        self.github_key_file = os.path.join(self.creds_path,
-                                            self.github_key_file)
 
     def _set_attrs(self):
         """Add attributes so that mypy doesn't complain."""
@@ -71,7 +68,7 @@ class Config:
         self.github_org_name = ''
         self.github_webhook_endpt = ''
         self.github_webhook_secret = ''
-        self.github_key_file = ''
+        self.github_key = ''
 
         self.aws_access_keyid = ''
         self.aws_secret_key = ''
