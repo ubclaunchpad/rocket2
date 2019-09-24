@@ -1,5 +1,4 @@
 TESTING='True'
-CREDS_PATH='credentials/'
 
 SLACK_BOT_CHANNEL='#rocket2'
 SLACK_SIGNING_SECRET=''
@@ -9,7 +8,7 @@ GITHUB_APP_ID=''
 GITHUB_ORG_NAME='ubclaunchpad'
 GITHUB_WEBHOOK_ENDPT='/webhook'
 GITHUB_WEBHOOK_SECRET=''
-GITHUB_KEY_FILE='github_signing_key.pem'
+GITHUB_KEY='BEGIN KEY END KEY'
 
 AWS_ACCESS_KEYID='53'
 AWS_SECRET_KEY='itsa secret'
