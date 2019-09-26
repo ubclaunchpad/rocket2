@@ -1,6 +1,8 @@
 """Represent a data model for a team."""
-from typing import Set, Dict, Any
+from typing import Set, Dict, Any, TypeVar, Type
 from app.model.base import RocketModel
+
+T = TypeVar('T', bound='Team')
 
 
 class Team(RocketModel):
@@ -52,17 +54,17 @@ class Team(RocketModel):
 
         return {'fallback': fallback, 'fields': fields}
 
-    @staticmethod
-    def from_dict(d: Dict[str, Any]) -> 'Team':
+    @classmethod
+    def from_dict(cls: Type[T], d: Dict[str, Any]) -> T:
         """
         Convert dict response object to team model.
 
         :param d: the dictionary representing a team
         :return: returns converted team model.
         """
-        team = Team(d['github_team_id'],
-                    d['github_team_name'],
-                    d.get('display_name', ''))
+        team = cls(d['github_team_id'],
+                   d['github_team_name'],
+                   d.get('display_name', ''))
         team.platform = d.get('platform', '')
         team.team_leads = set(d.get('team_leads', []))
         members = set(d.get('members', []))
@@ -70,8 +72,8 @@ class Team(RocketModel):
             team.add_member(member)
         return team
 
-    @staticmethod
-    def to_dict(team: 'Team') -> Dict[str, Any]:
+    @classmethod
+    def to_dict(cls: Type[T], team: T) -> Dict[str, Any]:
         """
         Convert team object to dict object.
 
@@ -97,8 +99,8 @@ class Team(RocketModel):
 
         return tdict
 
-    @staticmethod
-    def is_valid(team: 'Team') -> bool:
+    @classmethod
+    def is_valid(cls: Type[T], team: T) -> bool:
         """
         Return true if this team has no missing required fields.
 
