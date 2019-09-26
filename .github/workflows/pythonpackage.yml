@@ -20,7 +20,7 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y default-jdk nmap rubygems
+        sudo apt-get install -y default-jdk rubygems
         python -m pip install --upgrade pip
         pip install pipenv
         pipenv install --dev
