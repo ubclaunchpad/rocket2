@@ -1,7 +1,9 @@
 """Data model to represent an individual user."""
-from typing import Dict, Any
+from typing import Dict, Any, TypeVar, Type
 from app.model.permissions import Permissions
 from app.model.base import RocketModel
+
+T = TypeVar('T', bound='User')
 
 
 class User(RocketModel):
@@ -44,8 +46,8 @@ class User(RocketModel):
 
         return {'fallback': fallback, 'fields': fields}
 
-    @staticmethod
-    def to_dict(user: 'User') -> Dict[str, Any]:
+    @classmethod
+    def to_dict(cls: Type[T], user: T) -> Dict[str, Any]:
         """
         Convert user object to dict object.
 
@@ -76,15 +78,15 @@ class User(RocketModel):
 
         return udict
 
-    @staticmethod
-    def from_dict(d: Dict[str, Any]) -> 'User':
+    @classmethod
+    def from_dict(cls: Type[T], d: Dict[str, Any]) -> T:
         """
         Convert dict response object to user model.
 
         :param d: the dictionary representing a user
         :return: returns converted user model.
         """
-        user = User(d['slack_id'])
+        user = cls(d['slack_id'])
         user.email = d.get('email', '')
         user.name = d.get('name', '')
         user.github_username = d.get('github', '')
@@ -98,8 +100,8 @@ class User(RocketModel):
         user.karma = int(d.get('karma', 1))
         return user
 
-    @staticmethod
-    def is_valid(user: 'User') -> bool:
+    @classmethod
+    def is_valid(cls: Type[T], user: T) -> bool:
         """
         Return true if this user has no missing required fields.
 
