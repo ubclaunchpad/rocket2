@@ -13,8 +13,7 @@ class OrganizationEventHandler(GitHubEventHandler):
     def supported_action_list(self) -> List[str]:
         """Provide a list of all actions this handler can handle."""
         return ["member_removed",
-                "member_added",
-                "member_invited"]
+                "member_added"]
 
     def handle(self, payload: Dict[str, Any]) -> ResponseTuple:
         """

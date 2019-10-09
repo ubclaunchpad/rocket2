@@ -94,14 +94,6 @@ def org_rm_payload(org_default_payload):
 
 
 @pytest.fixture
-def org_inv_payload(org_default_payload):
-    """Provide an organization payload for inviting a member."""
-    inv_payload = org_default_payload
-    inv_payload["action"] = "member_invited"
-    return inv_payload
-
-
-@pytest.fixture
 def org_empty_payload(org_default_payload):
     """Provide an organization payload with no action."""
     empty_payload = org_default_payload
@@ -114,8 +106,7 @@ def test_org_supported_action_list():
     mock_facade = mock.MagicMock(DBFacade)
     webhook_handler = OrganizationEventHandler(mock_facade)
     assert webhook_handler.supported_action_list == ["member_removed",
-                                                     "member_added",
-                                                     "member_invited"]
+                                                     "member_added"]
 
 
 @mock.patch('app.controller.webhook.github.events.organization.logging')
@@ -177,18 +168,6 @@ def test_handle_org_event_rm_mult_members(mock_logging, org_rm_payload):
                                                " slack IDs")
     assert rsp == "Error: found github ID connected to multiple slack IDs"
     assert code == 412
-
-
-@mock.patch('app.controller.webhook.github.events.organization.logging')
-def test_handle_org_event_inv_member(mock_logging, org_inv_payload):
-    """Test that instances when members are added to the org are logged."""
-    mock_facade = mock.MagicMock(DBFacade)
-    webhook_handler = OrganizationEventHandler(mock_facade)
-    rsp, code = webhook_handler.handle(org_inv_payload)
-    mock_logging.info.assert_called_with(("user hacktocat invited "
-                                          "to Octocoders"))
-    assert rsp == "user hacktocat invited to Octocoders"
-    assert code == 200
 
 
 @mock.patch('app.controller.webhook.github.events.organization.logging')

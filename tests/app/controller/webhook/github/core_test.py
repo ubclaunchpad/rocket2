@@ -47,8 +47,7 @@ def test_verify_and_handle_org_event(mock_handle_org_event, mock_verify_hash,
     webhook_handler = GitHubWebhookHandler(mock_facade, config)
     rsp, code = webhook_handler.handle(None, None, {"action": "member_added"})
     webhook_handler.handle(None, None, {"action": "member_removed"})
-    webhook_handler.handle(None, None, {"action": "member_invited"})
-    assert mock_handle_org_event.call_count == 3
+    assert mock_handle_org_event.call_count == 2
     assert rsp == "rsp"
     assert code == 0
 
