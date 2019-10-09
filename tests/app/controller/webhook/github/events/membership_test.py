@@ -121,9 +121,13 @@ def test_handle_mem_event_add_member(mock_logging, mem_add_payload):
     """Test that instances when members are added to the mem are logged."""
     mock_facade = mock.MagicMock(DBFacade)
     return_user = User("SLACKID")
+    return_team = Team("2723476", "rocket", "rocket")
+    return_team.add_member("SLACKID")
     mock_facade.query.return_value = [return_user]
+    mock_facade.retrieve.return_value = return_team
     webhook_handler = MembershipEventHandler(mock_facade)
     rsp, code = webhook_handler.handle(mem_add_payload)
+    mock_facade.store.assert_called_once_with(return_team)
     mock_logging.info.assert_called_once_with(("user Codertocat added "
                                                "to rocket"))
     assert rsp == "added slack ID SLACKID"
@@ -157,6 +161,7 @@ def test_handle_mem_event_rm_single_member(mock_logging, mem_rm_payload):
         .assert_called_once_with(User, [('github_user_id', "21031067")])
     mock_facade.retrieve \
         .assert_called_once_with(Team, "2723476")
+    mock_facade.store.assert_called_once_with(return_team)
     mock_logging.info.assert_called_once_with("deleted slack user SLACKID"
                                               " from rocket")
     assert not return_team.has_member("21031067")
