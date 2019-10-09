@@ -105,10 +105,7 @@ class GithubInterface:
         :param name: name of team
         :return: Github team ID
         """
-        team = self.org.create_team(name,
-                                    GithubObject.NotSet,
-                                    "closed",
-                                    "push")
+        team = self.org.create_team(name, privacy="closed")
         return cast(int, team.id)
 
     @handle_github_error
@@ -156,14 +153,14 @@ class GithubInterface:
     @handle_github_error
     def list_team_members(self, team_id: str) -> List[NamedUser]:
         """Return a list of users in the team of id team_id."""
-        team = self.github.get_team(team_id)
+        team = self.org.get_team(int(team_id))
         return cast(List[NamedUser], list(team.get_members()))
 
     @handle_github_error
     def get_team_member(self, username: str, team_id: str) -> NamedUser:
         """Return a team member with a username of username."""
         try:
-            team = self.github.get_team(team_id)
+            team = self.org.get_team(int(team_id))
             team_members = team.get_members()
             return next(
                 member for member in team_members
@@ -175,20 +172,20 @@ class GithubInterface:
     @handle_github_error
     def add_team_member(self, username: str, team_id: str) -> None:
         """Add user with given username to team with id team_id."""
-        team = self.github.get_team(team_id)
+        team = self.org.get_team(int(team_id))
         new_member = self.github.get_user(username)
         team.add_membership(new_member)
 
     @handle_github_error
     def has_team_member(self, username: str, team_id: str) -> bool:
         """Check if team with team_id contains user with username."""
-        team = self.github.get_team(team_id)
+        team = self.org.get_team(int(team_id))
         member = self.github.get_user(username)
         return cast(bool, team.has_in_members(member))
 
     @handle_github_error
     def remove_team_member(self, username: str, team_id: str) -> None:
         """Remove user with given username from team with id team_id."""
-        team = self.github.get_team(team_id)
+        team = self.org.get_team(int(team_id))
         to_be_removed_member = self.github.get_user(username)
         team.remove_membership(to_be_removed_member)

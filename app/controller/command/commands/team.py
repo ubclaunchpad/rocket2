@@ -6,6 +6,7 @@ from app.controller import ResponseTuple
 from app.controller.command.commands.base import Command
 from db.facade import DBFacade
 from interface.github import GithubAPIException, GithubInterface
+from interface.slack import SlackAPIError
 from app.model import Team, User
 from utils.slack_parse import check_permissions
 from typing import Any, List
@@ -279,7 +280,7 @@ class TeamCommand(Command):
             if not check_permissions(command_user, None):
                 return self.permission_error, 200
             msg = f"New team created: {param_list['team_name']}, "
-            team_id = self.gh.org_create_team()
+            team_id = str(self.gh.org_create_team(param_list['team_name']))
             team = Team(team_id, param_list['team_name'], "")
             if param_list["name"] is not None:
                 msg += f"name: {param_list['name']}, "
@@ -291,9 +292,13 @@ class TeamCommand(Command):
                 msg += "added channel, "
                 for member_id in self.sc.get_channel_users(
                         param_list["channel"]):
-                    member = self.facade.retrieve(User, member_id)
-                    self.gh.add_team_member(member.github_username, team_id)
-                    team.add_member(member.github_id)
+                    try:
+                        member = self.facade.retrieve(User, member_id)
+                        self.gh.add_team_member(member.github_username,
+                                                team_id)
+                        team.add_member(member.github_id)
+                    except LookupError:
+                        pass
             else:
                 self.gh.add_team_member(command_user.github_username, team_id)
                 team.add_member(command_user.github_id)
@@ -310,11 +315,16 @@ class TeamCommand(Command):
             self.facade.store(team)
             return msg, 200
         except GithubAPIException as e:
-            logging.error("team creation unsuccessful")
+            logging.error(f"Team creation error with {e.data}")
             return f"Team creation unsuccessful with the" \
                    f" following error: {e.data}", 200
         except LookupError:
+            logging.error(f"User(uid={user_id}) isn't in database")
             return self.lookup_error, 200
+        except SlackAPIError as e:
+            logging.error(f"Slack error with {e.data}")
+            return f"Team creation unsuccessful with the" \
+                   f" following error: {e.data}", 200
 
     def add_helper(self, param_list, user_id) -> ResponseTuple:
         """
@@ -331,7 +341,12 @@ class TeamCommand(Command):
         """
         try:
             command_user = self.facade.retrieve(User, user_id)
-            team = self.facade.retrieve(Team, param_list['team_name'])
+            team = self.facade.query(Team, [('github_team_name',
+                                             param_list['team_name'])])
+            if len(team) != 1:
+                return self.lookup_error, 200
+            else:
+                team = team[0]
             if not check_permissions(command_user, team):
                 return self.permission_error, 200
 
@@ -366,7 +381,12 @@ class TeamCommand(Command):
         """
         try:
             command_user = self.facade.retrieve(User, user_id)
-            team = self.facade.retrieve(Team, param_list['team_name'])
+            team = self.facade.query(Team, [('github_team_name',
+                                             param_list['team_name'])])
+            if len(team) != 1:
+                return self.lookup_error, 200
+            else:
+                team = team[0]
             if not check_permissions(command_user, team):
                 return self.permission_error, 200
 
@@ -405,7 +425,12 @@ class TeamCommand(Command):
         """
         try:
             command_user = self.facade.retrieve(User, user_id)
-            team = self.facade.retrieve(Team, param_list['team_name'])
+            team = self.facade.query(Team, [('github_team_name',
+                                             param_list['team_name'])])
+            if len(team) != 1:
+                return self.lookup_error, 200
+            else:
+                team = team[0]
             if not check_permissions(command_user, team):
                 return self.permission_error, 200
             msg = f"Team edited: {param_list['team_name']}, "
@@ -435,7 +460,12 @@ class TeamCommand(Command):
         """
         try:
             command_user = self.facade.retrieve(User, user_id)
-            team = self.facade.retrieve(Team, param_list['team_name'])
+            team = self.facade.query(Team, [('github_team_name',
+                                             param_list['team_name'])])
+            if len(team) != 1:
+                return self.lookup_error, 200
+            else:
+                team = team[0]
             if not check_permissions(command_user, team):
                 return self.permission_error, 200
             user = self.facade.retrieve(User, param_list["slack_id"])
@@ -477,10 +507,14 @@ class TeamCommand(Command):
         """
         try:
             command_user = self.facade.retrieve(User, user_id)
-            team = self.facade.retrieve(Team, team_name)
+            team = self.facade.query(Team, [('github_team_name', team_name)])
+            if len(team) != 1:
+                raise LookupError(self.lookup_error)
+            else:
+                team = team[0]
             if not check_permissions(command_user, team):
                 return self.permission_error, 200
-            self.facade.delete(Team, team_name)
+            self.facade.delete(Team, team.github_team_id)
             self.gh.org_delete_team(team.github_team_id)
             return f"Team {team_name} deleted", 200
         except LookupError:
