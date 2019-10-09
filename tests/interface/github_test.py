@@ -36,6 +36,7 @@ class TestGithubInterface(TestCase):
         mock_user: MagicMock = MagicMock(NamedUser.NamedUser)
         mock_user.id = 1
         self.mock_github.get_user.return_value = mock_user
+        self.mock_org.has_in_members.return_value = False
         github_id = self.test_interface.org_add_member("user@email.com")
         self.mock_org.add_to_members. \
             assert_called_once_with(mock_user, "member")
@@ -129,6 +130,7 @@ class TestGithubInterface(TestCase):
         try:
             mock_user: MagicMock = MagicMock(NamedUser.NamedUser)
             self.mock_github.get_user.return_value = mock_user
+            self.mock_org.has_in_members.return_value = False
             self.test_interface.org_add_member("user@email.com")
             assert False
         except GithubAPIException:
