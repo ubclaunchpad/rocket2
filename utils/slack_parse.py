@@ -70,3 +70,21 @@ def is_slack_id(id: str) -> bool:
         return True
     else:
         return False
+
+
+def escape_email(email: str) -> str:
+    """
+    Convert a string with escaped emails to just the email.
+
+    Before::
+
+        <mailto:email@a.com|email@a.com>
+
+    After::
+
+        email@a.com
+
+    :param email: email to convert
+    :return: unescaped email
+    """
+    return email.split('|')[0][8:]

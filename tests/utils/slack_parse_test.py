@@ -79,3 +79,10 @@ def test_check_string_is_slack_id():
     """Test checking to see if string is a slack id."""
     string_to_test = "UFJ42EU67"
     assert util.is_slack_id(string_to_test)
+
+
+def test_escape_email():
+    """Test parsing escaped emails."""
+    email = "<mailto:email@a.com|email@a.com>"
+    ret = util.escape_email(email)
+    assert ret == "email@a.com"
