@@ -10,6 +10,7 @@ from flask import jsonify
 from interface.github import GithubAPIException, GithubInterface
 from app.model import User, Permissions
 from typing import Dict, cast
+from utils.slack_parse import escape_email
 
 
 class UserCommand(Command):
@@ -188,7 +189,7 @@ class UserCommand(Command):
         if param_list["name"]:
             edited_user.name = param_list["name"]
         if param_list["email"]:
-            edited_user.email = param_list["email"]
+            edited_user.email = escape_email(param_list["email"])
         if param_list["pos"]:
             edited_user.position = param_list["pos"]
         if param_list["github"]:
