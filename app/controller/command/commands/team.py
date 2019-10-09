@@ -238,15 +238,12 @@ class TeamCommand(Command):
         :return: error message if lookup error or no teams,
                  otherwise return teams' information
         """
-        try:
-            teams = self.facade.query(Team)
-            if not teams:
-                return "No Teams Exist!", 200
-            attachment = [team.get_basic_attachment() for
-                          team in teams]
-            return jsonify({'attachments': attachment}), 200
-        except LookupError:
-            return self.lookup_error, 200
+        teams = self.facade.query(Team)
+        if not teams:
+            return "No Teams Exist!", 200
+        attachment = [team.get_basic_attachment() for
+                      team in teams]
+        return jsonify({'attachments': attachment}), 200
 
     def view_helper(self, team_name) -> ResponseTuple:
         """
@@ -256,11 +253,10 @@ class TeamCommand(Command):
         :return: error message if team not found,
                  otherwise return team information
         """
-        try:
-            team = self.facade.retrieve(Team, team_name)
-            return jsonify({'attachments': [team.get_attachment()]}), 200
-        except LookupError:
+        teams = self.facade.query(Team, [('github_team_name', team_name)])
+        if len(teams) != 1:
             return self.lookup_error, 200
+        return jsonify({'attachments': [teams[0].get_attachment()]}), 200
 
     def create_helper(self, param_list, user_id) -> ResponseTuple:
         """

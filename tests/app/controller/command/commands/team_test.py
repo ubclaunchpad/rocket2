@@ -54,12 +54,6 @@ class TestTeamCommand(TestCase):
             self.assertEqual(code, 200)
         self.db.query.assert_called_once_with(Team)
 
-    def test_handle_list_lookup_error(self):
-        """Test team command list with lookup error."""
-        self.db.query.side_effect = LookupError
-        self.assertTupleEqual(self.testcommand.handle("team list", user),
-                              (self.testcommand.lookup_error, 200))
-
     def test_handle_list_no_teams(self):
         """Test team command list with no teams found."""
         self.db.query.return_value = []
@@ -70,18 +64,17 @@ class TestTeamCommand(TestCase):
         """Test team command view parser."""
         team = Team("BRS", "brs", "web")
         team_attach = [team.get_attachment()]
-        self.db.retrieve.return_value = team
+        self.db.query.return_value = [team]
         with self.app.app_context():
             resp, code = self.testcommand.handle("team view brs", user)
             expect = json.loads(jsonify({'attachments': team_attach}).data)
             resp = json.loads(resp.data)
             self.assertDictEqual(resp, expect)
             self.assertEqual(code, 200)
-        self.db.retrieve.assert_called_once_with(Team, "brs")
 
     def test_handle_view_lookup_error(self):
         """Test team command view parser with lookup error."""
-        self.db.retrieve.side_effect = LookupError
+        self.db.query.return_value = []
         self.assertTupleEqual(self.testcommand.handle("team view brs", user),
                               (self.testcommand.lookup_error, 200))
 
@@ -89,7 +82,8 @@ class TestTeamCommand(TestCase):
         """Test team command delete parser with improper permission."""
         team = Team("BRS", "brs", "web")
         test_user = User("userid")
-        self.db.retrieve.side_effect = [test_user, team]
+        self.db.retrieve.return_value = test_user
+        self.db.query.return_value = [team]
         self.assertTupleEqual(self.testcommand.handle("team delete brs", user),
                               (self.testcommand.permission_error, 200))
         self.db.delete.assert_not_called()
@@ -97,7 +91,7 @@ class TestTeamCommand(TestCase):
 
     def test_handle_delete_lookup_error(self):
         """Test team command delete parser with lookup error."""
-        self.db.retrieve.side_effect = LookupError
+        self.db.query.return_value = []
         self.assertTupleEqual(self.testcommand.handle("team delete brs", user),
                               (self.testcommand.lookup_error, 200))
         self.db.delete.assert_not_called()
@@ -105,7 +99,7 @@ class TestTeamCommand(TestCase):
 
     def test_handle_delete_github_error(self):
         """Test team command delete parser with Github error."""
-        self.db.retrieve.side_effect = GithubAPIException("error")
+        self.db.query.side_effect = GithubAPIException("error")
         self.assertTupleEqual(self.testcommand.handle("team delete brs", user),
                               ("Team delete was unsuccessful with "
                                "the following error: "
@@ -120,10 +114,11 @@ class TestTeamCommand(TestCase):
         test_user = User("userid")
         test_user.github_id = "1234"
         team.add_team_lead("1234")
-        self.db.retrieve.side_effect = [test_user, team]
+        self.db.retrieve.return_value = test_user
+        self.db.query.return_value = [team]
         self.assertTupleEqual(self.testcommand.handle("team delete brs", user),
                               (f"Team brs deleted", 200))
-        self.db.delete.assert_called_once_with(Team, "brs")
+        self.db.delete.assert_called_once_with(Team, "githubid")
         self.gh.org_delete_team.assert_called_once_with("githubid")
 
     def test_handle_create(self):
@@ -207,7 +202,8 @@ class TestTeamCommand(TestCase):
         add_user = User("anotheruser")
         add_user.github_username = "myuser"
         add_user.github_id = "otherID"
-        self.db.retrieve.side_effect = [test_user, team, add_user]
+        self.db.retrieve.side_effect = [test_user, add_user]
+        self.db.query.return_value = [team]
         with self.app.app_context():
             resp, code = self.testcommand.handle("team add brs ID", user)
             team_attach = team.get_attachment()
@@ -226,7 +222,8 @@ class TestTeamCommand(TestCase):
         test_user.github_username = "githubuser"
         team = Team("BRS", "brs", "web")
         team.github_team_id = "githubid"
-        self.db.retrieve.side_effect = [test_user, team]
+        self.db.retrieve.return_value = test_user
+        self.db.query.return_value = [team]
         self.assertTupleEqual(self.testcommand.handle("team add brs ID", user),
                               (self.testcommand.permission_error, 200))
         self.db.store.assert_not_called()
@@ -241,7 +238,8 @@ class TestTeamCommand(TestCase):
         team.github_team_id = "githubid"
         add_user = User("anotheruser")
         add_user.github_username = "myuser"
-        self.db.retrieve.side_effect = [test_user, team, add_user]
+        self.db.retrieve.side_effect = [test_user, add_user]
+        self.db.query.return_value = [team]
         self.gh.add_team_member.side_effect = GithubAPIException("error")
         self.assertTupleEqual(self.testcommand.handle("team add brs ID", user),
                               ("User added unsuccessfully with the"
@@ -266,8 +264,9 @@ class TestTeamCommand(TestCase):
         other_user = User("anotheruser")
         other_user.github_id = "githubID"
         other_user.github_username = "myuser"
-        self.db.retrieve.side_effect = [test_user, team, other_user,
-                                        test_user, team, other_user]
+        self.db.retrieve.side_effect = [test_user, other_user,
+                                        test_user, other_user]
+        self.db.query.return_value = [team]
         team_attach = [team.get_attachment()]
         with self.app.app_context():
             self.testcommand.handle("team add brs ID", user)
@@ -291,7 +290,8 @@ class TestTeamCommand(TestCase):
         other_user = User("anotheruser")
         other_user.github_id = "githubID"
         other_user.github_username = "myuser"
-        self.db.retrieve.side_effect = [test_user, team, other_user]
+        self.db.retrieve.side_effect = [test_user, other_user]
+        self.db.query.return_value = [team]
         self.gh.has_team_member.return_value = False
         with self.app.app_context():
             self.assertTupleEqual(self.testcommand.handle("team remove"
@@ -305,7 +305,8 @@ class TestTeamCommand(TestCase):
         """Test team command remove parser with insufficient permission."""
         test_user = User("userid")
         team = Team("BRS", "brs", "web")
-        self.db.retrieve.side_effect = [test_user, team]
+        self.db.retrieve.return_value= test_user
+        self.db.query.return_value = [team]
         with self.app.app_context():
             self.assertTupleEqual(self.testcommand.handle("team remove"
                                                           " brs ID", user),
@@ -333,7 +334,8 @@ class TestTeamCommand(TestCase):
         other_user = User("anotheruser")
         other_user.github_id = "githubID"
         other_user.github_username = "myuser"
-        self.db.retrieve.side_effect = [test_user, team, other_user]
+        self.db.retrieve.side_effect = [test_user, other_user]
+        self.db.query.return_value = [team]
         self.gh.has_team_member.side_effect = GithubAPIException("error")
         with self.app.app_context():
             self.assertTupleEqual(self.testcommand.handle("team remove"
@@ -353,8 +355,9 @@ class TestTeamCommand(TestCase):
         other_user = User("anotheruser")
         other_user.github_id = "githubID"
         other_user.github_username = "myuser"
-        self.db.retrieve.side_effect = [test_user, team, other_user,
-                                        test_user, team, other_user]
+        self.db.retrieve.side_effect = [test_user, other_user,
+                                        test_user, other_user]
+        self.db.query.return_value = [team]
         team.add_member("githubID")
         team_before_attach = [team.get_attachment()]
         team.add_team_lead("githubID")
@@ -387,7 +390,8 @@ class TestTeamCommand(TestCase):
         """Test team command lead parser with insufficient permission."""
         test_user = User("userid")
         team = Team("BRS", "brs", "web")
-        self.db.retrieve.side_effect = [test_user, team]
+        self.db.retrieve.return_value = test_user
+        self.db.query.return_value = [team]
         with self.app.app_context():
             self.assertTupleEqual(self.testcommand.handle("team "
                                                           "lead brs ID", user),
@@ -408,7 +412,8 @@ class TestTeamCommand(TestCase):
         test_user = User("userid")
         test_user.permissions_level = Permissions.admin
         team = Team("BRS", "brs", "web")
-        self.db.retrieve.side_effect = [test_user, team, test_user]
+        self.db.retrieve.side_effect = [test_user, test_user]
+        self.db.query.return_value = [team]
         self.gh.add_team_member.side_effect = GithubAPIException("error")
         with self.app.app_context():
             self.assertTupleEqual(self.testcommand.handle("team lead brs ID",
@@ -422,7 +427,8 @@ class TestTeamCommand(TestCase):
         test_user = User("userid")
         test_user.permissions_level = Permissions.admin
         team = Team("BRS", "brs", "web")
-        self.db.retrieve.side_effect = [test_user, team, test_user]
+        self.db.retrieve.side_effect = [test_user, test_user]
+        self.db.query.return_value = [team]
         with self.app.app_context():
             self.assertTupleEqual(self.testcommand.handle("team lead "
                                                           "--remove brs"
@@ -439,7 +445,8 @@ class TestTeamCommand(TestCase):
         team_attach = [team.get_attachment()]
         team.platform = "iOS"
         team.display_name = "b-s"
-        self.db.retrieve.side_effect = [test_user, team]
+        self.db.retrieve.return_value = test_user
+        self.db.query.return_value = [team]
         with self.app.app_context():
             resp, code = self.testcommand.handle("team edit brs "
                                                  "--name brS "
@@ -457,7 +464,8 @@ class TestTeamCommand(TestCase):
         """Test team command edit parser with insufficient permission."""
         test_user = User("userid")
         team = Team("BRS", "brs", "brS")
-        self.db.retrieve.side_effect = [test_user, team]
+        self.db.retrieve.return_value = test_user
+        self.db.query.return_value = [team]
         with self.app.app_context():
             self.assertTupleEqual(self.testcommand.handle("team "
                                                           "edit brs", user),
@@ -466,7 +474,7 @@ class TestTeamCommand(TestCase):
 
     def test_handle_edit_lookup_error(self):
         """Test team command edit parser with lookup error."""
-        self.db.retrieve.side_effect = LookupError
+        self.db.query.return_value = []
         with self.app.app_context():
             self.assertTupleEqual(self.testcommand.handle("team "
                                                           "edit brs", user),

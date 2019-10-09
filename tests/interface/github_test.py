@@ -23,7 +23,7 @@ class TestGithubInterface(TestCase):
         self.mock_team = MagicMock(Team.Team)
 
         self.mock_github.get_team = MagicMock(side_effect={
-            'brussels-sprouts': self.mock_team,
+            12345: self.mock_team,
         }.get)
 
         self.test_user = MagicMock(NamedUser.NamedUser)
@@ -79,8 +79,7 @@ class TestGithubInterface(TestCase):
             self.test_interface.org_create_team("brussel sprouts"),
             234111)
         self.mock_org.create_team. \
-            assert_called_once_with("brussel sprouts",
-                                    GithubObject.NotSet, "closed", "push")
+            assert_called_once_with("brussel sprouts", privacy='closed')
 
     def test_org_delete_team(self):
         """Test GithubInterface method org_delete_team."""
@@ -233,42 +232,45 @@ class TestGithubInterface(TestCase):
         self.mock_team.list_team_members = MagicMock(
             return_value=test_team_members_list
         )
-        self.test_interface.list_team_members('brussels-sprouts')
-        self.mock_github.get_team.assert_called_once_with('brussels-sprouts')
+        self.mock_org.get_team.return_value = self.mock_team
+        self.test_interface.list_team_members('12345')
+        self.mock_team.get_members.assert_called_once()
 
     def test_tmem_get_team_member(self):
         """Test if method gets the correct member when member exists."""
+        self.mock_org.get_team.return_value = self.mock_team
         assert self.test_interface.get_team_member(
             self.test_user.name,
-            'brussels-sprouts') is self.test_user
+            '12345') is self.test_user
 
     def test_tmem_get_nonexistent_team_member(self):
         """Test if raises GithubException when member does not exist."""
         with self.assertRaises(GithubAPIException):
             self.test_interface.get_team_member('nonexistent_username',
-                                                'brussels-sprouts')
+                                                '12345')
 
     def test_tmem_add_team_member(self):
         """Test if a user is added to a team properly."""
         self.mock_github.get_user = MagicMock(return_value=self.test_user)
         self.mock_team.add_membership = MagicMock()
+        self.mock_org.get_team.return_value = self.mock_team
         self.test_interface.add_team_member('member_username',
-                                            'brussels-sprouts')
+                                            '12345')
         self.mock_team.add_membership.assert_called_once_with(self.test_user)
 
     def test_tmem_remove_team_member(self):
         """Test if the user removed is no longer in the team."""
-        self.mock_team.remove_membership = MagicMock()
         self.mock_github.get_user = MagicMock(return_value=self.test_user)
+        self.mock_org.get_team.return_value = self.mock_team
         self.test_interface.remove_team_member(self.test_user.name,
-                                               'brussels-sprouts')
+                                               '12345')
         self.mock_team.remove_membership. \
             assert_called_once_with(self.test_user)
 
     def test_tmem_has_team_member(self):
         """Test if has_team_member method."""
         self.mock_github.get_user = MagicMock(return_value=self.test_user)
-        self.mock_team.has_in_members = MagicMock()
+        self.mock_org.get_team.return_value = self.mock_team
         self.test_interface.has_team_member('member_username',
-                                            'brussels-sprouts')
+                                            '12345')
         self.mock_team.has_in_members.assert_called_once_with(self.test_user)
