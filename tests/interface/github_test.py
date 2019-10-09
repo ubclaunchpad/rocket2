@@ -1,6 +1,6 @@
 """Test Github class."""
 from github import Github, Organization, NamedUser, \
-    GithubException, Team, GithubObject, PaginatedList
+    GithubException, Team, PaginatedList
 from interface.github import GithubInterface, GithubAPIException
 from unittest import TestCase
 from unittest.mock import MagicMock, Mock

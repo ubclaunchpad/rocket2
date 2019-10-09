@@ -305,7 +305,7 @@ class TestTeamCommand(TestCase):
         """Test team command remove parser with insufficient permission."""
         test_user = User("userid")
         team = Team("BRS", "brs", "web")
-        self.db.retrieve.return_value= test_user
+        self.db.retrieve.return_value = test_user
         self.db.query.return_value = [team]
         with self.app.app_context():
             self.assertTupleEqual(self.testcommand.handle("team remove"
