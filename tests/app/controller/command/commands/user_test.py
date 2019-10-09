@@ -236,7 +236,7 @@ class TestUserCommand(TestCase):
             resp, code = self.testcommand.handle(
                 "user edit --member U0G9QF9C6 "
                 "--name rob "
-                "--email rob@rob.com --pos dev --github"
+                "--email <mailto:rob@rob.com|rob@rob.com> --pos dev --github"
                 " rob@.github.com --major 'Computer Science'"
                 " --bio 'Im a human'",
                 "U0G9QF9C6")
@@ -255,7 +255,7 @@ class TestUserCommand(TestCase):
         self.assertEqual(self.testcommand.handle(
             "user edit --member ABCDE89JK "
             "--name rob "
-            "--email rob@rob.com --pos dev --github"
+            "--email <mailto:rob@rob.com|rob@rob.com> --pos dev --github"
             " rob@.github.com --major 'Computer Science'"
             " --bio 'Im a human'",
             "U0G9QF9C6"),
@@ -307,7 +307,7 @@ class TestUserCommand(TestCase):
         self.assertEqual(self.testcommand.handle(
             "user edit --member ABCDE89JK "
             "--name rob "
-            "--email rob@rob.com --pos dev --github"
+            "--email <mailto:rob@rob.com|rob@rob.com> --pos dev --github"
             " rob@.github.com --major 'Computer Science'"
             " --bio 'Im a human'",
             "U0G9QF9C6"),
