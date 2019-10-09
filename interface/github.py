@@ -64,9 +64,14 @@ class GithubInterface:
 
     @handle_github_error
     def org_add_member(self, username: str) -> str:
-        """Add/update to member with given username to organization."""
+        """
+        Add/update to member with given username to organization.
+
+        If the user is already in the organization, don't do anything.
+        """
         user = self.github.get_user(username)
-        self.org.add_to_members(user, "member")
+        if not self.org.has_in_members(user):
+            self.org.add_to_members(user, "member")
         return str(user.id)
 
     @handle_github_error
