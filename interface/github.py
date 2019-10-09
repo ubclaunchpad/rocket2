@@ -1,5 +1,5 @@
 """Utility classes for interacting with Github API via PyGithub."""
-from github import Github, GithubObject, GithubException
+from github import Github, GithubException
 from github.NamedUser import NamedUser
 from github.Team import Team
 from interface.exceptions.github import GithubAPIException

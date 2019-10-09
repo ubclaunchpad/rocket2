@@ -322,9 +322,9 @@ class TeamCommand(Command):
             logging.error(f"User(uid={user_id}) isn't in database")
             return self.lookup_error, 200
         except SlackAPIError as e:
-            logging.error(f"Slack error with {e.data}")
+            logging.error(f"Slack error with {e.error}")
             return f"Team creation unsuccessful with the" \
-                   f" following error: {e.data}", 200
+                   f" following error: {e.error}", 200
 
     def add_helper(self, param_list, user_id) -> ResponseTuple:
         """
@@ -341,12 +341,11 @@ class TeamCommand(Command):
         """
         try:
             command_user = self.facade.retrieve(User, user_id)
-            team = self.facade.query(Team, [('github_team_name',
-                                             param_list['team_name'])])
-            if len(team) != 1:
+            teams = self.facade.query(Team, [('github_team_name',
+                                              param_list['team_name'])])
+            if len(teams) != 1:
                 return self.lookup_error, 200
-            else:
-                team = team[0]
+            team = teams[0]
             if not check_permissions(command_user, team):
                 return self.permission_error, 200
 
@@ -381,12 +380,11 @@ class TeamCommand(Command):
         """
         try:
             command_user = self.facade.retrieve(User, user_id)
-            team = self.facade.query(Team, [('github_team_name',
-                                             param_list['team_name'])])
-            if len(team) != 1:
+            teams = self.facade.query(Team, [('github_team_name',
+                                              param_list['team_name'])])
+            if len(teams) != 1:
                 return self.lookup_error, 200
-            else:
-                team = team[0]
+            team = teams[0]
             if not check_permissions(command_user, team):
                 return self.permission_error, 200
 
@@ -425,12 +423,11 @@ class TeamCommand(Command):
         """
         try:
             command_user = self.facade.retrieve(User, user_id)
-            team = self.facade.query(Team, [('github_team_name',
-                                             param_list['team_name'])])
-            if len(team) != 1:
+            teams = self.facade.query(Team, [('github_team_name',
+                                              param_list['team_name'])])
+            if len(teams) != 1:
                 return self.lookup_error, 200
-            else:
-                team = team[0]
+            team = teams[0]
             if not check_permissions(command_user, team):
                 return self.permission_error, 200
             msg = f"Team edited: {param_list['team_name']}, "
@@ -460,12 +457,11 @@ class TeamCommand(Command):
         """
         try:
             command_user = self.facade.retrieve(User, user_id)
-            team = self.facade.query(Team, [('github_team_name',
-                                             param_list['team_name'])])
-            if len(team) != 1:
+            teams = self.facade.query(Team, [('github_team_name',
+                                              param_list['team_name'])])
+            if len(teams) != 1:
                 return self.lookup_error, 200
-            else:
-                team = team[0]
+            team = teams[0]
             if not check_permissions(command_user, team):
                 return self.permission_error, 200
             user = self.facade.retrieve(User, param_list["slack_id"])
@@ -507,11 +503,11 @@ class TeamCommand(Command):
         """
         try:
             command_user = self.facade.retrieve(User, user_id)
-            team = self.facade.query(Team, [('github_team_name', team_name)])
-            if len(team) != 1:
-                raise LookupError(self.lookup_error)
-            else:
-                team = team[0]
+            teams = self.facade.query(Team, [('github_team_name',
+                                              team_name)])
+            if len(teams) != 1:
+                return self.lookup_error, 200
+            team = teams[0]
             if not check_permissions(command_user, team):
                 return self.permission_error, 200
             self.facade.delete(Team, team.github_team_id)
