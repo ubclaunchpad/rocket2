@@ -51,6 +51,7 @@ class MembershipEventHandler(GitHubEventHandler):
                 logging.info(f"deleted slack user {slack_id} "
                              f"from {team_name}")
                 slack_ids_string += f" {slack_id}"
+                self._facade.store(selected_team)
                 return (f"deleted slack ID{slack_ids_string} "
                         f"from {team_name}", 200)
             else:
@@ -80,6 +81,7 @@ class MembershipEventHandler(GitHubEventHandler):
                 slack_id = member.slack_id
                 logging.info(f"user {github_username} added to {team_name}")
                 slack_ids_string += f" {slack_id}"
+            self._facade.store(selected_team)
             return f"added slack ID{slack_ids_string}", 200
         else:
             logging.error(f"could not find user {github_id}")

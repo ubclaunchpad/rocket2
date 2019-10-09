@@ -35,7 +35,7 @@ def escaped_id_to_id(s: str) -> str:
     :param s: string to convert
     :return: string where all instances of escaped ID is replaced with IDs
     """
-    return re.sub(r"<@(\w+)\|[^>]+>",
+    return re.sub(r"<[#@](\w+)\|[^>]+>",
                   r"\1",
                   s)
 
