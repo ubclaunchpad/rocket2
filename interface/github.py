@@ -24,6 +24,9 @@ def handle_github_error(func):
                 logging.warning(
                     "Attempting to create new instance of pygithub interface")
                 self.github = self.github_factory.create()
+                logging.warning(
+                    "Attempting to create new instance of organization object")
+                self.org = self.github.get_organization(self.org_name)
                 try:
                     return func(self, *arg, **kwargs)
                 except GithubException as e:
@@ -66,6 +69,7 @@ class GithubInterface:
                  org: str) -> None:
         """Initialize bot by creating Github object and get organization."""
         logging.info("Creating rocket's Github interface")
+        self.org_name = org
         self.github_factory = github_factory
         self.github = github_factory.create()
         try:
