@@ -4,6 +4,7 @@ import requests
 
 from datetime import datetime, timedelta
 from interface.exceptions.github import GithubAPIException
+import logging
 
 
 class GithubAppInterface:
@@ -28,11 +29,16 @@ class GithubAppInterface:
 
         :return: Decoded JSON object containing app details
         """
+        logging.info("Attempting to retrieve Github App details")
         url = "https://api.github.com/app"
         headers = self._gen_headers()
         r = requests.get(url=url, headers=headers)
         if r.status_code != 200:
+            logging.error("Failed to get Github App details with message "
+                          f"{r.text} and error code {r.status_code}")
             raise GithubAPIException(r.text)
+        logging.info("Successfully retrieved Github App details: "
+                     f"{r.json()}")
         return r.json()
 
     def create_api_token(self):
@@ -46,23 +52,32 @@ class GithubAppInterface:
 
         :return: Authenticated API token
         """
+        logging.info("Attempting to get list of installations")
         url = "https://api.github.com/app/installations"
         headers = self._gen_headers()
         r = requests.get(url=url,
                          headers=headers)
         if r.status_code != 200:
+            logging.error("Failed to get list of Github App installations "
+                          f"with error message {r.text} "
+                          f"and code {r.status_code}")
             raise GithubAPIException(r.text)
         installation_id = r.json()[0]['id']
 
+        logging.info("Attempting to create new installation token")
         url = f"https://api.github.com/app/installations/" \
               f"{installation_id}/access_tokens"
         r = requests.post(url=url, headers=headers)
         if r.status_code != 201:
+            logging.error("Failed to create new installtion token "
+                          f"with error message {r.text} "
+                          f"and code {r.status_code}")
             raise GithubAPIException(r.text)
         return r.json()['token']
 
     def _gen_headers(self):
         if self.auth.is_expired():
+            logging.info("GithubAppAuth expired, creating new instance")
             self.auth = self.app_auth_factory.create()
         return {
             'Authorization': f'Bearer {self.auth.token}',
