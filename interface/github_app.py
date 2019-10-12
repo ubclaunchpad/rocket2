@@ -69,7 +69,7 @@ class GithubAppInterface:
               f"{installation_id}/access_tokens"
         r = requests.post(url=url, headers=headers)
         if r.status_code != 201:
-            logging.error("Failed to create new installtion token "
+            logging.error("Failed to create new installation token "
                           f"with error message {r.text} "
                           f"and code {r.status_code}")
             raise GithubAPIException(r.text)
