@@ -8,6 +8,7 @@ from interface.github_app import GithubAppInterface, \
 from app.model.team import Team as ModelTeam
 from typing import cast, List
 from functools import wraps
+import logging
 
 
 def handle_github_error(func):
@@ -17,13 +18,24 @@ def handle_github_error(func):
         try:
             return func(self, *arg, **kwargs)
         except GithubException as e:
+            logging.warning(f"GithubException raised with message {e.data}"
+                            f" and error code {e.status}")
             if e.status == 401:
+                logging.warning(
+                    "Attempting to create new instance of pygithub interface")
                 self.github = self.github_factory.create()
+                logging.warning(
+                    "Attempting to create new instance of organization object")
+                self.org = self.github.get_organization(self.org_name)
                 try:
                     return func(self, *arg, **kwargs)
                 except GithubException as e:
+                    logging.error("Second attempt of using pygithub interface"
+                                  f" failed with message {e.data} and error "
+                                  f"code {e.status}")
                     raise GithubAPIException(e.data)
             else:
+                logging.error(f"Unable to handle error code {e.status}")
                 raise GithubAPIException(e.data)
 
     return wrapper
@@ -45,6 +57,7 @@ class DefaultGithubFactory:
 
     def create(self) -> Github:
         """Create instance of pygithub interface with Github Apps API token."""
+        logging.info("Creating new instance of pygithub interface")
         return self.github(self.auth.create_api_token())
 
 
@@ -55,11 +68,16 @@ class GithubInterface:
                  github_factory: DefaultGithubFactory,
                  org: str) -> None:
         """Initialize bot by creating Github object and get organization."""
+        logging.info("Creating rocket's Github interface")
+        self.org_name = org
         self.github_factory = github_factory
         self.github = github_factory.create()
         try:
             self.org = self.github.get_organization(org)
+            logging.info(f"Successfully fetched {org} Github organization")
         except GithubException as e:
+            logging.error(f"Failed to fetch {org} Github organization with "
+                          f"error message {e.data} and error code {e.status}")
             raise GithubAPIException(e.data)
 
     @handle_github_error
