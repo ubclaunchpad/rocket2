@@ -10,7 +10,8 @@ import structlog
 from flask_talisman import Talisman
 from config import Config
 from app.scheduler import Scheduler
-
+from interface.slack import Bot
+from slack import WebClient
 
 dictConfig({
     'version': 1,
@@ -63,6 +64,8 @@ sched = Scheduler(BackgroundScheduler(timezone="America/Los_Angeles"),
                   (app, config))
 sched.start()
 
+bot = Bot(WebClient(config.slack_api_token),  config.slack_bot_channel)
+bot.send_to_channel('rocket2 has restarted successfully! :clap: :clap:', config.slack_bot_channel)
 
 @app.route('/')
 def check():
