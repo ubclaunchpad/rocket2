@@ -21,4 +21,18 @@ services:
             - 5000:5000
         environment:
             - TESTING=${TESTING}
+            - SLACK_BOT_CHANNEL=${SLACK_BOT_CHANNEL}
+            - SLACK_SIGNING_SECRET=${SLACK_SIGNING_SECRET}
+            - SLACK_API_TOKEN=${SLACK_API_TOKEN}
+            - GITHUB_APP_ID=${GITHUB_APP_ID}
+            - GITHUB_ORG_NAME=${GITHUB_ORG_NAME}
+            - GITHUB_WEBHOOK_ENDPT=${GITHUB_WEBHOOK_ENDPT}
+            - GITHUB_WEBHOOK_SECRET=${GITHUB_WEBHOOK_SECRET}
+            - GITHUB_KEY=${GITHUB_KEY}
+            - AWS_ACCESS_KEYID=${AWS_ACCESS_KEYID}
+            - AWS_SECRET_KEY=${AWS_SECRET_KEY}
+            - AWS_USERS_TABLE=${AWS_USERS_TABLE}
+            - AWS_TEAMS_TABLE=${AWS_TEAMS_TABLE}
+            - AWS_PROJECTS_TABLE=${AWS_PROJECTS_TABLE}
+            - AWS_REGION=${AWS_REGION}
         restart: on-failure
