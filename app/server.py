@@ -53,7 +53,6 @@ app = Flask(__name__)
 talisman = Talisman(app)
 talisman.force_https = False
 config = Config()
-logging.info(config.github_key)
 command_parser = make_command_parser(config)
 github_webhook_handler = make_github_webhook_handler(config)
 slack_events_handler = make_slack_events_handler(config)
