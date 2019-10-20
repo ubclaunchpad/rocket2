@@ -62,7 +62,7 @@ def make_slack_events_handler(config: Config) -> SlackEventsHandler:
     """
     facade = DBFacade(DynamoDB(config))
     bot = Bot(WebClient(config.slack_api_token),
-        config.slack_notification_channel)
+              config.slack_notification_channel)
     return SlackEventsHandler(facade, bot)
 
 
