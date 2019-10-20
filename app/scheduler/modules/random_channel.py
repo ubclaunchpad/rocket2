@@ -18,7 +18,7 @@ class RandomChannelPromoter(ModuleBase):
                  flask_app: Flask,
                  config: Config):
         """Initialize the object."""
-        self.default_channel = config.slack_notification_channel
+        self.default_channel = config.slack_announcement_channel
         self.bot = Bot(WebClient(config.slack_api_token),
                        config.slack_notification_channel)
 
