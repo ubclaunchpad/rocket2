@@ -25,20 +25,20 @@ def make_command_parser(config: Config,
 
     :return: a new ``CommandParser`` object, freshly initialized
     """
-    slack_api_token, slack_bot_channel = "", ""
+    slack_api_token, slack_notification_channel = "", ""
     signing_key = ""
     if not config.testing:
         slack_api_token = config.slack_api_token
         github_auth_key = config.github_key
         github_app_id = config.github_app_id
         github_organization = config.github_org_name
-        slack_bot_channel = config.slack_bot_channel
+        slack_notification_channel = config.slack_notification_channel
         gh = GithubInterface(DefaultGithubFactory(github_app_id,
                                                   github_auth_key),
                              github_organization)
         signing_key = config.github_key
     facade = DBFacade(DynamoDB(config))
-    bot = Bot(WebClient(slack_api_token), slack_bot_channel)
+    bot = Bot(WebClient(slack_api_token), slack_notification_channel)
     # TODO: make token config expiry configurable
     token_config = TokenCommandConfig(timedelta(days=7), signing_key)
     return CommandParser(facade, bot, cast(GithubInterface, gh), token_config)
@@ -61,7 +61,7 @@ def make_slack_events_handler(config: Config) -> SlackEventsHandler:
     :return: a new ``SlackEventsHandler`` object, freshly initialized
     """
     facade = DBFacade(DynamoDB(config))
-    bot = Bot(WebClient(config.slack_api_token), config.slack_bot_channel)
+    bot = Bot(WebClient(config.slack_api_token), config.slack_notification_channel)
     return SlackEventsHandler(facade, bot)
 
 

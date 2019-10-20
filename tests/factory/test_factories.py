@@ -17,7 +17,7 @@ def test_config():
     test_config.aws_projects_tablename = 'projects_test'
     test_config.github_webhook_secret = 'secret'
     test_config.slack_api_token = 'token'
-    test_config.slack_bot_channel = 'channel'
+    test_config.slack_notification_channel = 'channel'
     test_config.testing = True
     return test_config
 

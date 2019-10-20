@@ -18,9 +18,9 @@ class RandomChannelPromoter(ModuleBase):
                  flask_app: Flask,
                  config: Config):
         """Initialize the object."""
-        self.default_channel = config.slack_bot_channel
+        self.default_channel = config.slack_notification_channel
         self.bot = Bot(WebClient(config.slack_api_token),
-                       config.slack_bot_channel)
+                       config.slack_notification_channel)
 
     def get_job_args(self) -> Dict[str, Any]:
         """Get job configuration arguments for apscheduler."""

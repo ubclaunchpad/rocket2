@@ -15,7 +15,7 @@ class Config:
     ENV_NAMES = {
         'TESTING': 'testing',
 
-        'SLACK_BOT_CHANNEL': 'slack_bot_channel',
+        'SLACK_NOTIFICATION_CHANNEL': 'slack_notification_channel',
         'SLACK_SIGNING_SECRET': 'slack_signing_secret',
         'SLACK_API_TOKEN': 'slack_api_token',
 
@@ -61,7 +61,7 @@ class Config:
         self.testing = ''
         self.creds_path = ''
 
-        self.slack_bot_channel = ''
+        self.slack_notification_channel = ''
         self.slack_signing_secret = ''
         self.slack_api_token = ''
 
