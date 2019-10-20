@@ -64,7 +64,8 @@ sched = Scheduler(BackgroundScheduler(timezone="America/Los_Angeles"),
                   (app, config))
 sched.start()
 
-bot = Bot(WebClient(config.slack_api_token),  config.slack_notification_channel)
+bot = Bot(WebClient(config.slack_api_token),
+    config.slack_notification_channel)
 bot.send_to_channel('rocket2 has restarted successfully! :clap: :clap:',
                     config.slack_notification_channel)
 
