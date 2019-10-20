@@ -10,11 +10,6 @@ variables are strings**
 Denotes if we are in testing mode or not. In testing mode, we use a local
 DynamoDB instead of connecting to the server. Can either be `True` or `False`.
 
-## SLACK\_BOT\_CHANNEL
-
-Name of the channel you want to have our rocket 2 slack bot to make
-announcements in.
-
 ## SLACK\_SIGNING\_SECRET
 
 Signing secret of the slack app. Can be found in the basic information tab of
@@ -24,6 +19,16 @@ your slack app (api.slack.com/apps).
 
 The slack api token of your slack bot. Can be found under OAuth & Permissions
 tab of your slack app (under the name "Bot user OAuth access token").
+
+## SLACK\_NOFICIATION\_CHANNEL
+
+Name of the channel you want to have our rocket 2 slack bot to make
+service notifications in.
+
+## SLACK\_ANNOUNCEMENT\_CHANNEL
+
+Name of the channel you want to have our rocket 2 slack bot to make
+announcements in.
 
 ## GITHUB\_APP\_ID
 
