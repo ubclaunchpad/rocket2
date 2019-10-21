@@ -10,9 +10,10 @@ def complete_config():
     os.environ = {
         'TESTING': 'True',
 
-        'SLACK_NOTIFICATION_CHANNEL': '#rocket2',
         'SLACK_SIGNING_SECRET': 'something secret',
         'SLACK_API_TOKEN': 'some token idk',
+        'SLACK_NOTIFICATION_CHANNEL': '#rocket2',
+        'SLACK_ANNOUNCEMENT_CHANNEL': '#ot-random',
 
         'GITHUB_APP_ID': '2024',
         'GITHUB_ORG_NAME': 'ubclaunchpad',
