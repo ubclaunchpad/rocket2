@@ -110,7 +110,7 @@ class TestTeamCommand(TestCase):
     def test_handle_delete(self):
         """Test team command delete parser."""
         team = Team("BRS", "brs", "web")
-        team.github_team_id = "githubid"
+        team.github_team_id = "12345"
         test_user = User("userid")
         test_user.github_id = "1234"
         team.add_team_lead("1234")
@@ -118,8 +118,8 @@ class TestTeamCommand(TestCase):
         self.db.query.return_value = [team]
         self.assertTupleEqual(self.testcommand.handle("team delete brs", user),
                               (f"Team brs deleted", 200))
-        self.db.delete.assert_called_once_with(Team, "githubid")
-        self.gh.org_delete_team.assert_called_once_with("githubid")
+        self.db.delete.assert_called_once_with(Team, "12345")
+        self.gh.org_delete_team.assert_called_once_with(int("12345"))
 
     def test_handle_create(self):
         """Test team command create parser."""

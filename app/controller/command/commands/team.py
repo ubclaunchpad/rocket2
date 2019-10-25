@@ -507,7 +507,7 @@ class TeamCommand(Command):
             if not check_permissions(command_user, team):
                 return self.permission_error, 200
             self.facade.delete(Team, team.github_team_id)
-            self.gh.org_delete_team(team.github_team_id)
+            self.gh.org_delete_team(int(team.github_team_id))
             return f"Team {team_name} deleted", 200
         except LookupError:
             return self.lookup_error, 200
