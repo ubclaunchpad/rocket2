@@ -12,7 +12,6 @@ from config import Config
 from app.scheduler import Scheduler
 from interface.slack import Bot
 from slack import WebClient
-import watchtower
 
 dictConfig({
     'version': 1,
@@ -69,7 +68,15 @@ bot = Bot(WebClient(config.slack_api_token),
           config.slack_notification_channel)
 bot.send_to_channel('rocket2 has restarted successfully! :clap: :clap:',
                     config.slack_notification_channel)
-app.logger.addHandler(watchtower.CloudWatchLogHandler())
+
+if not config.testing:
+    from boto3.session import Session
+    from watchtower import CloudWatchLogHandler
+    boto3_session = Session(aws_access_key_id=config.aws_access_keyid,
+                            aws_secret_access_key=config.aws_secret_key,
+                            region_name=config.aws_region)
+    app.logger.addHandler(CloudWatchLogHandler(boto3_session=boto3_session))
+    app.logger.info('Restarted rocket2!')
 
 
 @app.route('/')
