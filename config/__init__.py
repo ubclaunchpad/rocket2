@@ -55,7 +55,9 @@ class Config:
             raise MissingConfigError(missing_config_fields)
 
         self.testing = self.testing == 'True'
-        self.github_key = self.github_key.replace('\\n', '\n')
+        self.github_key = self.github_key\
+            .replace('\\n', '\n')\
+            .replace('\\-', '-')
 
     def _set_attrs(self):
         """Add attributes so that mypy doesn't complain."""
