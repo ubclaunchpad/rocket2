@@ -24,7 +24,21 @@ class TestUserCommand(TestCase):
 
     def test_get_help(self):
         """Test user command get_help method."""
-        assert self.testcommand.get_help() == self.testcommand.help
+        subcommands = list(self.testcommand.subparser.choices.keys())
+        help_message = self.testcommand.get_help()
+        self.assertEqual(len(subcommands), help_message.count("usage"))
+
+    def test_get_subcommand_help(self):
+        """Test user command get_help method for specific subcommands."""
+        subcommands = list(self.testcommand.subparser.choices.keys())
+        for subcommand in subcommands:
+            help_message = self.testcommand.get_help(subcommand=subcommand)
+            self.assertEqual(1, help_message.count("usage"))
+
+    def test_get_invalid_subcommand_help(self):
+        """Test user command get_help method for invalid subcommands."""
+        self.assertEqual(self.testcommand.get_help(),
+                         self.testcommand.get_help(subcommand="foo"))
 
     def test_handle_nosubs(self):
         """Test user with no sub-parsers."""
