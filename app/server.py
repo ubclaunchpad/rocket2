@@ -100,6 +100,7 @@ def handle_commands():
         logging.info("Slack signature verified")
         txt = request.form['text']
         uid = request.form['user_id']
+        logging.info(f"@{uid}: {request.form['command']} {txt}")
         return command_parser.handle_app_command(txt, uid)
     else:
         logging.error("Slack signature could not be verified")
