@@ -13,7 +13,8 @@ import utils.slack_parse as util
 import logging
 from utils.slack_msg_fmt import wrap_slack_code
 from utils.slack_parse import is_slack_id
-
+import requests
+import time
 
 class CommandParser:
     """Manage the different command parsers for Rocket 2 commands."""
@@ -38,7 +39,8 @@ class CommandParser:
 
     def handle_app_command(self,
                            cmd_txt: str,
-                           user: str) -> ResponseTuple:
+                           user: str,
+                           response_url: str) -> ResponseTuple:
         """
         Handle a command call to rocket.
 
@@ -55,15 +57,20 @@ class CommandParser:
         s = cmd_txt.split(' ', 1)
         if s[0] == "help" or s[0] is None:
             logging.info("Help command was called")
-            return self.get_help(), 200
+            v = self.get_help(), 200
         if s[0] in self.__commands:
-            return self.__commands[s[0]].handle(cmd_txt, user)
+            v = self.__commands[s[0]].handle(cmd_txt, user)
         elif is_slack_id(s[0]):
             logging.info("mention command activated")
-            return self.__commands["mention"].handle(cmd_txt, user)
+            v = self.__commands["mention"].handle(cmd_txt, user)
         else:
             logging.error("app command triggered incorrectly")
-            return 'Please enter a valid command', 200
+            v = 'Please enter a valid command', 200
+        if isinstance(v[0], str):
+          response_data = { 'text': v[0] }
+        else:
+          response_data = v[0].get_json()
+        requests.post(url = response_url, json = response_data)
 
     def get_help(self) -> Response:
         """
