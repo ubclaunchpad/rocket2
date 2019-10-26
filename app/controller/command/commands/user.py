@@ -10,7 +10,7 @@ from interface.github import GithubAPIException, GithubInterface
 from app.model import User, Permissions
 from typing import Dict, cast
 from utils.slack_parse import escape_email
-import json
+
 
 class UserCommand(Command):
     """Represent User Command Parser."""

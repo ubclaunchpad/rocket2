@@ -1,7 +1,7 @@
 """Test project command parsing."""
 from app.controller.command.commands import ProjectCommand
 from db import DBFacade
-from flask import jsonify, json, Flask
+from flask import Flask
 from unittest import mock, TestCase
 from app.model import Project, User, Team, Permissions
 
@@ -30,8 +30,7 @@ class TestProjectCommand(TestCase):
         with self.app.app_context():
             resp, code = self.testcommand.handle(
                 "project view %s" % project_id, user)
-            expect = json.loads(jsonify({'attachments': project_attach}).data)
-            resp = json.loads(resp.data)
+            expect = {'attachments': project_attach}
             self.assertDictEqual(resp, expect)
             self.assertEqual(code, 200)
         self.mock_facade.retrieve.assert_called_once_with(Project, project_id)
@@ -61,8 +60,7 @@ class TestProjectCommand(TestCase):
                 "project edit %s --name name2" % project_id, user)
             project.display_name = "name2"
             project_attach = [project.get_attachment()]
-            expect = json.loads(jsonify({'attachments': project_attach}).data)
-            resp = json.loads(resp.data)
+            expect = {'attachments': project_attach}
             self.assertDictEqual(resp, expect)
             self.assertEqual(code, 200)
         self.mock_facade.retrieve.assert_called_once_with(Project, project_id)
@@ -81,8 +79,7 @@ class TestProjectCommand(TestCase):
             resp, code = \
                 self.testcommand.handle("project create repo-link team-name",
                                         user)
-            expect = json.loads(jsonify({'attachments': project_attach}).data)
-            resp = json.loads(resp.data)
+            expect = {'attachments': project_attach}
             self.assertDictEqual(resp, expect)
             self.assertEqual(code, 200)
         self.mock_facade.query.assert_called_once_with(Team,
@@ -105,8 +102,7 @@ class TestProjectCommand(TestCase):
             resp, code = \
                 self.testcommand.handle("project create repo-link team-name",
                                         user)
-            expect = json.loads(jsonify({'attachments': project_attach}).data)
-            resp = json.loads(resp.data)
+            expect = {'attachments': project_attach}
             self.assertDictEqual(resp, expect)
             self.assertEqual(code, 200)
         self.mock_facade.query.assert_called_once_with(Team,
@@ -169,8 +165,7 @@ class TestProjectCommand(TestCase):
                 self.testcommand.handle("project create repo-link team-name "
                                         "--name display-name",
                                         user)
-            expect = json.loads(jsonify({'attachments': project_attach}).data)
-            resp = json.loads(resp.data)
+            expect = {'attachments': project_attach}
             self.assertDictEqual(resp, expect)
             self.assertEqual(code, 200)
         self.mock_facade.query.assert_called_once_with(Team,

@@ -102,7 +102,8 @@ def handle_commands():
         txt = request.form['text']
         uid = request.form['user_id']
         response_url = request.form['response_url']
-        Thread(target=command_parser.handle_app_command, args=(txt, uid, response_url)).start()
+        Thread(target=command_parser.handle_app_command,
+               args=(txt, uid, response_url)).start()
         return "", 200
     else:
         logging.error("Slack signature could not be verified")
