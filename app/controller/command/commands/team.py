@@ -183,7 +183,14 @@ class TeamCommand(Command):
         try:
             args = self.parser.parse_args(command_arg)
         except SystemExit:
-            return self.get_help(), 200
+            all_subcommands = list(self.subparser.choices.keys())
+            present_subcommands = [subcommand for subcommand in
+                                   all_subcommands
+                                   if subcommand in command_arg]
+            present_subcommand = None
+            if len(present_subcommands) == 1:
+                present_subcommand = present_subcommands[0]
+            return self.get_help(subcommand=present_subcommand), 200
 
         if args.which == "list":
             return self.list_helper()

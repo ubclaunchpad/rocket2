@@ -48,8 +48,34 @@ class TestTeamCommand(TestCase):
 
     def test_handle_help(self):
         """Test team command help parser."""
-        self.assertTupleEqual(self.testcommand.handle('team help', user),
-                              (self.help_text, 200))
+        ret, code = self.testcommand.handle("team help", user)
+        self.assertEqual(ret, self.testcommand.get_help())
+        self.assertEqual(code, 200)
+
+    def test_handle_multiple_subcommands(self):
+        """Test handling multiple observed subcommands."""
+        ret, code = self.testcommand.handle("team list edit", user)
+        self.assertEqual(ret, self.testcommand.get_help())
+        self.assertEqual(code, 200)
+
+    def test_handle_subcommand_help(self):
+        """Test user subcommand help text."""
+        subcommands = list(self.testcommand.subparser.choices.keys())
+        for subcommand in subcommands:
+            command = f"team {subcommand} --help"
+            ret, code = self.testcommand.handle(command, user)
+            self.assertEqual(1, ret.count("usage"))
+            self.assertEqual(code, 200)
+
+            command = f"team {subcommand} -h"
+            ret, code = self.testcommand.handle(command, user)
+            self.assertEqual(1, ret.count("usage"))
+            self.assertEqual(code, 200)
+
+            command = f"team {subcommand} --invalid argument"
+            ret, code = self.testcommand.handle(command, user)
+            self.assertEqual(1, ret.count("usage"))
+            self.assertEqual(code, 200)
 
     def test_handle_list(self):
         """Test team command list parser."""
