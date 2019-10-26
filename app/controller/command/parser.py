@@ -5,7 +5,7 @@ from app.controller.command.commands import UserCommand, TeamCommand, \
 from app.controller.command.commands.base import Command
 from app.controller.command.commands.token import TokenCommandConfig
 from db.facade import DBFacade
-from flask import jsonify, Response
+from flask import Response
 from interface.slack import Bot
 from interface.github import GithubInterface
 from typing import Dict, cast
@@ -14,7 +14,6 @@ import logging
 from utils.slack_msg_fmt import wrap_slack_code
 from utils.slack_parse import is_slack_id
 import requests
-import time
 
 class CommandParser:
     """Manage the different command parsers for Rocket 2 commands."""
@@ -67,9 +66,9 @@ class CommandParser:
             logging.error("app command triggered incorrectly")
             v = 'Please enter a valid command', 200
         if isinstance(v[0], str):
-          response_data = { 'text': v[0] }
+            response_data = { 'text': v[0] }
         else:
-          response_data = v[0].get_json()
+            response_data = v[0]
         requests.post(url = response_url, json = response_data)
 
     def get_help(self) -> Response:
@@ -92,4 +91,4 @@ class CommandParser:
             attachment = {"text": cmd_text, "mrkdwn_in": ["text"]}
             attachments.append(attachment)
         message["attachments"] = attachments  # type: ignore
-        return cast(Response, jsonify(message))
+        return cast(Response, message)
