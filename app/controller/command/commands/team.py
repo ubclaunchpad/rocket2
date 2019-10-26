@@ -154,14 +154,23 @@ class TeamCommand(Command):
         """Return the description of this command."""
         return self.desc
 
-    def get_help(self) -> str:
-        """Return command options for team events."""
-        res = "\n*" + self.command_name + " commands:*```"
-        for argument in self.subparser.choices:
-            name = argument.capitalize()
-            res += "\n*" + name + "*\n"
-            res += self.subparser.choices[argument].format_help()
-        return res + "```"
+    def get_help(self, subcommand: str = None) -> str:
+        """Return command options for team events with Slack formatting."""
+        def get_subcommand_help(sc: str) -> str:
+            """Return the help message of a specific subcommand."""
+            message = f"\n*{sc.capitalize()}*\n"
+            message += self.subparser.choices[sc].format_help()
+            return message
+
+        if subcommand is None or subcommand not in self.subparser.choices:
+            res = f"\n*{self.command_name} commands:*```"
+            for argument in self.subparser.choices:
+                res += get_subcommand_help(argument)
+            return res + "```"
+        else:
+            res = "\n```"
+            res += get_subcommand_help(subcommand)
+            return res + "```"
 
     def handle(self,
                command: str,
