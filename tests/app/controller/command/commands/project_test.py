@@ -35,6 +35,37 @@ class TestProjectCommand(TestCase):
         self.assertEqual(self.testcommand.get_help(),
                          self.testcommand.get_help(subcommand="foo"))
 
+    def test_handle_help(self):
+        """Test project command help parser."""
+        ret, code = self.testcommand.handle("project help", user)
+        self.assertEqual(ret, self.testcommand.get_help())
+        self.assertEqual(code, 200)
+
+    def test_handle_multiple_subcommands(self):
+        """Test handling multiple observed subcommands."""
+        ret, code = self.testcommand.handle("project list edit", user)
+        self.assertEqual(ret, self.testcommand.get_help())
+        self.assertEqual(code, 200)
+
+    def test_handle_subcommand_help(self):
+        """Test project subcommand help text."""
+        subcommands = list(self.testcommand.subparser.choices.keys())
+        for subcommand in subcommands:
+            command = f"project {subcommand} --help"
+            ret, code = self.testcommand.handle(command, user)
+            self.assertEqual(1, ret.count("usage"))
+            self.assertEqual(code, 200)
+
+            command = f"project {subcommand} -h"
+            ret, code = self.testcommand.handle(command, user)
+            self.assertEqual(1, ret.count("usage"))
+            self.assertEqual(code, 200)
+
+            command = f"project {subcommand} --invalid argument"
+            ret, code = self.testcommand.handle(command, user)
+            self.assertEqual(1, ret.count("usage"))
+            self.assertEqual(code, 200)
+
     def test_handle_view(self):
         """Test project command view parser."""
         project = Project("GTID", ["a", "b"])
