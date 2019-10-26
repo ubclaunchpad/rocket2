@@ -59,7 +59,7 @@ class TestTeamCommand(TestCase):
         self.assertEqual(code, 200)
 
     def test_handle_subcommand_help(self):
-        """Test user subcommand help text."""
+        """Test team subcommand help text."""
         subcommands = list(self.testcommand.subparser.choices.keys())
         for subcommand in subcommands:
             command = f"team {subcommand} --help"
