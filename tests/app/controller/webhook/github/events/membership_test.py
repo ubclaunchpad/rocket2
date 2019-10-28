@@ -116,8 +116,7 @@ def test_org_supported_action_list():
                                                      "added"]
 
 
-@mock.patch('app.controller.webhook.github.events.membership.logging')
-def test_handle_mem_event_add_member(mock_logging, mem_add_payload):
+def test_handle_mem_event_add_member(mem_add_payload):
     """Test that instances when members are added to the mem are logged."""
     mock_facade = mock.MagicMock(DBFacade)
     return_user = User("SLACKID")
@@ -128,26 +127,21 @@ def test_handle_mem_event_add_member(mock_logging, mem_add_payload):
     webhook_handler = MembershipEventHandler(mock_facade)
     rsp, code = webhook_handler.handle(mem_add_payload)
     mock_facade.store.assert_called_once_with(return_team)
-    mock_logging.info.assert_called_once_with(("user Codertocat added "
-                                               "to rocket"))
     assert rsp == "added slack ID SLACKID"
     assert code == 200
 
 
-@mock.patch('app.controller.webhook.github.events.membership.logging')
-def test_handle_mem_event_add_missing_member(mock_logging, mem_add_payload):
+def test_handle_mem_event_add_missing_member(mem_add_payload):
     """Test that instances when members are added to the mem are logged."""
     mock_facade = mock.MagicMock(DBFacade)
     mock_facade.query.return_value = []
     webhook_handler = MembershipEventHandler(mock_facade)
     rsp, code = webhook_handler.handle(mem_add_payload)
-    mock_logging.error.assert_called_once_with("could not find user 21031067")
     assert rsp == "could not find user Codertocat"
     assert code == 404
 
 
-@mock.patch('app.controller.webhook.github.events.membership.logging')
-def test_handle_mem_event_rm_single_member(mock_logging, mem_rm_payload):
+def test_handle_mem_event_rm_single_member(mem_rm_payload):
     """Test that members removed from the mem are deleted from rocket's db."""
     mock_facade = mock.MagicMock(DBFacade)
     return_user = User("SLACKID")
@@ -162,15 +156,12 @@ def test_handle_mem_event_rm_single_member(mock_logging, mem_rm_payload):
     mock_facade.retrieve \
         .assert_called_once_with(Team, "2723476")
     mock_facade.store.assert_called_once_with(return_team)
-    mock_logging.info.assert_called_once_with("deleted slack user SLACKID"
-                                              " from rocket")
     assert not return_team.has_member("21031067")
     assert rsp == "deleted slack ID SLACKID from rocket"
     assert code == 200
 
 
-@mock.patch('app.controller.webhook.github.events.membership.logging')
-def test_handle_mem_event_rm_member_missing(mock_logging, mem_rm_payload):
+def test_handle_mem_event_rm_member_missing(mem_rm_payload):
     """Test that members not in rocket db are handled correctly."""
     mock_facade = mock.MagicMock(DBFacade)
     return_user = User("SLACKID")
@@ -181,14 +172,11 @@ def test_handle_mem_event_rm_member_missing(mock_logging, mem_rm_payload):
     rsp, code = webhook_handler.handle(mem_rm_payload)
     mock_facade.query\
         .assert_called_once_with(User, [('github_user_id', "21031067")])
-    mock_logging.error.assert_called_once_with("slack user SLACKID "
-                                               "not in rocket")
     assert rsp == "slack user SLACKID not in rocket"
     assert code == 404
 
 
-@mock.patch('app.controller.webhook.github.events.membership.logging')
-def test_handle_mem_event_rm_member_wrong_team(mock_logging, mem_rm_payload):
+def test_handle_mem_event_rm_member_wrong_team(mem_rm_payload):
     """Test what happens when member removed from a team they are not in."""
     mock_facade = mock.MagicMock(DBFacade)
     mock_facade.query.return_value = []
@@ -196,13 +184,11 @@ def test_handle_mem_event_rm_member_wrong_team(mock_logging, mem_rm_payload):
     rsp, code = webhook_handler.handle(mem_rm_payload)
     mock_facade.query\
         .assert_called_once_with(User, [('github_user_id', "21031067")])
-    mock_logging.error.assert_called_once_with("could not find user 21031067")
     assert rsp == "could not find user 21031067"
     assert code == 404
 
 
-@mock.patch('app.controller.webhook.github.events.membership.logging')
-def test_handle_mem_event_rm_mult_members(mock_logging, mem_rm_payload):
+def test_handle_mem_event_rm_mult_members(mem_rm_payload):
     """Test that multiple members with the same github name can be deleted."""
     mock_facade = mock.MagicMock(DBFacade)
     user1 = User("SLACKUSER1")
@@ -213,22 +199,14 @@ def test_handle_mem_event_rm_mult_members(mock_logging, mem_rm_payload):
     rsp, code = webhook_handler.handle(mem_rm_payload)
     mock_facade.query\
         .assert_called_once_with(User, [('github_user_id', "21031067")])
-    mock_logging.error.assert_called_once_with("Error: found github ID "
-                                               "connected to multiple"
-                                               " slack IDs")
     assert rsp == "Error: found github ID connected to multiple slack IDs"
     assert code == 412
 
 
-@mock.patch('app.controller.webhook.github.events.membership.logging')
-def test_handle_mem_event_empty_action(mock_logging, mem_empty_payload):
+def test_handle_mem_event_empty_action(mem_empty_payload):
     """Test that instances where there is no/invalid action are logged."""
     mock_facade = mock.MagicMock(DBFacade)
     webhook_handler = MembershipEventHandler(mock_facade)
     rsp, code = webhook_handler.handle(mem_empty_payload)
-    mock_logging.error.assert_called_once_with(("membership webhook "
-                                                "triggered, invalid "
-                                                "action specified: {}"
-                                                .format(mem_empty_payload)))
     assert rsp == "invalid membership webhook triggered"
     assert code == 405

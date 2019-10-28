@@ -11,8 +11,7 @@ from unittest import mock
 from utils.slack_msg_fmt import wrap_slack_code
 
 
-@mock.patch('app.controller.command.parser.logging')
-def test_handle_app_command(mock_logging):
+def test_handle_app_command():
     """Test the instance of handle_app_command being called inappropriately."""
     mock_facade = mock.MagicMock(DBFacade)
     mock_bot = mock.MagicMock(Bot)
@@ -21,7 +20,6 @@ def test_handle_app_command(mock_logging):
     parser = CommandParser(mock_facade, mock_bot, mock_gh, mock_token_config)
     parser.handle_app_command('hello world', 'U061F7AUR')
     expected_log_message = "app command triggered incorrectly"
-    mock_logging.error.assert_called_once_with(expected_log_message)
 
 
 @mock.patch('app.controller.command.parser.UserCommand')
