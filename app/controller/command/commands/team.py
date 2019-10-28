@@ -153,14 +153,23 @@ class TeamCommand(Command):
         """Return the description of this command."""
         return self.desc
 
-    def get_help(self) -> str:
-        """Return command options for team events."""
-        res = "\n*" + self.command_name + " commands:*```"
-        for argument in self.subparser.choices:
-            name = argument.capitalize()
-            res += "\n*" + name + "*\n"
-            res += self.subparser.choices[argument].format_help()
-        return res + "```"
+    def get_help(self, subcommand: str = None) -> str:
+        """Return command options for team events with Slack formatting."""
+        def get_subcommand_help(sc: str) -> str:
+            """Return the help message of a specific subcommand."""
+            message = f"\n*{sc.capitalize()}*\n"
+            message += self.subparser.choices[sc].format_help()
+            return message
+
+        if subcommand is None or subcommand not in self.subparser.choices:
+            res = f"\n*{self.command_name} commands:*```"
+            for argument in self.subparser.choices:
+                res += get_subcommand_help(argument)
+            return res + "```"
+        else:
+            res = "\n```"
+            res += get_subcommand_help(subcommand)
+            return res + "```"
 
     def handle(self,
                command: str,
@@ -173,7 +182,14 @@ class TeamCommand(Command):
         try:
             args = self.parser.parse_args(command_arg)
         except SystemExit:
-            return self.get_help(), 200
+            all_subcommands = list(self.subparser.choices.keys())
+            present_subcommands = [subcommand for subcommand in
+                                   all_subcommands
+                                   if subcommand in command_arg]
+            present_subcommand = None
+            if len(present_subcommands) == 1:
+                present_subcommand = present_subcommands[0]
+            return self.get_help(subcommand=present_subcommand), 200
 
         if args.which == "list":
             return self.list_helper()

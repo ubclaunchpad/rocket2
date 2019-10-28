@@ -24,7 +24,21 @@ class TestUserCommand(TestCase):
 
     def test_get_help(self):
         """Test user command get_help method."""
-        assert self.testcommand.get_help() == self.testcommand.help
+        subcommands = list(self.testcommand.subparser.choices.keys())
+        help_message = self.testcommand.get_help()
+        self.assertEqual(len(subcommands), help_message.count("usage"))
+
+    def test_get_subcommand_help(self):
+        """Test user command get_help method for specific subcommands."""
+        subcommands = list(self.testcommand.subparser.choices.keys())
+        for subcommand in subcommands:
+            help_message = self.testcommand.get_help(subcommand=subcommand)
+            self.assertEqual(1, help_message.count("usage"))
+
+    def test_get_invalid_subcommand_help(self):
+        """Test user command get_help method for invalid subcommands."""
+        self.assertEqual(self.testcommand.get_help(),
+                         self.testcommand.get_help(subcommand="foo"))
 
     def test_handle_nosubs(self):
         """Test user with no sub-parsers."""
@@ -34,12 +48,6 @@ class TestUserCommand(TestCase):
     def test_handle_bad_args(self):
         """Test user with invalid arguments."""
         self.assertEqual(self.testcommand.handle('user geese', "U0G9QF9C6"),
-                         (self.testcommand.help, 200))
-
-    def test_handle_bad_optional_args(self):
-        """Test user edit with invalid optional arguments."""
-        self.assertEqual(self.testcommand.handle('user edit --biology stuff',
-                                                 "U0G9QF9C6"),
                          (self.testcommand.help, 200))
 
     def test_handle_add(self):
@@ -316,3 +324,34 @@ class TestUserCommand(TestCase):
                          (UserCommand.lookup_error, 200))
         self.mock_facade.retrieve.assert_called_once_with(User, "U0G9QF9C6")
         self.mock_facade.store.assert_not_called()
+
+    def test_handle_command_help(self):
+        """Test user command help text."""
+        ret, code = self.testcommand.handle("user help", "U0G9QF9C6")
+        self.assertEqual(ret, self.testcommand.get_help())
+        self.assertEqual(code, 200)
+
+    def test_handle_multiple_subcommands(self):
+        """Test handling multiple observed subcommands."""
+        ret, code = self.testcommand.handle("user edit view", "U0G9QF9C6")
+        self.assertEqual(ret, self.testcommand.get_help())
+        self.assertEqual(code, 200)
+
+    def test_handle_subcommand_help(self):
+        """Test user subcommand help text."""
+        subcommands = list(self.testcommand.subparser.choices.keys())
+        for subcommand in subcommands:
+            command = f"user {subcommand} --help"
+            ret, code = self.testcommand.handle(command, "U0G9QF9C6")
+            self.assertEqual(1, ret.count("usage"))
+            self.assertEqual(code, 200)
+
+            command = f"user {subcommand} -h"
+            ret, code = self.testcommand.handle(command, "U0G9QF9C6")
+            self.assertEqual(1, ret.count("usage"))
+            self.assertEqual(code, 200)
+
+            command = f"user {subcommand} --invalid argument"
+            ret, code = self.testcommand.handle(command, "U0G9QF9C6")
+            self.assertEqual(1, ret.count("usage"))
+            self.assertEqual(code, 200)
