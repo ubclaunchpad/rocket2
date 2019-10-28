@@ -32,8 +32,7 @@ dictConfig({
         "colored": {
             'format': '{Time: %(asctime)s, '
                       'Level: [%(levelname)s], '
-                      'module: %(module)s, '
-                      'function: %(funcName)s():%(lineno)s, '
+                      'function: %(module)s.%(funcName)s():%(lineno)s, '
                       'message: %(message)s}',
             "()": structlog.stdlib.ProcessorFormatter,
             "processor": structlog.dev.ConsoleRenderer(colors=True),
