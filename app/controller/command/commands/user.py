@@ -6,7 +6,6 @@ from argparse import ArgumentParser, _SubParsersAction
 from app.controller import ResponseTuple
 from app.controller.command.commands.base import Command
 from db.facade import DBFacade
-from flask import jsonify
 from interface.github import GithubAPIException, GithubInterface
 from app.model import User, Permissions
 from typing import Dict, cast
@@ -236,7 +235,7 @@ class UserCommand(Command):
             # for the values of the dict ret, so we have to ignore this line
             # for now
             ret['text'] = msg  # type: ignore
-        return jsonify(ret), 200
+        return ret, 200
 
     def delete_helper(self,
                       user_id: str,
@@ -284,7 +283,7 @@ class UserCommand(Command):
             else:
                 user = self.facade.retrieve(User, slack_id)
 
-            return jsonify({'attachments': [user.get_attachment()]}), 200
+            return {'attachments': [user.get_attachment()]}, 200
         except LookupError:
             return self.lookup_error, 200
 
