@@ -30,13 +30,52 @@ class TestTeamCommand(TestCase):
 
     def test_get_help(self):
         """Test team command get_help method."""
-        print(f"\n{self.testcommand.get_help()}")
-        self.assertEqual(self.testcommand.get_help(), self.help_text)
+        subcommands = list(self.testcommand.subparser.choices.keys())
+        help_message = self.testcommand.get_help()
+        self.assertEqual(len(subcommands), help_message.count("usage"))
+
+    def test_get_subcommand_help(self):
+        """Test team command get_help method for specific subcommands."""
+        subcommands = list(self.testcommand.subparser.choices.keys())
+        for subcommand in subcommands:
+            help_message = self.testcommand.get_help(subcommand=subcommand)
+            self.assertEqual(1, help_message.count("usage"))
+
+    def test_get_invalid_subcommand_help(self):
+        """Test team command get_help method for invalid subcommands."""
+        self.assertEqual(self.testcommand.get_help(),
+                         self.testcommand.get_help(subcommand="foo"))
 
     def test_handle_help(self):
         """Test team command help parser."""
-        self.assertTupleEqual(self.testcommand.handle('team help', user),
-                              (self.help_text, 200))
+        ret, code = self.testcommand.handle("team help", user)
+        self.assertEqual(ret, self.testcommand.get_help())
+        self.assertEqual(code, 200)
+
+    def test_handle_multiple_subcommands(self):
+        """Test handling multiple observed subcommands."""
+        ret, code = self.testcommand.handle("team list edit", user)
+        self.assertEqual(ret, self.testcommand.get_help())
+        self.assertEqual(code, 200)
+
+    def test_handle_subcommand_help(self):
+        """Test team subcommand help text."""
+        subcommands = list(self.testcommand.subparser.choices.keys())
+        for subcommand in subcommands:
+            command = f"team {subcommand} --help"
+            ret, code = self.testcommand.handle(command, user)
+            self.assertEqual(1, ret.count("usage"))
+            self.assertEqual(code, 200)
+
+            command = f"team {subcommand} -h"
+            ret, code = self.testcommand.handle(command, user)
+            self.assertEqual(1, ret.count("usage"))
+            self.assertEqual(code, 200)
+
+            command = f"team {subcommand} --invalid argument"
+            ret, code = self.testcommand.handle(command, user)
+            self.assertEqual(1, ret.count("usage"))
+            self.assertEqual(code, 200)
 
     def test_handle_list(self):
         """Test team command list parser."""
