@@ -39,9 +39,10 @@ def escaped_id_to_id(s: str) -> str:
                   r"\1",
                   s)
 
+
 def ios_dash(s: str) -> str:
     """
-    Convert a string with a dash (—) to just double-hyphens (--) since iOS converts double-hyphens to dashes.
+    Convert a string with a dash (—) to just double-hyphens (--).
 
     Before::
 
@@ -52,7 +53,7 @@ def ios_dash(s: str) -> str:
         /rocket user edit --name "Steven Universe"
 
     :param s: string to convert
-    :return: string where all instances of dashes are replaced with double-hyphens
+    :return: string where all dashes are replaced with double-hyphens
     """
     return re.sub(r"[—]+",
                   r"--",
