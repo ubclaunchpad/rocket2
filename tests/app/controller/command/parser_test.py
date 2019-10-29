@@ -19,7 +19,6 @@ def test_handle_app_command():
     mock_token_config = TokenCommandConfig(datetime.utcnow(), '')
     parser = CommandParser(mock_facade, mock_bot, mock_gh, mock_token_config)
     parser.handle_app_command('hello world', 'U061F7AUR')
-    expected_log_message = "app command triggered incorrectly"
 
 
 @mock.patch('app.controller.command.parser.UserCommand')
