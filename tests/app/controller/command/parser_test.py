@@ -4,7 +4,7 @@ from app.controller.command.commands import UserCommand
 from app.controller.command.commands.token import TokenCommandConfig
 from datetime import datetime
 from db import DBFacade
-from flask import jsonify, json, Flask
+from flask import Flask
 from interface.slack import Bot
 from interface.github import GithubInterface
 from unittest import mock
@@ -18,7 +18,7 @@ def test_handle_app_command():
     mock_gh = mock.MagicMock(GithubInterface)
     mock_token_config = TokenCommandConfig(datetime.utcnow(), '')
     parser = CommandParser(mock_facade, mock_bot, mock_gh, mock_token_config)
-    parser.handle_app_command('hello world', 'U061F7AUR')
+    parser.handle_app_command('hello world', 'U061F7AUR', '')
 
 
 @mock.patch('app.controller.command.parser.UserCommand')
@@ -31,7 +31,7 @@ def test_handle_invalid_command(mock_usercommand):
     mock_usercommand.handle.side_effect = KeyError
     user = 'U061F7AUR'
     parser = CommandParser(mock_facade, mock_bot, mock_gh, mock_token_config)
-    parser.handle_app_command('fake command', user)
+    parser.handle_app_command('fake command', user, '')
 
 
 def test_handle_help():
@@ -45,31 +45,29 @@ def test_handle_help():
     mock_token_config = TokenCommandConfig(datetime.utcnow(), '')
     parser = CommandParser(mock_facade, mock_bot, mock_gh, mock_token_config)
     with app.app_context():
-        resp, code = parser.handle_app_command("help", "U061F7AUR")
-        expect = json.loads(
-            jsonify({"text": "Displaying all available commands. "
-                             "To read about a specific command, "
-                             f"use \n"
-                             f"{wrap_slack_code('/rocket [command] help')}"
-                             "\n"
-                             "For arguments containing spaces, "
-                             "please enclose them with quotations.\n",
-                     "mrkdwn": "true",
-                     "attachments": [
-                         {"text": "*user:* for dealing with users",
-                          "mrkdwn_in": ["text"]},
-                         {"text": "*team:* for dealing with teams",
-                          'mrkdwn_in': ['text']},
-                         {"text": "*token:* Generate a signed "
-                                  "token for use with the HTTP API",
-                          "mrkdwn_in": ["text"]},
-                         {"text": "*project:* for dealing with projects",
-                          "mrkdwn_in": ["text"]},
-                         {"text": "*karma:* for dealing with karma",
-                          'mrkdwn_in': ['text']},
-                         {"text": "*mention:* for dealing with mention",
-                          'mrkdwn_in': ["text"]}]}).data)
-        resp = json.loads(resp.data)
+        resp, code = parser.handle_app_command("help", "U061F7AUR", '')
+        expect = {"text": "Displaying all available commands. "
+                          "To read about a specific command, "
+                          f"use \n"
+                          f"{wrap_slack_code('/rocket [command] help')}"
+                          "\n"
+                          "For arguments containing spaces, "
+                          "please enclose them with quotations.\n",
+                  "mrkdwn": "true",
+                  "attachments": [
+                      {"text": "*user:* for dealing with users",
+                       "mrkdwn_in": ["text"]},
+                      {"text": "*team:* for dealing with teams",
+                       'mrkdwn_in': ['text']},
+                      {"text": "*token:* Generate a signed "
+                               "token for use with the HTTP API",
+                       "mrkdwn_in": ["text"]},
+                      {"text": "*project:* for dealing with projects",
+                       "mrkdwn_in": ["text"]},
+                      {"text": "*karma:* for dealing with karma",
+                       'mrkdwn_in': ['text']},
+                      {"text": "*mention:* for dealing with mention",
+                       'mrkdwn_in': ["text"]}]}
     assert resp == expect
 
 
@@ -81,7 +79,7 @@ def test_handle_user_command(mock_usercommand):
     mock_gh = mock.MagicMock(GithubInterface)
     mock_token_config = TokenCommandConfig(datetime.utcnow(), '')
     parser = CommandParser(mock_facade, mock_bot, mock_gh, mock_token_config)
-    parser.handle_app_command('user name', 'U061F7AUR')
+    parser.handle_app_command('user name', 'U061F7AUR', '')
     mock_usercommand. \
         return_value.handle. \
         assert_called_once_with("user name", "U061F7AUR")
@@ -95,7 +93,7 @@ def test_handle_mention_command(mock_mentioncommand):
     mock_gh = mock.MagicMock(GithubInterface)
     mock_token_config = TokenCommandConfig(datetime.utcnow(), '')
     parser = CommandParser(mock_facade, mock_bot, mock_gh, mock_token_config)
-    parser.handle_app_command('U061F7AUR ++', 'UFJ42EU67')
+    parser.handle_app_command('U061F7AUR ++', 'UFJ42EU67', '')
     mock_mentioncommand
     mock_mentioncommand. \
         return_value.handle. \

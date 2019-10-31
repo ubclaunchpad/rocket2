@@ -6,7 +6,6 @@ from argparse import ArgumentParser, _SubParsersAction
 from app.controller import ResponseTuple
 from app.controller.command.commands.base import Command
 from db.facade import DBFacade
-from flask import jsonify
 from app.model import Project, User, Team, Permissions
 from typing import Dict
 
@@ -225,7 +224,7 @@ class ProjectCommand(Command):
         try:
             project = self.facade.retrieve(Project, project_id)
 
-            return jsonify({'attachments': [project.get_attachment()]}), 200
+            return {'attachments': [project.get_attachment()]}, 200
         except LookupError as e:
             logging.error(str(e))
             return str(e), 200
@@ -277,7 +276,7 @@ class ProjectCommand(Command):
 
             self.facade.store(project)
 
-            return jsonify({'attachments': [project.get_attachment()]}), 200
+            return {'attachments': [project.get_attachment()]}, 200
         except LookupError as e:
             logging.error(str(e))
             return str(e), 200
@@ -336,7 +335,7 @@ class ProjectCommand(Command):
 
             self.facade.store(project)
 
-            return jsonify({'attachments': [project.get_attachment()]}), 200
+            return {'attachments': [project.get_attachment()]}, 200
         except LookupError as e:
             logging.error(str(e))
             return str(e), 200

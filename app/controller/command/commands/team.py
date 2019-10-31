@@ -10,7 +10,6 @@ from interface.slack import SlackAPIError
 from app.model import Team, User
 from utils.slack_parse import check_permissions
 from typing import Any, List
-from flask import jsonify
 
 
 class TeamCommand(Command):
@@ -259,7 +258,7 @@ class TeamCommand(Command):
             return "No Teams Exist!", 200
         attachment = [team.get_basic_attachment() for
                       team in teams]
-        return jsonify({'attachments': attachment}), 200
+        return {'attachments': attachment}, 200
 
     def view_helper(self, team_name) -> ResponseTuple:
         """
@@ -272,7 +271,7 @@ class TeamCommand(Command):
         teams = self.facade.query(Team, [('github_team_name', team_name)])
         if len(teams) != 1:
             return self.lookup_error, 200
-        return jsonify({'attachments': [teams[0].get_attachment()]}), 200
+        return {'attachments': [teams[0].get_attachment()]}, 200
 
     def create_helper(self, param_list, user_id) -> ResponseTuple:
         """
@@ -367,7 +366,7 @@ class TeamCommand(Command):
             self.facade.store(team)
             msg = "Added User to " + param_list['team_name']
             ret = {'attachments': [team.get_attachment()], 'text': msg}
-            return jsonify(ret), 200
+            return ret, 200
 
         except LookupError:
             return self.lookup_error, 200
@@ -412,7 +411,7 @@ class TeamCommand(Command):
             self.facade.store(team)
             msg = "Removed User from " + param_list['team_name']
             ret = {'attachments': [team.get_attachment()], 'text': msg}
-            return jsonify(ret), 200
+            return ret, 200
 
         except LookupError:
             return self.lookup_error, 200
@@ -451,7 +450,7 @@ class TeamCommand(Command):
                 team.platform = param_list['platform']
             self.facade.store(team)
             ret = {'attachments': [team.get_attachment()], 'text': msg}
-            return jsonify(ret), 200
+            return ret, 200
         except LookupError:
             return self.lookup_error, 200
 
@@ -496,7 +495,7 @@ class TeamCommand(Command):
                 msg = f"User added as team lead to" \
                       f" {param_list['team_name']}"
             ret = {'attachments': [team.get_attachment()], 'text': msg}
-            return jsonify(ret), 200
+            return ret, 200
         except LookupError:
             return self.lookup_error, 200
         except GithubAPIException as e:
@@ -595,4 +594,4 @@ class TeamCommand(Command):
             f"{num_added} added, " \
             f"{num_deleted} deleted. Wonderful."
         ret = {'attachments': modified, 'text': status}
-        return jsonify(ret), 200
+        return ret, 200

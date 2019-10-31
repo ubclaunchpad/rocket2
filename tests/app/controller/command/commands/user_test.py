@@ -1,7 +1,7 @@
 """Test user command parsing."""
 from app.controller.command.commands import UserCommand
 from db import DBFacade
-from flask import jsonify, json, Flask
+from flask import Flask
 from interface.github import GithubInterface, GithubAPIException
 from app.model import User, Permissions
 from unittest import mock, TestCase
@@ -95,8 +95,7 @@ class TestUserCommand(TestCase):
         with self.app.app_context():
             # jsonify requires translating the byte-string
             resp, code = self.testcommand.handle('user view', user_id)
-            expect = json.loads(jsonify({'attachments': user_attaches}).data)
-            resp = json.loads(resp.data)
+            expect = {'attachments': user_attaches}
             self.assertDictEqual(resp, expect)
             self.assertEqual(code, 200)
         self.mock_facade.retrieve.assert_called_once_with(User, "U0G9QF9C6")
@@ -111,8 +110,7 @@ class TestUserCommand(TestCase):
         with self.app.app_context():
             # jsonify requires translating the byte-string
             resp, code = self.testcommand.handle(command, user_id)
-            expect = json.loads(jsonify({'attachments': user_attaches}).data)
-            resp = json.loads(resp.data)
+            expect = {'attachments': user_attaches}
             self.assertDictEqual(resp, expect)
             self.assertEqual(code, 200)
         self.mock_facade.retrieve. \
@@ -176,8 +174,7 @@ class TestUserCommand(TestCase):
         with self.app.app_context():
             resp, code = self.testcommand.handle("user edit --name rob",
                                                  "U0G9QF9C6")
-            expect = json.loads(jsonify({'attachments': user_attaches}).data)
-            resp = json.loads(resp.data)
+            expect = {'attachments': user_attaches}
             self.assertDictEqual(resp, expect)
             self.assertEqual(code, 200)
         self.mock_facade.retrieve.assert_called_once_with(User, "U0G9QF9C6")
@@ -194,8 +191,7 @@ class TestUserCommand(TestCase):
         with self.app.app_context():
             resp, code = self.testcommand.handle("user edit --github rob",
                                                  "U0G9QF9C6")
-            expect = json.loads(jsonify({'attachments': user_attaches}).data)
-            resp = json.loads(resp.data)
+            expect = {'attachments': user_attaches}
             self.assertDictEqual(resp, expect)
             self.assertEqual(code, 200)
         self.mock_facade.retrieve.assert_called_once_with(User, "U0G9QF9C6")
@@ -217,8 +213,7 @@ class TestUserCommand(TestCase):
                 'text': '\nError adding user rob to GitHub organization'
             }
 
-            expect = json.loads(jsonify(expect).data)
-            resp = json.loads(resp.data)
+            expect = expect
 
             self.assertDictEqual(resp, expect)
             self.assertEqual(code, 200)
@@ -248,8 +243,7 @@ class TestUserCommand(TestCase):
                 " rob@.github.com --major 'Computer Science'"
                 " --bio 'Im a human'",
                 "U0G9QF9C6")
-            expect = json.loads(jsonify({'attachments': user_attaches}).data)
-            resp = json.loads(resp.data)
+            expect = {'attachments': user_attaches}
             self.assertDictEqual(resp, expect)
             self.assertEqual(code, 200)
         self.mock_facade.retrieve.assert_any_call(User, "U0G9QF9C6")
@@ -285,8 +279,7 @@ class TestUserCommand(TestCase):
                 "user edit --member arst "
                 "--permission admin",
                 "a1")
-            expect = json.loads(jsonify({'attachments': editee_attaches}).data)
-            resp = json.loads(resp.data)
+            expect = {'attachments': editee_attaches}
             self.assertDictEqual(resp, expect)
             self.assertEqual(code, 200)
 
@@ -302,8 +295,6 @@ class TestUserCommand(TestCase):
                 'attachments': editor_attaches,
                 'text': "\nCannot change own permission: user isn't admin."
             }
-            expect = json.loads(jsonify(expect).data)
-            resp = json.loads(resp.data)
             self.assertDictEqual(resp, expect)
             self.assertEqual(code, 200)
 

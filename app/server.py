@@ -13,6 +13,7 @@ from app.scheduler import Scheduler
 from interface.slack import Bot
 from slack import WebClient
 from boto3.session import Session
+from threading import Thread
 
 config = Config()
 boto3_session = Session(aws_access_key_id=config.aws_access_keyid,
@@ -100,7 +101,10 @@ def handle_commands():
         txt = request.form['text']
         uid = request.form['user_id']
         logging.info(f"@{uid}: {request.form['command']} {txt}")
-        return command_parser.handle_app_command(txt, uid)
+        response_url = request.form['response_url']
+        Thread(target=command_parser.handle_app_command,
+               args=(txt, uid, response_url)).start()
+        return "", 200
     else:
         logging.error("Slack signature could not be verified")
         return "Slack signature could not be verified", 200

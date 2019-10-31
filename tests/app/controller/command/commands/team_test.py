@@ -5,7 +5,7 @@ from app.model.team import Team
 from app.model.user import User
 from app.model.permissions import Permissions
 from interface.exceptions.github import GithubAPIException
-from flask import jsonify, json, Flask
+from flask import Flask
 
 user = 'U123456789'
 user2 = 'U234567891'
@@ -87,8 +87,7 @@ class TestTeamCommand(TestCase):
         attachment = [attach, attach2]
         with self.app.app_context():
             resp, code = self.testcommand.handle("team list", user)
-            expect = json.loads(jsonify({'attachments': attachment}).data)
-            resp = json.loads(resp.data)
+            expect = {'attachments': attachment}
             self.assertDictEqual(resp, expect)
             self.assertEqual(code, 200)
         self.db.query.assert_called_once_with(Team)
@@ -106,8 +105,7 @@ class TestTeamCommand(TestCase):
         self.db.query.return_value = [team]
         with self.app.app_context():
             resp, code = self.testcommand.handle("team view brs", user)
-            expect = json.loads(jsonify({'attachments': team_attach}).data)
-            resp = json.loads(resp.data)
+            expect = {'attachments': team_attach}
             self.assertDictEqual(resp, expect)
             self.assertEqual(code, 200)
 
@@ -246,9 +244,8 @@ class TestTeamCommand(TestCase):
         with self.app.app_context():
             resp, code = self.testcommand.handle("team add brs ID", user)
             team_attach = team.get_attachment()
-            expect = json.loads(jsonify({'attachments': [team_attach],
-                                         'text': 'Added User to brs'}).data)
-            resp = json.loads(resp.data)
+            expect = {'attachments': [team_attach],
+                      'text': 'Added User to brs'}
             self.assertDictEqual(resp, expect)
             self.assertEqual(code, 200)
         self.db.store.assert_called_with(team)
@@ -310,10 +307,8 @@ class TestTeamCommand(TestCase):
         with self.app.app_context():
             self.testcommand.handle("team add brs ID", user)
             resp, code = self.testcommand.handle("team remove brs ID", user)
-            expect = json.loads(jsonify({'attachments': team_attach,
-                                         'text': 'Removed '
-                                                 'User from brs'}).data)
-            resp = json.loads(resp.data)
+            expect = {'attachments': team_attach,
+                      'text': 'Removed ' 'User from brs'}
             self.assertDictEqual(resp, expect)
             self.assertEqual(code, 200)
         self.db.store.assert_called_with(team)
@@ -404,10 +399,8 @@ class TestTeamCommand(TestCase):
         team.discard_member("githubID")
         with self.app.app_context():
             resp, code = self.testcommand.handle("team lead brs ID", user)
-            expect = json.loads(jsonify({'attachments': team_attach,
-                                         'text': 'User added '
-                                                 'as team lead to brs'}).data)
-            resp = json.loads(resp.data)
+            expect = {'attachments': team_attach,
+                      'text': 'User added ' 'as team lead to brs'}
             self.assertDictEqual(resp, expect)
             self.assertEqual(code, 200)
             assert team.has_member("githubID")
@@ -416,10 +409,8 @@ class TestTeamCommand(TestCase):
             self.db.store.assert_called()
             resp, code = self.testcommand.handle("team lead  "
                                                  "--remove brs ID", user)
-            expect = json.loads(jsonify({'attachments': team_before_attach,
-                                         'text': 'User removed as team lead'
-                                                 ' from brs'}).data)
-            resp = json.loads(resp.data)
+            expect = {'attachments': team_before_attach,
+                      'text': 'User removed as team lead' ' from brs'}
             self.assertDictEqual(resp, expect)
             self.assertEqual(code, 200)
             assert not team.has_team_lead("githubID")
@@ -490,11 +481,10 @@ class TestTeamCommand(TestCase):
             resp, code = self.testcommand.handle("team edit brs "
                                                  "--name brS "
                                                  "--platform web", user)
-            expect = json.loads(jsonify({'attachments': team_attach,
-                                         'text': 'Team edited: brs, '
-                                                 'name: brS, '
-                                                 'platform: web'}).data)
-            resp = json.loads(resp.data)
+            expect = {'attachments': team_attach,
+                      'text': 'Team edited: brs, '
+                      'name: brS, '
+                      'platform: web'}
             self.assertDictEqual(resp, expect)
             self.assertEqual(code, 200)
             self.db.store.assert_called_once_with(team)
@@ -576,9 +566,7 @@ class TestTeamCommand(TestCase):
             f"0 deleted. Wonderful."
         with self.app.app_context():
             resp, code = self.testcommand.handle("team refresh", user)
-            expect = json.loads(jsonify({'attachments': [attach],
-                                         'text': status}).data)
-            resp = json.loads(resp.data)
+            expect = {'attachments': [attach], 'text': status}
             self.assertDictEqual(resp, expect)
             self.assertEqual(code, 200)
         self.db.query.assert_called_once_with(Team)
@@ -603,9 +591,7 @@ class TestTeamCommand(TestCase):
             f"1 deleted. Wonderful."
         with self.app.app_context():
             resp, code = self.testcommand.handle("team refresh", user)
-            expect = json.loads(jsonify({'attachments': [attach2, attach],
-                                         'text': status}).data)
-            resp = json.loads(resp.data)
+            expect = {'attachments': [attach2, attach], 'text': status}
             self.assertDictEqual(resp, expect)
             self.assertEqual(code, 200)
         self.db.query.assert_called_once_with(Team)
