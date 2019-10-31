@@ -12,7 +12,8 @@ def test_doing_it(bot, config, app):
     config.slack_notification_channel = ''
     config.slack_announcement_channel = ''
     bot.get_channels.return_value = [{'id': '123', 'name': 'general'},
-                                     {'id': '321', 'name': 'random'}]
+                                     {'id': '321', 'name': 'random', 'is_archived': True},
+                                     {'id': '456', 'name': 'bobheadxi', 'is_private': True}]
 
     promoter = RandomChannelPromoter(app, config)
     promoter.bot = bot
@@ -20,5 +21,4 @@ def test_doing_it(bot, config, app):
     promoter.do_it()
 
     bot.send_to_channel.assert_called()
-    assert 'general' in bot.send_to_channel.call_args[0][0] or\
-        'random' in bot.send_to_channel.call_args[0][0]
+    assert 'general' in bot.send_to_channel.call_args[0][0]

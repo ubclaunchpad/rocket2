@@ -32,7 +32,17 @@ class RandomChannelPromoter(ModuleBase):
     def do_it(self):
         """Select and post random channels to #general."""
         channels = self.bot.get_channels()
+
+        # Find an appropriate random channel
         rand_channel = choice(channels)
+        checked = 0
+        while rand_channel['is_archived'] or rand_channel['is_private']:
+            rand_channel = choice(channels)
+            checked += 1
+            if checked > len(channels):
+                logging.error('No non-archived or non-private channels found')
+                return
+
         channel_id, channel_name = rand_channel['id'], rand_channel['name']
         self.bot.send_to_channel(f'Featured channel of the week: ' +
                                  f'<#{channel_id}|{channel_name}>!',
