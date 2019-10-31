@@ -14,7 +14,6 @@ class Scheduler():
     def __init__(self,
                  scheduler: BackgroundScheduler,
                  args: Tuple[Flask, Config]):
-        """Initialize scheduler class."""
         self.scheduler = scheduler
         self.args = args
         self.modules: List[ModuleBase] = []
