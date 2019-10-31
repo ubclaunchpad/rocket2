@@ -221,28 +221,22 @@ def test_org_supported_action_list():
                                                      ]
 
 
-@mock.patch('app.controller.webhook.github.events.team.logging')
-def test_handle_team_event_created_team(mock_logging, team_created_payload):
+def test_handle_team_event_created_team(team_created_payload):
     """Test that teams can be created if they are not in the db."""
     mock_facade = mock.MagicMock(DBFacade)
     mock_facade.retrieve.side_effect = LookupError
     webhook_handler = TeamEventHandler(mock_facade)
     rsp, code = webhook_handler.handle(team_created_payload)
-    mock_logging.debug.assert_called_with(("team github with id 2723476 "
-                                           "added to organization."))
     mock_facade.store.assert_called_once()
     assert rsp == "created team with github id 2723476"
     assert code == 200
 
 
-@mock.patch('app.controller.webhook.github.events.team.logging')
-def test_handle_team_event_create_update(mock_logging, team_created_payload):
+def test_handle_team_event_create_update(team_created_payload):
     """Test that teams can be updated if they are in the db."""
     mock_facade = mock.MagicMock(DBFacade)
     webhook_handler = TeamEventHandler(mock_facade)
     rsp, code = webhook_handler.handle(team_created_payload)
-    mock_logging.warning.assert_called_with(("team github with id 2723476 "
-                                             "already exists."))
     mock_facade.store.assert_called_once()
     assert rsp == "created team with github id 2723476"
     assert code == 200

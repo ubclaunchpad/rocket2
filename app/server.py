@@ -33,8 +33,7 @@ dictConfig({
         "colored": {
             'format': '{Time: %(asctime)s, '
                       'Level: [%(levelname)s], '
-                      'module: %(module)s, '
-                      'function: %(funcName)s():%(lineno)s, '
+                      'function: %(module)s.%(funcName)s():%(lineno)s, '
                       'message: %(message)s}',
             "()": structlog.stdlib.ProcessorFormatter,
             "processor": structlog.dev.ConsoleRenderer(colors=True),
@@ -101,6 +100,7 @@ def handle_commands():
         logging.info("Slack signature verified")
         txt = request.form['text']
         uid = request.form['user_id']
+        logging.info(f"@{uid}: {request.form['command']} {txt}")
         response_url = request.form['response_url']
         Thread(target=command_parser.handle_app_command,
                args=(txt, uid, response_url)).start()
