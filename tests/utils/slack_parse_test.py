@@ -42,6 +42,8 @@ def test_ios_dash():
          '/rocket user edit --member U1234 --name "User"'),
         ('/rocket user edit —name "Steven Universe"',
          '/rocket user edit --name "Steven Universe"'),
+        ('/rocket user edit ——name "Steven Universe"',
+         '/rocket user edit ----name "Steven Universe"'),
         ('/rocket foo U1234 U4321 U3412 -h',
          '/rocket foo U1234 U4321 U3412 -h'),
         # Normal operation without iOS

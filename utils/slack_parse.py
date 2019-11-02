@@ -55,9 +55,7 @@ def ios_dash(s: str) -> str:
     :param s: string to convert
     :return: string where all dashes are replaced with double-hyphens
     """
-    return re.sub(r"[—]+",
-                  r"--",
-                  s)
+    return s.replace("—", "--")
 
 
 def check_permissions(user: User, team: Optional[Team]) -> bool:
