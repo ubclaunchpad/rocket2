@@ -1,6 +1,10 @@
-name: Pull request lint/test
+name: Python lint/test
 
-on: pull_request
+on:
+    push:
+        branches:
+            - master
+            - ec2-release
 
 jobs:
     build:

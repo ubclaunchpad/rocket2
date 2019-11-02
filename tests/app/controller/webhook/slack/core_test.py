@@ -5,8 +5,7 @@ from interface.slack import Bot, SlackAPIError
 from unittest import mock
 
 
-@mock.patch('app.controller.webhook.slack.core.logging')
-def test_handle_team_join_success(mock_logging):
+def test_handle_team_join_success():
     """Test that the join handler adds users to the db successfully."""
     mock_facade = mock.MagicMock(DBFacade)
     mock_bot = mock.MagicMock(Bot)
@@ -67,13 +66,9 @@ def test_handle_team_join_success(mock_logging):
     welcome = 'Welcome to UBC Launch Pad!'
     id = "W012A3CDE"
     mock_bot.send_dm.assert_called_once_with(welcome, id)
-    expected_log_message = ("W012A3CDE added to database - "
-                            "user notified")
-    mock_logging.info.assert_called_once_with(expected_log_message)
 
 
-@mock.patch('app.controller.webhook.slack.core.logging')
-def test_handle_team_join_slack_error(mock_logging):
+def test_handle_team_join_slack_error():
     """Test that the join handler handles Slack API errors."""
     mock_facade = mock.MagicMock(DBFacade)
     mock_bot = mock.MagicMock(Bot)
@@ -135,6 +130,3 @@ def test_handle_team_join_slack_error(mock_logging):
     welcome = 'Welcome to UBC Launch Pad!'
     id = "W012A3CDE"
     mock_bot.send_dm.assert_called_once_with(welcome, id)
-    expected_log_message = ("W012A3CDE added to database - "
-                            "user not notified")
-    mock_logging.error.assert_called_once_with(expected_log_message)
