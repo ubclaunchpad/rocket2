@@ -53,6 +53,7 @@ class CommandParser:
         # smart punctuation messing with argparse.
         cmd_txt = ''.join(map(util.regularize_char, cmd_txt))
         cmd_txt = util.escaped_id_to_id(cmd_txt)
+        cmd_txt = util.ios_dash(cmd_txt)
         s = cmd_txt.split(' ', 1)
         if s[0] == "help" or s[0] is None:
             logging.info("Help command was called")

@@ -40,6 +40,24 @@ def escaped_id_to_id(s: str) -> str:
                   s)
 
 
+def ios_dash(s: str) -> str:
+    """
+    Convert a string with a dash (—) to just double-hyphens (--).
+
+    Before::
+
+        /rocket user edit —name "Steven Universe"
+
+    After::
+
+        /rocket user edit --name "Steven Universe"
+
+    :param s: string to convert
+    :return: string where all dashes are replaced with double-hyphens
+    """
+    return s.replace("—", "--")
+
+
 def check_permissions(user: User, team: Optional[Team]) -> bool:
     """
     Check if given user is admin or team lead.
