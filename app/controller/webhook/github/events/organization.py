@@ -24,12 +24,14 @@ class OrganizationEventHandler(GitHubEventHandler):
 
         If the member is added or invited, do nothing.
         """
-        logging.info("organization webhook triggered")
         action = payload["action"]
         github_user = payload["membership"]["user"]
         github_id = github_user["id"]
         github_username = github_user["login"]
         organization = payload["organization"]["login"]
+        logging.info("Github Organization webhook triggered with"
+                     f"{{action: {action}, user: {github_username}, "
+                     f"user_id: {github_id}, organization: {organization}}}")
         member_list = self._facade. \
             query(User, [('github_user_id', github_id)])
         if action == "member_removed":

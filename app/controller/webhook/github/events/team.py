@@ -34,11 +34,13 @@ class TeamEventHandler(GitHubEventHandler):
 
         If the team is added or removed from a repository, do nothing for now.
         """
-        logging.info("team webhook triggered")
         action = payload["action"]
         github_team = payload["team"]
         github_id = str(github_team["id"])
         github_team_name = github_team["name"]
+        logging.info("Github Team webhook triggered with"
+                     f"{{action: {action}, team: {github_team_name}, "
+                     f"team_id: {github_id}}}")
         if action == "created":
             return self.team_created(github_id, github_team_name, payload)
         elif action == "deleted":

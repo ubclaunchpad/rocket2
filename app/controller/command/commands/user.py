@@ -144,7 +144,6 @@ class UserCommand(Command):
             return self.view_helper(user_id, args.slack_id)
 
         elif args.which == "add":
-            # XXX: Remove in production
             return self.add_helper(user_id, args.force)
 
         elif args.which == "delete":

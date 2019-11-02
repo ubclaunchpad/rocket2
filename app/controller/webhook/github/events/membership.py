@@ -25,6 +25,10 @@ class MembershipEventHandler(GitHubEventHandler):
         team = payload["team"]
         team_id = str(team["id"])
         team_name = team["name"]
+        logging.info("Github Membership webhook triggered with "
+                     f"{{action: {action}, user: {github_username}, "
+                     f"user_id: {github_id}, team: {team_name}, "
+                     f"team_id: {team_id}}}")
         selected_team = self._facade.retrieve(Team, team_id)
         if action == "removed":
             return self.mem_remove(github_id, selected_team, team_name)
@@ -32,8 +36,7 @@ class MembershipEventHandler(GitHubEventHandler):
             return self.mem_added(github_id, selected_team, team_name,
                                   github_username)
         else:
-            logging.error("membership webhook triggered,"
-                          f" invalid action specified: {str(payload)}")
+            logging.error(f"invalid action specified: {str(payload)}")
             return "invalid membership webhook triggered", 405
 
     def mem_remove(self,

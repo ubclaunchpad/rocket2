@@ -5,9 +5,8 @@ from app.controller.webhook.github import GitHubWebhookHandler
 
 
 @mock.patch('config.Config')
-@mock.patch('app.controller.webhook.github.core.logging')
 @mock.patch('app.controller.webhook.github.core.hmac.new')
-def test_verify_correct_hash(mock_hmac_new, mock_logging, config):
+def test_verify_correct_hash(mock_hmac_new, config):
     """Test that correct hash signatures can be properly verified."""
     config.github_webhook_secret = ''
     mock_facade = mock.MagicMock(DBFacade)
@@ -15,13 +14,11 @@ def test_verify_correct_hash(mock_hmac_new, mock_logging, config):
     test_signature = "signature"
     mock_hmac_new.return_value.hexdigest.return_value = test_signature
     assert webhook_handler.verify_hash(b'body', "sha1=" + test_signature)
-    mock_logging.debug.assert_called_once_with("Webhook signature verified")
 
 
 @mock.patch('config.Config')
-@mock.patch('app.controller.webhook.github.core.logging')
 @mock.patch('app.controller.webhook.github.core.hmac.new')
-def test_verify_incorrect_hash(mock_hmac_new, mock_logging, config):
+def test_verify_incorrect_hash(mock_hmac_new, config):
     """Test that incorrect hash signaures can be properly ignored."""
     config.github_webhook_secret = ''
     mock_facade = mock.MagicMock(DBFacade)
@@ -29,8 +26,6 @@ def test_verify_incorrect_hash(mock_hmac_new, mock_logging, config):
     test_signature = "signature"
     mock_hmac_new.return_value.hexdigest.return_value = test_signature
     assert not webhook_handler.verify_hash(b'body', "sha1=helloworld")
-    mock_logging.warning.assert_called_once_with(
-        "Webhook not from GitHub; signature: sha1=helloworld")
 
 
 @mock.patch('config.Config')
