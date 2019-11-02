@@ -34,6 +34,29 @@ def test_escaped_id_conversion():
         assert util.escaped_id_to_id(inp) == expect
 
 
+def test_ios_dash():
+    """Test how this function reacts to normal operation."""
+    CMDS = [
+        # Normal operation with iOS
+        ('/rocket user edit —member U1234 —name "User"',
+         '/rocket user edit --member U1234 --name "User"'),
+        ('/rocket user edit —name "Steven Universe"',
+         '/rocket user edit --name "Steven Universe"'),
+        ('/rocket foo U1234 U4321 U3412 -h',
+         '/rocket foo U1234 U4321 U3412 -h'),
+        # Normal operation without iOS
+        ('/rocket user edit --member U1234 --name "User"',
+         '/rocket user edit --member U1234 --name "User"'),
+        ('/rocket user edit --name "Steven Universe"',
+         '/rocket user edit --name "Steven Universe"'),
+        ('/rocket foo U1234 U4321 U3412 -h',
+         '/rocket foo U1234 U4321 U3412 -h')
+    ]
+
+    for inp, expect in CMDS:
+        assert util.ios_dash(inp) == expect
+
+
 def test_check_credentials_admin():
     """Test checking to see if user is admin."""
     user = User("USFAS689")
