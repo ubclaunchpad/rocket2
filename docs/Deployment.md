@@ -2,13 +2,25 @@
 
 ## Deployment Process
 
+The following should be read as more of a reference than a guide. To deploy Rocket 2, you must follow the steps as if you were building it for local use, except some tweaks in regards to where it goes and more tooling-specific details mentioned below.
+
+### Hosting
+
+Rocket 2 is currently hosted by an AWS EC2 t2.micro instance.
+
+Should you wish to set up your own Rocket 2 instance for deployment, you should first be able to set up a Rocket 2 instance for testing on an local computer with `ngrok` forwarding. If you have successfully set up an instance on a remote computer, you may still want to have a look.
+
+For those of you who don't want too much of a hassle, hosting via Heroku is also a valid option, as Heroku does continuous deployment without the need of setting up Inertia, and also has built-in SSL so you don't need to set anything up. Be wary, however, that Heroku is almost twice as expensive as an AWS EC2 t2.micro instance.
+
+Do note that you must set the environmental variables in the provided settings page if you are to host via Heroku. For details regarding how you would input the `GITHUB_KEY`, please see [below](#inertia).
+
 ### SSL
 
 Before deploying for the first time, you must set up SSL and configuration for
 Nginx, which we are using as a proxy server. This can be done by running the
-`setup_deploy.sh` script. This runs the official
+`scripts/setup_deploy.sh` script. This runs the official
 [Let's Encrypt](https://letsencrypt.org/) container to request SSL certificates,
-sets up a cronjob to periodically revalidate them, and copies
+sets up a cronjob to periodically re-validate them, and copies
 `nginx.conf` to the correct location. Do note that the Let's
 Encrypt container needs to use port 443, so if you have another process or
 container using that port, you will need to kill it before running the
@@ -16,10 +28,22 @@ set up script.
 
 ### Inertia
 
-For UBC Launch Pad, we continuously deploy off the master branch on Github
+For UBC Launch Pad, we continuously deploy off the `ec2-release` branch on Github
 using UBC Launch Pad's [Inertia](https://github.com/ubclaunchpad/inertia).
 This will pull the repo when changes are merged, rebuild the containers from
 `docker-compose.yml`, and redeploy.
+
+When deploying with Inertia, make sure that you are using a stable version of Inertia.
+
+Since we have changed from using `.toml` configuration files to using environmental variables for configuration, you must inject them using `inertia <some name> env set TESTING False` and the like. If you already have all your environmental variables set up in your `.env` file, you can send the entire file over with `inertia <some name> send .env`.
+
+#### GITHUB_KEY
+
+The `GITHUB_KEY` is merely the GPG private key used to sign Github API requests. We simply shove the entire file into a string and use it in the environmental variable. Do note that doing this on the command line is somewhat difficult because `inertia` would treat the dashes `--` in the string as flags and get confused. Another thing to watch out for is that the command line ignores the new lines in the string. The current working method of doing this is to pass in the entire string with a single quote (which means that every symbol is taken literally), then for every dash in the string, we add a forward slash `\` in front. We then replace all new lines with the literal `\n`.
+
+Our configuration code replaces these instances of `\-` and `\n` with actual dashes and new lines.
+
+Note that these replacements are not necessary on Heroku and you can simply copy and paste the contents of the key file directly into the box provided.
 
 ### Docker Compose
 
@@ -72,7 +96,7 @@ using only one kernel which makes it more lightweight.
 ### Code Coverage
 
 Code coverage measures the lines that were executed by the test suite.
-[CodeCov](https://docs.codecov.io/docs/about-code-coverage) is used in Rocket2.
+[CodeCov](https://docs.codecov.io/docs/about-code-coverage) is used in Rocket 2.
 
 Two common code coverages are Statement Coverage and Branch Coverage. Statement
 coverage counts the number of executable lines of code that has been tested,
