@@ -12,7 +12,7 @@ Should you wish to set up your own Rocket 2 instance for deployment, you should 
 
 For those of you who don't want too much of a hassle, hosting via Heroku is also a valid option, as Heroku does continuous deployment without the need of setting up Inertia, and also has built-in SSL so you don't need to set anything up. Be wary, however, that Heroku is almost twice as expensive as an AWS EC2 t2.micro instance.
 
-Do note that you must set the environmental variables in the provided settings page if you are to host via Heroku. For details regarding how you would input the `GITHUB_KEY`, please see [below](#inertia).
+Do note that you must set the environmental variables in the provided settings page if you are to host via Heroku. For details regarding how you would input the `GITHUB_KEY`, please see [below](#github-key).
 
 ### SSL
 
@@ -44,6 +44,8 @@ The `GITHUB_KEY` is merely the GPG private key used to sign Github API requests.
 Our configuration code replaces these instances of `\-` and `\n` with actual dashes and new lines.
 
 Note that these replacements are not necessary on Heroku and you can simply copy and paste the contents of the key file directly into the box provided.
+
+If you are using the `.env` file approach, you only need to replace the new lines and not the dashes.
 
 ### Docker Compose
 
