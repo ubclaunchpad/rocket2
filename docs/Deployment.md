@@ -66,7 +66,7 @@ localhost. This is already handled in `nginx.conf`.
 
 [Github Actions CI](https://github.com/features/actions) is a continuous
 integration service that is used to build and test software projects hosted on
-Github.  To configure Github CI, a file  `pythonpackage.yml` needs to be added
+Github. To configure Github CI, a file `pythonpackage.yml` needs to be added
 to `.github/workflows/`. This YAML file will contain the commands for
 the automated tests that needs to run.
 
@@ -92,19 +92,3 @@ and all the dependencies and the virtual environment installed.
 
 Docker is different than virtual machines because it can run multiple containers
 using only one kernel which makes it more lightweight.
-
-### Code Coverage
-
-Code coverage measures the lines that were executed by the test suite.
-[CodeCov](https://docs.codecov.io/docs/about-code-coverage) is used in Rocket 2.
-
-Two common code coverages are Statement Coverage and Branch Coverage. Statement
-coverage counts the number of executable lines of code that has been tested,
-whereas branch coverage requires all code blocks and execution paths to
-be completed tested. For example, in an `if` statement, both the `true` and
-`false` outcome should be covered. If only one path is covered, then it is a
-called a partial coverage.
-
-CodeCov coverage is computed using `hits/(sum of hit + partial + miss)` where
-`hit` is the statement coverage and `partial` is for partial branch coverage and
-`miss` is for not tested code.
