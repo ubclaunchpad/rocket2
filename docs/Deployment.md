@@ -9,10 +9,15 @@ mentioned below.
 
 ### Hosting
 
-Rocket 2 is currently hosted by an AWS EC2 t2.micro instance.
+Rocket 2 is currently hosted by an AWS EC2 t2.micro instance. Since this is a
+single-threaded application with a single worker thread, there is not much of a
+reason to go for anything more. **Note: Adding more worker threads may cause
+"minor" issues such as the scheduler running more than once, weird exceptions,
+and may prevent the server from running in some cases, which is why increasing
+the number of worker threads beyond 1 is not recommended.**
 
 Should you wish to set up your own Rocket 2 instance for deployment, you should
-first be able to set up a Rocket 2 instance for testing on an local computer
+first be able to set up a Rocket 2 instance for testing on a local computer
 with `ngrok` forwarding. If you have successfully set up an instance on a remote
 computer, you may still want to have a look.
 
