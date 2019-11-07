@@ -16,6 +16,8 @@ reason to go for anything more. **Note: Adding more worker threads may cause
 and may prevent the server from running in some cases, which is why increasing
 the number of worker threads beyond 1 is not recommended.**
 
+If need-be, Inertia can [help provision an instance for you][inert].
+
 Should you wish to set up your own Rocket 2 instance for deployment, you should
 first be able to set up a Rocket 2 instance for testing on a local computer
 with `ngrok` forwarding. If you have successfully set up an instance on a remote
@@ -30,6 +32,8 @@ instance.
 Do note that you must set the environmental variables in the provided settings
 page if you are to host via Heroku. For details regarding how you would input
 the `GITHUB_KEY`, please see [below](#github-key).
+
+[inert]: https://inertia.ubclaunchpad.com/#provisioning-a-remote
 
 ### SSL
 
