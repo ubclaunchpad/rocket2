@@ -9,37 +9,38 @@ With this guide, you can be talking to your locally-hosted Slack bot in no time!
 
 ## 1: Install ngrok
 
-Slack requires that all webhooks are passed through HTTPS. This is rather inconvenient
-if you just want to test while running on your local computer. Luckily, we have ngrok,
-a forwarding service that hosts a public HTTPS URL that passes to your local computer.
-Sign up for ngrok and download it [here][download-ngrok].
+Slack requires that all webhooks are passed through HTTPS. This is rather
+inconvenient if you just want to test while running on your local computer.
+Luckily, we have ngrok, a forwarding service that hosts a public HTTPS URL that
+passes to your local computer. Sign up for ngrok and download it
+[here][download-ngrok].
 
-After installing, run `ngrok http 5000` to create an ngrok URL that will be passed
-to your local port 5000. As long as you run Rocket on port 5000 (see below),
-you can then access it through the HTTPS URL that ngrok gives you. Note that it is
-very important to use the HTTPS URL, *not* the HTTP URL.
+After installing, run `ngrok http 5000` to create an ngrok URL that will be
+passed to your local port 5000. As long as you run Rocket on port 5000 (see
+below), you can then access it through the HTTPS URL that ngrok gives you. Note
+that it is very important to use the HTTPS URL, *not* the HTTP URL.
 
 ## 2: Create a Slack Workspace
 
 For testing, it's useful to have your own Slack workspace set up. If you do not
-already have one, go [here][create-workspace] to create one, and follow the steps
-to set it up.
+already have one, go [here][create-workspace] to create one, and follow the
+steps to set it up.
 
 ## 3: Create a Slack App
 
-Follow the link [here][make-slack-app] to create a new Slack app - you can name it
-whatever you like - and install it to the appropriate workspace.
+Follow the link [here][make-slack-app] to create a new Slack app - you can name
+it whatever you like - and install it to the appropriate workspace.
 
 ### 3.1: Add a Bot User
 
-In "Add features and functionality", add a bot user. Since this is just for testing,
-you can name the bot user whatever you like.
+In "Add features and functionality", add a bot user. Since this is just for
+testing, you can name the bot user whatever you like.
 
 ### 3.2: Install Slack App
 
 In "Install your app to your workspace," click the button to install to your
-workspace. This will take you to a permissions page for the workspace - make sure
-this is for the correct workspace, and allow the app to connect.
+workspace. This will take you to a permissions page for the workspace - make
+sure this is for the correct workspace, and allow the app to connect.
 
 ### 3.3: Determine Credentials
 
@@ -146,12 +147,13 @@ enabled in the Slack app once the local instance of Rocket is running.
 
 ### 7.1: Add Event Subscriptions
 
-In "Add features and functionality", add event subscriptions. In particular, under
-Request URL, submit the ngrok HTTPS URL with `/slack/events` appended to the end.
-Note that ngrok will generate a new HTTPS URL every time it runs, so you will have
-to repeat this step every time you launch ngrok. You will then have to enable
-workspace and/or bot events that we want Rocket to listen for, like the `team_join`
-workspace event - ask the team for the most up-to-date list of these.
+In "Add features and functionality", add event subscriptions. In particular,
+under Request URL, submit the ngrok HTTPS URL with `/slack/events` appended to
+the end. Note that ngrok will generate a new HTTPS URL every time it runs, so
+you will have to repeat this step every time you launch ngrok. You will then
+have to enable workspace and/or bot events that we want Rocket to listen for,
+like the `team_join` workspace event - ask the team for the most up-to-date list
+of these.
 
 ### 7.2: Add Slash Command
 
@@ -181,7 +183,8 @@ If you see a list of options, Rocket is working!
 We currently haven't finished the command to add a user to the database or
 make them an admin, so we have to do it manually.
 
-First, determine your Slack ID by reading the logs. The logs are formatted like so:
+First, determine your Slack ID by reading the logs. The logs are formatted like
+so:
 
 ```
 {slackid_making_the_command}:{command_itself}
