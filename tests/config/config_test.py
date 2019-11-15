@@ -66,5 +66,8 @@ def test_incomplete_config(incomplete_config):
     except MissingConfigError as e:
         missing_fields = ['SLACK_NOTIFICATION_CHANNEL', 'SLACK_SIGNING_SECRET',
                           'SLACK_API_TOKEN', 'SLACK_ANNOUNCEMENT_CHANNEL']
+        optional_fields = ['AWS_LOCAL']
         for field in missing_fields:
             assert field in e.error
+        for field in optional_fields:
+            assert field not in e.error

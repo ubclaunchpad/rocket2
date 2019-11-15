@@ -34,6 +34,10 @@ class Config:
         'AWS_REGION': 'aws_region',
         'AWS_LOCAL': 'aws_local',
     }
+    OPTIONALS = {
+        'TESTING': 'False',
+        'AWS_LOCAL': 'False',
+    }
 
     def __init__(self):
         """
@@ -50,7 +54,11 @@ class Config:
                 data = os.environ[var_name]
                 setattr(self, var, data)
             except KeyError:
-                missing_config_fields.append(var_name)
+                if var_name in self.OPTIONALS:
+                    data = self.OPTIONALS[var_name]
+                    setattr(self, var, data)
+                else:
+                    missing_config_fields.append(var_name)
 
         if missing_config_fields:
             raise MissingConfigError(missing_config_fields)
