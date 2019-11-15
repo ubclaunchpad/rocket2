@@ -16,11 +16,8 @@ from boto3.session import Session
 from threading import Thread
 
 config = Config()
-boto3_session = Session(aws_access_key_id=config.aws_access_keyid,
-                        aws_secret_access_key=config.aws_secret_key,
-                        region_name=config.aws_region)
 
-dictConfig({
+loggingConfig = {
     'version': 1,
     'disable_existing_loggers': False,
     'formatters': {
@@ -45,21 +42,29 @@ dictConfig({
             'stream': 'ext://flask.logging.wsgi_errors_stream',
             'formatter': 'colored'
         },
-        'watchtower': {
-            'level': 'DEBUG',
-            'class': 'watchtower.CloudWatchLogHandler',
-            'boto3_session': boto3_session,
-            'log_group': 'watchtower',
-            'stream_name': 'rocket2',
-            'formatter': 'aws',
-        },
     },
     'root': {
         'level': 'INFO',
         'propagate': True,
-        'handlers': ['wsgi', 'watchtower']
+        'handlers': ['wsgi']
     }
-})
+}
+
+if config.aws_local != 'True':
+    boto3_session = Session(aws_access_key_id=config.aws_access_keyid,
+                        aws_secret_access_key=config.aws_secret_key,
+                        region_name=config.aws_region)
+    loggingConfig['handlers']['watchtower'] = {
+        'level': 'DEBUG',
+        'class': 'watchtower.CloudWatchLogHandler',
+        'boto3_session': boto3_session,
+        'log_group': 'watchtower',
+        'stream_name': 'rocket2',
+        'formatter': 'aws',
+    }
+    loggingConfig['root']['handlers'].append('watchtower')
+
+dictConfig(loggingConfig)
 
 app = Flask(__name__)
 # HTTP security header middleware for Flask

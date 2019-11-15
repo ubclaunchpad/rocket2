@@ -64,6 +64,9 @@ creating the new user.
 Note: if you are in the `brussel-sprouts` Github team, you should already have
 AWS credentials. Just ask.
 
+Alternatively, just set up [DynamoDB locally][localdynamodb] (the Docker-based
+setup is probably the easiest) and set `AWS_LOCAL=True`.
+
 ## 5: Set Up Config
 
 Our repo already contains `sample-env`, the main environmental configuration
@@ -116,7 +119,10 @@ following two commands:
 
 ```bash
 docker build -t rocket2-dev-img .
-docker run --rm -it -p 0.0.0.0:5000:5000 rocket2-dev-img
+docker run --rm -it \
+  --env-file .env \
+  -p 0.0.0.0:5000:5000 \
+  rocket2-dev-img
 ```
 
 Note that the options passed to `-p` in `docker run` tell Docker what port
@@ -125,7 +131,8 @@ the first `5000` is the port exposed inside the container, and the second
 `5000` is the port exposed outside the container. The port exposed outside
 the container can be changed (for instance, if port 5000 is already
 in use in your local development environment), but in that case ensure that
-ngrok is running on the same port.
+ngrok is running on the same port. The option [`--env-file`][docker-env-file]
+lets you pass in your [configuration options][config].
 
 Also note that, for your convenience, we have provided two scripts,
 `scripts/docker_build.sh` and `scripts/docker_run_local.sh`, that run these
@@ -237,3 +244,5 @@ Remember to rebulid your Docker image every time you make a change!
 [make-slack-app]: https://api.slack.com/apps
 [download-ngrok]: https://ngrok.com/
 [github-token]: https://github.com/settings/tokens
+[docker-env-file]: https://docs.docker.com/engine/reference/commandline/run/#set-environment-variables--e---env---env-file
+[localdynamodb]: index.html#running-dynamodb-locally

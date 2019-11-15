@@ -71,3 +71,9 @@ The names of the various tables (leave these as they are).
 ## AWS\_REGION
 
 The region where the AWS instance is located (leave these as they are).
+
+## AWS\_LOCAL
+
+Point all AWS requests to `http://localhost:8000`. This behaviour can also be
+enabled by setting `TESTING`, but this property can be used to only enable the
+AWS behaviour.

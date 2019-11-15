@@ -32,6 +32,7 @@ class Config:
         'AWS_TEAMS_TABLE': 'aws_teams_tablename',
         'AWS_PROJECTS_TABLE': 'aws_projects_tablename',
         'AWS_REGION': 'aws_region',
+        'AWS_LOCAL': 'aws_local',
     }
 
     def __init__(self):
@@ -81,6 +82,7 @@ class Config:
         self.aws_teams_tablename = ''
         self.aws_projects_tablename = ''
         self.aws_region = ''
+        self.aws_local = ''
 
 
 class MissingConfigError(Exception):
