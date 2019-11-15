@@ -131,6 +131,7 @@ docker run --rm -it \
   --env-file .env \
   -p 0.0.0.0:5000:5000 \
   rocket2-dev-img
+# optionally include `--network="host"` for local dynamoDB
 ```
 
 Note that the options passed to `-p` in `docker run` tell Docker what port
