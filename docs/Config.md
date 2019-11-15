@@ -9,6 +9,7 @@ variables are strings**
 
 Denotes if we are in testing mode or not. In testing mode, we use a local
 DynamoDB instead of connecting to the server. Can either be `True` or `False`.
+Optional, and defaults to `False`.
 
 ## SLACK\_SIGNING\_SECRET
 
@@ -76,4 +77,4 @@ The region where the AWS instance is located (leave these as they are).
 
 Point all AWS requests to `http://localhost:8000`. This behaviour can also be
 enabled by setting `TESTING`, but this property can be used to only enable the
-AWS behaviour.
+AWS behaviour. Optional, and defaults to `False`.
