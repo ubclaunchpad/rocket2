@@ -20,6 +20,14 @@ passed to your local port 5000. As long as you run Rocket on port 5000 (see
 below), you can then access it through the HTTPS URL that ngrok gives you. Note
 that it is very important to use the HTTPS URL, *not* the HTTP URL.
 
+An alternative to `ngrok` is [`localtunnel`](https://github.com/localtunnel/localtunnel),
+which lets you use the same subdomain every time.
+
+```bash
+$ lt --port 5000 --subdomain my-amazing-rocket2
+your url is: https://my-amazing-rocket2.localtunnel.me
+```
+
 ## 2: Create a Slack Workspace
 
 For testing, it's useful to have your own Slack workspace set up. If you do not
