@@ -3,10 +3,10 @@ from db.facade import DBFacade
 from interface.github import GithubInterface
 from interface.slack import Bot
 
-from api.command.mixins import UserCommandApis
+from api.command.mixins import UserCommandApis, TeamCommandApis
 
 
-class CommandApis(UserCommandApis):
+class CommandApis(UserCommandApis, TeamCommandApis):
     """Encapsulate the various APIs of each command type."""
 
     def __init__(self,
