@@ -23,7 +23,8 @@ class TestBot(TestCase):
         self.bot.send_dm("Hahahaha", "UD8UCTN05")
         self.mock_sc.chat_postMessage.assert_called_with(
             text="Hahahaha",
-            channel="UD8UCTN05"
+            channel="UD8UCTN05",
+            as_user=True
         )
 
     def test_send_dm_failure(self):
@@ -37,7 +38,8 @@ class TestBot(TestCase):
         finally:
             self.mock_sc.chat_postMessage.assert_called_with(
                 text="Hahahaha",
-                channel="UD8UCTN05"
+                channel="UD8UCTN05",
+                as_user=True
             )
 
     def test_send_to_channel(self):
