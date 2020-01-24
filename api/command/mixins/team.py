@@ -1,11 +1,12 @@
 """Encapsulate the common business logic of team commands."""
 import logging
-from typing import cast, List
+from typing import List
 from app.model import User, Team
-from interface.github import GithubAPIException
-from interface.slack import SlackAPIError
+from interface.github import GithubAPIException, GithubInterface
+from interface.slack import SlackAPIError, Bot
 from utils.slack_parse import check_permissions
 import db.utils as db_utils
+from db.facade import DBFacade
 
 
 class TeamCommandApis:
@@ -13,9 +14,9 @@ class TeamCommandApis:
 
     def __init__(self):
         """Declare the interfaces needed."""
-        self._db_facade = None
-        self._gh_interface = None
-        self._slack_client = None
+        self._db_facade: DBFacade = None
+        self._gh_interface: GithubInterface = None
+        self._slack_client: Bot = None
 
     def team_list(self) -> List[Team]:
         """
@@ -27,7 +28,7 @@ class TeamCommandApis:
         logging.info("Team list command API called")
         teams = self._db_facade.query(Team)
         logging.info(f"{len(teams)} teams found")
-        return cast(List[Team], teams)
+        return teams
 
     def team_view(self, gh_team_name: str) -> Team:
         """
@@ -41,23 +42,7 @@ class TeamCommandApis:
         :return: ``Team`` object if found
         """
         logging.info("Team view command API called")
-        teams = self._db_facade.query(Team,
-                                      [('github_team_name', gh_team_name)])
-        num_teams = len(teams)
-
-        if num_teams < 1:
-            msg = f"No teams found with team name {gh_team_name}"
-            logging.error(msg)
-            raise LookupError(msg)
-        elif num_teams > 1:
-            msg = f"{num_teams} found with team name {gh_team_name}"
-            logging.error(msg)
-            raise RuntimeError(msg)
-        else:
-            team = teams[0]
-            logging.info(f"Team queried with team name {gh_team_name}:"
-                         f" {team.__str__()}")
-            return cast(Team, team)
+        return db_utils.get_team_by_name(self._db_facade, gh_team_name)
 
     def team_create(self,
                     caller_id: str,
@@ -169,7 +154,7 @@ class TeamCommandApis:
             logging.debug(f"Calling user with ID {command_user.github_id} set"
                           f" as tech lead of {gh_team_name}")
 
-        created = cast(bool, self._db_facade.store(team))
+        created = self._db_facade.store(team)
         if created:
             logging.info(f"Team succesfully created: {team.__str__()}")
         else:
@@ -216,7 +201,7 @@ class TeamCommandApis:
                                            team.github_team_id)
         team.add_member(add_user.github_id)
 
-        added = cast(bool, self._db_facade.store(team))
+        added = self._db_facade.store(team)
         if added:
             logging.info(f"Member successfully added: {team.__str__()}")
         else:
@@ -273,7 +258,7 @@ class TeamCommandApis:
         if team.has_team_lead(rem_user.github_id):
             team.discard_team_lead(rem_user.github_id)
 
-        removed = cast(bool, self._db_facade.store(team))
+        removed = self._db_facade.store(team)
         if removed:
             logging.info(f"Member successfully removed: {team.__str__()}")
         else:
@@ -323,7 +308,7 @@ class TeamCommandApis:
             logging.debug(f"Attaching platform {platform} to {gh_team_name}")
             team.platform = platform
 
-        edited = cast(bool, self._db_facade.store(team))
+        edited = self._db_facade.store(team)
         if edited:
             logging.info(f"Team successfully edited: {team.__str__()}")
         else:
@@ -374,7 +359,7 @@ class TeamCommandApis:
                 raise LookupError(msg)
             if team.has_team_lead(lead_user.github_id):
                 team.discard_team_lead(lead_user.github_id)
-                discarded = cast(bool, self._db_facade.store(team))
+                discarded = self._db_facade.store(team)
                 if discarded:
                     logging.info(f"User with Github ID {lead_user.github_id} "
                                  "removed as team lead of specified team")
@@ -393,7 +378,7 @@ class TeamCommandApis:
                 self._gh_interface.add_team_member(lead_user.github_username,
                                                    team.github_team_id)
             team.add_team_lead(lead_user.github_id)
-            added = cast(bool, self._db_facade.store(team))
+            added = self._db_facade.store(team)
             if added:
                 logging.info("Member successfully assigned as lead: "
                              f"{team.__str__()}")
@@ -481,7 +466,7 @@ class TeamCommandApis:
         for remote_id in remote_team_dict:
             remote_team = remote_team_dict[remote_id]
             if remote_id not in local_team_dict:
-                stored = cast(bool, self._db_facade.store(remote_team))
+                stored = self._db_facade.store(remote_team)
                 if stored:
                     logging.debug("Created new team with "
                                   f"Github ID {remote_id}")
