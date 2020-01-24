@@ -5,6 +5,7 @@ from app.model import User, Team
 from interface.github import GithubAPIException
 from interface.slack import SlackAPIError
 from utils.slack_parse import check_permissions
+import db.utils as db_utils
 
 
 class TeamCommandApis:
@@ -200,22 +201,7 @@ class TeamCommandApis:
         command_user = self._db_facade.retrieve(User, caller_id)
         logging.debug(f"Calling user: {command_user.__str__()}")
 
-        teams = self._db_facade.query(Team,
-                                      [('github_team_name', gh_team_name)])
-        num_teams = len(teams)
-
-        if num_teams < 1:
-            msg = f"No teams found with team name {gh_team_name}"
-            logging.error(msg)
-            raise LookupError(msg)
-        elif num_teams > 1:
-            msg = f"{num_teams} found with team name {gh_team_name}"
-            logging.error(msg)
-            raise RuntimeError(msg)
-        else:
-            team = teams[0]
-            logging.info(f"Team queried with team name {gh_team_name}:"
-                         f" {team.__str__()}")
+        team = db_utils.get_team_by_name(self._db_facade, gh_team_name)
 
         if not check_permissions(command_user, team):
             msg = f"User with ID {caller_id} has insufficient permissions" \
@@ -264,22 +250,7 @@ class TeamCommandApis:
         command_user = self._db_facade.retrieve(User, caller_id)
         logging.debug(f"Calling user: {command_user.__str__()}")
 
-        teams = self._db_facade.query(Team,
-                                      [('github_team_name', gh_team_name)])
-        num_teams = len(teams)
-
-        if num_teams < 1:
-            msg = f"No teams found with team name {gh_team_name}"
-            logging.error(msg)
-            raise LookupError(msg)
-        elif num_teams > 1:
-            msg = f"{num_teams} found with team name {gh_team_name}"
-            logging.error(msg)
-            raise RuntimeError(msg)
-        else:
-            team = teams[0]
-            logging.info(f"Team queried with team name {gh_team_name}:"
-                         f" {team.__str__()}")
+        team = db_utils.get_team_by_name(self._db_facade, gh_team_name)
 
         if not check_permissions(command_user, team):
             msg = f"User with ID {caller_id} has insufficient permissions" \
@@ -335,22 +306,7 @@ class TeamCommandApis:
         command_user = self._db_facade.retrieve(User, caller_id)
         logging.debug(f"Calling user: {command_user.__str__()}")
 
-        teams = self._db_facade.query(Team,
-                                      [('github_team_name', gh_team_name)])
-        num_teams = len(teams)
-
-        if num_teams < 1:
-            msg = f"No teams found with team name {gh_team_name}"
-            logging.error(msg)
-            raise LookupError(msg)
-        elif num_teams > 1:
-            msg = f"{num_teams} found with team name {gh_team_name}"
-            logging.error(msg)
-            raise RuntimeError(msg)
-        else:
-            team = teams[0]
-            logging.info(f"Team queried with team name {gh_team_name}:"
-                         f" {team.__str__()}")
+        team = db_utils.get_team_by_name(self._db_facade, gh_team_name)
 
         if not check_permissions(command_user, team):
             msg = f"User with ID {caller_id} has insufficient permissions" \
@@ -399,22 +355,7 @@ class TeamCommandApis:
         command_user = self._db_facade.retrieve(User, caller_id)
         logging.debug(f"Calling user: {command_user.__str__()}")
 
-        teams = self._db_facade.query(Team,
-                                      [('github_team_name', gh_team_name)])
-        num_teams = len(teams)
-
-        if num_teams < 1:
-            msg = f"No teams found with team name {gh_team_name}"
-            logging.error(msg)
-            raise LookupError(msg)
-        elif num_teams > 1:
-            msg = f"{num_teams} found with team name {gh_team_name}"
-            logging.error(msg)
-            raise RuntimeError(msg)
-        else:
-            team = teams[0]
-            logging.info(f"Team queried with team name {gh_team_name}:"
-                         f" {team.__str__()}")
+        team = db_utils.get_team_by_name(self._db_facade, gh_team_name)
 
         if not check_permissions(command_user, team):
             msg = f"User with ID {caller_id} has insufficient permissions" \
@@ -479,22 +420,7 @@ class TeamCommandApis:
         command_user = self._db_facade.retrieve(User, caller_id)
         logging.debug(f"Calling user: {command_user.__str__()}")
 
-        teams = self._db_facade.query(Team,
-                                      [('github_team_name', gh_team_name)])
-        num_teams = len(teams)
-
-        if num_teams < 1:
-            msg = f"No teams found with team name {gh_team_name}"
-            logging.error(msg)
-            raise LookupError(msg)
-        elif num_teams > 1:
-            msg = f"{num_teams} found with team name {gh_team_name}"
-            logging.error(msg)
-            raise RuntimeError(msg)
-        else:
-            team = teams[0]
-            logging.info(f"Team queried with team name {gh_team_name}:"
-                         f" {team.__str__()}")
+        team = db_utils.get_team_by_name(self._db_facade, gh_team_name)
 
         if not check_permissions(command_user, team):
             msg = f"User with ID {caller_id} has insufficient permissions" \
