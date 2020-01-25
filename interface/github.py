@@ -66,7 +66,7 @@ class GithubInterface:
 
     def __init__(self,
                  github_factory: DefaultGithubFactory,
-                 org: str) -> None:
+                 org: str):
         """Initialize bot by creating Github object and get organization."""
         logging.info("Creating rocket's Github interface")
         self.org_name = org
@@ -93,13 +93,13 @@ class GithubInterface:
         return str(user.id)
 
     @handle_github_error
-    def org_add_admin(self, username: str) -> None:
+    def org_add_admin(self, username: str):
         """Add member with given username as admin to organization."""
         user = self.github.get_user(username)
         self.org.add_to_members(user, "admin")
 
     @handle_github_error
-    def org_remove_member(self, username: str) -> None:
+    def org_remove_member(self, username: str):
         """Remove member with given username from organization."""
         user = self.github.get_user(username)
         self.org.remove_from_membership(user)
@@ -127,7 +127,7 @@ class GithubInterface:
         return cast(int, team.id)
 
     @handle_github_error
-    def org_delete_team(self, id: int) -> None:
+    def org_delete_team(self, id: int):
         """Get team with given ID and delete it from organization."""
         team = self.org_get_team(id)
         team.delete()
@@ -136,7 +136,7 @@ class GithubInterface:
     def org_edit_team(self,
                       key: int,
                       name: str,
-                      description: str = None) -> None:
+                      description: str = None):
         """
         Get team with given ID and edit name and description.
 
@@ -172,7 +172,7 @@ class GithubInterface:
     def list_team_members(self, team_id: str) -> List[NamedUser]:
         """Return a list of users in the team of id team_id."""
         team = self.org.get_team(int(team_id))
-        return cast(List[NamedUser], list(team.get_members()))
+        return list(team.get_members())
 
     @handle_github_error
     def get_team_member(self, username: str, team_id: str) -> NamedUser:
@@ -180,15 +180,14 @@ class GithubInterface:
         try:
             team = self.org.get_team(int(team_id))
             team_members = team.get_members()
-            return next(
-                member for member in team_members
-                if member.name == username)
+            return next(member for member in team_members
+                        if member.name == username)
         except StopIteration:
             raise GithubAPIException(
                 f"User \"{username}\" does not exist in team \"{team_id}\"!")
 
     @handle_github_error
-    def add_team_member(self, username: str, team_id: str) -> None:
+    def add_team_member(self, username: str, team_id: str):
         """Add user with given username to team with id team_id."""
         team = self.org.get_team(int(team_id))
         new_member = self.github.get_user(username)
@@ -202,7 +201,7 @@ class GithubInterface:
         return cast(bool, team.has_in_members(member))
 
     @handle_github_error
-    def remove_team_member(self, username: str, team_id: str) -> None:
+    def remove_team_member(self, username: str, team_id: str):
         """Remove user with given username from team with id team_id."""
         team = self.org.get_team(int(team_id))
         to_be_removed_member = self.github.get_user(username)

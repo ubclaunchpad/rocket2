@@ -24,7 +24,7 @@ class UserCommand(Command):
 
     def __init__(self,
                  db_facade: DBFacade,
-                 github_interface: GithubInterface) -> None:
+                 github_interface: GithubInterface):
         """Initialize user command."""
         logging.info("Initializing UserCommand instance")
         self.parser = ArgumentParser(prog="/rocket")

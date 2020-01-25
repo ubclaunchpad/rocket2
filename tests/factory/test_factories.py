@@ -4,7 +4,7 @@ import pytest
 from factory import make_command_parser, CommandParser, \
     make_github_webhook_handler, GitHubWebhookHandler, \
     make_slack_events_handler, SlackEventsHandler
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 from config import Config
 
 
@@ -24,9 +24,10 @@ def test_config():
 
 
 @pytest.mark.db
-def test_make_command_parser(test_config):
+@patch('interface.github.GithubInterface')
+def test_make_command_parser(gi, test_config):
     """Test the make_command_parser function."""
-    parser = make_command_parser(test_config)
+    parser = make_command_parser(test_config, gi)
     assert isinstance(parser, CommandParser)
 
 

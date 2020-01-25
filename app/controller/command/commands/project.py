@@ -20,7 +20,7 @@ class ProjectCommand(Command):
     desc = f"for dealing with {command_name}s"
 
     def __init__(self,
-                 db_facade: DBFacade) -> None:
+                 db_facade: DBFacade):
         """Initialize project command."""
         logging.info("Initializing ProjectCommand instance")
         self.parser = ArgumentParser(prog="/rocket")

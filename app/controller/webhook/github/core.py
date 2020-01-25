@@ -13,7 +13,7 @@ from app.controller.webhook.github.events import MembershipEventHandler, \
 class GitHubWebhookHandler:
     """Encapsulate the handlers for all GitHub webhook events."""
 
-    def __init__(self, db_facade: DBFacade, config: Config) -> None:
+    def __init__(self, db_facade: DBFacade, config: Config):
         """Give handlers access to the database."""
         self.__secret = config.github_webhook_secret
         self.__event_handlers = [

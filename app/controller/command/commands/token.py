@@ -23,7 +23,7 @@ class TokenCommand(Command):
 
     def __init__(self,
                  db_facade: DBFacade,
-                 config: 'TokenCommandConfig') -> None:
+                 config: 'TokenCommandConfig'):
         """
         Initialize TokenCommand.
 
@@ -67,7 +67,7 @@ class TokenCommandConfig:
 
     def __init__(self,
                  expiry: timedelta,
-                 signing_key: str) -> None:
+                 signing_key: str):
         """Initialize config for TokenCommand."""
         self.expiry = expiry
         self.signing_key = signing_key

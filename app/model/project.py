@@ -11,7 +11,7 @@ class Project(RocketModel):
 
     def __init__(self,
                  github_team_id: str,
-                 github_urls: List[str]) -> None:
+                 github_urls: List[str]):
         """
         Initialize the team project.
 

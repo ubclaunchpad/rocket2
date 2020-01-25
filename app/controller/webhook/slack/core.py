@@ -11,12 +11,12 @@ class SlackEventsHandler:
 
     def __init__(self,
                  db_facade: DBFacade,
-                 bot: Bot) -> None:
+                 bot: Bot):
         """Initialize all the required interfaces."""
         self.__facade = db_facade
         self.__bot = bot
 
-    def handle_team_join(self, event_data: Dict[str, Any]) -> None:
+    def handle_team_join(self, event_data: Dict[str, Any]):
         """
         Handle the event of a new user joining the workspace.
 

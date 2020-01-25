@@ -26,21 +26,19 @@ def make_command_parser(config: Config,
     :return: a new ``CommandParser`` object, freshly initialized
     """
     slack_api_token, slack_notification_channel = "", ""
-    signing_key = ""
+    slack_api_token = config.slack_api_token
+    github_auth_key = config.github_key
+    github_app_id = config.github_app_id
+    github_organization = config.github_org_name
+    slack_notification_channel = config.slack_notification_channel
     if not config.testing:
-        slack_api_token = config.slack_api_token
-        github_auth_key = config.github_key
-        github_app_id = config.github_app_id
-        github_organization = config.github_org_name
-        slack_notification_channel = config.slack_notification_channel
         gh = GithubInterface(DefaultGithubFactory(github_app_id,
                                                   github_auth_key),
                              github_organization)
-        signing_key = config.github_key
     facade = DBFacade(DynamoDB(config))
     bot = Bot(WebClient(slack_api_token), slack_notification_channel)
     # TODO: make token config expiry configurable
-    token_config = TokenCommandConfig(timedelta(days=7), signing_key)
+    token_config = TokenCommandConfig(timedelta(days=7), config.github_key)
     return CommandParser(facade, bot, cast(GithubInterface, gh), token_config)
 
 
