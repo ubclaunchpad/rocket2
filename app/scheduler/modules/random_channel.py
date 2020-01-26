@@ -31,7 +31,8 @@ class RandomChannelPromoter(ModuleBase):
 
     def do_it(self):
         """Select and post random channels to #general."""
-        channels = self.bot.get_channels()
+        channels = list(filter(lambda c: not c['is_archived'],
+                               self.bot.get_channels()))
         rand_channel = choice(channels)
         channel_id, channel_name = rand_channel['id'], rand_channel['name']
         self.bot.send_to_channel(f'Featured channel of the week: ' +

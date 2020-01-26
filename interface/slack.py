@@ -18,7 +18,8 @@ class Bot:
         logging.debug(f"Sending direct message to {slack_user_id}")
         response = self.sc.chat_postMessage(
             channel=slack_user_id,
-            text=message
+            text=message,
+            as_user=True
         )
         if not response['ok']:
             logging.error(f"Direct message to {slack_user_id} failed with "
