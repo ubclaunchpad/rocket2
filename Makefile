@@ -15,7 +15,6 @@ help:
 
 lint:
 	pipenv run pycodestyle .
-	pipenv run pycodestyle .
 	pipenv run flake8 .
 	pipenv run pydocstyle .
 	pipenv run mypy .
