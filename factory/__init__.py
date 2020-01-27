@@ -27,13 +27,12 @@ def make_command_parser(config: Config,
     """
     slack_api_token, slack_notification_channel = "", ""
     slack_api_token = config.slack_api_token
-    github_auth_key = config.github_key
     github_app_id = config.github_app_id
     github_organization = config.github_org_name
     slack_notification_channel = config.slack_notification_channel
     if not config.testing:
         gh = GithubInterface(DefaultGithubFactory(github_app_id,
-                                                  github_auth_key),
+                                                  config.github_key),
                              github_organization)
     facade = DBFacade(DynamoDB(config))
     bot = Bot(WebClient(slack_api_token), slack_notification_channel)
