@@ -457,8 +457,7 @@ class TeamCommandApis:
         # remove teams not in github anymore
         for local_id in local_team_dict:
             if local_id not in remote_team_dict:
-                # XXX: Should this be a local delete instead of a Github?
-                self._gh_interface.org_delete_team(local_id)
+                self._db_facade.delete(Team, local_id)
                 logging.debug(f"Team with Github ID {local_id} deleted")
                 num_deleted += 1
 

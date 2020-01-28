@@ -762,8 +762,8 @@ class TestTeamCommandApis(TestCase):
         ]
         refreshed = self.testapi.team_refresh("admin")
         self.assertTrue(refreshed)
-        self.mock_github.org_delete_team.assert_called_once_with(
-            self.team1.github_team_id)
+        self.mock_facade.delete.assert_called_once_with(
+            Team, self.team1.github_team_id)
 
     def test_refresh_github_added_failed_store(self) -> None:
         """Test refresh team command API unable to store new Github teams."""
