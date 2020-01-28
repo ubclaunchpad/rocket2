@@ -62,6 +62,9 @@ existing permissions directly" and add the following policies:
 - `AmazonDynamoDBFullAccess`
 - `CloudWatchLogsFullAccess`
 
+As you may have noticed, we not only want to use DynamoDB, but also CloudWatch.
+We send our logs to CloudWatch for easier storage and querying.
+
 Finally, copy the provided access key ID and secret access key after creating
 the new user.
 
