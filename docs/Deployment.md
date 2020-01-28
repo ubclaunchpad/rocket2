@@ -35,14 +35,6 @@ the `GITHUB_KEY`, please see [below](#github-key).
 
 [inert]: https://inertia.ubclaunchpad.com/#provisioning-a-remote
 
-#### Viewing logs
-
-Rocket 2 logs directly to standard output/error. Since it is closely tied to
-AWS, we also log to CloudWatch so that maintainers can easily query logs. This
-is done automatically using `watchtower`. Do note that nothing needs to be set
-up for `watchtower` to work - it works on its own, given that your AWS
-credentials are set up correctly.
-
 ### SSL
 
 Before deploying for the first time, you must set up SSL and configuration for

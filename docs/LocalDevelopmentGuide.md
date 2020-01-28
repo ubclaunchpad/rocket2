@@ -55,11 +55,15 @@ Rocket makes use of AWS DynamoDB as its database, and for testing you will want
 to test on the "real" DynamoDB. If you do not already have access to DynamoDB,
 you can use it as part of the free tier of AWS. Create an AWS account for
 yourself, then go to the IAM service and create a new user. The user name
-doesn't particularly matter (though `rocket2-dev-$NAME` is recommended),
-but make sure you check "programmatic access." In permissions, go to
-"Attach existing permissions directly" and add the `AmazonDynamoDBFullAccess`
-policy. Finally, copy the provided access key ID and secret access key after
-creating the new user.
+doesn't particularly matter (though `rocket2-dev-$NAME` is recommended), but
+make sure you check "programmatic access." In permissions, go to "Attach
+existing permissions directly" and add the following policies:
+
+- `AmazonDynamoDBFullAccess`
+- `CloudWatchLogsFullAccess`
+
+Finally, copy the provided access key ID and secret access key after creating
+the new user.
 
 Note: if you are in the `brussel-sprouts` Github team, you should already have
 AWS credentials. Just ask.
