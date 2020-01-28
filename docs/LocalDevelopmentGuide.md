@@ -96,9 +96,8 @@ Github API should be automated, once the signing key is available.
 
 After doing this, remember to put your ngrok HTTPS URL with `/webhook` appended
 at the end, into the "Webhook URL" box. After doing this, you must go to the
-app's "Permissions & Events" tab and set the following as read-only:
+app's "Permissions & Events" tab and set the following as Read & Write:
 
-- Organization hooks
 - Organization members
 
 After doing so, please check the checkboxes below:
