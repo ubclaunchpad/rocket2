@@ -242,8 +242,6 @@ class TestTeamCommandApis(TestCase):
             "lead", "team_name", channel="channel")
         self.assertTrue(created)
         stored_team = Team("team_gh_id", "team_name", "")
-        # XXX: See concern on line 160 and 190 in team.py
-        # stored_team.add_member(self.lead_user.github_id)
         stored_team.add_member(self.regular_user.github_id)
         stored_team.add_team_lead(self.lead_user.github_id)
         self.mock_github.add_team_member.assert_called_with(
@@ -265,7 +263,7 @@ class TestTeamCommandApis(TestCase):
         self.mock_github.has_team_member.side_effect = GithubAPIException("")
         try:
             self.testapi.team_create(
-                "lead", "team_name", lead_id="regular")
+                "admin", "team_name", lead_id="lead")
         except GithubAPIException:
             pass
         else:
@@ -276,27 +274,39 @@ class TestTeamCommandApis(TestCase):
         self.mock_github.org_create_team.return_value = "team_gh_id"
         self.mock_github.has_team_member.return_value = False
         self.testapi.team_create(
-            "lead", "team_name", lead_id="regular")
+            "admin", "team_name", lead_id="lead")
         self.mock_github.add_team_member.assert_called_with(
-            self.regular_user.github_username, "team_gh_id")
+            self.lead_user.github_username, "team_gh_id")
 
     def test_create_with_lead_in_gh_team(self) -> None:
         """Test create team command API with lead in Github team."""
         self.mock_github.org_create_team.return_value = "team_gh_id"
         self.mock_github.has_team_member.return_value = True
         self.testapi.team_create(
-            "lead", "team_name", lead_id="regular")
+            "admin", "team_name", lead_id="lead")
         self.assertEqual(self.mock_github.add_team_member.call_count, 1)
+
+    def test_create_with_non_lead_lead(self) -> None:
+        """Test create team command API with non-lead lead."""
+        self.mock_github.org_create_team.return_value = "team_gh_id"
+        try:
+            self.testapi.team_create("admin",
+                                     "team_name",
+                                     lead_id="regular")
+        except PermissionError:
+            pass
+        else:
+            self.assertTrue(False)
 
     def test_create_with_lead(self) -> None:
         """Test create team command API with lead."""
         self.mock_github.org_create_team.return_value = "team_gh_id"
         created = self.testapi.team_create(
-            "lead", "team_name", lead_id="regular")
+            "admin", "team_name", lead_id="lead")
         self.assertTrue(created)
         stored_team = Team("team_gh_id", "team_name", "")
-        stored_team.add_member(self.lead_user.github_id)
-        stored_team.add_team_lead(self.regular_user.github_id)
+        stored_team.add_member(self.admin_user.github_id)
+        stored_team.add_team_lead(self.lead_user.github_id)
         self.mock_facade.store.assert_called_once_with(stored_team)
 
     def test_create_store_fail(self) -> None:

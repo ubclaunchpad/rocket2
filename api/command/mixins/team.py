@@ -68,7 +68,8 @@ class TeamCommandApis:
         :raises: LookupError if the calling user or tech lead cannot be found
                  in the database
         :raises: PermissionError if the calling user has insufficient
-                 permissions to create a team
+                 permissions to create a team, or if the specified user with
+                 lead_id does not have the permission to be a lead
         :raises: SlackAPIError if a channel name is provided by an error
                  is encountered retrieving the members of that channel
         :raises: GithubAPIException if an error occurs on team creation or
@@ -133,22 +134,26 @@ class TeamCommandApis:
                           f"added to {gh_team_name}")
 
         if lead_id is not None:
-            # XXX: Should check be done to ensure user has lead status?
             lead = self._db_facade.retrieve(User, lead_id)
 
-            lead_in_team = self._gh_interface.has_team_member(
-                lead.github_username,
-                gh_team_id)
-            if not lead_in_team:
-                self._gh_interface.add_team_member(lead.github_username,
-                                                   gh_team_id)
+            if check_permissions(lead, None):
+                lead_in_team = self._gh_interface.has_team_member(
+                    lead.github_username,
+                    gh_team_id)
+                if not lead_in_team:
+                    self._gh_interface.add_team_member(lead.github_username,
+                                                       gh_team_id)
 
-            # XXX: Should lead also be added as member via `add_member`?
-            team.add_team_lead(lead.github_id)
-            logging.debug(f"User with ID {lead_id} set as tech lead of "
-                          f"{gh_team_name}")
-        # XXX: In the case where a channel name is provided, this may result
-        #      in setting a tech lead who is not a part of the team
+                # XXX: Should lead also be added as member via `add_member`?
+                team.add_team_lead(lead.github_id)
+                logging.debug(f"User with ID {lead_id} set as tech lead of "
+                              f"{gh_team_name}")
+            else:
+                msg = f"User specified with lead ID {lead_id} has S" \
+                    f" permission level {str(lead.permissions_level)}, " \
+                    "insufficient to lead a team!"
+                logging.error(msg)
+                raise PermissionError(msg)
         else:
             team.add_team_lead(command_user.github_id)
             logging.debug(f"Calling user with ID {command_user.github_id} set"
