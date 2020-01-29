@@ -2,7 +2,8 @@
 import logging
 from app.model import User, Permissions
 from utils.slack_parse import escape_email
-from typing import cast
+from db.facade import DBFacade
+from interface.github import GithubInterface
 
 
 class UserCommandApis:
@@ -10,8 +11,8 @@ class UserCommandApis:
 
     def __init__(self):
         """Declare the interfaces needed."""
-        self._db_facade = None
-        self._gh_interface = None
+        self._db_facade: DBFacade = None
+        self._gh_interface: GithubInterface = None
 
     def user_edit(self,
                   caller_id: str,
@@ -70,7 +71,7 @@ class UserCommandApis:
             edited_user = calling_user
 
         if permission and is_admin:
-            edited_user.permissions_level = cast(Permissions, permission)
+            edited_user.permissions_level = permission
         elif permission and not is_admin:
             msg = f"Calling user with Slack ID {caller_id} has permission" \
                 f" level {str(calling_user.permissions_level)}, " \
@@ -92,7 +93,7 @@ class UserCommandApis:
         if bio:
             edited_user.biography = bio
 
-        return cast(bool, self._db_facade.store(edited_user))
+        return self._db_facade.store(edited_user)
 
     def user_delete(self,
                     caller_id: str,
@@ -140,7 +141,7 @@ class UserCommandApis:
         :return: ``User`` object whose information was retrieved
         """
         user_to_view_id = caller_id if view_user_id is None else view_user_id
-        return cast(User, self._db_facade.retrieve(User, user_to_view_id))
+        return self._db_facade.retrieve(User, user_to_view_id)
 
     def user_add(self,
                  add_user_id: str,
@@ -166,4 +167,4 @@ class UserCommandApis:
                 logging.info(f"User with Slack ID {add_user_id} "
                              "not in database")
 
-        return cast(bool, self._db_facade.store(User(add_user_id)))
+        return self._db_facade.store(User(add_user_id))
