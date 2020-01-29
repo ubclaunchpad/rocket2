@@ -144,7 +144,7 @@ class TeamCommandApis:
                     self._gh_interface.add_team_member(lead.github_username,
                                                        gh_team_id)
 
-                # XXX: Should lead also be added as member via `add_member`?
+                team.add_member(lead.github_id)
                 team.add_team_lead(lead.github_id)
                 logging.debug(f"User with ID {lead_id} set as tech lead of "
                               f"{gh_team_name}")

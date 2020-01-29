@@ -306,6 +306,7 @@ class TestTeamCommandApis(TestCase):
         self.assertTrue(created)
         stored_team = Team("team_gh_id", "team_name", "")
         stored_team.add_member(self.admin_user.github_id)
+        stored_team.add_member(self.lead_user.github_id)
         stored_team.add_team_lead(self.lead_user.github_id)
         self.mock_facade.store.assert_called_once_with(stored_team)
 
