@@ -114,18 +114,27 @@ class TeamCommandApis:
                     f"{e.error}"
                 logging.error(msg)
                 raise SlackAPIError(msg)
-            for member_id in channel_member_ids:
-                try:
-                    member = self._db_facade.retrieve(User, member_id)
-                    self._gh_interface.add_team_member(member.github_username,
-                                                       gh_team_id)
-                    team.add_member(member.github_id)
-                    logging.debug(f"Member with ID {member.slack_id} added "
-                                  f"to {gh_team_name}")
-                except LookupError:
-                    logging.warning(f"Member with ID {member_id} not found, "
-                                    "ignoring...")
-                    pass
+
+            channel_members = \
+                self._db_facade.bulk_retrieve(User,
+                                              list(channel_member_ids.keys()))
+
+            if len(channel_members) is not len(channel_member_ids):
+                retrieved_members_ids = [member.slack_id
+                                         for member in channel_members]
+                unaccounted_member_ids = [member_id for member_id
+                                          in channel_member_ids
+                                          if member_id
+                                          not in retrieved_members_ids]
+                logging.warning("Users not found for following Slack IDs: "
+                                f"{unaccounted_member_ids}")
+
+            for member in channel_members:
+                self._gh_interface.add_team_member(member.github_username,
+                                                   gh_team_id)
+                team.add_member(member.github_id)
+                logging.debug(f"Member with ID {member.slack_id} added "
+                              f"to {gh_team_name}")
         else:
             self._gh_interface.add_team_member(command_user.github_username,
                                                gh_team_id)

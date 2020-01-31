@@ -211,7 +211,7 @@ class TestTeamCommandApis(TestCase):
 
     def test_create_missing_slack_user_from_channel(self) -> None:
         """Test create team command API with missing channel member."""
-        self.mock_slack.get_channel_users.return_value = ["missing"]
+        self.mock_slack.get_channel_users.return_value = {"missing": None}
         try:
             self.testapi.team_create("lead", "team_name", channel="channel")
         except LookupError:
@@ -222,7 +222,8 @@ class TestTeamCommandApis(TestCase):
     def test_create_add_channel_member_gh_team_error(self) -> None:
         """Test create team command API adding channel member to Github."""
         self.mock_slack.get_channel_users.return_value = \
-            [self.regular_user.slack_id]
+            {self.regular_user.slack_id: self.regular_user}
+        self.mock_facade.bulk_retrieve.return_value = [self.regular_user]
 
         self.mock_github.add_team_member.side_effect = GithubAPIException("")
 
@@ -236,7 +237,8 @@ class TestTeamCommandApis(TestCase):
     def test_create_add_channel_members(self) -> None:
         """Test create team command API with specified channel."""
         self.mock_slack.get_channel_users.return_value = \
-            [self.regular_user.slack_id]
+            {self.regular_user.slack_id: self.regular_user}
+        self.mock_facade.bulk_retrieve.return_value = [self.regular_user]
         self.mock_github.org_create_team.return_value = "team_gh_id"
         created = self.testapi.team_create(
             "lead", "team_name", channel="channel")
