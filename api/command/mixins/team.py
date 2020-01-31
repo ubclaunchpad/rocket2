@@ -149,7 +149,7 @@ class TeamCommandApis:
                 logging.debug(f"User with ID {lead_id} set as tech lead of "
                               f"{gh_team_name}")
             else:
-                msg = f"User specified with lead ID {lead_id} has S" \
+                msg = f"User specified with lead ID {lead_id} has" \
                     f" permission level {str(lead.permissions_level)}, " \
                     "insufficient to lead a team!"
                 logging.error(msg)
@@ -160,10 +160,6 @@ class TeamCommandApis:
                           f" as tech lead of {gh_team_name}")
 
         created = self._db_facade.store(team)
-        if created:
-            logging.info(f"Team succesfully created: {team.__str__()}")
-        else:
-            logging.error("Team creation unsuccessful")
         return created
 
     def team_add(self,
@@ -207,10 +203,6 @@ class TeamCommandApis:
         team.add_member(add_user.github_id)
 
         added = self._db_facade.store(team)
-        if added:
-            logging.info(f"Member successfully added: {team.__str__()}")
-        else:
-            logging.error("Member add unsuccessful")
         return added
 
     def team_remove(self,
@@ -264,10 +256,6 @@ class TeamCommandApis:
             team.discard_team_lead(rem_user.github_id)
 
         removed = self._db_facade.store(team)
-        if removed:
-            logging.info(f"Member successfully removed: {team.__str__()}")
-        else:
-            logging.error("Member remove unsuccessful")
         return removed
 
     def team_edit(self,
@@ -314,10 +302,6 @@ class TeamCommandApis:
             team.platform = platform
 
         edited = self._db_facade.store(team)
-        if edited:
-            logging.info(f"Team successfully edited: {team.__str__()}")
-        else:
-            logging.error("Team edit unsuccessful")
         return edited
 
     def team_lead(self,
@@ -365,12 +349,6 @@ class TeamCommandApis:
             if team.has_team_lead(lead_user.github_id):
                 team.discard_team_lead(lead_user.github_id)
                 discarded = self._db_facade.store(team)
-                if discarded:
-                    logging.info(f"User with Github ID {lead_user.github_id} "
-                                 "removed as team lead of specified team")
-                else:
-                    logging.error("Failed to remove user with Github ID "
-                                  f"{lead_user.github_id} as lead of team")
                 return discarded
             else:
                 msg = f"User with Github ID {lead_user.github_id} not a " \
@@ -384,11 +362,6 @@ class TeamCommandApis:
                                                    team.github_team_id)
             team.add_team_lead(lead_user.github_id)
             added = self._db_facade.store(team)
-            if added:
-                logging.info("Member successfully assigned as lead: "
-                             f"{team.__str__()}")
-            else:
-                logging.error("Member lead assignment unsuccessful")
             return added
 
     def team_delete(self,
