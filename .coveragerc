@@ -1,0 +1,5 @@
+[run]
+omit =
+	conf.py
+	tests/*
+	app/server.py
