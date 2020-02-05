@@ -43,3 +43,4 @@ python_version = "3.7"
 
 [scripts]
 launch = "gunicorn -b 0.0.0.0:5000 -w 1 --forwarded-allow-ips=* app.server:app"
+lint = "make lint"

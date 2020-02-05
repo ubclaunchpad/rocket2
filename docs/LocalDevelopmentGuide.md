@@ -20,6 +20,14 @@ passed to your local port 5000. As long as you run Rocket on port 5000 (see
 below), you can then access it through the HTTPS URL that ngrok gives you. Note
 that it is very important to use the HTTPS URL, *not* the HTTP URL.
 
+An alternative to `ngrok` is [`localtunnel`](https://github.com/localtunnel/localtunnel),
+which lets you use the same subdomain every time.
+
+```bash
+$ lt --port 5000 --subdomain my-amazing-rocket2
+your url is: https://my-amazing-rocket2.localtunnel.me
+```
+
 ## 2: Create a Slack Workspace
 
 For testing, it's useful to have your own Slack workspace set up. If you do not
@@ -70,6 +78,9 @@ the new user.
 
 Note: if you are in the `brussel-sprouts` Github team, you should already have
 AWS credentials. Just ask.
+
+Alternatively, just set up [DynamoDB locally][localdynamodb] (the Docker-based
+setup is probably the easiest) and set `AWS_LOCAL=True`.
 
 ## 5: Set Up Config
 
@@ -122,7 +133,11 @@ following two commands:
 
 ```bash
 docker build -t rocket2-dev-img .
-docker run --rm -it -p 0.0.0.0:5000:5000 rocket2-dev-img
+docker run --rm -it \
+  --env-file .env \
+  -p 0.0.0.0:5000:5000 \
+  rocket2-dev-img
+# optionally include `--network="host"` for local dynamoDB
 ```
 
 Note that the options passed to `-p` in `docker run` tell Docker what port
@@ -131,7 +146,8 @@ the first `5000` is the port exposed inside the container, and the second
 `5000` is the port exposed outside the container. The port exposed outside
 the container can be changed (for instance, if port 5000 is already
 in use in your local development environment), but in that case ensure that
-ngrok is running on the same port.
+ngrok is running on the same port. The option [`--env-file`][docker-env-file]
+lets you pass in your [configuration options][config].
 
 Also note that, for your convenience, we have provided two scripts,
 `scripts/docker_build.sh` and `scripts/docker_run_local.sh`, that run these
@@ -243,3 +259,5 @@ Remember to rebulid your Docker image every time you make a change!
 [make-slack-app]: https://api.slack.com/apps
 [download-ngrok]: https://ngrok.com/
 [github-token]: https://github.com/settings/tokens
+[docker-env-file]: https://docs.docker.com/engine/reference/commandline/run/#set-environment-variables--e---env---env-file
+[localdynamodb]: index.html#running-dynamodb-locally
