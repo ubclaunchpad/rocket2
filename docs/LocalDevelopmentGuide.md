@@ -63,11 +63,18 @@ Rocket makes use of AWS DynamoDB as its database, and for testing you will want
 to test on the "real" DynamoDB. If you do not already have access to DynamoDB,
 you can use it as part of the free tier of AWS. Create an AWS account for
 yourself, then go to the IAM service and create a new user. The user name
-doesn't particularly matter (though `rocket2-dev-$NAME` is recommended),
-but make sure you check "programmatic access." In permissions, go to
-"Attach existing permissions directly" and add the `AmazonDynamoDBFullAccess`
-policy. Finally, copy the provided access key ID and secret access key after
-creating the new user.
+doesn't particularly matter (though `rocket2-dev-$NAME` is recommended), but
+make sure you check "programmatic access." In permissions, go to "Attach
+existing permissions directly" and add the following policies:
+
+- `AmazonDynamoDBFullAccess`
+- `CloudWatchLogsFullAccess`
+
+As you may have noticed, we not only want to use DynamoDB, but also CloudWatch.
+We send our logs to CloudWatch for easier storage and querying.
+
+Finally, copy the provided access key ID and secret access key after creating
+the new user.
 
 Note: if you are in the `brussel-sprouts` Github team, you should already have
 AWS credentials. Just ask.
@@ -107,9 +114,8 @@ Github API should be automated, once the signing key is available.
 
 After doing this, remember to put your ngrok HTTPS URL with `/webhook` appended
 at the end, into the "Webhook URL" box. After doing this, you must go to the
-app's "Permissions & Events" tab and set the following as read-only:
+app's "Permissions & Events" tab and set the following as Read & Write:
 
-- Organization hooks
 - Organization members
 
 After doing so, please check the checkboxes below:
