@@ -17,17 +17,24 @@ from config import Config
 from typing import Optional
 
 
-def make_command_parser(config: Config,
-                        gh: Optional[GithubInterface] = None) \
+def make_github_interface(config: Config) -> GithubInterface:
+    """
+    Initialize and return a :class:`GithubInterface` object.
+
+    :return: a new ``GithubInterface`` object, freshly initialized
+    """
+    return GithubInterface(DefaultGithubFactory(config.github_app_id,
+                                                config.github_key),
+                           config.github_org_name)
+
+
+def make_command_parser(config: Config, gh: GithubInterface) \
         -> CommandParser:
     """
     Initialize and returns a :class:`CommandParser` object.
 
     :return: a new ``CommandParser`` object, freshly initialized
     """
-    gh = GithubInterface(DefaultGithubFactory(config.github_app_id,
-                                              config.github_key),
-                         config.github_org_name)
     facade = DBFacade(DynamoDB(config))
     bot = Bot(WebClient(config.slack_api_token),
               config.slack_notification_channel)

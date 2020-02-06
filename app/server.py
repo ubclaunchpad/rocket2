@@ -1,6 +1,6 @@
 """Flask server instance."""
 from factory import make_command_parser, make_github_webhook_handler, \
-    make_slack_events_handler
+    make_slack_events_handler, make_github_interface
 from flask import Flask, request
 from logging.config import dictConfig
 from slackeventsapi import SlackEventAdapter
@@ -26,7 +26,7 @@ loggingHandlersConfig = {
         'formatter': 'colored'
     },
 }
-if config.aws_local != 'True':
+if not config.aws_local:
     # set up logging to AWS cloudwatch when not restricted to local AWS
     boto3_session = Session(aws_access_key_id=config.aws_access_keyid,
                             aws_secret_access_key=config.aws_secret_key,
@@ -74,7 +74,8 @@ app = Flask(__name__)
 # HTTP security header middleware for Flask
 talisman = Talisman(app)
 talisman.force_https = False
-command_parser = make_command_parser(config)
+github_interface = make_github_interface(config)
+command_parser = make_command_parser(config, github_interface)
 github_webhook_handler = make_github_webhook_handler(config)
 slack_events_handler = make_slack_events_handler(config)
 slack_events_adapter = SlackEventAdapter(config.slack_signing_secret,

@@ -86,7 +86,7 @@ class Config:
         self.aws_teams_tablename = ''
         self.aws_projects_tablename = ''
         self.aws_region = ''
-        self.aws_local = ''
+        self.aws_local: bool = False
 
 
 class MissingConfigError(Exception):
