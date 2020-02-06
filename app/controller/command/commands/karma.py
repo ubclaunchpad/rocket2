@@ -31,7 +31,8 @@ class KarmaCommand(Command):
 
     def init_subparsers(self) -> _SubParsersAction:
         """Initialize subparsers for karma command."""
-        subparsers: _SubParsersAction = self.parser.add_subparsers(dest="which")
+        subparsers: _SubParsersAction = \
+            self.parser.add_subparsers(dest="which")
 
         """Parser for set command."""
         parser_set = subparsers.add_parser("set")

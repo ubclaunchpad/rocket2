@@ -13,8 +13,6 @@ class Config:
 
     # Map name of env variable to python variable
     ENV_NAMES = {
-        'TESTING': 'testing',
-
         'SLACK_SIGNING_SECRET': 'slack_signing_secret',
         'SLACK_API_TOKEN': 'slack_api_token',
         'SLACK_NOTIFICATION_CHANNEL': 'slack_notification_channel',
@@ -35,7 +33,6 @@ class Config:
         'AWS_LOCAL': 'aws_local',
     }
     OPTIONALS = {
-        'TESTING': 'False',
         'AWS_LOCAL': 'False',
     }
 
@@ -63,14 +60,13 @@ class Config:
         if missing_config_fields:
             raise MissingConfigError(missing_config_fields)
 
-        self.testing = self.testing == 'True'
+        self.aws_local = self.aws_local == 'True'
         self.github_key = self.github_key\
             .replace('\\n', '\n')\
             .replace('\\-', '-')
 
     def _set_attrs(self):
         """Add attributes so that mypy doesn't complain."""
-        self.testing = ''
         self.creds_path = ''
 
         self.slack_signing_secret = ''

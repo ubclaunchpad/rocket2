@@ -14,7 +14,7 @@ from app.controller.webhook.github import GitHubWebhookHandler
 from app.controller.webhook.slack import SlackEventsHandler
 from config import Config
 
-from typing import Optional, cast
+from typing import Optional
 
 
 def make_command_parser(config: Config,
@@ -25,20 +25,15 @@ def make_command_parser(config: Config,
 
     :return: a new ``CommandParser`` object, freshly initialized
     """
-    slack_api_token, slack_notification_channel = "", ""
-    slack_api_token = config.slack_api_token
-    github_app_id = config.github_app_id
-    github_organization = config.github_org_name
-    slack_notification_channel = config.slack_notification_channel
-    if not config.testing:
-        gh = GithubInterface(DefaultGithubFactory(github_app_id,
-                                                  config.github_key),
-                             github_organization)
+    gh = GithubInterface(DefaultGithubFactory(config.github_app_id,
+                                              config.github_key),
+                         config.github_org_name)
     facade = DBFacade(DynamoDB(config))
-    bot = Bot(WebClient(slack_api_token), slack_notification_channel)
+    bot = Bot(WebClient(config.slack_api_token),
+              config.slack_notification_channel)
     # TODO: make token config expiry configurable
     token_config = TokenCommandConfig(timedelta(days=7), config.github_key)
-    return CommandParser(facade, bot, cast(GithubInterface, gh), token_config)
+    return CommandParser(facade, bot, gh, token_config)
 
 
 def make_github_webhook_handler(config: Config) -> GitHubWebhookHandler:

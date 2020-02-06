@@ -60,7 +60,7 @@ Inertia.
 
 Since we have changed from using `.toml` configuration files to using
 environmental variables for configuration, you must inject them using `inertia
-{some name} env set TESTING False` and the like. If you already have all your
+{some name} env set AWS_LOCAL False` and the like. If you already have all your
 environmental variables set up in your `.env` file, you can send the entire file
 over with `inertia {some name} send .env`.
 

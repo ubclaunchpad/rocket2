@@ -19,7 +19,7 @@ def test_config():
     test_config.slack_api_token = 'token'
     test_config.slack_notification_channel = 'channel'
     test_config.slack_announcement_channel = 'announcements'
-    test_config.testing = True
+    test_config.aws_local = True
     return test_config
 
 

@@ -5,12 +5,6 @@ sample `.env` file (which is what `pipenv` looks for when it tries to launch)
 can be found at `sample-env`. Here is how each variable works. **Note: all
 variables are strings**
 
-## TESTING
-
-Denotes if we are in testing mode or not. In testing mode, we use a local
-DynamoDB instead of connecting to the server. Can either be `True` or `False`.
-Optional, and defaults to `False`.
-
 ## SLACK\_SIGNING\_SECRET
 
 Signing secret of the slack app. Can be found in the basic information tab of
@@ -75,6 +69,5 @@ The region where the AWS instance is located (leave these as they are).
 
 ## AWS\_LOCAL
 
-Point all AWS requests to `http://localhost:8000`. This behaviour can also be
-enabled by setting `TESTING`, but this property can be used to only enable the
-AWS behaviour. Optional, and defaults to `False`.
+Point all AWS DynamoDB requests to `http://localhost:8000`. Optional, and
+defaults to `False`.

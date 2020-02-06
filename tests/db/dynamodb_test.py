@@ -15,7 +15,7 @@ def ddb():
     test_config.aws_users_tablename = 'users_test'
     test_config.aws_teams_tablename = 'teams_test'
     test_config.aws_projects_tablename = 'projects_test'
-    test_config.testing = True
+    test_config.aws_local = True
     actual = DynamoDB(test_config)
     yield actual
     ts = [User, Team, Project]

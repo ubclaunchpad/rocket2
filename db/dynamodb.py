@@ -103,7 +103,7 @@ class DynamoDB:
         self.projects_table = config.aws_projects_tablename
         self.CONST = DynamoDB.Const(config)
 
-        if config.testing or config.aws_local == 'True':
+        if config.aws_local:
             logging.info("Connecting to local DynamoDb")
             self.ddb = boto3.resource(service_name="dynamodb",
                                       region_name="",
