@@ -14,8 +14,6 @@ from app.controller.webhook.github import GitHubWebhookHandler
 from app.controller.webhook.slack import SlackEventsHandler
 from config import Config
 
-from typing import Optional
-
 
 def make_github_interface(config: Config) -> GithubInterface:
     """

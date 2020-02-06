@@ -1,2 +1,4 @@
 [run]
-omit = conf.py
+omit =
+	conf.py
+	factory/__init__.py
