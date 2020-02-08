@@ -3,3 +3,4 @@ omit =
 	conf.py
 	tests/*
 	app/server.py
+	factory/__init__.py
