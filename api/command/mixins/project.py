@@ -6,15 +6,15 @@ from app.controller import ResponseTuple
 from app.controller.command.commands.base import Command
 from db.facade import DBFacade
 from app.model import Project, User, Team, Permissions
-from typing import Dict, cast
+from typing import Dict, cast, List
 
 class ProjectCommandApis:
     """Encapsulate the various APIs for project command logic."""
-    def __init__(self,
-                 db_facade: DBFacade):
+    def __init__(self):
         """Declare the interfaces needed."""
-        self.facade = db_facade
+        self._db_facade = None
         self._gh_interface = None
+        self._slack_client = None
     
     def create_project(self,
                       gh_repo: str,
@@ -37,32 +37,33 @@ class ProjectCommandApis:
                  project to, else information about the project
         """
         logging.debug("Handling project create subcommand")
-        team_list = self.facade.query(Team,
+        team_list = self._db_facade.query(Team,
                                       [("github_team_name",
                                         github_team_name)])
         if len(team_list) != 1:
             error = f"{len(team_list)} teams found with " \
                 f"GitHub team name {github_team_name}"
             logging.error(error)
-            return error, 200
+            return False
 
         team = team_list[0]
 
-        user = self.facade.retrieve(User, user_id)
+        user = self._db_facade.retrieve(User, user_id)
 
-        if not (user_id in team.team_leads or
+        if not (user.github_id in team.team_leads or
                 user.permissions_level is Permissions.admin):
             logging.error(f"User with user ID {user_id} is not "
                             "a team lead of the specified team or an admin")
+            return False
 
         project = Project(team.github_team_id, [gh_repo])
 
         if param_list["display_name"]:
             project.display_name = param_list["display_name"]
             
-        return cast(bool, self.facade.store(project))
+        return cast(bool, self._db_facade.store(project))
     
-    def edit_helper(self,
+    def edit_project(self,
                     project_id: str,
                     param_list: Dict[str, str]) -> bool:
         """
@@ -74,13 +75,13 @@ class ProjectCommandApis:
                  error message if the project was not found in the database
         """
         logging.debug("Handling project edit subcommand")
-        project = self.facade.retrieve(Project, project_id)
+        project = self._db_facade.retrieve(Project, project_id)
 
         if param_list["display_name"]:
             project.display_name = param_list["display_name"]
             logging.debug("Changed display "
                             f"name to {project.display_name}")
-            return cast(bool, self.facade.store(project))
+            return cast(bool, self._db_facade.store(project))
 
     def delete_helper(self,
                       project_id: str,
@@ -98,18 +99,20 @@ class ProjectCommandApis:
                  is assigned to a team, otherwise success message
         """
         logging.debug("Handling project delete subcommand")
-        project = self.facade.retrieve(Project, project_id)
-        team = self.facade.retrieve(Team, project.github_team_id)
-        user = self.facade.retrieve(User, user_id)
+        project = self._db_facade.retrieve(Project, project_id)
+        team = self._db_facade.retrieve(Team, project.github_team_id)
+        user = self._db_facade.retrieve(User, user_id)
 
         if project.github_team_id != "" and not force:
             logging.error("Project is assigned to team with "
                           f"GitHub team ID {project.github_team_id}")
-        elif not (user_id in team.team_leads or
+            return False
+        elif not (user.github_id in team.team_leads or
                     user.permissions_level is Permissions.admin):
             logging.error(f"User with user ID {user_id} is not "
                           "a team lead of the specified team or an admin")
-        return cast(bool, self.facade.delete(Project, project_id))
+            return False
+        return cast(bool, self._db_facade.delete(Project, project_id))
     
     def assign_helper(self,
                       project_id: str,
@@ -132,21 +135,23 @@ class ProjectCommandApis:
                  project is assigned to a team, otherwise success message
         """
         logging.debug("Handling project assign subcommand")
-        project = self.facade.retrieve(Project, project_id)
+        project = self._db_facade.retrieve(Project, project_id)
 
-        team_list = self.facade.query(Team,
+        team_list = self._db_facade.query(Team,
                                         [("github_team_name",
                                         github_team_name)])
         if len(team_list) != 1:
             error = f"{len(team_list)} teams found with " \
                 f"GitHub team name {github_team_name}"
             logging.error(error)
-            return error, 200
+            return False
 
         team = team_list[0]
-        user = self.facade.retrieve(User, user_id)
+        user = self._db_facade.retrieve(User, user_id)
 
-        if not (user_id in team.team_leads or
+        print(project, team, user)
+
+        if not (user.github_id in team.team_leads or
                 user.permissions_level is Permissions.admin):
             logging.error(f"User with user ID {user_id} is not "
                             "a team lead of the specified team or an admin")
@@ -157,9 +162,9 @@ class ProjectCommandApis:
             return False
         else:
             project.github_team_id = team.github_team_id
-            return cast(bool, self.facade.store(project))
+            return cast(bool, self._db_facade.store(project))
 
-    def list_helper(self) -> list:
+    def projects_list(self) -> List[Project]:
         """
         Return display information of all projects.
 
@@ -167,7 +172,7 @@ class ProjectCommandApis:
                  otherwise return projects' information
         """
         logging.debug("Handling project list subcommand")
-        projects = self.facade.query(Project)
+        projects = self._db_facade.query(Project)
         if not projects:
             logging.info("No projects found in database")
             return cast(list, [])
@@ -193,20 +198,22 @@ class ProjectCommandApis:
                  otherwise success message
         """
         logging.debug("Handling project unassign subcommand")
-        project = self.facade.retrieve(Project, project_id)
-        team = self.facade.retrieve(Team, project.github_team_id)
-        user = self.facade.retrieve(User, user_id)
+        project = self._db_facade.retrieve(Project, project_id)
+        team = self._db_facade.retrieve(Team, project.github_team_id)
+        user = self._db_facade.retrieve(User, user_id)
 
-        if not (user_id in team.team_leads or
+        print(project, team, user)
+
+        if not (user.github_id in team.team_leads or
                 user.permissions_level is Permissions.admin):
             logging.error(f"User with user ID {user_id} is not "
                             "a team lead of the specified team or an admin")
             return False
         else:
             project.github_team_id = ""
-            return cast(bool, self.facade.store(project))
+            return cast(bool, self._db_facade.store(project))
 
-    def view_helper(self,
+    def project_view(self,
                     project_id: str) -> Project:
         """
         View project info from database.
@@ -216,5 +223,5 @@ class ProjectCommandApis:
                  information about the project
         """
         logging.debug("Handling project view subcommand")
-        project = self.facade.retrieve(Project, project_id)
+        project = self._db_facade.retrieve(Project, project_id)
         return cast(Project, project)
