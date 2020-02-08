@@ -20,7 +20,7 @@ class DBFacade:
     would stay the same.
     """
 
-    def __init__(self, db: DynamoDB) -> None:
+    def __init__(self, db: DynamoDB):
         """
         Initialize facade using a given class.
 
@@ -155,7 +155,7 @@ class DBFacade:
 
     def delete(self,
                Model: Type[T],
-               k: str) -> None:
+               k: str):
         """
         Remove an object from a table.
 

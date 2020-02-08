@@ -23,7 +23,7 @@ class DynamoDB:
     class Const:
         """A bunch of static constants and functions."""
 
-        def __init__(self, config: Config) -> None:
+        def __init__(self, config: Config):
             """Initialize the constants."""
             self.users_table: str = config.aws_users_tablename
             self.teams_table: str = config.aws_teams_tablename
@@ -80,7 +80,7 @@ class DynamoDB:
             else:
                 raise TypeError('Table name does not correspond to anything')
 
-    def __init__(self, config: Config) -> None:
+    def __init__(self, config: Config):
         """Initialize facade using DynamoDB settings.
 
         To avoid local tests failure when the DynamoDb server is used,
@@ -103,7 +103,7 @@ class DynamoDB:
         self.projects_table = config.aws_projects_tablename
         self.CONST = DynamoDB.Const(config)
 
-        if config.testing or config.aws_local == 'True':
+        if config.aws_local:
             logging.info("Connecting to local DynamoDb")
             self.ddb = boto3.resource(service_name="dynamodb",
                                       region_name="",
@@ -132,7 +132,7 @@ class DynamoDB:
         """Return a string representing this class."""
         return "DynamoDB"
 
-    def __create_table(self, table_name: str, key_type: str = 'S') -> None:
+    def __create_table(self, table_name: str, key_type: str = 'S'):
         """
         Create a table.
 
@@ -366,7 +366,7 @@ class DynamoDB:
 
     def delete(self,
                Model: Type[T],
-               k: str) -> None:
+               k: str):
         """
         Remove an object from a table.
 

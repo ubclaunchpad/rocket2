@@ -9,7 +9,7 @@ T = TypeVar('T', bound='User')
 class User(RocketModel):
     """Represent a user with related fields and methods."""
 
-    def __init__(self, slack_id: str) -> None:
+    def __init__(self, slack_id: str):
         """Initialize the user with a given Slack ID."""
         self.slack_id = slack_id
         self.name = ""
@@ -57,7 +57,7 @@ class User(RocketModel):
         :param user: the user object
         :return: the dictionary representing the user
         """
-        def place_if_filled(name: str, field: Any) -> None:
+        def place_if_filled(name: str, field: Any):
             """Populate ``udict`` if ``field`` isn't empty."""
             if field:
                 udict[name] = field

@@ -24,7 +24,7 @@ class TeamCommand(Command):
     def __init__(self,
                  db_facade: DBFacade,
                  gh: GithubInterface,
-                 sc: Any) -> None:
+                 sc: Any):
         """
         Initialize team command parser.
 

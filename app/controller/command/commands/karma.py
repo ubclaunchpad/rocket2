@@ -20,7 +20,7 @@ class KarmaCommand(Command):
                        "permission level for this command!"
     karma_default_amount = 1
 
-    def __init__(self, db_facade) -> None:
+    def __init__(self, db_facade):
         """Initialize karma command."""
         logging.info("Starting karma command initializer")
         self.parser = ArgumentParser(prog="/rocket")
@@ -31,7 +31,8 @@ class KarmaCommand(Command):
 
     def init_subparsers(self) -> _SubParsersAction:
         """Initialize subparsers for karma command."""
-        subparsers = self.parser.add_subparsers(dest="which")
+        subparsers: _SubParsersAction = \
+            self.parser.add_subparsers(dest="which")
 
         """Parser for set command."""
         parser_set = subparsers.add_parser("set")

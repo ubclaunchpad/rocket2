@@ -22,7 +22,7 @@ class CommandParser:
                  db_facade: DBFacade,
                  bot: Bot,
                  gh_interface: GithubInterface,
-                 token_config: TokenCommandConfig) -> None:
+                 token_config: TokenCommandConfig):
         """Initialize the dictionary of command handlers."""
         self.__commands: Dict[str, Command] = {}
         self.__facade = db_facade
