@@ -32,6 +32,11 @@ class Config:
         'AWS_TEAMS_TABLE': 'aws_teams_tablename',
         'AWS_PROJECTS_TABLE': 'aws_projects_tablename',
         'AWS_REGION': 'aws_region',
+        'AWS_LOCAL': 'aws_local',
+    }
+    OPTIONALS = {
+        'TESTING': 'False',
+        'AWS_LOCAL': 'False',
     }
 
     def __init__(self):
@@ -49,7 +54,11 @@ class Config:
                 data = os.environ[var_name]
                 setattr(self, var, data)
             except KeyError:
-                missing_config_fields.append(var_name)
+                if var_name in self.OPTIONALS:
+                    data = self.OPTIONALS[var_name]
+                    setattr(self, var, data)
+                else:
+                    missing_config_fields.append(var_name)
 
         if missing_config_fields:
             raise MissingConfigError(missing_config_fields)
@@ -81,6 +90,7 @@ class Config:
         self.aws_teams_tablename = ''
         self.aws_projects_tablename = ''
         self.aws_region = ''
+        self.aws_local = ''
 
 
 class MissingConfigError(Exception):

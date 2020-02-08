@@ -11,6 +11,7 @@ __pycache__/
 DynamoDB/
 .coverage
 .env
+.pytest_cache
 
 # Deployment files
 inertia.toml
