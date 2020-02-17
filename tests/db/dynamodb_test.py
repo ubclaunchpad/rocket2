@@ -3,6 +3,7 @@ from unittest.mock import MagicMock
 from unittest import TestCase
 import pytest
 import boto3
+import time
 
 from app.model import User, Project, Team, Permissions
 from config import Config
@@ -54,6 +55,7 @@ class TestDynamoDB(TestCase):
                                 aws_access_key_id="",
                                 aws_secret_access_key="",
                                 endpoint_url="http://localhost:8000")
+        time.sleep(1)
         user_table = botodb.Table(self.config.aws_users_tablename)
         team_table = botodb.Table(self.config.aws_teams_tablename)
         project_table = botodb.Table(self.config.aws_projects_tablename)
