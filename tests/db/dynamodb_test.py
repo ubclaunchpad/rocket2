@@ -47,7 +47,10 @@ class TestDynamoDB(TestCase):
         self.config.aws_teams_tablename = 'teams_test'
         self.config.aws_projects_tablename = 'projects_test'
         self.config.aws_local = True
+        self.ddb = DynamoDB(self.config)
 
+    def tearDown(self):
+        """Delete all database tables after usage."""
         # Delete the table itself instead of just the items in it
         botodb = boto3.resource(service_name="dynamodb",
                                 region_name="",
@@ -56,8 +59,6 @@ class TestDynamoDB(TestCase):
                                 endpoint_url="http://localhost:8000")
         for table in botodb.tables.all():
             table.delete()
-
-        self.ddb = DynamoDB(self.config)
 
     @pytest.mark.db
     def test_string_rep(self):
