@@ -8,7 +8,7 @@ from typing import Tuple, List
 from config import Config
 
 
-class Scheduler():
+class Scheduler:
     """The scheduler class for scheduling everything."""
 
     def __init__(self,

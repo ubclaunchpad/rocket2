@@ -3,4 +3,7 @@ omit =
 	conf.py
 	tests/*
 	app/server.py
+	app/model/base.py
+	app/scheduler/modules/base.py
+	app/scheduler/modules/__init__.py
 	factory/__init__.py
