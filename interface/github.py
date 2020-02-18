@@ -151,7 +151,7 @@ class GithubInterface:
             team.edit(name)
 
     @handle_github_error
-    def org_get_teams(self) -> List[Team]:
+    def org_get_teams(self) -> List[ModelTeam]:
         """Return array of teams associated with organization."""
         teams = self.org.get_teams()
         team_array = []
