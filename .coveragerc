@@ -6,4 +6,6 @@ omit =
 	app/model/base.py
 	app/scheduler/modules/base.py
 	app/scheduler/modules/__init__.py
+	app/controller/webhook/github/events/base.py
+	app/controller/command/commands/base.py
 	factory/__init__.py
