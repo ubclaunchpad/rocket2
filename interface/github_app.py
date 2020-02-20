@@ -55,8 +55,7 @@ class GithubAppInterface:
         logging.info("Attempting to get list of installations")
         url = "https://api.github.com/app/installations"
         headers = self._gen_headers()
-        r = requests.get(url=url,
-                         headers=headers)
+        r = requests.get(url=url, headers=headers)
         if r.status_code != 200:
             logging.error("Failed to get list of Github App installations "
                           f"with error message {r.text} "

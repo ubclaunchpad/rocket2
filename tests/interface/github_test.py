@@ -1,9 +1,9 @@
 """Test Github class."""
-from github import Github, Organization, NamedUser, \
-    GithubException, Team, PaginatedList
-from interface.github import GithubInterface, GithubAPIException
 from unittest import TestCase
 from unittest.mock import MagicMock, Mock
+from github import Github, Organization, NamedUser, \
+    GithubException, Team
+from interface.github import GithubInterface, GithubAPIException
 
 
 class TestGithubInterface(TestCase):
@@ -31,6 +31,22 @@ class TestGithubInterface(TestCase):
         self.mock_team.get_members = MagicMock(
             return_value=[self.test_user])
 
+    def test_try_twice_add_admin(self):
+        """Test org_add_admin() where the first try gives 401."""
+        mock_user = MagicMock(NamedUser.NamedUser)
+        self.mock_github.get_user.side_effect = [
+            GithubException(401, ''), mock_user
+        ]
+        self.test_interface.org_add_admin('user@email.com')
+        self.mock_org.add_to_members.\
+            assert_called_once_with(mock_user, 'admin')
+
+    def test_try_thrice_add_admin(self):
+        """Test org_add_admin() where all tries give 401."""
+        self.mock_github.get_user.side_effect = GithubException(401, '')
+        with self.assertRaises(GithubAPIException):
+            self.test_interface.org_add_admin('user@email.com')
+
     def test_org_add_member(self):
         """Test GithubInterface method org_add_member."""
         mock_user: MagicMock = MagicMock(NamedUser.NamedUser)
@@ -41,6 +57,10 @@ class TestGithubInterface(TestCase):
         self.mock_org.add_to_members. \
             assert_called_once_with(mock_user, "member")
         self.assertEqual(github_id, str(mock_user.id))
+        # Or maybe it has already been added before....
+        # stupid coverage
+        self.mock_org.has_in_members.return_value = True
+        github_id = self.test_interface.org_add_member("user@email.com")
 
     def test_org_add_admin(self):
         """Test GithubInterface method org_add_admin."""
@@ -107,10 +127,16 @@ class TestGithubInterface(TestCase):
 
     def test_org_get_teams(self):
         """Test GithubInterface method org_get_teams."""
-        mock_list: MagicMock = MagicMock(PaginatedList.PaginatedList)
-        self.mock_org.get_teams.return_value = mock_list
-        self.test_interface.org_get_teams()
+        teamo = MagicMock(Team.Team)
+        teamo.id = 12
+        userperson = MagicMock(NamedUser)
+        userperson.id = 34
+        teamo.get_members.return_value = [userperson]
+        self.mock_org.get_teams.return_value = [teamo]
+        self.mock_org.get_team.return_value = teamo
+        teams = self.test_interface.org_get_teams()
         self.mock_org.get_teams.assert_called_once()
+        self.assertEqual(len(teams), 1)
 
     def test_setup_exception(self):
         """Test GithubInterface setup with exception raised."""

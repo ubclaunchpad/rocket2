@@ -1,10 +1,11 @@
 """Tests for Github App interface."""
+from unittest.mock import patch
+from unittest import TestCase
 import jwt
 
-from datetime import datetime, timedelta
+from interface.exceptions.github import GithubAPIException
 from interface.github_app import GithubAppInterface, \
     DefaultGithubAppAuthFactory
-from unittest.mock import MagicMock, patch
 
 PRIVATE_KEY = \
     "-----BEGIN PRIVATE KEY-----\n" \
@@ -47,94 +48,99 @@ PUBLIC_KEY = \
     "-----END PUBLIC KEY-----\n"
 
 
-def test_github_app_auth():
-    """Test GithubAppAuth internal class."""
-    app_id = "test_app_id"
-    factory = DefaultGithubAppAuthFactory(app_id, PRIVATE_KEY)
-    auth = factory.create()
-    token = jwt.decode(auth.token, PUBLIC_KEY, algorithms='RS256')
-    assert token['iss'] == app_id
-    assert not auth.is_expired()
+class TestDefaultGithubAppAuthFactory(TestCase):
+    """Test case for DefaultGithubAppAuthFactory class."""
+
+    def setUp(self):
+        """Set everything up for testing the class."""
+        self.app_id = "test_app_id"
+        self.factory = DefaultGithubAppAuthFactory(self.app_id, PRIVATE_KEY)
+
+    def test_token_creation(self):
+        """Test create() function."""
+        auth = self.factory.create()
+        token = jwt.decode(auth.token, PUBLIC_KEY, algorithms='RS256')
+        self.assertEqual(token['iss'], self.app_id)
+        self.assertFalse(auth.is_expired())
 
 
-@patch('requests.get')
-def test_get_app_details(mock_request):
-    """Test get_app_details()."""
-    app_id = "test_app_id"
-    payload = {
-        'iat': datetime.utcnow(),
-        'exp': datetime.utcnow() + timedelta(minutes=1),
-        'iss': app_id
-    }
-    mock_token = jwt.encode(payload,
-                            PRIVATE_KEY,
-                            algorithm='RS256') \
-        .decode('utf-8')
-    mock_auth = MagicMock(GithubAppInterface.GithubAppAuth)
-    mock_auth.is_expired = MagicMock(return_value=False)
-    mock_auth.token = mock_token
-    mock_factory = MagicMock(DefaultGithubAppAuthFactory)
-    mock_factory.create = MagicMock(return_value=mock_auth)
-    app_interface = GithubAppInterface(mock_factory)
-    expected_headers = {
-        'Authorization': f'Bearer {mock_token}',
-        'Accept': 'application/vnd.github.machine-man-preview+json'
-    }
-    mock_request.return_value.status_code = 200
+class TestGithubAppInterface(TestCase):
+    """Test case for GithubAppInterface class."""
 
-    app_interface.get_app_details()
+    def setUp(self):
+        """Set everything up for testing the class."""
+        self.app_id = 'test_app_id'
+        self.default_factory = DefaultGithubAppAuthFactory(self.app_id,
+                                                           PRIVATE_KEY)
+        self.interface = GithubAppInterface(self.default_factory)
 
-    mock_request.assert_called_once_with(url="https://api.github.com/app",
-                                         headers=expected_headers)
-    mock_factory.create.assert_called_once()
-    mock_auth.is_expired.assert_called_once()
+    @patch('requests.get')
+    def test_get_app_details_bad_status(self, mock_request):
+        """Test get_app_details() when status code returns non-200."""
+        mock_request.return_value.status_code = 500
+        with self.assertRaises(GithubAPIException):
+            self.interface.get_app_details()
 
+    @patch('requests.get')
+    def test_get_app_details(self, mock_request):
+        """Test get_app_details()."""
+        expected_headers = {
+            'Authorization': f'Bearer {self.interface.auth.token}',
+            'Accept': 'application/vnd.github.machine-man-preview+json'
+        }
+        mock_request.return_value.status_code = 200
 
-@patch('requests.get')
-@patch('requests.post')
-def test_create_api_token(mock_post, mock_get):
-    """Test create_api_token()."""
-    app_id = "test_app_id"
+        self.interface.get_app_details()
 
-    payload = {
-        'iat': datetime.utcnow(),
-        'exp': datetime.utcnow() + timedelta(minutes=1),
-        'iss': app_id
-    }
-    mock_token = jwt.encode(payload,
-                            PRIVATE_KEY,
-                            algorithm='RS256') \
-        .decode('utf-8')
-    expected_headers = {
-        'Authorization': f'Bearer {mock_token}',
-        'Accept': 'application/vnd.github.machine-man-preview+json'
-    }
-    mock_auth = MagicMock(GithubAppInterface.GithubAppAuth)
-    mock_auth.is_expired = MagicMock(return_value=False)
-    mock_auth.token = mock_token
-    mock_factory = MagicMock(DefaultGithubAppAuthFactory)
-    mock_factory.create = MagicMock(return_value=mock_auth)
-    app_interface = GithubAppInterface(mock_factory)
+        mock_request.assert_called_once_with(
+            url="https://api.github.com/app",
+            headers=expected_headers
+        )
 
-    mock_ret_val = "token"
-    mock_id = 7
-    mock_get.return_value.status_code = 200
-    mock_get.return_value.json.return_value = [{
-        'id': mock_id
-    }]
-    mock_post.return_value.status_code = 201
-    mock_post.return_value.json.return_value = {
-        'token': "token"
-    }
+    @patch('requests.get')
+    def test_create_api_token_get_failure(self, mock_get):
+        """Test create_api_token() with failing get request."""
+        mock_get.return_value.status_code = 500
+        with self.assertRaises(GithubAPIException):
+            self.interface.create_api_token()
 
-    assert app_interface.create_api_token() == mock_ret_val
+    @patch('requests.get')
+    @patch('requests.post')
+    def test_create_api_token_post_failure(self, mock_post, mock_get):
+        """Test create_api_token() with failing post request."""
+        mock_get.return_value.status_code = 200
+        mock_get.return_value.json.return_value = [{
+            'id': 7
+        }]
+        mock_post.return_value.status_code = 500
+        with self.assertRaises(GithubAPIException):
+            self.interface.create_api_token()
 
-    mock_get.assert_called_once_with(
-        url="https://api.github.com/app/installations",
-        headers=expected_headers)
-    mock_post.assert_called_once_with(
-        url=f"https://api.github.com/app/installations/"
-            f"{mock_id}/access_tokens",
-        headers=expected_headers)
-    mock_factory.create.assert_called_once()
-    mock_auth.is_expired.assert_called_once()
+    @patch('requests.get')
+    @patch('requests.post')
+    def test_create_api_token(self, mock_post, mock_get):
+        """Test create_api_token()."""
+        expected_headers = {
+            'Authorization': f'Bearer {self.interface.auth.token}',
+            'Accept': 'application/vnd.github.machine-man-preview+json'
+        }
+        mock_ret_val = "token"
+        mock_id = 7
+        mock_get.return_value.status_code = 200
+        mock_get.return_value.json.return_value = [{
+            'id': mock_id
+        }]
+        mock_post.return_value.status_code = 201
+        mock_post.return_value.json.return_value = {
+            'token': "token"
+        }
+
+        self.assertEqual(self.interface.create_api_token(), mock_ret_val)
+
+        mock_get.assert_called_once_with(
+            url="https://api.github.com/app/installations",
+            headers=expected_headers)
+        mock_post.assert_called_once_with(
+            url=f"https://api.github.com/app/installations/"
+                f"{mock_id}/access_tokens",
+            headers=expected_headers)

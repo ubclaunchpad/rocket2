@@ -1,4 +1,0 @@
-[run]
-omit =
-	conf.py
-	factory/__init__.py
