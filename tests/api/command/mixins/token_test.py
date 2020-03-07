@@ -1,19 +1,19 @@
 """Test the common business logic for the team command APIs."""
 from api.command import CommandApis
 from db import DBFacade
-from interface.github import GithubInterface, GithubAPIException
-from interface.slack import Bot, SlackAPIError
-from app.model import User, Team, Project, Permissions
+from interface.github import GithubInterface
+from interface.slack import Bot
+from app.model import User, Team, Permissions
 from unittest import mock, TestCase
-from typing import List, TypeVar
+from typing import Union
 from datetime import datetime, timedelta
 import jwt
 
-T = TypeVar('T', User, Team)
+T = Union[User, Team]
 
 
 class TestProjectCommandApis(TestCase):
-    """Test Case for ProjectCommandApi methods."""
+    """Test Case for TokenCommandApi methods."""
 
     def setUp(self) -> None:
         """Set up the test case environment."""
@@ -47,13 +47,13 @@ class TestProjectCommandApis(TestCase):
                     return self.lead_user
                 elif slack_id == self.admin_user.slack_id:
                     return self.admin_user
-                else:
-                    raise LookupError
-        
+            raise LookupError
+
         self.mock_facade.retrieve.side_effect = \
             mock_facade_retrieve_side_effect
 
     def generate_token(self, delta, user):
+        """Generate JWT Token."""
         delta = timedelta(days=3, milliseconds=4)
         expiry = datetime.utcnow() + delta
         payload = {
@@ -70,17 +70,33 @@ class TestProjectCommandApis(TestCase):
         return token
 
     def test_create_token_from_admin_user(self):
+        """Testing if token can be made from admin user."""
         delta = timedelta(days=3, milliseconds=4)
-        self.assertEqual(self.generate_token(delta, self.admin_user), self.testapi.handle_token_request(self.admin_user.slack_id, delta, "testing"))
+        exp_token = self.generate_token(delta, self.admin_user)
+        token = self.testapi.handle_token_request(self.admin_user.slack_id,
+                                                  delta,
+                                                  "testing")
+        self.assertEqual(token, exp_token)
 
     def test_create_token_from_lead_user(self):
+        """Testing if token can be made from lead user."""
         delta = timedelta(days=3, milliseconds=4)
-        self.assertEqual(self.generate_token(delta, self.lead_user), self.testapi.handle_token_request(self.lead_user.slack_id, delta, "testing"))
+        exp_token = self.generate_token(delta, self.lead_user)
+        token = self.testapi.handle_token_request(self.lead_user.slack_id,
+                                                  delta,
+                                                  "testing")
+        self.assertEqual(token, exp_token)
 
     def test_create_token_from_reg_user(self):
+        """Testing if token can be made from regular user."""
         delta = timedelta(days=3, milliseconds=4)
-        self.assertEqual(self.testapi.token_permission_error, self.testapi.handle_token_request(self.regular_user.slack_id, delta, "testing"))
+        token = self.testapi.handle_token_request(self.regular_user.slack_id,
+                                                  delta,
+                                                  "testing")
+        self.assertEqual(self.testapi.token_permission_error, token)
 
     def test_create_token_from_nonexistent_user(self):
+        """Testing if token can be made from nonexistent user."""
         delta = timedelta(days=3, milliseconds=4)
-        self.assertEqual(self.testapi.token_lookup_error, self.testapi.handle_token_request("testing", delta, "testing"))
+        token = self.testapi.handle_token_request("testing", delta, "testing")
+        self.assertEqual(self.testapi.token_lookup_error, token)

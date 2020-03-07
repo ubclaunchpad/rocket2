@@ -2,24 +2,19 @@
 import jwt
 import logging
 
-from app.controller import ResponseTuple
 from datetime import datetime, timedelta
-from db.facade import DBFacade
 from app.model import User, Permissions
-from utils.slack_msg_fmt import wrap_code_block
-from interface.github import GithubAPIException
-from utils.slack_parse import escape_email
-from typing import cast
+from db.facade import DBFacade
 
 
 class TokenCommandApis:
     """Encapsulate the various APIs for token command logic."""
 
     token_permission_error = "You do not have the sufficient " \
-                       "permission level for this command!"
+                             "permission level for this command!"
     token_lookup_error = "Requesting user not found!"
 
-    def __init__(self) -> None:
+    def __init__(self):
         """
         Initialize TokenCommand.
 
@@ -28,10 +23,10 @@ class TokenCommandApis:
                                .TokenCommandConfig` object
         """
         logging.info("Initializing TokenCommand instance")
-        self._db_facade = None
+        self._db_facade: DBFacade = None
         self.expiry = None
         self.signing_key = None
-    
+
     def handle_token_request(self,
                              user_id: str,
                              expiry: timedelta,
@@ -43,10 +38,10 @@ class TokenCommandApis:
                 return self.token_permission_error
         except LookupError:
             return self.token_lookup_error
-        expiry = datetime.utcnow() + expiry
+        exp = datetime.utcnow() + expiry
         payload = {
             'nbf': datetime.utcnow(),
-            'exp': expiry,
+            'exp': exp,
             'iss': 'ubclaunchpad:rocket2',
             'iat': datetime.utcnow(),
             'user_id': user_id,
@@ -56,4 +51,3 @@ class TokenCommandApis:
             .decode('utf-8')
         format(token)
         return token
-

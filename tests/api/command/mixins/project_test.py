@@ -1,13 +1,13 @@
 """Test the common business logic for the team command APIs."""
 from api.command import CommandApis
 from db import DBFacade
-from interface.github import GithubInterface, GithubAPIException
-from interface.slack import Bot, SlackAPIError
+from interface.github import GithubInterface
+from interface.slack import Bot
 from app.model import User, Team, Project, Permissions
 from unittest import mock, TestCase
-from typing import List, TypeVar
+from typing import List, Union
 
-T = TypeVar('T', User, Team)
+T = Union[User, Team, Project]
 
 
 class TestProjectCommandApis(TestCase):
@@ -39,7 +39,7 @@ class TestProjectCommandApis(TestCase):
         self.team2 = Team("2", "gh2", "name2")
         self.team3 = Team("3", "gh3", "name3")
         self.team3_dup = Team("4", "gh3", "name4")
-        self.nonexistent_team = Team("5", "gh5", "name5")
+        self.no_team = Team("5", "gh5", "name5")
 
         self.project1 = Project(self.team1.github_team_id, [])
         self.project2 = Project("", [])
@@ -68,6 +68,7 @@ class TestProjectCommandApis(TestCase):
                     return self.team1
                 elif args[1] == self.team2.github_team_id:
                     return self.team2
+            raise LookupError
 
         self.mock_facade.retrieve.side_effect = \
             mock_facade_retrieve_side_effect
@@ -75,7 +76,7 @@ class TestProjectCommandApis(TestCase):
         def mock_facade_query_side_effect(*args, **kwargs) -> List[T]:
             """Mock behavior of the query mock facade function."""
             if args[0] == Team:
-                query_teams = []
+                query_teams: List[T] = []
                 try:
                     params = args[1]
                 except IndexError:
@@ -119,63 +120,123 @@ class TestProjectCommandApis(TestCase):
         self.mock_facade.store.return_value = True
 
     def test_create_project_with_tech_lead(self):
+        """Test creating a project from a lead user."""
         self.team1.add_team_lead(self.lead_user.github_id)
-        self.assertTrue(self.testapi.create_project("1111", self.team1.github_team_name, {"display_name": "1111"}, self.lead_user.slack_id))
+        project = self.testapi.create_project("1111",
+                                              self.team1.github_team_name,
+                                              {"display_name": "1111"},
+                                              self.lead_user.slack_id)
+        self.assertTrue(project)
 
     def test_create_project_non_tech_lead(self):
+        """Test creating a project from a non-lead user."""
         self.team1.add_team_lead(self.lead_user.github_id)
-        self.assertFalse(self.testapi.create_project("1111", self.team1.github_team_name, {"display_name": "1111"}, self.regular_user.slack_id))
+        project = self.testapi.create_project("1111",
+                                              self.team1.github_team_name,
+                                              {"display_name": "1111"},
+                                              self.regular_user.slack_id)
+        self.assertFalse(project)
 
     def test_create_project_admin_in_project(self):
+        """Test creating a project with an admin in project."""
         self.team1.add_team_lead(self.admin_user.github_id)
-        self.assertTrue(self.testapi.create_project("1111", self.team1.github_team_name, {"display_name": "1111"}, self.admin_user.slack_id))
+        project = self.testapi.create_project("1111",
+                                              self.team1.github_team_name,
+                                              {"display_name": "1111"},
+                                              self.admin_user.slack_id)
+        self.assertTrue(project)
 
     def test_create_project_admin_not_in_project(self):
+        """Test creating a project with an admin not in project."""
         self.team1.add_team_lead(self.lead_user.github_id)
-        self.assertTrue(self.testapi.create_project("1111", self.team1.github_team_name, {"display_name": "1111"}, self.admin_user.slack_id))
+        project = self.testapi.create_project("1111",
+                                              self.team1.github_team_name,
+                                              {"display_name": "1111"},
+                                              self.admin_user.slack_id)
+        self.assertTrue(project)
 
-    def test_create_project_on_nonexistent_team(self):
-        self.assertFalse(self.testapi.create_project("1111", self.nonexistent_team.github_team_name, {"display_name": "1111"}, self.admin_user.slack_id))
-    
+    def test_create_project_on_no_team(self):
+        """Test creating a project with no team."""
+        project = self.testapi.create_project("1111",
+                                              self.no_team.github_team_name,
+                                              {"display_name": "1111"},
+                                              self.admin_user.slack_id)
+        self.assertFalse(project)
+
     def test_projects_list(self):
+        """Test listing projects."""
         all_projects = self.testapi.projects_list()
-        self.assertListEqual(all_projects, [ self.project1 ])
+        self.assertListEqual(all_projects, [self.project1])
 
     def test_project_view(self):
+        """Test view a project."""
         project = self.testapi.project_view(self.project1.project_id)
         self.assertEqual(project, self.project1)
-    
+
     def test_project_view_no_project(self):
+        """Test view a nonexistent project."""
         with self.assertRaises(LookupError):
-          self.testapi.project_view("lol")
-          self.fail
-    
+            self.testapi.project_view("lol")
+            self.fail
+
     def test_edit_project(self):
-        self.assertTrue(self.testapi.edit_project(self.project1.project_id, {"display_name": "2222"}))
+        """Test edit a project."""
+        project = self.testapi.edit_project(self.project1.project_id,
+                                            {"display_name": "2222"})
+        self.assertTrue(project)
         self.assertEqual(self.project1.display_name, "2222")
-        self.assertEqual(self.testapi.project_view(self.project1.project_id).display_name, "2222")
+        p = self.testapi.project_view(self.project1.project_id).display_name
+        self.assertEqual(p, "2222")
 
-    def test_assign_team_to_project(self): 
+    def test_assign_team_to_project(self):
+        """Test assigning a team to a project."""
         self.team2.add_team_lead(self.lead_user.github_id)
-        self.assertTrue(self.testapi.assign_helper(self.project2.project_id, self.team2.github_team_name, self.lead_user.slack_id, False))
-    
-    def test_assign_team_to_existing_project(self): 
-        self.assertFalse(self.testapi.assign_helper(self.project1.project_id, self.team2.github_team_name, self.lead_user.slack_id, False))
+        assign = self.testapi.assign_helper(self.project2.project_id,
+                                            self.team2.github_team_name,
+                                            self.lead_user.slack_id,
+                                            False)
+        self.assertTrue(assign)
 
-    def test_unassign_team(self): 
+    def test_assign_team_to_existing_project(self):
+        """Test assigning a team to an existing project."""
+        assign = self.testapi.assign_helper(self.project1.project_id,
+                                            self.team2.github_team_name,
+                                            self.lead_user.slack_id,
+                                            False)
+        self.assertFalse(assign)
+
+    def test_unassign_team(self):
+        """Test unassigning a team to a project."""
         self.team1.add_team_lead(self.lead_user.github_id)
-        self.assertTrue(self.testapi.unassign_helper(self.project1.project_id, self.lead_user.slack_id))
+        project = self.testapi.unassign_helper(self.project1.project_id,
+                                               self.lead_user.slack_id)
+        self.assertTrue(project)
         self.assertEqual(self.project1.github_team_id, "")
-    
+
     def test_unassign_team_no_perms(self):
-        self.assertFalse(self.testapi.unassign_helper(self.project1.project_id, self.regular_user.slack_id))
-    
+        """Test unassigning a team from a project with no permissions."""
+        assign = self.testapi.unassign_helper(self.project1.project_id,
+                                              self.regular_user.slack_id)
+        self.assertFalse(assign)
+
     def test_delete_project(self):
+        """Test delete a project."""
         self.team2.add_team_lead(self.lead_user.github_id)
-        self.testapi.assign_helper(self.project2.project_id, self.team2.github_team_name, self.lead_user.slack_id, False)
-        self.assertTrue(self.testapi.delete_helper(self.project2.project_id, self.lead_user.slack_id, True))
-    
+        self.testapi.assign_helper(self.project2.project_id,
+                                   self.team2.github_team_name,
+                                   self.lead_user.slack_id,
+                                   False)
+        self.assertTrue(self.testapi.delete_helper(self.project2.project_id,
+                                                   self.lead_user.slack_id,
+                                                   True))
+
     def test_delete_project_no_perms(self):
+        """Test delete a project with no permissions."""
         self.team2.add_team_lead(self.lead_user.github_id)
-        self.testapi.assign_helper(self.project2.project_id, self.team2.github_team_name, self.lead_user.slack_id, False)
-        self.assertFalse(self.testapi.delete_helper(self.project2.project_id, self.regular_user.slack_id, True))
+        self.testapi.assign_helper(self.project2.project_id,
+                                   self.team2.github_team_name,
+                                   self.lead_user.slack_id,
+                                   False)
+        self.assertFalse(self.testapi.delete_helper(self.project2.project_id,
+                                                    self.regular_user.slack_id,
+                                                    True))

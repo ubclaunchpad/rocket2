@@ -1,26 +1,24 @@
 """Encapsulate the common business logic of project commands."""
 import logging
 
-from argparse import ArgumentParser, _SubParsersAction
-from app.controller import ResponseTuple
-from app.controller.command.commands.base import Command
-from db.facade import DBFacade
 from app.model import Project, User, Team, Permissions
 from typing import Dict, cast, List
 
+
 class ProjectCommandApis:
     """Encapsulate the various APIs for project command logic."""
+
     def __init__(self):
         """Declare the interfaces needed."""
         self._db_facade = None
         self._gh_interface = None
         self._slack_client = None
-    
+
     def create_project(self,
-                      gh_repo: str,
-                      github_team_name: str,
-                      param_list: Dict[str, str],
-                      user_id: str) -> bool:
+                       gh_repo: str,
+                       github_team_name: str,
+                       param_list: Dict[str, str],
+                       user_id: str) -> bool:
         """
         Create a project and store it in the database.
 
@@ -38,8 +36,8 @@ class ProjectCommandApis:
         """
         logging.debug("Handling project create subcommand")
         team_list = self._db_facade.query(Team,
-                                      [("github_team_name",
-                                        github_team_name)])
+                                          [("github_team_name",
+                                            github_team_name)])
         if len(team_list) != 1:
             error = f"{len(team_list)} teams found with " \
                 f"GitHub team name {github_team_name}"
@@ -53,19 +51,19 @@ class ProjectCommandApis:
         if not (user.github_id in team.team_leads or
                 user.permissions_level is Permissions.admin):
             logging.error(f"User with user ID {user_id} is not "
-                            "a team lead of the specified team or an admin")
+                          "a team lead of the specified team or an admin")
             return False
 
         project = Project(team.github_team_id, [gh_repo])
 
         if param_list["display_name"]:
             project.display_name = param_list["display_name"]
-            
+
         return cast(bool, self._db_facade.store(project))
-    
+
     def edit_project(self,
-                    project_id: str,
-                    param_list: Dict[str, str]) -> bool:
+                     project_id: str,
+                     param_list: Dict[str, str]) -> bool:
         """
         Edit project from database.
 
@@ -80,9 +78,9 @@ class ProjectCommandApis:
         if param_list["display_name"]:
             project.display_name = param_list["display_name"]
             logging.debug("Changed display "
-                            f"name to {project.display_name}")
+                          f"name to {project.display_name}")
             return cast(bool, self._db_facade.store(project))
-      
+        return False
 
     def delete_helper(self,
                       project_id: str,
@@ -109,12 +107,12 @@ class ProjectCommandApis:
                           f"GitHub team ID {project.github_team_id}")
             return False
         elif not (user.github_id in team.team_leads or
-                    user.permissions_level is Permissions.admin):
+                  user.permissions_level is Permissions.admin):
             logging.error(f"User with user ID {user_id} is not "
                           "a team lead of the specified team or an admin")
             return False
         return cast(bool, self._db_facade.delete(Project, project_id))
-    
+
     def assign_helper(self,
                       project_id: str,
                       github_team_name: str,
@@ -139,8 +137,8 @@ class ProjectCommandApis:
         project = self._db_facade.retrieve(Project, project_id)
 
         team_list = self._db_facade.query(Team,
-                                        [("github_team_name",
-                                        github_team_name)])
+                                          [("github_team_name",
+                                            github_team_name)])
         if len(team_list) != 1:
             error = f"{len(team_list)} teams found with " \
                 f"GitHub team name {github_team_name}"
@@ -155,11 +153,11 @@ class ProjectCommandApis:
         if not (user.github_id in team.team_leads or
                 user.permissions_level is Permissions.admin):
             logging.error(f"User with user ID {user_id} is not "
-                            "a team lead of the specified team or an admin")
+                          "a team lead of the specified team or an admin")
             return False
         elif project.github_team_id != "" and not force:
             logging.error("Project is assigned to team with "
-                            f"GitHub team ID {project.github_team_id}")
+                          f"GitHub team ID {project.github_team_id}")
             return False
         else:
             project.github_team_id = team.github_team_id
@@ -184,7 +182,7 @@ class ProjectCommandApis:
         #         f"{project.github_team_id} : " \
         #         f"{project.display_name}\n"
         # return project_list_str, 200
-    
+
     def unassign_helper(self,
                         project_id: str,
                         user_id: str) -> bool:
@@ -208,14 +206,14 @@ class ProjectCommandApis:
         if not (user.github_id in team.team_leads or
                 user.permissions_level is Permissions.admin):
             logging.error(f"User with user ID {user_id} is not "
-                            "a team lead of the specified team or an admin")
+                          "a team lead of the specified team or an admin")
             return False
         else:
             project.github_team_id = ""
             return cast(bool, self._db_facade.store(project))
 
     def project_view(self,
-                    project_id: str) -> Project:
+                     project_id: str) -> Project:
         """
         View project info from database.
 

@@ -5,9 +5,9 @@ from interface.github import GithubInterface, GithubAPIException
 from interface.slack import Bot, SlackAPIError
 from app.model import User, Team, Permissions
 from unittest import mock, TestCase
-from typing import List, TypeVar
+from typing import List, Union
 
-T = TypeVar('T', User, Team)
+T = Union[User, Team]
 
 
 class TestTeamCommandApis(TestCase):
@@ -51,7 +51,7 @@ class TestTeamCommandApis(TestCase):
 
         def mock_facade_query_side_effect(*args, **kwargs) -> List[T]:
             """Mock behavior of the query mock facade function."""
-            query_teams = []
+            query_teams: List[T] = []
             try:
                 params = args[1]
             except IndexError:
@@ -87,6 +87,7 @@ class TestTeamCommandApis(TestCase):
         self.mock_facade.store.return_value = True
 
     def test_list(self) -> None:
+        """Test list all teams."""
         all_teams = self.testapi.team_list()
         self.assertListEqual(all_teams,
                              [
@@ -498,7 +499,7 @@ class TestTeamCommandApis(TestCase):
             self.assertTrue(False)
 
     def test_edit_permission_error(self) -> None:
-        """Test edit team command API with caller with caller without permissions."""
+        """Test edit team command API with caller without permissions."""
         try:
             self.testapi.team_edit("regular", "gh1")
         except PermissionError:

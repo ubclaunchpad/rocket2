@@ -5,6 +5,7 @@ from app.model import User, Team
 from interface.github import GithubAPIException
 from interface.slack import SlackAPIError
 from utils.slack_parse import check_permissions
+from db.facade import DBFacade
 
 
 class TeamCommandApis:
@@ -12,7 +13,7 @@ class TeamCommandApis:
 
     def __init__(self):
         """Declare the interfaces needed."""
-        self._db_facade = None
+        self._db_facade: DBFacade = None
         self._gh_interface = None
         self._slack_client = None
 
@@ -66,7 +67,7 @@ class TeamCommandApis:
                     channel: str = None,
                     lead_id: str = None) -> bool:
         """
-        Creates a team both in the Rocket database and Github organization.
+        Create a team both in the Rocket database and Github organization.
 
         :param user_id: Slack ID of the user who is calling the API
         :param gh_team_name: desired team name to give the team on Github
@@ -484,11 +485,11 @@ class TeamCommandApis:
         num_teams = len(teams)
 
         if num_teams < 1:
-            msg = f"No teams found with team name {team_name}"
+            msg = f"No teams found with team name {gh_team_name}"
             logging.error(msg)
             raise LookupError(msg)
         elif num_teams > 1:
-            msg = f"{num_teams} found with team name {team_name}"
+            msg = f"{num_teams} found with team name {gh_team_name}"
             logging.error(msg)
             raise RuntimeError(msg)
         else:
@@ -535,8 +536,9 @@ class TeamCommandApis:
             if not team.has_member(lead_user.github_id):
                 team.add_member(lead_user.github_id)
                 try:
-                    self.gh.add_team_member(lead_user.github_username,
-                                            team.github_team_id)
+                    self._gh_interface.add_team_member(
+                      lead_user.github_username,
+                      team.github_team_id)
                 except GithubAPIException as e:
                     msg = f"Error adding {lead_user.github_username} to " \
                         f"Github organization: {e.data}"
@@ -580,11 +582,11 @@ class TeamCommandApis:
         num_teams = len(teams)
 
         if num_teams < 1:
-            msg = f"No teams found with team name {team_name}"
+            msg = f"No teams found with team name {gh_team_name}"
             logging.error(msg)
             raise LookupError(msg)
         elif num_teams > 1:
-            msg = f"{num_teams} found with team name {team_name}"
+            msg = f"{num_teams} found with team name {gh_team_name}"
             logging.error(msg)
             raise RuntimeError(msg)
         else:
@@ -655,12 +657,13 @@ class TeamCommandApis:
         # remove teams not in github anymore
         for local_id in local_team_dict:
             if local_id not in remote_team_dict:
-                # XXX: Should this be a local delete instead of a Github delete?
+                # XXX: Should this be a local
+                # delete instead of a Github delete?
                 try:
-                    self.gh.org_delete_team(local_id)
-                except GithubAPIException as e:
+                    self._gh_interface.org_delete_team(local_id)
+                except GithubAPIException:
                     msg = "Failed to delete Github team " \
-                        f"{local_team_dict[local_id].github_team_name}"
+                          f"{local_team_dict[local_id].github_team_name}"
                 logging.debug(f"Team with Github ID {local_id} deleted")
                 num_deleted += 1
 
@@ -686,7 +689,7 @@ class TeamCommandApis:
                     # update the old team, to retain additional parameters
                     local_team.github_team_name = remote_team.github_team_name
                     local_team.members = remote_team.members
-                    edited = self.facade.store(local_team)
+                    edited = self._db_facade.store(local_team)
                     if edited:
                         logging.debug("Successfully edited team with "
                                       f"Github ID {remote_id}")
