@@ -74,6 +74,7 @@ class TeamCommandApis:
                  is encountered retrieving the members of that channel
         :raises: GithubAPIException if an error occurs on team creation or
                  Github team member addition
+        :raises: Exception for any other generic error
         :return: True if the team creation was successful, False otherwise
         """
         logging.info("Team create command API called")
@@ -92,7 +93,7 @@ class TeamCommandApis:
                 f" Github username in this system."\
                 f" Register with `/rocket user edit --github username`."
             logging.error(msg)
-            return False
+            raise Exception(msg)
 
         gh_team_id = str(self._gh_interface.org_create_team(gh_team_name))
         logging.debug(f"Github team {gh_team_name} created with "
