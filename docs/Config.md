@@ -53,7 +53,8 @@ and verify that the webhook is indeed coming from Github.
 
 The Github app signing key (can be found under Github organization settings ->
 Developer Settings -> Github Apps -> Edit (at the bottom you generate and
-download the key)). Paste the contents of the file as a string.
+download the key)). Paste the contents of the file as a string. See
+[deployment](Deployment.html#github-key) for troubleshooting.
 
 ## AWS\_ACCESS\_KEYID
 

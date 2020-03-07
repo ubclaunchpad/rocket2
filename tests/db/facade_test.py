@@ -50,9 +50,9 @@ def test_store_team(ddb):
 def test_retrieve_team(ddb):
     """Test retrieving team calls correct functions."""
     dbf = DBFacade(ddb)
-    team_name = 'brussel-sprouts'
-    dbf.retrieve(Team, team_name)
-    ddb.retrieve.assert_called_with(Team, team_name)
+    team_id = '12345'
+    dbf.retrieve(Team, team_id)
+    ddb.retrieve.assert_called_with(Team, team_id)
 
 
 @mock.patch('db.dynamodb.DynamoDB', autospec=True)
