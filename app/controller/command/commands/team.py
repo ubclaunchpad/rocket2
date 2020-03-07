@@ -303,6 +303,12 @@ class TeamCommand(Command):
             command_user = self.facade.retrieve(User, user_id)
             if not check_permissions(command_user, None):
                 return self.permission_error, 200
+            if not command_user.github_id:
+                msg = f"User {command_user.slack_id} has yet to register a"\
+                    f" Github username in this system."\
+                    f" Register with `/rocket user edit --github username`."
+                logging.error(msg)
+                return msg, 200
             msg = f"New team created: {param_list['team_name']}, "
             team_id = str(self.gh.org_create_team(param_list['team_name']))
             team = Team(team_id, param_list['team_name'], "")
