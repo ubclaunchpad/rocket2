@@ -274,7 +274,9 @@ class TeamCommand(Command):
         team_leads_set = teams[0].team_leads
         team_leads_list = list(map(lambda i: ('github_user_id',
                                               str(i)), team_leads_set))
-        team_leads = self.facade.query_or(User, team_leads_list)
+        team_leads: List[User] = []
+        if team_leads_list:
+            team_leads = self.facade.query_or(User, team_leads_list)
         names = set(map(lambda m: m.github_username, team_leads))
         teams[0].team_leads = names
 

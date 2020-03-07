@@ -115,6 +115,17 @@ class TestTeamCommand(TestCase):
         self.assertTupleEqual(self.testcommand.handle("team view brs", user),
                               (self.testcommand.lookup_error, 200))
 
+    def test_handle_view_noleads(self):
+        """Test team command view parser with no team leads."""
+        team = Team("BRS", "brs", "web")
+        user = User("someID")
+        team_attach = [team.get_attachment()]
+        self.db.query.side_effect = [[team], [user]]
+        expect = {'attachments': team_attach}
+        resp, code = self.testcommand.handle("team view brs", user)
+        self.assertDictEqual(resp, expect)
+        self.assertEqual(code, 200)
+
     def test_handle_delete_not_admin(self):
         """Test team command delete parser with improper permission."""
         team = Team("BRS", "brs", "web")
