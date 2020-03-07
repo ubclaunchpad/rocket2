@@ -82,6 +82,7 @@ class ProjectCommandApis:
             logging.debug("Changed display "
                             f"name to {project.display_name}")
             return cast(bool, self._db_facade.store(project))
+      
 
     def delete_helper(self,
                       project_id: str,
