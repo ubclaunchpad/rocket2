@@ -17,7 +17,7 @@ class MentionCommand(Command):
     karma_add_amount = 1
     unsupported_error = "unsupported usage"
 
-    def __init__(self, db_facade: DBFacade) -> None:
+    def __init__(self, db_facade: DBFacade):
         """Initialize Mention command."""
         logging.info("Starting Mention command initializer")
         self.parser = argparse.ArgumentParser(prog="Mention")

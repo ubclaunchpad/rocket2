@@ -11,12 +11,12 @@ class SlackEventsHandler:
 
     def __init__(self,
                  db_facade: DBFacade,
-                 bot: Bot) -> None:
+                 bot: Bot):
         """Initialize all the required interfaces."""
         self.__facade = db_facade
         self.__bot = bot
 
-    def handle_team_join(self, event_data: Dict[str, Any]) -> None:
+    def handle_team_join(self, event_data: Dict[str, Any]):
         """
         Handle the event of a new user joining the workspace.
 
@@ -25,7 +25,10 @@ class SlackEventsHandler:
         new_id = event_data["event"]["user"]["id"]
         new_user = User(new_id)
         self.__facade.store(new_user)
-        welcome = 'Welcome to UBC Launch Pad!'
+        welcome = "Welcome to UBC Launch Pad!" + \
+                  "Please type `/rocket user edit " + \
+                  "--github <YOUR GITHUB USERNAME>` " + \
+                  "to add yourself to the GitHub organization."
         try:
             self.__bot.send_dm(welcome, new_id)
             logging.info(f"{new_id} added to database - user notified")

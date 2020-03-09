@@ -1,0 +1,17 @@
+# sandbox.yml
+# Spin up a sandbox environment for local development using Docker.
+#
+# Usage:
+#   docker-compose -f sandbox.yml up
+#
+
+version: '3'
+
+services:
+  dynamodb:
+    image: amazon/dynamodb-local
+    ports:
+      - 8000:8000
+    command: -Djava.library.path=./DynamoDBLocal_lib -jar DynamoDBLocal.jar -sharedDb -dbPath ./data
+    volumes:
+      - ${PWD}/DynamoDB/data:/home/dynamodblocal/data

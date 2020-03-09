@@ -11,7 +11,7 @@ pipenv run mypy .
 mdl .
 
 # We use a script to check if dynamodb is running locally
-COV_OPTIONS="--mypy --cov=./ --cov-branch --cov-config .coverageac"
+COV_OPTIONS="--mypy --cov=./ --cov-branch --cov-config .coveragerc"
 PORT_CHECKER="scripts/port_busy.py"
 TESTS="tests/"
 PORT_BUSY="pipenv run python ${PORT_CHECKER} 8000"

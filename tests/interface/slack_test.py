@@ -14,7 +14,7 @@ class TestBot(TestCase):
     def setUp(self):
         """Set up the test case environment."""
         self.mock_sc = mock.MagicMock(WebClient)
-        self.bot = Bot(self.mock_sc)
+        self.bot = Bot(self.mock_sc, "#general")
 
     def test_send_dm(self):
         """Test the Bot class method send_dm()."""
@@ -23,7 +23,8 @@ class TestBot(TestCase):
         self.bot.send_dm("Hahahaha", "UD8UCTN05")
         self.mock_sc.chat_postMessage.assert_called_with(
             text="Hahahaha",
-            channel="UD8UCTN05"
+            channel="UD8UCTN05",
+            as_user=True
         )
 
     def test_send_dm_failure(self):
@@ -37,7 +38,8 @@ class TestBot(TestCase):
         finally:
             self.mock_sc.chat_postMessage.assert_called_with(
                 text="Hahahaha",
-                channel="UD8UCTN05"
+                channel="UD8UCTN05",
+                as_user=True
             )
 
     def test_send_to_channel(self):
@@ -66,13 +68,40 @@ class TestBot(TestCase):
                 channel="#random"
             )
 
+    def test_send_event_notif(self):
+        """Test send_event_notif()."""
+        self.mock_sc.chat_postMessage.return_value = OK_RESP
+        self.bot.send_event_notif("Good work everyone")
+        self.mock_sc.chat_postMessage.assert_called_with(
+            text="Good work everyone",
+            attachments=[],
+            channel=self.bot.slack_channel
+        )
+
+    def test_send_event_notif_error(self):
+        """Test send_event_notif() that errors out."""
+        self.mock_sc.chat_postMessage.return_value = BAD_RESP
+        self.bot.send_event_notif("Good work everyone")
+        self.mock_sc.chat_postMessage.assert_called_with(
+            text="Good work everyone",
+            attachments=[],
+            channel=self.bot.slack_channel
+        )
+
+    def test_get_channels_error(self):
+        """Test get_channels() with errors."""
+        resp = {'ok': False, 'error': 'bad bad bad'}
+        self.mock_sc.conversations_list.return_value = resp
+        with self.assertRaises(SlackAPIError):
+            self.bot.get_channels()
+
     def test_get_channels(self):
         """Test get_channel_names() method."""
-        resp = {'ok': True, 'channels': []}
+        resp = {'ok': True, 'channels': [{'name': 'happy'}]}
         self.mock_sc.conversations_list = mock.MagicMock(return_values=resp)
         names = self.bot.get_channel_names()
 
-        assert len(names) == 0
+        self.assertEqual(len(names), 0)
 
     def test_get_channel_users(self):
         """Test the bot method get_channel_users()."""
@@ -93,14 +122,11 @@ class TestBot(TestCase):
         self.mock_sc.conversations_members =\
             mock.MagicMock(return_value={"ok": False, "error": "Error"})
 
-        try:
-            self.bot.get_channel_users("C1234441")
-        except SlackAPIError as e:
-            assert e.error == "Error"
-        finally:
-            self.mock_sc.conversations_members.assert_called_with(
-                channel="C1234441"
-            )
+        with self.assertRaises(SlackAPIError):
+            self.bot.get_channel_users('C1234441')
+        self.mock_sc.conversations_members.assert_called_with(
+            channel='C1234441'
+        )
 
     def test_create_same_channel_thrice(self):
         """Test create_channel() thrice, with the third call throwing up."""

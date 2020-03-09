@@ -20,7 +20,6 @@ services:
         ports:
             - 5000:5000
         environment:
-            - TESTING=${TESTING}
             - SLACK_NOTIFICATION_CHANNEL=${SLACK_NOTIFICATION_CHANNEL}
             - SLACK_ANNOUNCEMENT_CHANNEL=${SLACK_ANNOUNCEMENT_CHANNEL}
             - SLACK_SIGNING_SECRET=${SLACK_SIGNING_SECRET}
@@ -36,4 +35,5 @@ services:
             - AWS_TEAMS_TABLE=${AWS_TEAMS_TABLE}
             - AWS_PROJECTS_TABLE=${AWS_PROJECTS_TABLE}
             - AWS_REGION=${AWS_REGION}
+            - AWS_LOCAL=${AWS_LOCAL}
         restart: on-failure

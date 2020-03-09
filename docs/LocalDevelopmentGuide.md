@@ -20,6 +20,14 @@ passed to your local port 5000. As long as you run Rocket on port 5000 (see
 below), you can then access it through the HTTPS URL that ngrok gives you. Note
 that it is very important to use the HTTPS URL, *not* the HTTP URL.
 
+An alternative to `ngrok` is [`localtunnel`](https://github.com/localtunnel/localtunnel),
+which lets you use the same subdomain every time.
+
+```bash
+$ lt --port 5000 --subdomain my-amazing-rocket2
+your url is: https://my-amazing-rocket2.localtunnel.me
+```
+
 ## 2: Create a Slack Workspace
 
 For testing, it's useful to have your own Slack workspace set up. If you do not
@@ -55,14 +63,24 @@ Rocket makes use of AWS DynamoDB as its database, and for testing you will want
 to test on the "real" DynamoDB. If you do not already have access to DynamoDB,
 you can use it as part of the free tier of AWS. Create an AWS account for
 yourself, then go to the IAM service and create a new user. The user name
-doesn't particularly matter (though `rocket2-dev-$NAME` is recommended),
-but make sure you check "programmatic access." In permissions, go to
-"Attach existing permissions directly" and add the `AmazonDynamoDBFullAccess`
-policy. Finally, copy the provided access key ID and secret access key after
-creating the new user.
+doesn't particularly matter (though `rocket2-dev-$NAME` is recommended), but
+make sure you check "programmatic access." In permissions, go to "Attach
+existing permissions directly" and add the following policies:
+
+- `AmazonDynamoDBFullAccess`
+- `CloudWatchLogsFullAccess`
+
+As you may have noticed, we not only want to use DynamoDB, but also CloudWatch.
+We send our logs to CloudWatch for easier storage and querying.
+
+Finally, copy the provided access key ID and secret access key after creating
+the new user.
 
 Note: if you are in the `brussel-sprouts` Github team, you should already have
 AWS credentials. Just ask.
+
+Alternatively, just set up [DynamoDB locally][localdynamodb] (the Docker-based
+setup is probably the easiest) and set `AWS_LOCAL=True`.
 
 ## 5: Set Up Config
 
@@ -96,9 +114,8 @@ Github API should be automated, once the signing key is available.
 
 After doing this, remember to put your ngrok HTTPS URL with `/webhook` appended
 at the end, into the "Webhook URL" box. After doing this, you must go to the
-app's "Permissions & Events" tab and set the following as read-only:
+app's "Permissions & Events" tab and set the following as Read & Write:
 
-- Organization hooks
 - Organization members
 
 After doing so, please check the checkboxes below:
@@ -116,7 +133,11 @@ following two commands:
 
 ```bash
 docker build -t rocket2-dev-img .
-docker run --rm -it -p 0.0.0.0:5000:5000 rocket2-dev-img
+docker run --rm -it \
+  --env-file .env \
+  -p 0.0.0.0:5000:5000 \
+  rocket2-dev-img
+# optionally include `--network="host"` for local dynamoDB
 ```
 
 Note that the options passed to `-p` in `docker run` tell Docker what port
@@ -125,7 +146,8 @@ the first `5000` is the port exposed inside the container, and the second
 `5000` is the port exposed outside the container. The port exposed outside
 the container can be changed (for instance, if port 5000 is already
 in use in your local development environment), but in that case ensure that
-ngrok is running on the same port.
+ngrok is running on the same port. The option [`--env-file`][docker-env-file]
+lets you pass in your [configuration options][config].
 
 Also note that, for your convenience, we have provided two scripts,
 `scripts/docker_build.sh` and `scripts/docker_run_local.sh`, that run these
@@ -237,3 +259,5 @@ Remember to rebulid your Docker image every time you make a change!
 [make-slack-app]: https://api.slack.com/apps
 [download-ngrok]: https://ngrok.com/
 [github-token]: https://github.com/settings/tokens
+[docker-env-file]: https://docs.docker.com/engine/reference/commandline/run/#set-environment-variables--e---env---env-file
+[localdynamodb]: index.html#running-dynamodb-locally

@@ -7,18 +7,19 @@ import logging
 class Bot:
     """Utility class for calling Slack APIs."""
 
-    def __init__(self, sc: WebClient, slack_channel: str = '') -> None:
+    def __init__(self, sc: WebClient, slack_channel: str = ''):
         """Initialize Bot by creating a WebClient Object."""
         logging.info("Initializing Slack client interface")
         self.sc = sc
         self.slack_channel = slack_channel
 
-    def send_dm(self, message: str, slack_user_id: str) -> None:
+    def send_dm(self, message: str, slack_user_id: str):
         """Send direct message to user with id of slack_user_id."""
         logging.debug(f"Sending direct message to {slack_user_id}")
         response = self.sc.chat_postMessage(
             channel=slack_user_id,
-            text=message
+            text=message,
+            as_user=True
         )
         if not response['ok']:
             logging.error(f"Direct message to {slack_user_id} failed with "
@@ -28,7 +29,7 @@ class Bot:
     def send_to_channel(self,
                         message: str,
                         channel_name: str,
-                        attachments: List[Any] = []) -> None:
+                        attachments: List[Any] = []):
         """Send message to channel with name channel_name."""
         logging.debug(f"Sending message to channel {channel_name}")
         response = self.sc.chat_postMessage(

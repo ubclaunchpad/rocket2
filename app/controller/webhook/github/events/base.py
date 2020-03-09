@@ -8,7 +8,7 @@ from typing import Dict, Any, List
 class GitHubEventHandler(ABC):
     """Define the properties and methods needed for a GitHub event handler."""
 
-    def __init__(self, db_facade: DBFacade) -> None:
+    def __init__(self, db_facade: DBFacade):
         """Give handler access to the database facade."""
         self._facade = db_facade
         super().__init__()

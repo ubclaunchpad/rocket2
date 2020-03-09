@@ -1,6 +1,6 @@
 """Flask server instance."""
 from factory import make_command_parser, make_github_webhook_handler, \
-    make_slack_events_handler
+    make_slack_events_handler, make_github_interface
 from flask import Flask, request
 from logging.config import dictConfig
 from slackeventsapi import SlackEventAdapter
@@ -16,11 +16,33 @@ from boto3.session import Session
 from threading import Thread
 
 config = Config()
-boto3_session = Session(aws_access_key_id=config.aws_access_keyid,
-                        aws_secret_access_key=config.aws_secret_key,
-                        region_name=config.aws_region)
 
-dictConfig({
+# set up logging handlers from config
+loggingHandlers = ['wsgi']
+loggingHandlersConfig = {
+    'wsgi': {
+        'class': 'logging.StreamHandler',
+        'stream': 'ext://flask.logging.wsgi_errors_stream',
+        'formatter': 'colored'
+    },
+}
+if not config.aws_local:
+    # set up logging to AWS cloudwatch when not restricted to local AWS
+    boto3_session = Session(aws_access_key_id=config.aws_access_keyid,
+                            aws_secret_access_key=config.aws_secret_key,
+                            region_name=config.aws_region)
+    loggingHandlers.append('watchtower')
+    loggingHandlersConfig['watchtower'] = {
+        'level': 'DEBUG',
+        'class': 'watchtower.CloudWatchLogHandler',
+        'boto3_session': boto3_session,
+        'log_group': 'watchtower',
+        'stream_name': 'rocket2',
+        'formatter': 'aws',
+    }
+
+# set up logging
+loggingConfig = {
     'version': 1,
     'disable_existing_loggers': False,
     'formatters': {
@@ -39,33 +61,21 @@ dictConfig({
             "processor": structlog.dev.ConsoleRenderer(colors=True),
             'datefmt': '%Y-%m-%d %H:%M:%S',
         }},
-    'handlers': {
-        'wsgi': {
-            'class': 'logging.StreamHandler',
-            'stream': 'ext://flask.logging.wsgi_errors_stream',
-            'formatter': 'colored'
-        },
-        'watchtower': {
-            'level': 'DEBUG',
-            'class': 'watchtower.CloudWatchLogHandler',
-            'boto3_session': boto3_session,
-            'log_group': 'watchtower',
-            'stream_name': 'rocket2',
-            'formatter': 'aws',
-        },
-    },
+    'handlers': loggingHandlersConfig,
     'root': {
         'level': 'INFO',
         'propagate': True,
-        'handlers': ['wsgi', 'watchtower']
+        'handlers': loggingHandlers
     }
-})
+}
+dictConfig(loggingConfig)
 
 app = Flask(__name__)
 # HTTP security header middleware for Flask
 talisman = Talisman(app)
 talisman.force_https = False
-command_parser = make_command_parser(config)
+github_interface = make_github_interface(config)
+command_parser = make_command_parser(config, github_interface)
 github_webhook_handler = make_github_webhook_handler(config)
 slack_events_handler = make_slack_events_handler(config)
 slack_events_adapter = SlackEventAdapter(config.slack_signing_secret,

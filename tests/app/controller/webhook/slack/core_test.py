@@ -63,7 +63,10 @@ def test_handle_team_join_success():
     }
     handler = SlackEventsHandler(mock_facade, mock_bot)
     handler.handle_team_join(event)
-    welcome = 'Welcome to UBC Launch Pad!'
+    welcome = "Welcome to UBC Launch Pad!" + \
+              "Please type `/rocket user edit " + \
+              "--github <YOUR GITHUB USERNAME>` " + \
+              "to add yourself to the GitHub organization."
     id = "W012A3CDE"
     mock_bot.send_dm.assert_called_once_with(welcome, id)
 
@@ -127,6 +130,9 @@ def test_handle_team_join_slack_error():
     }
     handler = SlackEventsHandler(mock_facade, mock_bot)
     handler.handle_team_join(event)
-    welcome = 'Welcome to UBC Launch Pad!'
+    welcome = "Welcome to UBC Launch Pad!" + \
+              "Please type `/rocket user edit " + \
+              "--github <YOUR GITHUB USERNAME>` " + \
+              "to add yourself to the GitHub organization."
     id = "W012A3CDE"
     mock_bot.send_dm.assert_called_once_with(welcome, id)

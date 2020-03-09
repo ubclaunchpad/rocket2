@@ -81,3 +81,13 @@ cd DynamoDB/
 java -Djava.library.path=./DynamoDBLocal_lib -jar DynamoDBLocal.jar -sharedDb
 # Open a new terminal to continue interacting
 ```
+
+For a more sandboxed approach, you can use Docker and docker-compose to spin
+up a local DynamoDB instance:
+
+```bash
+docker-compose -f sandbox.yml up
+```
+
+You can then point a Rocket instance at this DynamoDB database by setting
+`AWS_LOCAL=True`.

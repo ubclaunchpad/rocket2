@@ -11,7 +11,7 @@ class Team(RocketModel):
     def __init__(self,
                  github_team_id: str,
                  github_team_name: str,
-                 display_name: str) -> None:
+                 display_name: str):
         """
         Initialize the team.
 
@@ -83,7 +83,7 @@ class Team(RocketModel):
         :param team: the team object
         :return: the dictionary representing the team
         """
-        def place_if_filled(name: str, field: Any) -> None:
+        def place_if_filled(name: str, field: Any):
             """Populate ``tdict`` if ``field`` isn't empty."""
             if field:
                 tdict[name] = field
@@ -122,11 +122,11 @@ class Team(RocketModel):
         """Return the opposite of what is returned in self.__eq__(other)."""
         return not (self == other)
 
-    def add_member(self, github_user_id: str) -> None:
+    def add_member(self, github_user_id: str):
         """Add a new member's Github ID to the team's set of members' IDs."""
         self.members.add(github_user_id)
 
-    def discard_member(self, github_user_id: str) -> None:
+    def discard_member(self, github_user_id: str):
         """Discard the member of the team with Github ID in the argument."""
         self.members.discard(github_user_id)
 
@@ -134,7 +134,7 @@ class Team(RocketModel):
         """Identify if any member has the ID specified in the argument."""
         return github_user_id in self.members
 
-    def add_team_lead(self, github_user_id: str) -> None:
+    def add_team_lead(self, github_user_id: str):
         """Add a user's Github ID to the team's set of team lead IDs."""
         self.team_leads.add(github_user_id)
 
@@ -146,7 +146,7 @@ class Team(RocketModel):
         """Identify if user with given ID is a team lead."""
         return github_user_id in self.team_leads
 
-    def discard_team_lead(self, github_user_id: str) -> None:
+    def discard_team_lead(self, github_user_id: str):
         """Remove a user's Github ID to the team's set of team lead IDs."""
         self.team_leads.remove(github_user_id)
 

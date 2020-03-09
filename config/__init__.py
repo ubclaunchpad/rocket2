@@ -13,8 +13,6 @@ class Config:
 
     # Map name of env variable to python variable
     ENV_NAMES = {
-        'TESTING': 'testing',
-
         'SLACK_SIGNING_SECRET': 'slack_signing_secret',
         'SLACK_API_TOKEN': 'slack_api_token',
         'SLACK_NOTIFICATION_CHANNEL': 'slack_notification_channel',
@@ -32,6 +30,10 @@ class Config:
         'AWS_TEAMS_TABLE': 'aws_teams_tablename',
         'AWS_PROJECTS_TABLE': 'aws_projects_tablename',
         'AWS_REGION': 'aws_region',
+        'AWS_LOCAL': 'aws_local',
+    }
+    OPTIONALS = {
+        'AWS_LOCAL': 'False',
     }
 
     def __init__(self):
@@ -49,19 +51,22 @@ class Config:
                 data = os.environ[var_name]
                 setattr(self, var, data)
             except KeyError:
-                missing_config_fields.append(var_name)
+                if var_name in self.OPTIONALS:
+                    data = self.OPTIONALS[var_name]
+                    setattr(self, var, data)
+                else:
+                    missing_config_fields.append(var_name)
 
         if missing_config_fields:
             raise MissingConfigError(missing_config_fields)
 
-        self.testing = self.testing == 'True'
+        self.aws_local = self.aws_local == 'True'
         self.github_key = self.github_key\
             .replace('\\n', '\n')\
             .replace('\\-', '-')
 
     def _set_attrs(self):
         """Add attributes so that mypy doesn't complain."""
-        self.testing = ''
         self.creds_path = ''
 
         self.slack_signing_secret = ''
@@ -81,6 +86,7 @@ class Config:
         self.aws_teams_tablename = ''
         self.aws_projects_tablename = ''
         self.aws_region = ''
+        self.aws_local: bool = False
 
 
 class MissingConfigError(Exception):

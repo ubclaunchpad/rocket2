@@ -1,5 +1,9 @@
 # Testing
 
+> **Warning**: This is no longer the most up-to-date documentation on how
+> testing is done here. You may want to head over [here][full-testing] for more
+> up-to-date documentation on how we test things. *You have been warned....*
+
 ## Running Pytest Efficiently
 
 Test Driven Development... we hear professors preach about it during lectures
@@ -33,18 +37,19 @@ get everything working.
 
 ### Run local DynamoDB
 
-We use `testing` in the `config.toml` to indicate if we want to run DynamoDB
-locally or on a server. Change `testing = true` to use local DynamoDB.
+We use the `AWS_LOCAL` environment variable to indicate if we want to run
+DynamoDB locally or on a server. Change `AWS_LOCAL = 'True'` to use local
+DynamoDB.
 
-If `testing == true` but you did not start an instance of local DynamoDB,
+If `AWS_LOCAL == 'True'` but you did not start an instance of local DynamoDB,
 `scripts/build_check.sh` will automatically skip all database tests.
 
 This is the recommended way for unit testing.
 
 ### Run server DynamoDB
 
-To run the server DynamoDB we need to set the `region` and obtain both the
-AWS `access_key_id` and `secret_access_key`.
+To run the server DynamoDB we need to set the `AWS_REGION` and obtain
+`AWS_ACCESS_KEYID`, `AWS_SECRET_KEY`, and `GITHUB_KEY`.
 
 This is the recommended way for testing everything (not unit testing, but
 testing the slack commands themselves). Click [here][full-testing] to learn how
