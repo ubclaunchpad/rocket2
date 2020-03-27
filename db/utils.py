@@ -34,12 +34,13 @@ def get_team_by_name(dbf: DBFacade, gh_team_name: str) -> Team:
                      f" {teams[0].__str__()}")
         return teams[0]
 
-def get_users_by_ghid(dbf: DBFacade, gh_ids: List[str]) -> User:
+
+def get_users_by_ghid(dbf: DBFacade, gh_ids: List[str]) -> List[User]:
     """
     Query users by github user id.
 
     :return: List of users if found
     """
     q = [('github_user_id', gh_id) for gh_id in gh_ids]
-    users = dbf.query(User, q)
+    users = dbf.query_or(User, q)
     return users

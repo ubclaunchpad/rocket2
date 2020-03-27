@@ -1,17 +1,14 @@
 """Command parsing for quitting events."""
 import logging
-import shlex
 import random
+from typing import Dict, List
 
-from argparse import ArgumentParser, _SubParsersAction
+from argparse import ArgumentParser
 from app.controller import ResponseTuple
 from app.controller.command.commands.base import Command
 from db.facade import DBFacade
 from db.utils import get_users_by_ghid
-from interface.github import GithubAPIException, GithubInterface
 from app.model import User, Team, Permissions
-from typing import Dict, List, Tuple
-from utils.slack_parse import escape_email
 
 
 class IQuitCommand(Command):
@@ -47,9 +44,8 @@ class IQuitCommand(Command):
         - Nothing happens for admins.
         """
         logging.debug("Handling IQuitCommand")
-        user: User = None
         try:
-            user = self.facade.retrieve(User, user_id)
+            user: User = self.facade.retrieve(User, user_id)
         except LookupError:
             return self.lookup_error, 200
 
@@ -78,7 +74,8 @@ class IQuitCommand(Command):
         leads: List[User] = []
         for team in teams:
             if team.has_member(user.github_id):
-                leads.extend(get_users_by_ghid(self.facade, team.team_leads))
+                leads.extend(get_users_by_ghid(self.facade,
+                                               list(team.team_leads)))
         return leads
 
     def get_admins(self) -> List[User]:
@@ -96,7 +93,7 @@ class IQuitCommand(Command):
             # Find a random member in the team and use them to replace you. If
             # we cannot another random member, just say that we deleted the
             # team.
-            members = team.members - team.team_leads
+            members = list(team.members - team.team_leads)
             if members:
                 random.shuffle(members)
                 for gh_id in members:
