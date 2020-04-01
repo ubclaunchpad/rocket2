@@ -1,0 +1,9 @@
+name = "rocket2"
+url = "git@github.com:ubclaunchpad/rocket2.git"
+
+[[profile]]
+  name = "default"
+  branch = "master"
+  [profile.build]
+    type = "docker-compose"
+    buildfile = "docker-compose.yml"
