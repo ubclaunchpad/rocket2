@@ -1,7 +1,7 @@
 """Handle Rocket 2 commands."""
 from app.controller import ResponseTuple
 from app.controller.command.commands import UserCommand, TeamCommand, \
-    TokenCommand, ProjectCommand, KarmaCommand, MentionCommand
+    TokenCommand, ProjectCommand, KarmaCommand, MentionCommand, IQuitCommand
 from app.controller.command.commands.base import Command
 from app.controller.command.commands.token import TokenCommandConfig
 from db.facade import DBFacade
@@ -35,6 +35,7 @@ class CommandParser:
         self.__commands["project"] = ProjectCommand(self.__facade)
         self.__commands["karma"] = KarmaCommand(self.__facade)
         self.__commands["mention"] = MentionCommand(self.__facade)
+        self.__commands["i-quit"] = IQuitCommand(self.__facade)
 
     def handle_app_command(self,
                            cmd_txt: str,

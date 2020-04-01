@@ -174,6 +174,7 @@ class TestTeamCommand(TestCase):
         test_user = User("userid")
         test_user.permissions_level = Permissions.admin
         test_user.github_username = "githubuser"
+        test_user.github_id = "12"
         self.db.retrieve.return_value = test_user
         self.gh.org_create_team.return_value = "team_id"
         inputstring = "team create b-s --name 'B S'"
@@ -206,6 +207,7 @@ class TestTeamCommand(TestCase):
         """Test team command create parser with improper permission."""
         test_user = User("userid")
         test_user.github_username = "githubuser"
+        test_user.github_id = "12"
         self.db.retrieve.return_value = test_user
         self.gh.org_create_team.return_value = "team_id"
         inputstring = "team create b-s --name 'B S'"
@@ -213,11 +215,23 @@ class TestTeamCommand(TestCase):
                               (self.testcommand.permission_error, 200))
         self.db.store.assert_not_called()
 
+    def test_handle_create_not_ghuser(self):
+        """Test team command create parser without github user."""
+        test_user = User("userid")
+        test_user.permissions_level = Permissions.admin
+        self.db.retrieve.return_value = test_user
+        self.gh.org_create_team.return_value = "team_id"
+        s = "team create someting"
+        ret, val = self.testcommand.handle(s, user)
+        self.assertEqual(val, 200)
+        self.assertIn("yet to register", ret)
+
     def test_handle_create_github_error(self):
         """Test team command create parser with Github error."""
         test_user = User("userid")
         test_user.permissions_level = Permissions.admin
         test_user.github_username = "githubuser"
+        test_user.github_id = "12"
         self.db.retrieve.return_value = test_user
         self.gh.org_create_team.return_value = "team_id"
         inputstring = "team create b-s --name 'B S'"
