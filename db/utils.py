@@ -1,6 +1,7 @@
 """Database utilities, for functions that you use all the time."""
 from db.facade import DBFacade
-from app.model.team import Team
+from app.model import Team, User
+from typing import List
 import logging
 
 
@@ -32,3 +33,14 @@ def get_team_by_name(dbf: DBFacade, gh_team_name: str) -> Team:
         logging.info(f"Team queried with team name {gh_team_name}:"
                      f" {teams[0].__str__()}")
         return teams[0]
+
+
+def get_users_by_ghid(dbf: DBFacade, gh_ids: List[str]) -> List[User]:
+    """
+    Query users by github user id.
+
+    :return: List of users if found
+    """
+    q = [('github_user_id', gh_id) for gh_id in gh_ids]
+    users = dbf.query_or(User, q)
+    return users
