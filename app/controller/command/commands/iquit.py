@@ -77,7 +77,7 @@ class IQuitCommand(Command):
                 leads.extend(get_users_by_ghid(self.facade,
                                                list(team.team_leads)))
             if team.github_team_name != "all" and\
-                team.has_member(user.github_id):
+                    team.has_member(user.github_id):
                 # Some teams aren't up to date and don't have team leads, so we
                 # have to add them manually. Just don't add the 'all' team and
                 # we'll be fine.
