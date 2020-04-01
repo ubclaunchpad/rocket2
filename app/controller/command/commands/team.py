@@ -274,14 +274,18 @@ class TeamCommand(Command):
         team_leads_set = teams[0].team_leads
         team_leads_list = list(map(lambda i: ('github_user_id',
                                               str(i)), team_leads_set))
-        team_leads = self.facade.query_or(User, team_leads_list)
+        team_leads: List[User] = []
+        if team_leads_list:
+            team_leads = self.facade.query_or(User, team_leads_list)
         names = set(map(lambda m: m.github_username, team_leads))
         teams[0].team_leads = names
 
         members_set = teams[0].members
         members_list = list(map(lambda i: ('github_user_id',
                                            str(i)), members_set))
-        members = self.facade.query_or(User, members_list)
+        members: List[User] = []
+        if members_list:
+            members = self.facade.query_or(User, members_list)
         names = set(map(lambda m: m.github_username, members))
         teams[0].members = names
         return {'attachments': [teams[0].get_attachment()]}, 200
