@@ -73,9 +73,19 @@ class IQuitCommand(Command):
         teams: List[Team] = self.facade.query(Team)
         leads: List[User] = []
         for team in teams:
-            if team.has_member(user.github_id):
+            if len(team.team_leads) > 0 and team.has_member(user.github_id):
                 leads.extend(get_users_by_ghid(self.facade,
                                                list(team.team_leads)))
+            if team.github_team_name != "all" and\
+                team.has_member(user.github_id):
+                # Some teams aren't up to date and don't have team leads, so we
+                # have to add them manually. Just don't add the 'all' team and
+                # we'll be fine.
+                members = get_users_by_ghid(self.facade, list(team.members))
+                for m in members:
+                    if m.permissions_level == Permissions.team_lead or\
+                            m.permissions_level == Permissions.admin:
+                        leads.append(m)
         return leads
 
     def get_admins(self) -> List[User]:
