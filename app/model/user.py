@@ -126,3 +126,7 @@ class User(RocketModel):
     def __str__(self) -> str:
         """Print information on the user class."""
         return str(self.__dict__)
+
+    def __hash__(self) -> int:
+        """Hash the user class using a dictionary."""
+        return self.__str__().__hash__()

@@ -52,7 +52,7 @@ class IQuitCommand(Command):
         if user.permissions_level == Permissions.member:
             # User is a member
             leads = self.get_leads(user)
-            leads.extend(self.get_admins())
+            leads = list(set(leads + self.get_admins()))    # rem duplicates
             return self.membermsg + "\n(Pinging {})".format(
                 ", ".join(map(lambda u: f"<@{u.slack_id}>", leads))
             ) + "\n\n" + self.remfromall, 200
