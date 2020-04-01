@@ -37,7 +37,8 @@ class TestFacade:
         self.teams = {
             "t1": makeTeam("t1", [], []),
             "t2": makeTeam("t2", ["g1", "g3"], ["g1", "g2", "g3"]),
-            "t3": makeTeam("t3", ["g1"], ["g1", "g4", "g2", "g5", "g6"])
+            "t3": makeTeam("t3", ["g1"], ["g1", "g4", "g2", "g5", "g6"]),
+            "t4": makeTeam("t4", [], ["g6"])
         }
 
     def retrieve(self, Model, k):
@@ -88,3 +89,11 @@ class TestIQuitCommand(TestCase):
         actual, resp = self.cmd.handle("", "u2")
         self.assertEqual(actual.count("u1"), 1)
         self.assertEqual(actual.count("u3"), 1)
+
+    def testReturnNotEveryone(self):
+        """Test that members should not see everyone."""
+        actual, resp = self.cmd.handle("", "u6")
+        print(actual)
+        self.assertNotEqual(actual.count("u2"), 1)
+        self.assertNotEqual(actual.count("u3"), 1)
+        self.assertNotEqual(actual.count("u6"), 1)
