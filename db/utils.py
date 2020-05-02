@@ -41,6 +41,9 @@ def get_users_by_ghid(dbf: DBFacade, gh_ids: List[str]) -> List[User]:
 
     :return: List of users if found
     """
+    if len(gh_ids) == 0:
+        return []
+
     q = [('github_user_id', gh_id) for gh_id in gh_ids]
     users = dbf.query_or(User, q)
     return users
