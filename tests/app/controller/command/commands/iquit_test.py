@@ -30,14 +30,16 @@ class TestFacade:
             "u1": makeUser("u1", "g1", "G1", Permissions.admin),
             "u2": makeUser("u2", "g2", "G2", Permissions.member),
             "u3": makeUser("u3", "g3", "G3", Permissions.team_lead),
-            "u4": makeUser("u4", "g4", "G4", Permissions.member),
+            "u4": makeUser("u4", "g4", "G4", Permissions.team_lead),
             "u5": makeUser("u5", "g5", "G5", Permissions.member),
             "u6": makeUser("u6", "g6", "G6", Permissions.member)
         }
         self.teams = {
             "t1": makeTeam("t1", [], []),
             "t2": makeTeam("t2", ["g1", "g3"], ["g1", "g2", "g3"]),
-            "t3": makeTeam("t3", ["g1"], ["g1", "g4", "g2", "g5", "g6"])
+            "t3": makeTeam("t3", ["g1"], ["g1", "g4", "g2", "g5", "g6"]),
+            "t4": makeTeam("t4", [], ["g6"]),
+            "t6": makeTeam("t5", ["g4"], ["g5", "g3"])
         }
 
     def retrieve(self, Model, k):
@@ -88,3 +90,18 @@ class TestIQuitCommand(TestCase):
         actual, resp = self.cmd.handle("", "u2")
         self.assertEqual(actual.count("u1"), 1)
         self.assertEqual(actual.count("u3"), 1)
+
+    def testReturnNotEveryone(self):
+        """Test that members should not see everyone."""
+        actual, resp = self.cmd.handle("", "u6")
+        self.assertNotEqual(actual.count("u2"), 1)
+        self.assertNotEqual(actual.count("u3"), 1)
+        self.assertNotEqual(actual.count("u6"), 1)
+
+    def testReturnNobody(self):
+        """Test teams with no team lead."""
+        actual, resp = self.cmd.handle("", "u5")
+        self.assertEqual(actual.count("u1"), 1)
+        self.assertEqual(actual.count("u3"), 1)
+        self.assertEqual(actual.count("u4"), 1)
+        self.assertNotEqual(actual.count("u5"), 1)
