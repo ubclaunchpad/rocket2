@@ -74,7 +74,7 @@ class DynamoDB:
             if table_name == self.users_table:
                 return []
             elif table_name == self.teams_table:
-                return ['members']
+                return ['team_leads', 'members']
             elif table_name == self.projects_table:
                 return ['tags', 'github_urls']
             else:

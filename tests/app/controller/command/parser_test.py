@@ -1,14 +1,11 @@
 """Test the main command parser."""
 from app.controller.command import CommandParser
-from app.controller.command.commands import UserCommand
 from app.controller.command.commands.token import TokenCommandConfig
 from datetime import datetime
 from db import DBFacade
-from flask import Flask
 from interface.slack import Bot
 from interface.github import GithubInterface
 from unittest import mock
-from utils.slack_msg_fmt import wrap_slack_code
 
 
 def test_handle_app_command():
@@ -32,43 +29,6 @@ def test_handle_invalid_command(mock_usercommand):
     user = 'U061F7AUR'
     parser = CommandParser(mock_facade, mock_bot, mock_gh, mock_token_config)
     parser.handle_app_command('fake command', user, '')
-
-
-def test_handle_help():
-    """Test that a '/rocket help' brings up help."""
-    app = Flask(__name__)
-    mock_usercommand = mock.MagicMock(UserCommand)
-    mock_usercommand.get_name.return_value = "user"
-    mock_facade = mock.MagicMock(DBFacade)
-    mock_bot = mock.MagicMock(Bot)
-    mock_gh = mock.MagicMock(GithubInterface)
-    mock_token_config = TokenCommandConfig(datetime.utcnow(), '')
-    parser = CommandParser(mock_facade, mock_bot, mock_gh, mock_token_config)
-    with app.app_context():
-        resp, code = parser.handle_app_command("help", "U061F7AUR", '')
-        expect = {"text": "Displaying all available commands. "
-                          "To read about a specific command, "
-                          f"use \n"
-                          f"{wrap_slack_code('/rocket [command] help')}"
-                          "\n"
-                          "For arguments containing spaces, "
-                          "please enclose them with quotations.\n",
-                  "mrkdwn": "true",
-                  "attachments": [
-                      {"text": "*user:* for dealing with users",
-                       "mrkdwn_in": ["text"]},
-                      {"text": "*team:* for dealing with teams",
-                       'mrkdwn_in': ['text']},
-                      {"text": "*token:* Generate a signed "
-                               "token for use with the HTTP API",
-                       "mrkdwn_in": ["text"]},
-                      {"text": "*project:* for dealing with projects",
-                       "mrkdwn_in": ["text"]},
-                      {"text": "*karma:* for dealing with karma",
-                       'mrkdwn_in': ['text']},
-                      {"text": "*mention:* for dealing with mention",
-                       'mrkdwn_in': ["text"]}]}
-    assert resp == expect
 
 
 @mock.patch('app.controller.command.parser.UserCommand')
