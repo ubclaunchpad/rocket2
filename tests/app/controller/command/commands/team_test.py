@@ -24,10 +24,6 @@ class TestTeamCommand(TestCase):
         self.help_text = self.testcommand.help
         self.maxDiff = None
 
-    def test_get_name(self):
-        """Test team command get_name method."""
-        self.assertEqual(self.testcommand.get_name(), "team")
-
     def test_get_help(self):
         """Test team command get_help method."""
         subcommands = list(self.testcommand.subparser.choices.keys())

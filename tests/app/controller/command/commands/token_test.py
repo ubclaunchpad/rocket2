@@ -19,15 +19,6 @@ class TestTokenCommand(TestCase):
                                         TokenCommandConfig(timedelta(days=7),
                                                            "secret"))
 
-    def test_get_command_name(self):
-        """Test get_name()."""
-        assert self.testcommand.command_name == "token"
-
-    def test_get_command_desc(self):
-        """Test get_desc()."""
-        assert self.testcommand.desc == "Generate a signed token " \
-                                        "for use with the HTTP API"
-
     def test_handle_nonexistent_member(self):
         """Test handle() when given a nonexistent member."""
         self.mock_facade.retrieve.side_effect = LookupError
