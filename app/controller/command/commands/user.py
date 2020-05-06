@@ -94,10 +94,6 @@ class UserCommand(Command):
                                  action='store', choices=list(Permissions))
         return subparsers
 
-    def get_name(self) -> str:
-        """Return the command type."""
-        return self.command_name
-
     def get_help(self, subcommand: str = None) -> str:
         """Return command options for user events with Slack formatting."""
         def get_subcommand_help(sc: str) -> str:
@@ -115,10 +111,6 @@ class UserCommand(Command):
             res = "\n```"
             res += get_subcommand_help(subcommand)
             return res + "```"
-
-    def get_desc(self) -> str:
-        """Return the description of this command."""
-        return self.desc
 
     def handle(self,
                command: str,
