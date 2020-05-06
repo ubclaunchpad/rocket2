@@ -18,10 +18,6 @@ class TestUserCommand(TestCase):
         self.testcommand = UserCommand(self.mock_facade, self.mock_github)
         self.maxDiff = None
 
-    def test_get_command_name(self):
-        """Test user command get_name method."""
-        assert self.testcommand.get_name() == "user"
-
     def test_get_help(self):
         """Test user command get_help method."""
         subcommands = list(self.testcommand.subparser.choices.keys())
