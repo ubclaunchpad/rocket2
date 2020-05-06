@@ -620,7 +620,8 @@ class TeamCommand(Command):
 
     def refresh_all_team(self):
         """
-        Refresh the 'all' team.
+        Refresh the 'all' team - this team is used to track all members.
+        See https://github.com/orgs/ubclaunchpad/teams/all
 
         Should only be called after the teams have all synced, or bugs will
         probably occur.
