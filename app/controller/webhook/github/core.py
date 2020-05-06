@@ -3,6 +3,7 @@ import logging
 import hmac
 import hashlib
 from db.facade import DBFacade
+from interface.github import GithubInterface
 from typing import Dict, Any
 from app.controller import ResponseTuple
 from config import Config
@@ -13,13 +14,16 @@ from app.controller.webhook.github.events import MembershipEventHandler, \
 class GitHubWebhookHandler:
     """Encapsulate the handlers for all GitHub webhook events."""
 
-    def __init__(self, db_facade: DBFacade, config: Config):
+    def __init__(self,
+                 db_facade: DBFacade,
+                 gh_face: GithubInterface,
+                 config: Config):
         """Give handlers access to the database."""
         self.__secret = config.github_webhook_secret
         self.__event_handlers = [
-            OrganizationEventHandler(db_facade),
-            TeamEventHandler(db_facade),
-            MembershipEventHandler(db_facade)
+            OrganizationEventHandler(db_facade, gh_face, config),
+            TeamEventHandler(db_facade, gh_face, config),
+            MembershipEventHandler(db_facade, gh_face, config)
         ]
 
     def handle(self,

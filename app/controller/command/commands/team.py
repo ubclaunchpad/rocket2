@@ -574,7 +574,7 @@ class TeamCommand(Command):
             # remove teams not in github anymore
             for local_id in local_team_dict:
                 if local_id not in remote_team_dict:
-                    self.gh.org_delete_team(local_id)
+                    self.facade.delete(Team, local_id)
                     num_deleted += 1
                     modified.append(local_team_dict[local_id].get_attachment())
 

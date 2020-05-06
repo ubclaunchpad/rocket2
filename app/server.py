@@ -76,7 +76,7 @@ talisman = Talisman(app)
 talisman.force_https = False
 github_interface = make_github_interface(config)
 command_parser = make_command_parser(config, github_interface)
-github_webhook_handler = make_github_webhook_handler(config)
+github_webhook_handler = make_github_webhook_handler(github_interface, config)
 slack_events_handler = make_slack_events_handler(config)
 slack_events_adapter = SlackEventAdapter(config.slack_signing_secret,
                                          "/slack/events",
