@@ -38,7 +38,7 @@ class KarmaCommand(Command):
         parser_set = subparsers.add_parser("set")
         parser_set.set_defaults(which="set",
                                 help="Manually sets a user's karma")
-        parser_set.add_argument("slack_id", metavar="SLACK-ID",
+        parser_set.add_argument("username", metavar="USERNAME",
                                 type=str, action='store',
                                 help="slack id of kuser's karma to set")
         parser_set.add_argument("amount", metavar="amount",
@@ -56,7 +56,7 @@ class KarmaCommand(Command):
         parser_view = subparsers.add_parser("view")
         parser_view.set_defaults(which="view",
                                  help="view a user's karma amount")
-        parser_view.add_argument("slack_id", metavar="SLACK-ID",
+        parser_view.add_argument("username", metavar="USERNAME",
                                  type=str, action='store',
                                  help="slack id of user karma to view")
         return subparsers
@@ -73,11 +73,11 @@ class KarmaCommand(Command):
             return self.get_help(), 200
 
         if args.which == "set":
-            return self.set_helper(user_id, args.slack_id, args.amount)
+            return self.set_helper(user_id, args.username, args.amount)
         elif args.which == "reset":
             return self.reset_helper(user_id, args.all)
         elif args.which == "view":
-            return self.view_helper(user_id, args.slack_id)
+            return self.view_helper(user_id, args.username)
         else:
             return self.get_help(), 200
 

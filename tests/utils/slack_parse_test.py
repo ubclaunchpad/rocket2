@@ -20,8 +20,8 @@ def test_escaped_id_conversion():
     """Test how this function reacts to normal operation."""
     CMDS = [
         # Normal operation
-        ('/rocket user edit --member <@U1234|user> --name "User"',
-         '/rocket user edit --member U1234 --name "User"'),
+        ('/rocket user edit --username <@U1234|user> --name "User"',
+         '/rocket user edit --username U1234 --name "User"'),
         # No users
         ('/rocket user view',
          '/rocket user view'),
@@ -38,8 +38,8 @@ def test_ios_dash():
     """Test how this function reacts to normal operation."""
     CMDS = [
         # Normal operation with iOS
-        ('/rocket user edit —member U1234 —name "User"',
-         '/rocket user edit --member U1234 --name "User"'),
+        ('/rocket user edit —username U1234 —name "User"',
+         '/rocket user edit --username U1234 --name "User"'),
         ('/rocket user edit —name "Steven Universe"',
          '/rocket user edit --name "Steven Universe"'),
         ('/rocket user edit ——name "Steven Universe"',
@@ -47,8 +47,8 @@ def test_ios_dash():
         ('/rocket foo U1234 U4321 U3412 -h',
          '/rocket foo U1234 U4321 U3412 -h'),
         # Normal operation without iOS
-        ('/rocket user edit --member U1234 --name "User"',
-         '/rocket user edit --member U1234 --name "User"'),
+        ('/rocket user edit --username U1234 --name "User"',
+         '/rocket user edit --username U1234 --name "User"'),
         ('/rocket user edit --name "Steven Universe"',
          '/rocket user edit --name "Steven Universe"'),
         ('/rocket foo U1234 U4321 U3412 -h',

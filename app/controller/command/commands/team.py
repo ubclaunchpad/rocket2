@@ -97,7 +97,7 @@ class TeamCommand(Command):
         parser_add.add_argument("team_name", metavar='team-name',
                                 type=str, action='store',
                                 help="Team to add the user to.")
-        parser_add.add_argument("slack_id", metavar='slack-id',
+        parser_add.add_argument("username", metavar='USERNAME',
                                 type=str, action='store',
                                 help="User to be added to team.")
 
@@ -108,7 +108,7 @@ class TeamCommand(Command):
         parser_remove.add_argument("team_name", metavar='team-name',
                                    type=str, action='store',
                                    help="Team to remove user from.")
-        parser_remove.add_argument("slack_id", metavar='slack-id',
+        parser_remove.add_argument("username", metavar='USERNAME',
                                    type=str, action='store',
                                    help="User to be removed from team.")
 
@@ -132,7 +132,7 @@ class TeamCommand(Command):
         parser_lead.add_argument("team_name", metavar='team-name',
                                  type=str, action='store',
                                  help="Name of team to edit.")
-        parser_lead.add_argument("slack_id", metavar='slack-id',
+        parser_lead.add_argument("username", metavar='username',
                                  type=str, action='store',
                                  help="User to be added/removed as lead.")
         parser_lead.add_argument("--remove", action='store_true',
@@ -213,14 +213,14 @@ class TeamCommand(Command):
         elif args.which == "add":
             param_list = {
                 "team_name": args.team_name,
-                "slack_id": args.slack_id
+                "username": args.username
             }
             return self.add_helper(param_list, user_id)
 
         elif args.which == "remove":
             param_list = {
                 "team_name": args.team_name,
-                "slack_id": args.slack_id
+                "username": args.username
             }
             return self.remove_helper(param_list, user_id)
 
@@ -235,7 +235,7 @@ class TeamCommand(Command):
         elif args.which == "lead":
             param_list = {
                 "team_name": args.team_name,
-                "slack_id": args.slack_id,
+                "username": args.username,
                 "remove": args.remove
             }
             return self.lead_helper(param_list, user_id)
@@ -383,7 +383,7 @@ class TeamCommand(Command):
             if not check_permissions(command_user, team):
                 return self.permission_error, 200
 
-            user = self.facade.retrieve(User, param_list['slack_id'])
+            user = self.facade.retrieve(User, param_list['username'])
             team.add_member(user.github_id)
             self.gh.add_team_member(user.github_username, team.github_team_id)
             self.facade.store(team)
@@ -422,7 +422,7 @@ class TeamCommand(Command):
             if not check_permissions(command_user, team):
                 return self.permission_error, 200
 
-            user = self.facade.retrieve(User, param_list['slack_id'])
+            user = self.facade.retrieve(User, param_list['username'])
             if not self.gh.has_team_member(user.github_username,
                                            team.github_team_id):
                 return "User not in team!", 200
@@ -498,7 +498,7 @@ class TeamCommand(Command):
             team = teams[0]
             if not check_permissions(command_user, team):
                 return self.permission_error, 200
-            user = self.facade.retrieve(User, param_list["slack_id"])
+            user = self.facade.retrieve(User, param_list["username"])
             msg = ""
             if param_list["remove"]:
                 if not team.has_member(user.github_id):

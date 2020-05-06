@@ -44,7 +44,7 @@ class UserCommand(Command):
         parser_view.set_defaults(which="view",
                                  help="View information about a given user.")
         parser_view. \
-            add_argument("--slack-id", metavar="SLACK-ID",
+            add_argument("--username", metavar="USERNAME",
                          type=str, action='store',
                          help="Use if using slack id instead of username.")
 
@@ -61,7 +61,7 @@ class UserCommand(Command):
         parser_delete.set_defaults(which="delete",
                                    help="(Admin only) permanently delete "
                                         "member's profile.")
-        parser_delete.add_argument("slack_id", metavar="slack-id",
+        parser_delete.add_argument("username", metavar="USERNAME",
                                    type=str, action='store',
                                    help="Slack id of member to delete.")
 
@@ -84,7 +84,7 @@ class UserCommand(Command):
                                  help="Add to change your major.")
         parser_edit.add_argument("--bio", type=str, action='store',
                                  help="Add to change your biography.")
-        parser_edit.add_argument("--member", type=str, action='store',
+        parser_edit.add_argument("--username", type=str, action='store',
                                  help="(Admin only) Add to edit properties "
                                       "of another user.")
         parser_edit.add_argument("--permission",
@@ -141,17 +141,17 @@ class UserCommand(Command):
             return self.get_help(subcommand=present_subcommand), 200
 
         if args.which == "view":
-            return self.view_helper(user_id, args.slack_id)
+            return self.view_helper(user_id, args.username)
 
         elif args.which == "add":
             return self.add_helper(user_id, args.force)
 
         elif args.which == "delete":
-            return self.delete_helper(user_id, args.slack_id)
+            return self.delete_helper(user_id, args.username)
 
         elif args.which == "edit":
             param_list = {
-                "member": args.member,
+                "username": args.username,
                 "name": args.name,
                 "email": args.email,
                 "pos": args.pos,
@@ -171,8 +171,8 @@ class UserCommand(Command):
         """
         Edit user from database.
 
-        If ``param_list['member'] is not None``, this function edits using the
-        ID from ``param_list['member']`` (must be an admin to do so).
+        If ``param_list['username'] is not None``, this function edits using
+        the ID from ``param_list['username']`` (must be an admin to do so).
         Otherwise, edits the user that called the function.
 
         :param user_id: Slack ID of user who is calling the command
@@ -183,14 +183,14 @@ class UserCommand(Command):
         is_admin = False
         edited_user = None
         msg = ""
-        if param_list["member"] is not None:
+        if param_list["username"] is not None:
             try:
                 admin_user = self.facade.retrieve(User, user_id)
                 if admin_user.permissions_level != Permissions.admin:
                     return self.permission_error, 200
                 else:
                     is_admin = True
-                    edited_id = param_list["member"]
+                    edited_id = param_list["username"]
                     edited_user = self.facade.retrieve(User, edited_id)
             except LookupError:
                 return self.lookup_error, 200
