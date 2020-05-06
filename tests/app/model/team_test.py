@@ -20,57 +20,6 @@ def test_valid_team():
     assert Team.is_valid(team)
 
 
-def test_get_github_team_id():
-    """Test the Team class method get_github_team_id()."""
-    team = Team('1', 'brussel-sprouts', 'Brussel Sprouts')
-    assert team.github_team_id == '1'
-
-
-def test_set_github_team_id():
-    """Test the Team class method set_github_team_id()."""
-    team = Team('1', 'brussel-sprouts', 'Brussel Sprouts')
-    team.github_team_id = '2'
-    assert team.github_team_id == '2'
-
-
-def test_get_github_team_name():
-    """Test the Team class method set_github_team_name()."""
-    team = Team("1", "brussel-sprouts", "Brussel Sprouts")
-    assert team.github_team_name == "brussel-sprouts"
-
-
-def test_get_display_name():
-    """Test the Team class method get_display_name()."""
-    team = Team("1", "brussel-sprouts", "Brussel Sprouts")
-    assert team.display_name == "Brussel Sprouts"
-
-
-def test_set_display_name():
-    """Test the Team class method set_display_name(display_name)."""
-    team = Team("1", "brussel-sprouts", "Brussel Sprouts")
-    team.display_name = "Corn Cobs"
-    assert team.display_name == "Corn Cobs"
-
-
-def test_get_platform():
-    """Test the Team class method get_platform()."""
-    team = Team("1", "brussel-sprouts", "Brussel Sprouts")
-    assert team.platform == ""
-
-
-def test_set_platform():
-    """Test the Team class method set_platform(platform)."""
-    team = Team("1", "brussel-sprouts", "Brussel Sprouts")
-    team.platform = "web"
-    assert team.platform == "web"
-
-
-def test_get_members():
-    """Test the Team class method get_members()."""
-    team = Team("1", "brussel-sprouts", "Brussel Sprouts")
-    assert team.members == set()
-
-
 def test_add_member():
     """Test the Team class method add_member(github_id)."""
     team = Team("1", "brussel-sprouts", "Brussel Sprouts")

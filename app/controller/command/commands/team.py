@@ -145,14 +145,6 @@ class TeamCommand(Command):
                                          "Refresh local team database.")
         return subparsers
 
-    def get_name(self) -> str:
-        """Return the command type."""
-        return self.command_name
-
-    def get_desc(self) -> str:
-        """Return the description of this command."""
-        return self.desc
-
     def get_help(self, subcommand: str = None) -> str:
         """Return command options for team events with Slack formatting."""
         def get_subcommand_help(sc: str) -> str:
