@@ -15,7 +15,8 @@ def test_handle_app_command():
     mock_bot = mock.MagicMock(Bot)
     mock_gh = mock.MagicMock(GithubInterface)
     mock_token_config = TokenCommandConfig(datetime.utcnow(), '')
-    parser = CommandParser(conf, mock_facade, mock_bot, mock_gh, mock_token_config)
+    parser = CommandParser(conf, mock_facade, mock_bot, mock_gh,
+                           mock_token_config)
     parser.handle_app_command('hello world', 'U061F7AUR', '')
 
 
@@ -29,7 +30,8 @@ def test_handle_invalid_command(mock_usercommand):
     mock_token_config = TokenCommandConfig(datetime.utcnow(), '')
     mock_usercommand.handle.side_effect = KeyError
     user = 'U061F7AUR'
-    parser = CommandParser(conf, mock_facade, mock_bot, mock_gh, mock_token_config)
+    parser = CommandParser(conf, mock_facade, mock_bot, mock_gh,
+                           mock_token_config)
     parser.handle_app_command('fake command', user, '')
 
 
@@ -41,7 +43,8 @@ def test_handle_user_command(mock_usercommand):
     mock_bot = mock.MagicMock(Bot)
     mock_gh = mock.MagicMock(GithubInterface)
     mock_token_config = TokenCommandConfig(datetime.utcnow(), '')
-    parser = CommandParser(conf, mock_facade, mock_bot, mock_gh, mock_token_config)
+    parser = CommandParser(conf, mock_facade, mock_bot, mock_gh,
+                           mock_token_config)
     parser.handle_app_command('user name', 'U061F7AUR', '')
     mock_usercommand. \
         return_value.handle. \
@@ -56,7 +59,8 @@ def test_handle_mention_command(mock_mentioncommand):
     mock_bot = mock.MagicMock(Bot)
     mock_gh = mock.MagicMock(GithubInterface)
     mock_token_config = TokenCommandConfig(datetime.utcnow(), '')
-    parser = CommandParser(conf, mock_facade, mock_bot, mock_gh, mock_token_config)
+    parser = CommandParser(conf, mock_facade, mock_bot, mock_gh,
+                           mock_token_config)
     parser.handle_app_command('U061F7AUR ++', 'UFJ42EU67', '')
     mock_mentioncommand
     mock_mentioncommand. \
