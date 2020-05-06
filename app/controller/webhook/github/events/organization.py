@@ -85,6 +85,7 @@ class OrganizationEventHandler(GitHubEventHandler):
         except LookupError:
             # If that team doesn't exist, make it exist
             t_id = str(self._gh.org_create_team(self._conf.github_team_all))
+            self._gh.add_team_member(github_username, t_id)
             logging.info(f'team {all_name} created for {organization}')
             team = Team(t_id, all_name, all_name)
             team.add_member(github_id)
