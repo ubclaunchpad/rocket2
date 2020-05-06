@@ -5,8 +5,10 @@ from argparse import ArgumentParser, _SubParsersAction
 from app.controller import ResponseTuple
 from app.controller.command.commands.base import Command
 from db.facade import DBFacade
+from db.utils import get_team_by_name
 from interface.github import GithubAPIException, GithubInterface
 from interface.slack import SlackAPIError
+from config import Config
 from app.model import Team, User
 from utils.slack_parse import check_permissions
 from typing import Any, List
@@ -22,6 +24,7 @@ class TeamCommand(Command):
     lookup_error = "Lookup error: Object not found!"
 
     def __init__(self,
+                 config: Config,
                  db_facade: DBFacade,
                  gh: GithubInterface,
                  sc: Any):
@@ -35,6 +38,7 @@ class TeamCommand(Command):
         logging.info("Initializing TeamCommand instance")
         self.facade = db_facade
         self.gh = gh
+        self.config = config
         self.sc = sc
         self.desc = "for dealing with teams"
         self.parser = ArgumentParser(prog="/rocket")
@@ -598,6 +602,9 @@ class TeamCommand(Command):
                         self.facade.store(old_team)
                         num_changed += 1
                         modified.append(old_team.get_attachment())
+
+            # add all members (if not already added) to the 'all' team
+            self.refresh_all_team()
         except GithubAPIException as e:
             logging.error("team refresh unsuccessful due to github error")
             return "Refresh teams was unsuccessful with " \
@@ -610,3 +617,36 @@ class TeamCommand(Command):
             f"{num_deleted} deleted. Wonderful."
         ret = {'attachments': modified, 'text': status}
         return ret, 200
+
+    def refresh_all_team(self):
+        """
+        Refresh the 'all' team.
+
+        Should only be called after the teams have all synced, or bugs will
+        probably occur.
+        """
+        all_name = self.config.github_team_all
+        team_all = None
+
+        try:
+            team_all = get_team_by_name(self.facade, all_name)
+        except LookupError:
+            t_id = str(self.gh.org_create_team(all_name))
+            logging.info(f'team {all_name} created')
+            team_all = Team(t_id, all_name, all_name)
+
+        if team_all is not None:
+            all_members = self.facade.query(User)
+            for m in all_members:
+                if len(m.github_id) > 0 and\
+                        not team_all.has_member(m.github_id):
+                    # The only way for this to be true is if both locally and
+                    # remotely the member (who is part of launchpad) is not
+                    # part of the 'all' team.
+                    self.gh.add_team_member(m.github_username,
+                                            team_all.github_team_id)
+                    team_all.add_member(m.github_id)
+
+            self.facade.store(team_all)
+        else:
+            logging.error(f'Could not create {all_name}. Aborting.')
