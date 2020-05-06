@@ -29,7 +29,7 @@ overwrite users that have already been entered into the database. By using the
 ```
 
 Allows user to edit their Launch Pad profile. Admins and team leads can edit
-another user's Launch Pad profile by using `[--member SLACKID]` option.
+another user's Launch Pad profile by using `[--username SLACKID]` option.
 `SLACK_ID` is the `@`-name, for easy slack autocomplete.
 
 If a user edits their Github handle, rocket will also add the handle to Launch
@@ -40,13 +40,13 @@ Pad's Github organization.
 /rocket user edit --name "Steven Universe" --email "su@gmail.com"
 
 # Admin/Team lead use
-/rocket user edit --member @s_universe --name "Steven Universe"
+/rocket user edit --username @s_universe --name "Steven Universe"
 ```
 
 Admins can easily promote other admins or team leads.
 
 ```sh
-/rocket user edit --member @s_universe --permission admin
+/rocket user edit --username @s_universe --permission admin
 ```
 
 ### View

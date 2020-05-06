@@ -26,11 +26,11 @@ def escaped_id_to_id(s: str) -> str:
 
     Before::
 
-        /rocket user edit --member <@U1143214|su> --name "Steven Universe"
+        /rocket user edit --username <@U1143214|su> --name "Steven Universe"
 
     After::
 
-        /rocket user edit --member U1143214 --name "Steven Universe"
+        /rocket user edit --username U1143214 --name "Steven Universe"
 
     :param s: string to convert
     :return: string where all instances of escaped ID is replaced with IDs
