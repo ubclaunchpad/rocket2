@@ -1,7 +1,8 @@
 """Handle GitHub organization events."""
 import logging
-from app.model import User
+from app.model import User, Team
 from app.controller import ResponseTuple
+from db.utils import get_team_by_name
 from typing import Dict, Any, List
 from app.controller.webhook.github.events.base import GitHubEventHandler
 
@@ -37,7 +38,7 @@ class OrganizationEventHandler(GitHubEventHandler):
         if action == "member_removed":
             return self.handle_remove(member_list, github_id, github_username)
         elif action == "member_added":
-            return self.handle_added(github_username, organization)
+            return self.handle_added(github_id, github_username, organization)
         elif action == "member_invited":
             return self.handle_invited(github_username, organization)
         else:
@@ -68,10 +69,33 @@ class OrganizationEventHandler(GitHubEventHandler):
             return f"could not find user {github_username}", 404
 
     def handle_added(self,
+                     github_id: str,
                      github_username: str,
                      organization: str) -> ResponseTuple:
         """Help organization function if payload action is added."""
         logging.info(f"user {github_username} added to {organization}")
+        all_name = self._conf.github_team_all
+
+        try:
+            # Try to add the user to the 'all' team if it exists
+            team_all = get_team_by_name(self._facade, all_name)
+            self._gh.add_team_member(github_username, team_all.github_team_id)
+            team_all.add_member(github_id)
+            self._facade.store(team_all)
+        except LookupError:
+            # If that team doesn't exist, make it exist
+            t_id = str(self._gh.org_create_team(self._conf.github_team_all))
+            self._gh.add_team_member(github_username, t_id)
+            logging.info(f'team {all_name} created for {organization}')
+            team = Team(t_id, all_name, all_name)
+            team.add_member(github_id)
+            self._facade.store(team)
+        except RuntimeError as e:
+            # If there are any other kinds of errors, we log it
+            logging.error(e)
+            return '', 200
+
+        logging.info(f'user {github_username} added to team {all_name}')
         return f"user {github_username} added to {organization}", 200
 
     def handle_invited(self,

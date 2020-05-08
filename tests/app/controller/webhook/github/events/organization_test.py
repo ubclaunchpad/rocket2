@@ -2,6 +2,8 @@
 import pytest
 
 from db import DBFacade
+from interface.github import GithubInterface
+from config import Config
 from app.model import User
 from unittest import mock
 from app.controller.webhook.github.events import OrganizationEventHandler
@@ -104,7 +106,9 @@ def org_empty_payload(org_default_payload):
 def test_org_supported_action_list():
     """Confirm the supported action list of the handler."""
     mock_facade = mock.MagicMock(DBFacade)
-    webhook_handler = OrganizationEventHandler(mock_facade)
+    gh = mock.MagicMock(GithubInterface)
+    conf = mock.MagicMock(Config)
+    webhook_handler = OrganizationEventHandler(mock_facade, gh, conf)
     assert webhook_handler.supported_action_list == ["member_removed",
                                                      "member_added"]
 
@@ -112,7 +116,10 @@ def test_org_supported_action_list():
 def test_handle_org_event_add_member(org_add_payload):
     """Test that instances when members are added to the org are logged."""
     mock_facade = mock.MagicMock(DBFacade)
-    webhook_handler = OrganizationEventHandler(mock_facade)
+    gh = mock.MagicMock(GithubInterface)
+    conf = mock.MagicMock(Config)
+    conf.github_team_all = 'all'
+    webhook_handler = OrganizationEventHandler(mock_facade, gh, conf)
     rsp, code = webhook_handler.handle(org_add_payload)
     assert rsp == "user hacktocat added to Octocoders"
     assert code == 200
@@ -121,9 +128,11 @@ def test_handle_org_event_add_member(org_add_payload):
 def test_handle_org_event_rm_single_member(org_rm_payload):
     """Test that members removed from the org are deleted from rocket's db."""
     mock_facade = mock.MagicMock(DBFacade)
+    gh = mock.MagicMock(GithubInterface)
+    conf = mock.MagicMock(Config)
     return_user = User("SLACKID")
     mock_facade.query.return_value = [return_user]
-    webhook_handler = OrganizationEventHandler(mock_facade)
+    webhook_handler = OrganizationEventHandler(mock_facade, gh, conf)
     rsp, code = webhook_handler.handle(org_rm_payload)
     mock_facade.query\
         .assert_called_once_with(User, [('github_user_id', "39652351")])
@@ -135,8 +144,10 @@ def test_handle_org_event_rm_single_member(org_rm_payload):
 def test_handle_org_event_rm_member_missing(org_rm_payload):
     """Test that members not in rocket db are handled correctly."""
     mock_facade = mock.MagicMock(DBFacade)
+    gh = mock.MagicMock(GithubInterface)
+    conf = mock.MagicMock(Config)
     mock_facade.query.return_value = []
-    webhook_handler = OrganizationEventHandler(mock_facade)
+    webhook_handler = OrganizationEventHandler(mock_facade, gh, conf)
     rsp, code = webhook_handler.handle(org_rm_payload)
     mock_facade.query\
         .assert_called_once_with(User, [('github_user_id', "39652351")])
@@ -147,11 +158,13 @@ def test_handle_org_event_rm_member_missing(org_rm_payload):
 def test_handle_org_event_rm_mult_members(org_rm_payload):
     """Test that multiple members with the same github name can be deleted."""
     mock_facade = mock.MagicMock(DBFacade)
+    gh = mock.MagicMock(GithubInterface)
+    conf = mock.MagicMock(Config)
     user1 = User("SLACKUSER1")
     user2 = User("SLACKUSER2")
     user3 = User("SLACKUSER3")
     mock_facade.query.return_value = [user1, user2, user3]
-    webhook_handler = OrganizationEventHandler(mock_facade)
+    webhook_handler = OrganizationEventHandler(mock_facade, gh, conf)
     rsp, code = webhook_handler.handle(org_rm_payload)
     mock_facade.query\
         .assert_called_once_with(User, [('github_user_id', "39652351")])
@@ -162,7 +175,9 @@ def test_handle_org_event_rm_mult_members(org_rm_payload):
 def test_handle_org_event_empty_action(org_empty_payload):
     """Test that instances where there is no/invalid action are logged."""
     mock_facade = mock.MagicMock(DBFacade)
-    webhook_handler = OrganizationEventHandler(mock_facade)
+    gh = mock.MagicMock(GithubInterface)
+    conf = mock.MagicMock(Config)
+    webhook_handler = OrganizationEventHandler(mock_facade, gh, conf)
     rsp, code = webhook_handler.handle(org_empty_payload)
     assert rsp == "invalid organization webhook triggered"
     assert code == 405
