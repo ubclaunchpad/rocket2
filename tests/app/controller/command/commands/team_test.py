@@ -17,16 +17,15 @@ class TestTeamCommand(TestCase):
     def setUp(self):
         """Set up the test case environment."""
         self.app = Flask(__name__)
+        self.config = mock.MagicMock()
         self.gh = mock.MagicMock()
         self.db = mock.MagicMock()
         self.sc = mock.MagicMock()
-        self.testcommand = TeamCommand(self.db, self.gh, self.sc)
+        self.testcommand = TeamCommand(self.config, self.db, self.gh, self.sc)
         self.help_text = self.testcommand.help
         self.maxDiff = None
 
-    def test_get_name(self):
-        """Test team command get_name method."""
-        self.assertEqual(self.testcommand.get_name(), "team")
+        self.config.github_team_all = 'all'
 
     def test_get_help(self):
         """Test team command get_help method."""
@@ -576,13 +575,15 @@ class TestTeamCommand(TestCase):
         """Test team command refresh parser if team edited in github."""
         test_user = User(user)
         test_user.permissions_level = Permissions.admin
+        test_user.github_id = '12'
+        test_user.github_username = 'bob'
         team = Team("TeamID", "TeamName", "android")
         team_update = Team("TeamID", "new team name", "android")
         team_update.add_member(test_user.github_id)
         team2 = Team("OTEAM", "other team2", "ios")
 
         self.db.retrieve.return_value = test_user
-        self.db.query.return_value = [team, team2]
+        self.db.query.side_effect = [[team, team2], [], [test_user]]
         self.gh.org_get_teams.return_value = [team_update, team2]
         attach = team_update.get_attachment()
 
@@ -594,17 +595,18 @@ class TestTeamCommand(TestCase):
             expect = {'attachments': [attach], 'text': status}
             self.assertDictEqual(resp, expect)
             self.assertEqual(code, 200)
-        self.db.query.assert_called_once_with(Team)
 
     def test_handle_refresh_addition_and_deletion(self):
         """Test team command refresh parser if local differs from github."""
         test_user = User(user)
         test_user.permissions_level = Permissions.admin
+        test_user.github_id = '12'
+        test_user.github_username = 'bob'
         team = Team("TeamID", "TeamName", "")
         team2 = Team("OTEAM", "other team", "android")
 
         self.db.retrieve.return_value = test_user
-        self.db.query.return_value = [team2]
+        self.db.query.side_effect = [[team2], [], [test_user]]
 
         # In this case, github does not have team2!
         self.gh.org_get_teams.return_value = [team]
@@ -619,4 +621,3 @@ class TestTeamCommand(TestCase):
             expect = {'attachments': [attach2, attach], 'text': status}
             self.assertDictEqual(resp, expect)
             self.assertEqual(code, 200)
-        self.db.query.assert_called_once_with(Team)

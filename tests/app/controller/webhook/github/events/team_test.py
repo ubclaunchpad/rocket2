@@ -2,6 +2,8 @@
 import pytest
 
 from db import DBFacade
+from interface.github import GithubInterface
+from config import Config
 from app.model import Team
 from unittest import mock
 from app.controller.webhook.github.events import TeamEventHandler
@@ -212,7 +214,9 @@ def team_empty_payload(team_default_payload):
 def test_org_supported_action_list():
     """Confirm the supported action list of the handler."""
     mock_facade = mock.MagicMock(DBFacade)
-    webhook_handler = TeamEventHandler(mock_facade)
+    gh = mock.MagicMock(GithubInterface)
+    conf = mock.MagicMock(Config)
+    webhook_handler = TeamEventHandler(mock_facade, gh, conf)
     assert webhook_handler.supported_action_list == ["created",
                                                      "deleted",
                                                      "edited",
@@ -224,8 +228,10 @@ def test_org_supported_action_list():
 def test_handle_team_event_created_team(team_created_payload):
     """Test that teams can be created if they are not in the db."""
     mock_facade = mock.MagicMock(DBFacade)
+    gh = mock.MagicMock(GithubInterface)
+    conf = mock.MagicMock(Config)
     mock_facade.retrieve.side_effect = LookupError
-    webhook_handler = TeamEventHandler(mock_facade)
+    webhook_handler = TeamEventHandler(mock_facade, gh, conf)
     rsp, code = webhook_handler.handle(team_created_payload)
     mock_facade.store.assert_called_once()
     assert rsp == "created team with github id 2723476"
@@ -235,7 +241,9 @@ def test_handle_team_event_created_team(team_created_payload):
 def test_handle_team_event_create_update(team_created_payload):
     """Test that teams can be updated if they are in the db."""
     mock_facade = mock.MagicMock(DBFacade)
-    webhook_handler = TeamEventHandler(mock_facade)
+    gh = mock.MagicMock(GithubInterface)
+    conf = mock.MagicMock(Config)
+    webhook_handler = TeamEventHandler(mock_facade, gh, conf)
     rsp, code = webhook_handler.handle(team_created_payload)
     mock_facade.store.assert_called_once()
     assert rsp == "created team with github id 2723476"
@@ -245,7 +253,9 @@ def test_handle_team_event_create_update(team_created_payload):
 def test_handle_team_event_delete_team(team_deleted_payload):
     """Test that teams can be deleted if they are in the db."""
     mock_facade = mock.MagicMock(DBFacade)
-    webhook_handler = TeamEventHandler(mock_facade)
+    gh = mock.MagicMock(GithubInterface)
+    conf = mock.MagicMock(Config)
+    webhook_handler = TeamEventHandler(mock_facade, gh, conf)
     rsp, code = webhook_handler.handle(team_deleted_payload)
     mock_facade.delete.assert_called_once_with(Team, "2723476")
     assert rsp == "deleted team with github id 2723476"
@@ -255,8 +265,10 @@ def test_handle_team_event_delete_team(team_deleted_payload):
 def test_handle_team_event_deleted_miss(team_deleted_payload):
     """Test that attempts to delete a missing team are handled."""
     mock_facade = mock.MagicMock(DBFacade)
+    gh = mock.MagicMock(GithubInterface)
+    conf = mock.MagicMock(Config)
     mock_facade.retrieve.side_effect = LookupError
-    webhook_handler = TeamEventHandler(mock_facade)
+    webhook_handler = TeamEventHandler(mock_facade, gh, conf)
     rsp, code = webhook_handler.handle(team_deleted_payload)
     assert rsp == "team with github id 2723476 not found"
     assert code == 404
@@ -265,7 +277,9 @@ def test_handle_team_event_deleted_miss(team_deleted_payload):
 def test_handle_team_event_edit_team(team_edited_payload):
     """Test that teams can be edited if they are in the db."""
     mock_facade = mock.MagicMock(DBFacade)
-    webhook_handler = TeamEventHandler(mock_facade)
+    gh = mock.MagicMock(GithubInterface)
+    conf = mock.MagicMock(Config)
+    webhook_handler = TeamEventHandler(mock_facade, gh, conf)
     rsp, code = webhook_handler.handle(team_edited_payload)
     assert rsp == "updated team with id 2723476"
     assert code == 200
@@ -274,15 +288,19 @@ def test_handle_team_event_edit_team(team_edited_payload):
 def test_handle_team_event_edit_miss(team_edited_payload):
     """Test that attempts to edit a missing team are handled."""
     mock_facade = mock.MagicMock(DBFacade)
+    gh = mock.MagicMock(GithubInterface)
+    conf = mock.MagicMock(Config)
     mock_facade.retrieve.side_effect = LookupError
-    webhook_handler = TeamEventHandler(mock_facade)
+    webhook_handler = TeamEventHandler(mock_facade, gh, conf)
     rsp, code = webhook_handler.handle(team_edited_payload)
 
 
 def test_handle_team_event_add_to_repo(team_added_to_repository_payload):
     """Test that rocket knows when team is added to a repo."""
     mock_facade = mock.MagicMock(DBFacade)
-    webhook_handler = TeamEventHandler(mock_facade)
+    gh = mock.MagicMock(GithubInterface)
+    conf = mock.MagicMock(Config)
+    webhook_handler = TeamEventHandler(mock_facade, gh, conf)
     rsp, code = \
         webhook_handler.handle(team_added_to_repository_payload)
     assert rsp == "team with id 2723476 added to repository Hello-World"
@@ -292,7 +310,9 @@ def test_handle_team_event_add_to_repo(team_added_to_repository_payload):
 def test_handle_team_event_rm_from_repo(team_rm_from_repository_payload):
     """Test that rocket knows when team is removed from a repo."""
     mock_facade = mock.MagicMock(DBFacade)
-    webhook_handler = TeamEventHandler(mock_facade)
+    gh = mock.MagicMock(GithubInterface)
+    conf = mock.MagicMock(Config)
+    webhook_handler = TeamEventHandler(mock_facade, gh, conf)
     rsp, code = \
         webhook_handler.handle(team_rm_from_repository_payload)
     assert rsp == "team with id 2723476 removed repository Hello-World"
@@ -302,6 +322,8 @@ def test_handle_team_event_rm_from_repo(team_rm_from_repository_payload):
 def test_handle_team_event_empty_payload(team_empty_payload):
     """Test that empty/invalid payloads can be handled."""
     mock_facade = mock.MagicMock(DBFacade)
-    webhook_handler = TeamEventHandler(mock_facade)
+    gh = mock.MagicMock(GithubInterface)
+    conf = mock.MagicMock(Config)
+    webhook_handler = TeamEventHandler(mock_facade, gh, conf)
     rsp, code = webhook_handler.handle(team_empty_payload)
     assert rsp == "invalid payload"

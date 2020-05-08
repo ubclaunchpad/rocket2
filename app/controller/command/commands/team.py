@@ -5,8 +5,10 @@ from argparse import ArgumentParser, _SubParsersAction
 from app.controller import ResponseTuple
 from app.controller.command.commands.base import Command
 from db.facade import DBFacade
+from db.utils import get_team_by_name
 from interface.github import GithubAPIException, GithubInterface
 from interface.slack import SlackAPIError
+from config import Config
 from app.model import Team, User
 from utils.slack_parse import check_permissions
 from typing import Any, List
@@ -22,6 +24,7 @@ class TeamCommand(Command):
     lookup_error = "Lookup error: Object not found!"
 
     def __init__(self,
+                 config: Config,
                  db_facade: DBFacade,
                  gh: GithubInterface,
                  sc: Any):
@@ -35,6 +38,7 @@ class TeamCommand(Command):
         logging.info("Initializing TeamCommand instance")
         self.facade = db_facade
         self.gh = gh
+        self.config = config
         self.sc = sc
         self.desc = "for dealing with teams"
         self.parser = ArgumentParser(prog="/rocket")
@@ -97,7 +101,7 @@ class TeamCommand(Command):
         parser_add.add_argument("team_name", metavar='team-name',
                                 type=str, action='store',
                                 help="Team to add the user to.")
-        parser_add.add_argument("slack_id", metavar='slack-id',
+        parser_add.add_argument("username", metavar='USERNAME',
                                 type=str, action='store',
                                 help="User to be added to team.")
 
@@ -108,7 +112,7 @@ class TeamCommand(Command):
         parser_remove.add_argument("team_name", metavar='team-name',
                                    type=str, action='store',
                                    help="Team to remove user from.")
-        parser_remove.add_argument("slack_id", metavar='slack-id',
+        parser_remove.add_argument("username", metavar='USERNAME',
                                    type=str, action='store',
                                    help="User to be removed from team.")
 
@@ -132,7 +136,7 @@ class TeamCommand(Command):
         parser_lead.add_argument("team_name", metavar='team-name',
                                  type=str, action='store',
                                  help="Name of team to edit.")
-        parser_lead.add_argument("slack_id", metavar='slack-id',
+        parser_lead.add_argument("username", metavar='username',
                                  type=str, action='store',
                                  help="User to be added/removed as lead.")
         parser_lead.add_argument("--remove", action='store_true',
@@ -144,14 +148,6 @@ class TeamCommand(Command):
                                     help="(Admin only)"
                                          "Refresh local team database.")
         return subparsers
-
-    def get_name(self) -> str:
-        """Return the command type."""
-        return self.command_name
-
-    def get_desc(self) -> str:
-        """Return the description of this command."""
-        return self.desc
 
     def get_help(self, subcommand: str = None) -> str:
         """Return command options for team events with Slack formatting."""
@@ -213,14 +209,14 @@ class TeamCommand(Command):
         elif args.which == "add":
             param_list = {
                 "team_name": args.team_name,
-                "slack_id": args.slack_id
+                "username": args.username
             }
             return self.add_helper(param_list, user_id)
 
         elif args.which == "remove":
             param_list = {
                 "team_name": args.team_name,
-                "slack_id": args.slack_id
+                "username": args.username
             }
             return self.remove_helper(param_list, user_id)
 
@@ -235,7 +231,7 @@ class TeamCommand(Command):
         elif args.which == "lead":
             param_list = {
                 "team_name": args.team_name,
-                "slack_id": args.slack_id,
+                "username": args.username,
                 "remove": args.remove
             }
             return self.lead_helper(param_list, user_id)
@@ -383,7 +379,7 @@ class TeamCommand(Command):
             if not check_permissions(command_user, team):
                 return self.permission_error, 200
 
-            user = self.facade.retrieve(User, param_list['slack_id'])
+            user = self.facade.retrieve(User, param_list['username'])
             team.add_member(user.github_id)
             self.gh.add_team_member(user.github_username, team.github_team_id)
             self.facade.store(team)
@@ -422,7 +418,7 @@ class TeamCommand(Command):
             if not check_permissions(command_user, team):
                 return self.permission_error, 200
 
-            user = self.facade.retrieve(User, param_list['slack_id'])
+            user = self.facade.retrieve(User, param_list['username'])
             if not self.gh.has_team_member(user.github_username,
                                            team.github_team_id):
                 return "User not in team!", 200
@@ -498,7 +494,7 @@ class TeamCommand(Command):
             team = teams[0]
             if not check_permissions(command_user, team):
                 return self.permission_error, 200
-            user = self.facade.retrieve(User, param_list["slack_id"])
+            user = self.facade.retrieve(User, param_list["username"])
             msg = ""
             if param_list["remove"]:
                 if not team.has_member(user.github_id):
@@ -582,7 +578,7 @@ class TeamCommand(Command):
             # remove teams not in github anymore
             for local_id in local_team_dict:
                 if local_id not in remote_team_dict:
-                    self.gh.org_delete_team(local_id)
+                    self.facade.delete(Team, local_id)
                     num_deleted += 1
                     modified.append(local_team_dict[local_id].get_attachment())
 
@@ -606,6 +602,9 @@ class TeamCommand(Command):
                         self.facade.store(old_team)
                         num_changed += 1
                         modified.append(old_team.get_attachment())
+
+            # add all members (if not already added) to the 'all' team
+            self.refresh_all_team()
         except GithubAPIException as e:
             logging.error("team refresh unsuccessful due to github error")
             return "Refresh teams was unsuccessful with " \
@@ -618,3 +617,36 @@ class TeamCommand(Command):
             f"{num_deleted} deleted. Wonderful."
         ret = {'attachments': modified, 'text': status}
         return ret, 200
+
+    def refresh_all_team(self):
+        """
+        Refresh the 'all' team - this team is used to track all members.
+
+        Should only be called after the teams have all synced, or bugs will
+        probably occur. See https://github.com/orgs/ubclaunchpad/teams/all
+        """
+        all_name = self.config.github_team_all
+        team_all = None
+
+        try:
+            team_all = get_team_by_name(self.facade, all_name)
+        except LookupError:
+            t_id = str(self.gh.org_create_team(all_name))
+            logging.info(f'team {all_name} created')
+            team_all = Team(t_id, all_name, all_name)
+
+        if team_all is not None:
+            all_members = self.facade.query(User)
+            for m in all_members:
+                if len(m.github_id) > 0 and\
+                        not team_all.has_member(m.github_id):
+                    # The only way for this to be true is if both locally and
+                    # remotely the member (who is part of launchpad) is not
+                    # part of the 'all' team.
+                    self.gh.add_team_member(m.github_username,
+                                            team_all.github_team_id)
+                    team_all.add_member(m.github_id)
+
+            self.facade.store(team_all)
+        else:
+            logging.error(f'Could not create {all_name}. Aborting.')

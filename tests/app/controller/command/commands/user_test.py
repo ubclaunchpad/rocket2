@@ -18,10 +18,6 @@ class TestUserCommand(TestCase):
         self.testcommand = UserCommand(self.mock_facade, self.mock_github)
         self.maxDiff = None
 
-    def test_get_command_name(self):
-        """Test user command get_name method."""
-        assert self.testcommand.get_name() == "user"
-
     def test_get_help(self):
         """Test user command get_help method."""
         subcommands = list(self.testcommand.subparser.choices.keys())
@@ -101,10 +97,10 @@ class TestUserCommand(TestCase):
         self.mock_facade.retrieve.assert_called_once_with(User, "U0G9QF9C6")
 
     def test_handle_view_other_user(self):
-        """Test user command view handle with slack-id parameter."""
+        """Test user command view handle with username parameter."""
         user_id = "U0G9QF9C6"
         user = User("ABCDE8FA9")
-        command = 'user view --slack-id ' + user.slack_id
+        command = 'user view --username ' + user.slack_id
         self.mock_facade.retrieve.return_value = user
         user_attaches = [user.get_attachment()]
         with self.app.app_context():
@@ -119,7 +115,7 @@ class TestUserCommand(TestCase):
     def test_handle_view_lookup_error(self):
         """Test user command view handle with user not in database."""
         user_id = "U0G9QF9C6"
-        command = 'user view --slack-id ABCDE8FA9'
+        command = 'user view --username ABCDE8FA9'
         self.mock_facade.retrieve.side_effect = LookupError
         self.assertTupleEqual(self.testcommand.handle(command, user_id),
                               (UserCommand.lookup_error, 200))
@@ -237,7 +233,7 @@ class TestUserCommand(TestCase):
         self.mock_github.org_add_member.return_value = "123"
         with self.app.app_context():
             resp, code = self.testcommand.handle(
-                "user edit --member U0G9QF9C6 "
+                "user edit --username U0G9QF9C6 "
                 "--name rob "
                 "--email <mailto:rob@rob.com|rob@rob.com> --pos dev --github"
                 " rob@.github.com --major 'Computer Science'"
@@ -255,7 +251,7 @@ class TestUserCommand(TestCase):
         user_editor.permissions_level = Permissions.member
         self.mock_facade.retrieve.return_value = user_editor
         self.assertEqual(self.testcommand.handle(
-            "user edit --member ABCDE89JK "
+            "user edit --username ABCDE89JK "
             "--name rob "
             "--email <mailto:rob@rob.com|rob@rob.com> --pos dev --github"
             " rob@.github.com --major 'Computer Science'"
@@ -276,7 +272,7 @@ class TestUserCommand(TestCase):
         editee_attaches = [editee.get_attachment()]
         with self.app.app_context():
             resp, code = self.testcommand.handle(
-                "user edit --member arst "
+                "user edit --username arst "
                 "--permission admin",
                 "a1")
             expect = {'attachments': editee_attaches}
@@ -304,7 +300,7 @@ class TestUserCommand(TestCase):
         self.mock_facade.retrieve.return_value = user_editor
         self.mock_facade.retrieve.side_effect = LookupError
         self.assertEqual(self.testcommand.handle(
-            "user edit --member ABCDE89JK "
+            "user edit --username ABCDE89JK "
             "--name rob "
             "--email <mailto:rob@rob.com|rob@rob.com> --pos dev --github"
             " rob@.github.com --major 'Computer Science'"

@@ -12,6 +12,7 @@ import utils.slack_parse as util
 import logging
 from utils.slack_msg_fmt import wrap_slack_code
 from utils.slack_parse import is_slack_id
+from config import Config
 import requests
 
 
@@ -19,6 +20,7 @@ class CommandParser:
     """Manage the different command parsers for Rocket 2 commands."""
 
     def __init__(self,
+                 config: Config,
                  db_facade: DBFacade,
                  bot: Bot,
                  gh_interface: GithubInterface,
@@ -29,7 +31,7 @@ class CommandParser:
         self.__bot = bot
         self.__github = gh_interface
         self.__commands["user"] = UserCommand(self.__facade, self.__github)
-        self.__commands["team"] = TeamCommand(self.__facade,
+        self.__commands["team"] = TeamCommand(config, self.__facade,
                                               self.__github, self.__bot)
         self.__commands["token"] = TokenCommand(self.__facade, token_config)
         self.__commands["project"] = ProjectCommand(self.__facade)

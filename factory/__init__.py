@@ -38,17 +38,18 @@ def make_command_parser(config: Config, gh: GithubInterface) \
               config.slack_notification_channel)
     # TODO: make token config expiry configurable
     token_config = TokenCommandConfig(timedelta(days=7), config.github_key)
-    return CommandParser(facade, bot, gh, token_config)
+    return CommandParser(config, facade, bot, gh, token_config)
 
 
-def make_github_webhook_handler(config: Config) -> GitHubWebhookHandler:
+def make_github_webhook_handler(gh: GithubInterface,
+                                config: Config) -> GitHubWebhookHandler:
     """
     Initialize a :class:`GitHubWebhookHandler` object.
 
     :return: a new ``GitHubWebhookHandler`` object, freshly initialized
     """
     facade = DBFacade(DynamoDB(config))
-    return GitHubWebhookHandler(facade, config)
+    return GitHubWebhookHandler(facade, gh, config)
 
 
 def make_slack_events_handler(config: Config) -> SlackEventsHandler:
