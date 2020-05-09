@@ -13,9 +13,6 @@ DynamoDB/
 .env
 .pytest_cache
 
-# Deployment files
-inertia.toml
-
 # Docs generation files
 _build/
 /credentials/
