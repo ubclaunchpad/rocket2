@@ -24,7 +24,7 @@ watchtower = "==0.7.3"
 
 [dev-packages]
 awscli = "*"
-codecov = "*"
+codecov = "==2.1.7"
 flake8 = "*"
 m2r = "*"
 ipython = "*"
