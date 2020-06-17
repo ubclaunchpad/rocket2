@@ -5,7 +5,7 @@ import logging
 from boto3.dynamodb.conditions import Attr
 from functools import reduce
 from app.model import User, Team, Project
-from typing import Optional, Tuple, List, Type, TypeVar
+from typing import Tuple, List, Type, TypeVar
 from config import Config
 
 T = TypeVar('T', User, Team, Project)
@@ -186,22 +186,16 @@ class DynamoDB:
         :param obj: Object to store in database
         :return: True if object was stored, and false otherwise
         """
-        Model: Optional[Type[T]] = None
-        if isinstance(obj, User):
-            Model = User
-        elif isinstance(obj, Team):
-            Model = Team
-        elif isinstance(obj, Project):
-            Model = Project
-        else:
+        Model = obj.__class__
+        if Model not in [User, Team, Project]:
             logging.error(f"Cannot store object {str(obj)}")
             raise RuntimeError(f'Cannot store object{str(obj)}')
 
         # Check if object is valid
-        if Model.is_valid(obj):  # type: ignore
+        if Model.is_valid(obj):
             table_name = self.CONST.get_table_name(Model)
             table = self.ddb.Table(table_name)
-            d = Model.to_dict(obj)  # type: ignore
+            d = Model.to_dict(obj)
 
             logging.info(f"Storing obj {obj} in table {table_name}")
             table.put_item(Item=d)

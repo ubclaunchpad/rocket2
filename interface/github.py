@@ -87,7 +87,7 @@ class GithubInterface:
 
         If the user is already in the organization, don't do anything.
         """
-        user = self.github.get_user(username)
+        user = cast(NamedUser, self.github.get_user(username))
         if not self.org.has_in_members(user):
             self.org.add_to_members(user, "member")
         return str(user.id)
@@ -95,19 +95,19 @@ class GithubInterface:
     @handle_github_error
     def org_add_admin(self, username: str):
         """Add member with given username as admin to organization."""
-        user = self.github.get_user(username)
+        user = cast(NamedUser, self.github.get_user(username))
         self.org.add_to_members(user, "admin")
 
     @handle_github_error
     def org_remove_member(self, username: str):
         """Remove member with given username from organization."""
-        user = self.github.get_user(username)
+        user = cast(NamedUser, self.github.get_user(username))
         self.org.remove_from_membership(user)
 
     @handle_github_error
     def org_has_member(self, username: str) -> bool:
         """Return true if user with username is member of organization."""
-        user = self.github.get_user(username)
+        user = cast(NamedUser, self.github.get_user(username))
         return cast(bool, self.org.has_in_members(user))
 
     @handle_github_error
@@ -190,19 +190,19 @@ class GithubInterface:
     def add_team_member(self, username: str, team_id: str):
         """Add user with given username to team with id team_id."""
         team = self.org.get_team(int(team_id))
-        new_member = self.github.get_user(username)
+        new_member = cast(NamedUser, self.github.get_user(username))
         team.add_membership(new_member)
 
     @handle_github_error
     def has_team_member(self, username: str, team_id: str) -> bool:
         """Check if team with team_id contains user with username."""
         team = self.org.get_team(int(team_id))
-        member = self.github.get_user(username)
+        member = cast(NamedUser, self.github.get_user(username))
         return cast(bool, team.has_in_members(member))
 
     @handle_github_error
     def remove_team_member(self, username: str, team_id: str):
         """Remove user with given username from team with id team_id."""
         team = self.org.get_team(int(team_id))
-        to_be_removed_member = self.github.get_user(username)
+        to_be_removed_member = cast(NamedUser, self.github.get_user(username))
         team.remove_membership(to_be_removed_member)

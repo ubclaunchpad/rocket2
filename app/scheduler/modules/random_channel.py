@@ -35,7 +35,7 @@ class RandomChannelPromoter(ModuleBase):
                                self.bot.get_channels()))
         rand_channel = choice(channels)
         channel_id, channel_name = rand_channel['id'], rand_channel['name']
-        self.bot.send_to_channel(f'Featured channel of the week: ' +
+        self.bot.send_to_channel('Featured channel of the week: ' +
                                  f'<#{channel_id}|{channel_name}>!',
                                  self.default_channel)
 

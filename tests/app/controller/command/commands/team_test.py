@@ -164,7 +164,7 @@ class TestTeamCommand(TestCase):
         self.db.retrieve.return_value = test_user
         self.db.query.return_value = [team]
         self.assertTupleEqual(self.testcommand.handle("team delete brs", user),
-                              (f"Team brs deleted", 200))
+                              ("Team brs deleted", 200))
         self.db.delete.assert_called_once_with(Team, "12345")
         self.gh.org_delete_team.assert_called_once_with(int("12345"))
 
@@ -587,9 +587,7 @@ class TestTeamCommand(TestCase):
         self.gh.org_get_teams.return_value = [team_update, team2]
         attach = team_update.get_attachment()
 
-        status = f"1 teams changed, " \
-            f"0 added, " \
-            f"0 deleted. Wonderful."
+        status = "1 teams changed, 0 added, 0 deleted. Wonderful."
         with self.app.app_context():
             resp, code = self.testcommand.handle("team refresh", user)
             expect = {'attachments': [attach], 'text': status}
@@ -613,9 +611,7 @@ class TestTeamCommand(TestCase):
         attach = team.get_attachment()
         attach2 = team2.get_attachment()
 
-        status = f"0 teams changed, " \
-            f"1 added, " \
-            f"1 deleted. Wonderful."
+        status = "0 teams changed, 1 added, 1 deleted. Wonderful."
         with self.app.app_context():
             resp, code = self.testcommand.handle("team refresh", user)
             expect = {'attachments': [attach2, attach], 'text': status}
