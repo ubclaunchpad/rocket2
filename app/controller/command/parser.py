@@ -26,18 +26,18 @@ class CommandParser:
                  gh_interface: GithubInterface,
                  token_config: TokenCommandConfig):
         """Initialize the dictionary of command handlers."""
-        self.__commands: Dict[str, Command] = {}
+        self.commands: Dict[str, Command] = {}
         self.__facade = db_facade
         self.__bot = bot
         self.__github = gh_interface
-        self.__commands["user"] = UserCommand(self.__facade, self.__github)
-        self.__commands["team"] = TeamCommand(config, self.__facade,
-                                              self.__github, self.__bot)
-        self.__commands["token"] = TokenCommand(self.__facade, token_config)
-        self.__commands["project"] = ProjectCommand(self.__facade)
-        self.__commands["karma"] = KarmaCommand(self.__facade)
-        self.__commands["mention"] = MentionCommand(self.__facade)
-        self.__commands["i-quit"] = IQuitCommand(self.__facade)
+        self.commands["user"] = UserCommand(self.__facade, self.__github)
+        self.commands["team"] = TeamCommand(config, self.__facade,
+                                            self.__github, self.__bot)
+        self.commands["token"] = TokenCommand(self.__facade, token_config)
+        self.commands["project"] = ProjectCommand(self.__facade)
+        self.commands["karma"] = KarmaCommand(self.__facade)
+        self.commands["mention"] = MentionCommand(self.__facade)
+        self.commands["i-quit"] = IQuitCommand(self.__facade)
 
     def handle_app_command(self,
                            cmd_txt: str,
@@ -61,11 +61,11 @@ class CommandParser:
         if s[0] == "help" or s[0] is None:
             logging.info("Help command was called")
             v = self.get_help()
-        if s[0] in self.__commands:
-            v = self.__commands[s[0]].handle(cmd_txt, user)
+        if s[0] in self.commands:
+            v = self.commands[s[0]].handle(cmd_txt, user)
         elif is_slack_id(s[0]):
             logging.info("mention command activated")
-            v = self.__commands["mention"].handle(cmd_txt, user)
+            v = self.commands["mention"].handle(cmd_txt, user)
         else:
             logging.error("app command triggered incorrectly")
             v = self.get_help()
@@ -92,7 +92,7 @@ class CommandParser:
                            "please enclose them with quotations.\n",
                    "mrkdwn": "true"}
         attachments = []
-        for cmd in self.__commands.values():
+        for cmd in self.commands.values():
             cmd_name = cmd.command_name
             cmd_text = f"*{cmd_name}:* {cmd.desc}"
             attachment = {"text": cmd_text, "mrkdwn_in": ["text"]}

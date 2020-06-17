@@ -17,7 +17,7 @@ class IQuitCommand(Command):
     command_name = "i-quit"
     lookup_error = "Lookup error! User not found!"
     delete_text = "Deleted user with Slack ID: "
-    desc = f"`New!` for dealing with quitting users. Try it out!"
+    desc = "`New!` for dealing with quitting users. Try it out!"
     snowflake = "You think you are so special, huh?"
     adminmsg = "Oh well. You can do whatever you want I guess."
     teamleadmsg = "Resignation processed successfully. Notifying admins:"
