@@ -61,7 +61,7 @@ class CommandParser:
         if s[0] == "help" or s[0] is None:
             logging.info("Help command was called")
             v = self.get_help()
-        if s[0] in self.commands:
+        elif s[0] in self.commands:
             v = self.commands[s[0]].handle(cmd_txt, user)
         elif is_slack_id(s[0]):
             logging.info("mention command activated")
