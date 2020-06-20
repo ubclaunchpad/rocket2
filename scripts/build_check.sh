@@ -6,7 +6,6 @@ pushd "${REPO_ROOT}"
 
 pipenv run pycodestyle .
 pipenv run flake8 .
-pipenv run pydocstyle .
 pipenv run mypy .
 mdl .
 

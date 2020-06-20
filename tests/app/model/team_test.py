@@ -1,13 +1,9 @@
-"""Test the data model for a team."""
 from app.model import Team
 from unittest import TestCase
 
 
 class TestTeamModel(TestCase):
-    """Test team class model functions."""
-
     def setUp(self):
-        """Set up variables for use below."""
         self.brussel_sprouts = Team('1', 'brussel-sprouts', 'Brussel Sprouts')
         self.brussel_sprouts_copy =\
             Team('1', 'brussel-sprouts', 'Brussel Sprouts')
