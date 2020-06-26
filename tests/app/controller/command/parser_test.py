@@ -1,14 +1,10 @@
-"""Test the main command parser."""
 from app.controller.command import CommandParser
 from unittest import mock, TestCase
 from app.model import User
 
 
 class TestParser(TestCase):
-    """Test command parser functions."""
-
     def setUp(self):
-        """Set up mocks and variables."""
         self.conf = mock.Mock()
         self.dbf = mock.Mock()
         self.gh = mock.Mock()
@@ -21,31 +17,40 @@ class TestParser(TestCase):
         self.mentioncmd.get_help.return_value = ('', 200)
         self.parser.commands['mention'] = self.mentioncmd
         self.parser.commands['user'] = self.usercmd
-        self.parser.get_help = mock.Mock()
-        self.parser.get_help.return_value = ('', 200)
 
-    def test_handle_app_command(self):
-        """Test handle_app_command being called inappropriately."""
+    @mock.patch('logging.error')
+    def test_handle_app_command(self, mock_logging_error):
         self.parser.handle_app_command('hello world', 'U061F7AUR', '')
+        mock_logging_error.assert_called_with(
+            'app command triggered incorrectly')
 
-    def test_handle_invalid_command(self):
-        """Test that invalid commands are being handled appropriately."""
+    @mock.patch('logging.error')
+    def test_handle_invalid_command(self, mock_logging_error):
         self.usercmd.handle.side_effect = KeyError
         user = 'U061F7AUR'
         self.parser.handle_app_command('fake command', user, '')
+        mock_logging_error.assert_called_with(
+            'app command triggered incorrectly')
 
-    def test_handle_user_command(self):
-        """Test that UserCommand.handle is called appropriately."""
+    @mock.patch('logging.error')
+    def test_handle_user_command(self, mock_logging_error):
         self.usercmd.handle.return_value = ('', 200)
         self.parser.handle_app_command('user name', 'U061F7AUR', '')
         self.usercmd.handle.\
             assert_called_once_with("user name", "U061F7AUR")
+        mock_logging_error.assert_not_called()
 
-    def test_handle_mention_command(self):
-        """Test that MentionCommand was handled successfully."""
+    @mock.patch('logging.error')
+    def test_handle_mention_command(self, mock_logging_error):
         user = User('U061F7AUR')
         self.dbf.retrieve.return_value = user
         self.mentioncmd.handle.return_value = ('', 200)
         self.parser.handle_app_command('U061F7AUR ++', 'UFJ42EU67', '')
         self.mentioncmd.handle.\
             assert_called_once_with('U061F7AUR ++', 'UFJ42EU67')
+        mock_logging_error.assert_not_called()
+
+    @mock.patch('logging.error')
+    def test_handle_help(self, mock_logging_error):
+        self.parser.handle_app_command('help', 'UFJ42EU67', '')
+        mock_logging_error.assert_not_called()
