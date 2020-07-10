@@ -3,14 +3,12 @@ from app.model.user import User
 from app.model.team import Team
 from app.model.project import Project
 from typing import List, Tuple, TypeVar, Type
-from db.dynamodb import DynamoDB
-import logging
-
+from abc import ABC, abstractmethod
 
 T = TypeVar('T', User, Team, Project)
 
 
-class DBFacade:
+class DBFacade(ABC):
     """
     A database facade that gives an overall API for any databases.
 
@@ -20,21 +18,7 @@ class DBFacade:
     would stay the same.
     """
 
-    def __init__(self, db: DynamoDB):
-        """
-        Initialize facade using a given class.
-
-        Currently, we can only initialize with :class:`db.dynamodb.DynamoDB`.
-
-        :param db: Database class for API calls
-        """
-        logging.info("Initializing database facade")
-        self.ddb = db
-
-    def __str__(self) -> str:
-        """Return a string representing this class."""
-        return "Database Facade"
-
+    @abstractmethod
     def store(self, obj: T) -> bool:
         """
         Store object into the correct table.
@@ -45,12 +29,10 @@ class DBFacade:
         :param obj: Object to store in database
         :return: True if object was stored, and false otherwise
         """
-        logging.info(f"Storing object {obj}")
-        return self.ddb.store(obj)
+        pass
 
-    def retrieve(self,
-                 Model: Type[T],
-                 k: str) -> T:
+    @abstractmethod
+    def retrieve(self, Model: Type[T], k: str) -> T:
         """
         Retrieve a model from the database.
 
@@ -59,22 +41,23 @@ class DBFacade:
         :raise: LookupError if key is not found
         :return: a model ``Model`` if key is found
         """
-        logging.info(f"Retrieving {Model.__name__}(id={k})")
-        return self.ddb.retrieve(Model, k)
+        pass
 
+    @abstractmethod
     def bulk_retrieve(self, Model: Type[T], ks: List[str]) -> List[T]:
         """
         Retrieve a list of models from the database.
 
-        Keys not found in the database will be skipped.
+        Keys not found in the database will be skipped. Should be at least as
+        fast as multiple calls to ``.retrieve``.
 
         :param Model: the actual class you want to retrieve
         :param ks: retrieve based on this key (or ID)
         :return: a list of models ``Model``
         """
-        logging.info(f"Bulk retrieving {len(ks)} {Model.__name__}(s)")
-        return self.ddb.bulk_retrieve(Model, ks)
+        pass
 
+    @abstractmethod
     def query(self,
               Model: Type[T],
               params: List[Tuple[str, str]] = []) -> List[T]:
@@ -108,10 +91,9 @@ class DBFacade:
         :param params: list of tuples to match
         :return: a list of ``Model`` that fit the query parameters
         """
-        logging.info(f"Querying {Model.__name__} matching "
-                     f"parameters: {params}")
-        return self.ddb.query(Model, params)
+        pass
 
+    @abstractmethod
     def query_or(self,
                  Model: Type[T],
                  params: List[Tuple[str, str]] = []) -> List[T]:
@@ -149,18 +131,14 @@ class DBFacade:
         :param params: list of tuples to match
         :return: a list of ``Model`` that fit the query parameters
         """
-        logging.info(f"Querying {Model.__name__} matching "
-                     f"parameters: {params}")
-        return self.ddb.query_or(Model, params)
+        pass
 
-    def delete(self,
-               Model: Type[T],
-               k: str):
+    @abstractmethod
+    def delete(self, Model: Type[T], k: str):
         """
         Remove an object from a table.
 
         :param Model: table type to remove the object from
         :param k: ID or key of the object to remove (must be primary key)
         """
-        logging.info(f"Deleting {Model.__name__}(id={k})")
-        self.ddb.delete(Model, k)
+        pass
