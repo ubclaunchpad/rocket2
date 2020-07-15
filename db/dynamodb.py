@@ -1,4 +1,3 @@
-"""DynamoDB."""
 import boto3
 import logging
 
@@ -7,11 +6,12 @@ from functools import reduce
 from app.model import User, Team, Project
 from typing import Tuple, List, Type, TypeVar
 from config import Config
+from db.facade import DBFacade
 
 T = TypeVar('T', User, Team, Project)
 
 
-class DynamoDB:
+class DynamoDB(DBFacade):
     """
     Handles calls to database through API.
 
@@ -128,10 +128,6 @@ class DynamoDB:
         if not self.check_valid_table(self.projects_table):
             self.__create_table(self.projects_table)
 
-    def __str__(self) -> str:
-        """Return a string representing this class."""
-        return "DynamoDB"
-
     def __create_table(self, table_name: str, key_type: str = 'S'):
         """
         Create a table.
@@ -177,15 +173,6 @@ class DynamoDB:
                        existing_tables))
 
     def store(self, obj: T) -> bool:
-        """
-        Store object into the correct table.
-
-        Object can be of type :class:`model.user.User`,
-        :class:`model.team.Team`, or :class:`model.project.Project`.
-
-        :param obj: Object to store in database
-        :return: True if object was stored, and false otherwise
-        """
         Model = obj.__class__
         if Model not in [User, Team, Project]:
             logging.error(f"Cannot store object {str(obj)}")
@@ -202,17 +189,7 @@ class DynamoDB:
             return True
         return False
 
-    def retrieve(self,
-                 Model: Type[T],
-                 k: str) -> T:
-        """
-        Retrieve a model from the database.
-
-        :param Model: the actual class you want to retrieve
-        :param k: retrieve based on this key (or ID)
-        :raise: LookupError if key is not found
-        :return: a model ``Model`` if key is found
-        """
+    def retrieve(self, Model: Type[T], k: str) -> T:
         table_name = self.CONST.get_table_name(Model)
         table = self.ddb.Table(table_name)
         resp = table.get_item(
@@ -230,15 +207,6 @@ class DynamoDB:
             raise LookupError(err_msg)
 
     def bulk_retrieve(self, Model: Type[T], ks: List[str]) -> List[T]:
-        """
-        Retrieve a list of models from the database.
-
-        Keys not found in the database will be skipped.
-
-        :param Model: the actual class you want to retrieve
-        :param ks: retrieve based on this key (or ID)
-        :return: a list of models ``Model``
-        """
         table_name = self.CONST.get_table_name(Model)
         resp = self.ddb.batch_get_item(
             RequestItems={
@@ -257,36 +225,7 @@ class DynamoDB:
     def query(self,
               Model: Type[T],
               params: List[Tuple[str, str]] = []) -> List[T]:
-        """
-        Query a table using a list of parameters.
 
-        Returns a list of ``Model`` that have **all** of the attributes
-        specified in the parameters. Every item in parameters is a tuple, where
-        the first element is the user attribute, and the second is the value.
-
-        Example::
-
-            ddb = DynamoDb(config)
-            users = ddb.query(User, [('platform', 'slack')])
-
-        If you try to query a table without any parameters, the function will
-        return all objects of that table.::
-
-            projects = ddb.query(Project)
-
-        Attributes that are sets (e.g. ``team.member``,
-        ``project.github_urls``) would be treated differently. This function
-        would check to see if the entry **contains** a certain element. You can
-        specify multiple elements, but they must be in different parameters
-        (one element per tuple).::
-
-            teams = ddb.query(Team, [('members', 'abc123'),
-                                     ('members', '231abc')])
-
-        :param Model: type of list elements you'd want
-        :param params: list of tuples to match
-        :return: a list of ``Model`` that fit the query parameters
-        """
         table_name = self.CONST.get_table_name(Model)
         table = self.ddb.Table(table_name)
         set_attrs = self.CONST.get_set_attrs(table_name)
@@ -307,40 +246,7 @@ class DynamoDB:
     def query_or(self,
                  Model: Type[T],
                  params: List[Tuple[str, str]] = []) -> List[T]:
-        """
-        Query a table using a list of parameters.
 
-        Returns a list of ``Model`` that have **one** of the attributes
-        specified in the parameters. Some might say that this is a **union** of
-        the parameters. Every item in parameters is a tuple, where
-        the first element is the user attribute, and the second is the value.
-
-        Example::
-
-            ddb = DynamoDb(config)
-            users = ddb.query_or(User, [('platform', 'slack')])
-
-        If you try to query a table without any parameters, the function will
-        return all objects of that table.::
-
-            projects = ddb.query_or(Project)
-
-        Attributes that are sets (e.g. ``team.member``,
-        ``project.github_urls``) would be treated differently. This function
-        would check to see if the entry **contains** a certain element. You can
-        specify multiple elements, but they must be in different parameters
-        (one element per tuple).::
-
-            teams = ddb.query_or(Team, [('members', 'abc123'),
-                                        ('members', '231abc')])
-
-        The above would get you the teams that contain either member ``abc123``
-        or ``231abc``.
-
-        :param Model: type of list elements you'd want
-        :param params: list of tuples to match
-        :return: a list of ``Model`` that fit the query parameters
-        """
         table_name = self.CONST.get_table_name(Model)
         table = self.ddb.Table(table_name)
         set_attrs = self.CONST.get_set_attrs(table_name)
@@ -358,15 +264,7 @@ class DynamoDB:
 
         return list(map(Model.from_dict, resp['Items']))
 
-    def delete(self,
-               Model: Type[T],
-               k: str):
-        """
-        Remove an object from a table.
-
-        :param Model: table type to remove the object from
-        :param k: ID or key of the object to remove (must be primary key)
-        """
+    def delete(self, Model: Type[T], k: str):
         logging.info(f"Deleting {Model.__name__}(id={k})")
         table_name = self.CONST.get_table_name(Model)
         table = self.ddb.Table(table_name)

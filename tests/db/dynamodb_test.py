@@ -38,10 +38,7 @@ class TestDDBConstants(TestCase):
 
 
 class TestDynamoDB(TestCase):
-    """Test DynamoDB."""
-
     def setUp(self):
-        """Set up DynamoDB instance and other things."""
         self.config = MagicMock(Config)
         self.config.aws_users_tablename = 'users_test'
         self.config.aws_teams_tablename = 'teams_test'
@@ -61,11 +58,6 @@ class TestDynamoDB(TestCase):
             table.delete()
 
     @pytest.mark.db
-    def test_string_rep(self):
-        """Test string representation of the DynamoDB class."""
-        self.assertEqual(str(self.ddb), "DynamoDB")
-
-    @pytest.mark.db
     def test_store_invalid_type(self):
         """Test that we cannot store an object that isn't one of the types."""
         with self.assertRaises(RuntimeError):
@@ -73,19 +65,16 @@ class TestDynamoDB(TestCase):
 
     @pytest.mark.db
     def test_store_invalid_user(self):
-        """Test handling of invalid user."""
         user = User('')
         self.assertFalse(self.ddb.store(user))
 
     @pytest.mark.db
     def test_store_invalid_team(self):
-        """Test handling of invalid team."""
         team = Team('1', '', 'Brussel Sprouts')
         self.assertFalse(self.ddb.store(team))
 
     @pytest.mark.db
     def test_store_invalid_project(self):
-        """Test handling of invalid project."""
         project = Project('12456', [''])
         project.github_urls = []
         self.assertFalse(self.ddb.store(project))
@@ -208,13 +197,11 @@ class TestDynamoDB(TestCase):
 
     @pytest.mark.db
     def test_bulk_retrieve_no_users(self):
-        """Test to see if we can retrieve no users."""
         uids = list(map(str, range(10)))
         self.assertEqual(self.ddb.bulk_retrieve(User, uids), [])
 
     @pytest.mark.db
     def test_bulk_retrieve_users(self):
-        """Test to see if we can store and bulk retrieve."""
         uids = list(map(str, range(10)))
         users = [create_test_admin(i) for i in uids]
         for user in users:
@@ -238,7 +225,6 @@ class TestDynamoDB(TestCase):
 
     @pytest.mark.db
     def test_query_or_users(self):
-        """Test to see if we can query users using union of parameters."""
         uids = list(map(str, range(10)))
         users = [create_test_admin(i) for i in uids]
 
@@ -283,7 +269,6 @@ class TestDynamoDB(TestCase):
 
     @pytest.mark.db
     def test_delete_user(self):
-        """Test to see if we can successfully delete a user."""
         user = create_test_admin('abc_123')
         self.assertTrue(self.ddb.store(user))
 
@@ -293,7 +278,6 @@ class TestDynamoDB(TestCase):
 
     @pytest.mark.db
     def test_delete_team(self):
-        """Test to see if we can successfully delete a team."""
         team = create_test_team('1', 'rocket-2.0', 'Rocket 2.0')
         self.assertTrue(self.ddb.store(team))
 
@@ -303,7 +287,6 @@ class TestDynamoDB(TestCase):
 
     @pytest.mark.db
     def test_delete_project(self):
-        """Test to see if we can successfully delete a team."""
         project = create_test_project('abc_123', ['a'])
         self.assertTrue(self.ddb.store(project))
 
