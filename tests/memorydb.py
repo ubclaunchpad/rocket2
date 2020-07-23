@@ -70,4 +70,6 @@ class MemoryDB(DBFacade):
         pass
 
     def delete(self, Model: Type[T], k: str):
-        pass
+        d = self.get_db(Model)
+        if k in d:
+            d.pop(k)

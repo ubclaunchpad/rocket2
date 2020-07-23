@@ -68,3 +68,9 @@ class TestMemoryDB(TestCase):
         selection = [str(i) for i in range(100)]
         us = self.db.bulk_retrieve(User, selection)
         self.assertEqual(us, [])
+
+    def testDeleteUser(self):
+        slack_id = random.choice(list(self.users.keys()))
+        self.db.delete(User, slack_id)
+        with self.assertRaises(LookupError):
+            self.db.retrieve(User, slack_id)
