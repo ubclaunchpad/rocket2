@@ -1,6 +1,6 @@
 from db.facade import DBFacade
 from app.model import User, Team, Project  # , Permissions
-from typing import Dict, TypeVar, List, Type, Tuple, cast
+from typing import Dict, TypeVar, List, Type, Tuple, cast, Set
 
 T = TypeVar('T', User, Team, Project)
 
@@ -61,16 +61,17 @@ def field_to_attr(Model: Type[T], field: str) -> str:
         return TEAM_ATTRS[field]
     elif Model is Project:
         return PROJ_ATTRS[field]
+    return field
 
 
-def filter_by_matching_field(l: List[T],
-                            Model: Type[T],
-                            field: str,
-                            v: str) -> List[T]:
+def filter_by_matching_field(ls: List[T],
+                             Model: Type[T],
+                             field: str,
+                             v: str) -> List[T]:
     r = []
     is_set = field_is_set(Model, field)
     attr = field_to_attr(Model, field)
-    for x in l:
+    for x in ls:
         if is_set and v in getattr(x, attr):
             r.append(x)
         elif not is_set and v == getattr(x, attr):
@@ -147,7 +148,7 @@ class MemoryDB(DBFacade):
             return self.query(Model)
 
         d = list(self.get_db(Model).values())
-        r = set()
+        r: Set[T] = set()
         for field, val in params:
             r = r.union(set(filter_by_matching_field(d, Model, field, val)))
         return list(r)
