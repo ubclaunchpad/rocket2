@@ -5,6 +5,79 @@ from typing import Dict, TypeVar, List, Type, Tuple, cast
 T = TypeVar('T', User, Team, Project)
 
 
+# Convert DB field names to python attribute names
+USER_ATTRS = {
+    'slack_id': 'slack_id',
+    'permission_level': 'permissions_level',
+    'email': 'email',
+    'name': 'name',
+    'github': 'github_username',
+    'github_user_id': 'github_id',
+    'major': 'major',
+    'position': 'position',
+    'bio': 'biography',
+    'image_url': 'image_url',
+    'karma': 'karma'
+}
+
+
+TEAM_ATTRS = {
+    'github_team_id': 'github_team_id',
+    'github_team_name': 'github_team_name',
+    'display_name': 'display_name',
+    'platform': 'platform',
+    'members': 'members',
+    'team_leads': 'team_leads'
+}
+
+
+PROJ_ATTRS = {
+    'project_id': 'project_id',
+    'github_urls': 'github_urls',
+    'github_team_id': 'github_team_id',
+    'display_name': 'display_name',
+    'short_description': 'short_description',
+    'long_description': 'long_description',
+    'tags': 'tags',
+    'website_url': 'website_url',
+    'appstore_url': 'appstore_url',
+    'playstore_url': 'playstore_url'
+}
+
+
+def field_is_set(Model: Type[T], field: str) -> bool:
+    if Model is Team:
+        return field in ['team_leads', 'members']
+    elif Model is Project:
+        return field in ['tags', 'github_urls']
+    else:
+        return False
+
+
+def field_to_attr(Model: Type[T], field: str) -> str:
+    if Model is User:
+        return USER_ATTRS[field]
+    elif Model is Team:
+        return TEAM_ATTRS[field]
+    elif Model is Project:
+        return PROJ_ATTRS[field]
+
+
+def filter_by_matching_field(l: List[T],
+                            Model: Type[T],
+                            field: str,
+                            v: str) -> List[T]:
+    r = []
+    is_set = field_is_set(Model, field)
+    attr = field_to_attr(Model, field)
+    for x in l:
+        if is_set and v in getattr(x, attr):
+            r.append(x)
+        elif not is_set and v == getattr(x, attr):
+            r.append(x)
+    return r
+
+
 def get_key(m: T) -> str:
     if isinstance(m, User):
         return cast(User, m).slack_id
@@ -62,12 +135,22 @@ class MemoryDB(DBFacade):
     def query(self,
               Model: Type[T],
               params: List[Tuple[str, str]] = []) -> List[T]:
-        pass
+        d = list(self.get_db(Model).values())
+        for field, val in params:
+            d = filter_by_matching_field(d, Model, field, val)
+        return d
 
     def query_or(self,
                  Model: Type[T],
                  params: List[Tuple[str, str]] = []) -> List[T]:
-        pass
+        if len(params) == 0:
+            return self.query(Model)
+
+        d = list(self.get_db(Model).values())
+        r = set()
+        for field, val in params:
+            r = r.union(set(filter_by_matching_field(d, Model, field, val)))
+        return list(r)
 
     def delete(self, Model: Type[T], k: str):
         d = self.get_db(Model)
