@@ -1,6 +1,6 @@
 from db.facade import DBFacade
 from app.model import User, Team, Project  # , Permissions
-from typing import Dict, TypeVar, List, Type, Tuple, cast, Set
+from typing import TypeVar, List, Type, Tuple, cast, Set
 
 T = TypeVar('T', User, Team, Project)
 
