@@ -263,7 +263,7 @@ class ProjectCommand(Command):
         try:
             user = self.facade.retrieve(User, user_id)
 
-            if not (user_id in team.team_leads or
+            if not (user.github_id in team.team_leads or
                     user.permissions_level is Permissions.admin):
                 logging.error(f"User with user ID {user_id} is not "
                               "a team lead of the specified team or an admin")
@@ -300,7 +300,7 @@ class ProjectCommand(Command):
             team = self.facade.retrieve(Team, project.github_team_id)
             user = self.facade.retrieve(User, user_id)
 
-            if not (user_id in team.team_leads or
+            if not (user.github_id in team.team_leads or
                     user.permissions_level is Permissions.admin):
                 logging.error(f"User with user ID {user_id} is not "
                               "a team lead of the specified team or an admin")
@@ -376,7 +376,7 @@ class ProjectCommand(Command):
             team = team_list[0]
             user = self.facade.retrieve(User, user_id)
 
-            if not (user_id in team.team_leads or
+            if not (user.github_id in team.team_leads or
                     user.permissions_level is Permissions.admin):
                 logging.error(f"User with user ID {user_id} is not "
                               "a team lead of the specified team or an admin")
@@ -411,15 +411,13 @@ class ProjectCommand(Command):
         logging.debug("Handling project delete subcommand")
         try:
             project = self.facade.retrieve(Project, project_id)
-            team = self.facade.retrieve(Team, project.github_team_id)
             user = self.facade.retrieve(User, user_id)
 
             if project.github_team_id != "" and not force:
                 logging.error("Project is assigned to team with "
                               f"GitHub team ID {project.github_team_id}")
                 return self.assigned_error, 200
-            elif not (user_id in team.team_leads or
-                      user.permissions_level is Permissions.admin):
+            elif user.permissions_level is not Permissions.admin:
                 logging.error(f"User with user ID {user_id} is not "
                               "a team lead of the specified team or an admin")
                 return self.permission_error, 200
