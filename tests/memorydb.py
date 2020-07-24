@@ -90,12 +90,12 @@ def get_key(m: T) -> str:
 
 class MemoryDB(DBFacade):
     def __init__(self,
-                 users: Dict[str, User] = {},
-                 teams: Dict[str, Team] = {},
-                 projs: Dict[str, Project] = {}):
-        self.users = dict(users)
-        self.teams = dict(teams)
-        self.projs = dict(projs)
+                 users: List[User] = [],
+                 teams: List[Team] = [],
+                 projs: List[Project] = []):
+        self.users = {u.slack_id: u for u in users}
+        self.teams = {t.github_team_id: t for t in teams}
+        self.projs = {p.project_id: p for p in projs}
 
     def get_db(self, Model: Type[T]):
         if Model is User:

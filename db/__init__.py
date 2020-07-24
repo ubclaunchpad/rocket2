@@ -1,4 +1,3 @@
 """Pack the modules contained in the db directory."""
-import db.facade
-
-DBFacade = db.facade.DBFacade
+from db.dynamodb import DynamoDB
+from db.facade import DBFacade

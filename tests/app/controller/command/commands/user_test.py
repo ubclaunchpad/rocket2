@@ -1,6 +1,5 @@
-"""Test user command parsing."""
 from app.controller.command.commands import UserCommand
-from db import DBFacade
+from tests.memorydb import MemoryDB
 from flask import Flask
 from interface.github import GithubInterface, GithubAPIException
 from app.model import User, Permissions
@@ -8,14 +7,14 @@ from unittest import mock, TestCase
 
 
 class TestUserCommand(TestCase):
-    """Test Case for UserCommand class."""
-
     def setUp(self):
-        """Set up the test case environment."""
         self.app = Flask(__name__)
-        self.mock_facade = mock.MagicMock(DBFacade)
+
+        self.u0 = User('U0G9QF9C6')
+        self.db = MemoryDB(users=[self.u0])
+
         self.mock_github = mock.MagicMock(GithubInterface)
-        self.testcommand = UserCommand(self.mock_facade, self.mock_github)
+        self.testcommand = UserCommand(self.db, self.mock_github)
         self.maxDiff = None
 
     def test_get_help(self):

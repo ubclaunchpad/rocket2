@@ -1,46 +1,44 @@
 from unittest import TestCase
 from uuid import uuid4
-from typing import Dict
+from typing import List
 import random
 from tests.memorydb import MemoryDB
 from app.model import User, Team  # , Project, Permissions
 import tests.util as util
 
 
-def makeUsers(amount: int = 20) -> Dict[str, User]:
-    r = {}
+def makeUsers(amount: int = 20) -> List[User]:
+    r = []
     for _ in range(amount):
         u = User(str(uuid4()))
         u.github_username = u.slack_id
-        r[u.slack_id] = u
+        r.append(u)
     return r
 
 
-def makeTeams() -> Dict[str, Team]:
-    r = {}
+def makeTeams() -> List[Team]:
     t0 = Team('t0', 'TZ', 'T Zero Blasters')
     t0.platform = 'iOS'
     t0.team_leads = set(['u0', 'u1', 'u2'])
     t0.members = set(['u0', 'u1', 'u2'])
-    r['t0'] = t0
     t1 = Team('t1', 'T1', 'T 1 Blasters')
     t1.platform = 'iOS'
     t1.team_leads = set(['u0', 'u2'])
     t1.members = set(['u0', 'u2', 'u3'])
-    r['t1'] = t1
-    return r
+    return [t0, t1]
 
 
 class TestMemoryDB(TestCase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.admin = util.create_test_admin('Uadmin')
-        self.users = makeUsers(20)
+        self.users = {u.slack_id: u for u in makeUsers(20)}
         self.users['Uadmin'] = self.admin
-        self.teams = makeTeams()
+        self.teams = {t.github_team_id: t for t in makeTeams()}
 
     def setUp(self):
-        self.db = MemoryDB(users=self.users, teams=self.teams)
+        self.db = MemoryDB(users=list(self.users.values()),
+                           teams=list(self.teams.values()))
 
     def test_users_dont_affect_DB(self):
         """
