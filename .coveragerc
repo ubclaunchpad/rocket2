@@ -1,11 +1,17 @@
 [run]
 omit =
 	conf.py
-	tests/*
+	tests/*/*
+	tests/__init__.py
+	tests/*_test.py
 	app/server.py
 	app/model/base.py
 	app/scheduler/modules/base.py
-	app/scheduler/modules/__init__.py
 	app/controller/webhook/github/events/base.py
 	app/controller/command/commands/base.py
 	factory/__init__.py
+
+[report]
+exclude_lines =
+	pragma: no cover
+	raise NotImplementedError
