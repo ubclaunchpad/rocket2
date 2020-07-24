@@ -42,7 +42,7 @@ class TestMemoryDB(TestCase):
     def setUp(self):
         self.db = MemoryDB(users=self.users, teams=self.teams)
 
-    def testUsersDontAffectDB(self):
+    def test_users_dont_affect_DB(self):
         """
         DB modifications shouldn't affect dict outside.
 
@@ -55,15 +55,15 @@ class TestMemoryDB(TestCase):
         self.db.users.pop(slack_id)
         self.assertIn(slack_id, self.users)
 
-    def testStoreValidUser(self):
+    def test_store_valid_user(self):
         u = User('u3')
         self.assertTrue(self.db.store(u))
 
-    def testStoreInvalidUser(self):
+    def test_store_invalid_user(self):
         u = User('')
         self.assertFalse(self.db.store(u))
 
-    def testRetrieveUsersRandomly(self):
+    def test_retrieve_users_randomly(self):
         ks = list(self.users.keys())
         for _ in range(10):
             slack_id = random.choice(ks)
@@ -71,11 +71,11 @@ class TestMemoryDB(TestCase):
             self.assertEqual(u.github_username,
                              self.users[slack_id].github_username)
 
-    def testRetrieveNonexistantUser(self):
+    def test_retrieve_nonexistant_user(self):
         with self.assertRaises(LookupError):
             self.db.retrieve(User, 'bad user bad bad')
 
-    def testBulkRetrieve(self):
+    def test_bulk_retrieve(self):
         selection = random.sample(list(self.users.keys()), k=10)
         us = self.db.bulk_retrieve(User, selection)
         self.assertEqual(len(us), 10)
@@ -83,36 +83,36 @@ class TestMemoryDB(TestCase):
             self.assertEqual(u.github_username,
                              self.users[u.slack_id].github_username)
 
-    def testBulkRetrieveNothing(self):
+    def test_bulk_retrieve_nothing(self):
         selection = [str(i) for i in range(100)]
         us = self.db.bulk_retrieve(User, selection)
         self.assertEqual(us, [])
 
-    def testQueryTeamName(self):
+    def test_query_team_name(self):
         ts = self.db.query(Team, [('github_team_name', 'T1')])
         self.assertEqual(len(ts), 1)
         self.assertEqual(ts[0], self.teams['t1'])
 
-    def testQueryMultiParams(self):
+    def test_query_multi_params(self):
         ts = self.db.query(
             Team,
             [('members', 'u0'), ('team_leads', 'u1')])
         self.assertEqual(len(ts), 1)
         self.assertEqual(ts[0], self.teams['t0'])
 
-    def testQueryMultiTeams(self):
+    def test_query_multi_teams(self):
         ts = self.db.query(Team, [('members', 'u0')])
         self.assertCountEqual(ts, [self.teams['t0'], self.teams['t1']])
 
-    def testScanQuery(self):
+    def test_scan_query(self):
         us = self.db.query(User)
         self.assertCountEqual(us, list(self.users.values()))
 
-    def testScanTeams(self):
+    def test_scan_teams(self):
         ts = self.db.query_or(Team)
         self.assertCountEqual(ts, list(self.teams.values()))
 
-    def testBulkRetrieveUsingQuery(self):
+    def test_bulk_retrieve_using_query(self):
         selection = random.sample(list(self.users.items()), k=10)
         rand_vals = [v for _, v in selection]
         q_string = [('slack_id', k) for k, _ in selection]
@@ -120,7 +120,7 @@ class TestMemoryDB(TestCase):
         self.assertCountEqual(us, rand_vals)
         self.assertEqual(len(us), 10)
 
-    def testDeleteUser(self):
+    def test_delete_user(self):
         slack_id = random.choice(list(self.users.keys()))
         self.db.delete(User, slack_id)
         with self.assertRaises(LookupError):
