@@ -116,6 +116,11 @@ class TestUserCommand(TestCase):
         self.assertEqual(self.testcommand.handle(cmd, self.u0.slack_id),
                          (UserCommand.permission_error, 200))
 
+    def test_handle_delete_callinguser_lookup_error(self):
+        cmd = f'user delete {self.u1.slack_id}'
+        self.assertEqual(self.testcommand.handle(cmd, 'rando.id'),
+                         (UserCommand.lookup_error, 200))
+
     def test_handle_edit_name(self):
         with self.app.app_context():
             resp, code = self.testcommand.handle('user edit --name rob',
