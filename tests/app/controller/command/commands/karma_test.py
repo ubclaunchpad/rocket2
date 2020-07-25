@@ -1,113 +1,78 @@
-"""Test karma command parsing."""
 from app.controller.command.commands.karma import KarmaCommand
-from db import DBFacade
+from tests.memorydb import MemoryDB
+from tests.util import create_test_admin
 from flask import Flask
-from app.model import User, Permissions
-from unittest import mock, TestCase
+from app.model import User
+from unittest import TestCase
 
 
 class MentionCommandTest(TestCase):
-    """Test cases for using the karma command."""
-
     def setUp(self):
-        """Set up test environment."""
         self.app = Flask(__name__)
-        self.mock_facade = mock.MagicMock(DBFacade)
-        self.testcommand = KarmaCommand(self.mock_facade)
+
+        self.u0 = User('U0G9QF9C6')
+        self.u0.karma = KarmaCommand.karma_default_amount
+        self.u1 = User('UFJ42EU67')
+        self.u0.karma = KarmaCommand.karma_default_amount
+        self.admin = create_test_admin('Uadmin')
+        self.db = MemoryDB(users=[self.u0, self.u1, self.admin])
+
+        self.testcommand = KarmaCommand(self.db)
         self.maxDiff = None
 
     def test_get_help(self):
-        """Test karma command get_help method."""
         assert self.testcommand.get_help() == self.testcommand.help
 
     def test_handle_bad_args(self):
-        """Test karma with invalid arguments."""
-        self.assertEqual(self.testcommand.handle('karma ggwp', "U0G9QF9C6"),
+        self.assertEqual(self.testcommand.handle('karma ggwp',
+                                                 self.u0.slack_id),
                          (self.testcommand.help, 200))
 
     def test_handle_view(self):
-        """Test karma command view method."""
-        user_id = "U0G9QF9C6"
-        user = User(user_id)
-        user.karma = 15
-        self.mock_facade.retrieve.return_value = user
-        resp, code = self.testcommand.handle('karma view UFJ42EU67', user_id)
-        self.assertIn('15', resp)
+        self.u1.karma = 15
+        cmd = f'karma view {self.u1.slack_id}'
+        resp, code = self.testcommand.handle(cmd, self.u0.slack_id)
+        self.assertIn(str(self.u1.karma), resp)
         self.assertEqual(code, 200)
-        self.mock_facade.retrieve.assert_called_once_with(User, "UFJ42EU67")
 
     def test_handle_view_lookup_error(self):
-        """Test karma command view handle with user not in database."""
-        user_id = "U0G9QF9C6"
-        command = 'karma view ABCDE8FA9'
-        self.mock_facade.retrieve.side_effect = LookupError
-        self.assertTupleEqual(self.testcommand.handle(command, user_id),
+        cmd = 'karma view ABCDE8FA9'
+        self.assertTupleEqual(self.testcommand.handle(cmd, self.u0.slack_id),
                               (KarmaCommand.lookup_error, 200))
-        self.mock_facade.retrieve.assert_called_once_with(User, "ABCDE8FA9")
 
-    def test_handle_reset_as_admin(self):
-        """Test karma command resets all users."""
-        user = User("ABCDEFG2F")
-        user.permissions_level = Permissions.admin
-        self.mock_facade.retrieve.return_value = user
-        user_a = User("MMMM1234")
-        user_b = User("YYYY1234")
-        user_a.karma = 2019
-        user_b.karma = 2048
-        self.mock_facade.query.return_value = [user_a, user_b]
+    def test_handle_reset_all_as_admin(self):
+        self.u0.karma = 2019
+        self.u1.karma = 2048
         with self.app.app_context():
             resp, code = self.testcommand.handle(
-                "karma reset --all", "ABCDEFG2F")
+                'karma reset --all', self.admin.slack_id)
             self.assertEqual(code, 200)
-        store_calls = [mock.call(user_a), mock.call(user_b)]
-        self.mock_facade.query.assert_called_once_with(User, [])
-        self.mock_facade.retrieve.assert_called_once_with(User, "ABCDEFG2F")
-        self.mock_facade.store.assert_has_calls(store_calls)
 
-    def test_handle_reset_not_as_admin(self):
-        """Test karma command resets all users."""
-        user = User("ABCDEFG2F")
-        user.permissions_level = Permissions.member
-        self.mock_facade.retrieve.return_value = user
+        self.assertEqual(self.u0.karma, KarmaCommand.karma_default_amount)
+        self.assertEqual(self.u1.karma, KarmaCommand.karma_default_amount)
+
+    def test_handle_reset_all_not_as_admin(self):
+        self.u1.karma = 20
         with self.app.app_context():
             resp, code = self.testcommand.handle(
-                "karma reset --all", "ABCDEFG2F")
+                'karma reset --all', self.u0.slack_id)
             self.assertEqual(code, 200)
             self.assertEqual(KarmaCommand.permission_error, resp)
-        self.mock_facade.assert_not_called()
+
+        self.assertNotEqual(self.u1.karma, KarmaCommand.karma_default_amount)
 
     def test_handle_set_as_admin(self):
-        """Test setting karma as admin."""
-        user = User("ABCDEFG2F")
-        destuser = User("MMMM1234")
-        user.permissions_level = Permissions.admin
-        self.mock_facade.retrieve.side_effect = [user, destuser]
-        self.testcommand.handle("karma set MMMM1234 10", "ABCDEFG2F")
-        retrieve_calls = [mock.call(User, "ABCDEFG2F"),
-                          mock.call(User, "MMMM1234")]
-        self.mock_facade.retrieve.assert_has_calls(retrieve_calls)
-        self.mock_facade.store.assert_called_once_with(destuser)
+        cmd = f'karma set {self.u0.slack_id} 10'
+        self.assertNotEqual(self.u0.karma, 10)
+        self.testcommand.handle(cmd, self.admin.slack_id)
+        self.assertEqual(self.u0.karma, 10)
 
     def test_handle_set_as_non_admin(self):
-        """Test setting karma as non admin."""
-        user = User("ABCDEFG2F")
-        destuser = User("MMMM1234")
-        user.permissions_level = Permissions.member
-        self.mock_facade.retrieve.side_effect = [user, destuser]
-        self.assertEqual(self.testcommand.handle("karma set MMMM1234 10",
-                                                 "ABCDEFG2F"),
+        cmd = f'karma set {self.u1.slack_id} 10'
+        self.assertEqual(self.testcommand.handle(cmd, self.u0.slack_id),
                          (KarmaCommand.permission_error, 200))
-        self.mock_facade.retrieve.assert_called_once_with(User, "ABCDEFG2F")
 
     def test_handle_set_lookup_error(self):
-        """Test setting karma with lookup error."""
-        user = User("ABCDEFG2F")
-        user.permissions_level = Permissions.admin
-        self.mock_facade.retrieve.side_effect = [user, LookupError]
-        self.assertEqual(self.testcommand.handle("karma set MMMM1234 10",
-                                                 "ABCDEFG2F"),
+        cmd = 'karma set rando.id 10'
+        self.assertEqual(self.testcommand.handle(cmd, self.admin.slack_id),
                          (KarmaCommand.lookup_error, 200))
-        retrieve_calls = [mock.call(User, "ABCDEFG2F"),
-                          mock.call(User, "MMMM1234")]
-        self.mock_facade.retrieve.assert_has_calls(retrieve_calls)
-        self.mock_facade.store.asser_not_called()
