@@ -6,7 +6,7 @@ from app.model import User
 from unittest import TestCase
 
 
-class MentionCommandTest(TestCase):
+class KarmaCommandTest(TestCase):
     def setUp(self):
         self.app = Flask(__name__)
 
