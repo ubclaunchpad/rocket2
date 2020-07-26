@@ -1,9 +1,8 @@
-"""Test mention command parsing."""
 from app.controller.command.commands.mention import MentionCommand
 from tests.memorydb import MemoryDB
 from flask import Flask
 from app.model import User
-from unittest import mock, TestCase
+from unittest import TestCase
 
 
 class MentionCommandTest(TestCase):
