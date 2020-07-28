@@ -58,7 +58,6 @@ class TokenCommand(Command):
         }
         token = jwt.encode(payload, self.signing_key, algorithm='HS256') \
             .decode('utf-8')
-        format(token)
         return self.success_msg.format(token, expiry), 200
 
 
