@@ -10,11 +10,9 @@ from app.controller.webhook.github.events.base import GitHubEventHandler
 class OrganizationEventHandler(GitHubEventHandler):
     """Encapsulate the handler methods for GitHub organization events."""
 
-    @property
-    def supported_action_list(self) -> List[str]:
-        """Provide a list of all actions this handler can handle."""
-        return ["member_removed",
-                "member_added"]
+    invite_text = 'user {} invited to {}'
+    supported_action_list = ['member_removed', 'member_added',
+                             'member_invited']
 
     def handle(self, payload: Dict[str, Any]) -> ResponseTuple:
         """
@@ -44,7 +42,7 @@ class OrganizationEventHandler(GitHubEventHandler):
         else:
             logging.error("organization webhook triggered,"
                           f" invalid action specified: {str(payload)}")
-            return "invalid organization webhook triggered", 405
+            return "invalid organization webhook triggered", 200
 
     def handle_remove(self,
                       member_list: List[User],
@@ -63,10 +61,10 @@ class OrganizationEventHandler(GitHubEventHandler):
             logging.error("Error: found github ID connected to"
                           " multiple slack IDs")
             return ("Error: found github ID connected to multiple slack"
-                    " IDs", 412)
+                    " IDs", 200)
         else:
             logging.error(f"could not find user {github_id}")
-            return f"could not find user {github_username}", 404
+            return f"could not find user {github_username}", 200
 
     def handle_added(self,
                      github_id: str,
@@ -102,5 +100,5 @@ class OrganizationEventHandler(GitHubEventHandler):
                        github_username: str,
                        organization: str) -> ResponseTuple:
         """Help organization function if payload action is invited."""
-        logging.info(f"user {github_username} invited to {organization}")
-        return f"user {github_username} invited to {organization}", 200
+        logging.info(f'user {github_username} invited to {organization}')
+        return self.invite_text.format(github_username, organization), 200
