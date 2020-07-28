@@ -131,7 +131,7 @@ class TestOrganizationHandles(TestCase):
         self.db.users = {}
         rsp, code = self.webhook_handler.handle(self.rm_payload)
         self.assertEqual(rsp, f'could not find user {self.username}')
-        self.assertEqual(code, 200)
+        self.assertEqual(code, 404)
 
     def test_handle_org_event_rm_multiple_members_cause_error(self):
         clone0 = User('Ustreisand')
@@ -143,9 +143,9 @@ class TestOrganizationHandles(TestCase):
             rsp,
             'Error: found github ID connected to multiple slack IDs'
         )
-        self.assertEqual(code, 200)
+        self.assertEqual(code, 412)
 
     def test_handle_org_event_empty_action(self):
         rsp, code = self.webhook_handler.handle(self.empty_payload)
         self.assertEqual(rsp, 'invalid organization webhook triggered')
-        self.assertEqual(code, 200)
+        self.assertEqual(code, 405)
