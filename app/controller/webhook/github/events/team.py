@@ -2,21 +2,15 @@
 import logging
 from app.model import Team
 from app.controller import ResponseTuple
-from typing import Dict, Any, List
+from typing import Dict, Any
 from app.controller.webhook.github.events.base import GitHubEventHandler
 
 
 class TeamEventHandler(GitHubEventHandler):
     """Encapsulate the handler methods for GitHub team events."""
 
-    @property
-    def supported_action_list(self) -> List[str]:
-        """Provide a list of all actions this handler can handle."""
-        return ["created",
-                "deleted",
-                "edited",
-                "added_to_repository",
-                "removed_from_repository"]
+    supported_action_list = ['created', 'deleted', 'edited',
+                             'added_to_repository', 'removed_from_repository']
 
     def handle(self, payload: Dict[str, Any]) -> ResponseTuple:
         """
@@ -133,7 +127,7 @@ class TeamEventHandler(GitHubEventHandler):
                                      payload: Dict[str, Any]) -> ResponseTuple:
         """Help team function if payload action is removed_from_repository."""
         logging.debug(
-            f"team removed_to_repository event triggered: {str(payload)}")
+            f"team removed_from_repository event triggered: {str(payload)}")
         repository_name = payload["repository"]["name"]
         logging.info(f"team with id {github_id} from repository"
                      f" {repository_name}")

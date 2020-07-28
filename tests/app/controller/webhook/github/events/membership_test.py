@@ -5,8 +5,8 @@ from app.controller.webhook.github.events import MembershipEventHandler
 from tests.memorydb import MemoryDB
 
 
-def mem_default_payload(teamname: str, teamid: str,
-                        member: str, memberid: str):
+def mem_default_payload(teamname: str, teamid: int,
+                        member: str, memberid: int):
     """Provide the basic structure for a membership payload."""
     return {
         'action': 'removed',
@@ -83,9 +83,9 @@ def mem_default_payload(teamname: str, teamid: str,
 class TestMembershipHandles(TestCase):
     def setUp(self):
         self.team = 'rocket'
-        self.teamid = '395830'
+        self.teamid = 395830
         self.member = 'theflatearth'
-        self.memberid = '3058493'
+        self.memberid = 3058493
         self.add_payload = mem_default_payload(
             self.team, self.teamid,
             self.member, self.memberid
@@ -104,9 +104,9 @@ class TestMembershipHandles(TestCase):
         self.empty_payload['action'] = ''
 
         self.u = User('U4058409')
-        self.u.github_id = self.memberid
+        self.u.github_id = str(self.memberid)
         self.u.github_username = self.member
-        self.t = Team(self.teamid, self.team, self.team.capitalize())
+        self.t = Team(str(self.teamid), self.team, self.team.capitalize())
         self.db = MemoryDB(users=[self.u], teams=[self.t])
 
         self.gh = mock.Mock()
@@ -148,7 +148,7 @@ class TestMembershipHandles(TestCase):
 
     def test_handle_mem_event_rm_multiple_members(self):
         clone = User('Uclones')
-        clone.github_id = self.memberid
+        clone.github_id = str(self.memberid)
         clone.github_username = self.member
         self.db.users['Uclones'] = clone
         rsp, code = self.webhook_handler.handle(self.rm_payload)

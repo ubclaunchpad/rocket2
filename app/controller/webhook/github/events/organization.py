@@ -25,7 +25,7 @@ class OrganizationEventHandler(GitHubEventHandler):
         """
         action = payload["action"]
         github_user = payload["membership"]["user"]
-        github_id = github_user["id"]
+        github_id = str(github_user["id"])
         github_username = github_user["login"]
         organization = payload["organization"]["login"]
         logging.info("Github Organization webhook triggered with"

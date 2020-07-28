@@ -4,7 +4,7 @@ from app.controller.webhook.github.events import OrganizationEventHandler
 from tests.memorydb import MemoryDB
 
 
-def org_default_payload(login: str, uid: str):
+def org_default_payload(login: str, uid: int):
     """Provide the basic structure for an organization payload."""
     return {
         'action': 'member_added',
@@ -74,7 +74,7 @@ def org_default_payload(login: str, uid: str):
 class TestOrganizationHandles(TestCase):
     def setUp(self):
         self.username = 'hacktocat'
-        self.gh_uid = '4738549'
+        self.gh_uid = 4738549
         self.default_payload = org_default_payload(self.username, self.gh_uid)
         self.add_payload = org_default_payload(self.username, self.gh_uid)
         self.rm_payload = org_default_payload(self.username, self.gh_uid)
@@ -87,7 +87,7 @@ class TestOrganizationHandles(TestCase):
         self.empty_payload['action'] = ''
 
         self.u0 = User('U01234954')
-        self.u0.github_id = self.gh_uid
+        self.u0.github_id = str(self.gh_uid)
         self.u0.github_username = self.username
         self.team_all = Team('1', 'all', 'Team all')
         self.db = MemoryDB(users=[self.u0], teams=[self.team_all])
@@ -107,7 +107,7 @@ class TestOrganizationHandles(TestCase):
         rsp, code = self.webhook_handler.handle(self.add_payload)
         self.assertEqual(rsp, f'user {self.username} added to Octocoders')
         self.assertEqual(code, 200)
-        self.assertIn(self.gh_uid, self.team_all.members)
+        self.assertIn(str(self.gh_uid), self.team_all.members)
 
     def test_handle_org_event_add_no_all_team(self):
         self.db.teams = {}
@@ -118,7 +118,7 @@ class TestOrganizationHandles(TestCase):
 
         team = self.db.retrieve(Team, '305938')
         self.assertEqual(team.github_team_name, self.conf.github_team_all)
-        self.assertIn(self.gh_uid, team.members)
+        self.assertIn(str(self.gh_uid), team.members)
 
     def test_handle_org_event_rm_single_member(self):
         rsp, code = self.webhook_handler.handle(self.rm_payload)
@@ -136,7 +136,7 @@ class TestOrganizationHandles(TestCase):
     def test_handle_org_event_rm_multiple_members_cause_error(self):
         clone0 = User('Ustreisand')
         clone0.github_username = self.username
-        clone0.github_id = self.gh_uid
+        clone0.github_id = str(self.gh_uid)
         self.db.users['Ustreisand'] = clone0
         rsp, code = self.webhook_handler.handle(self.rm_payload)
         self.assertEqual(
