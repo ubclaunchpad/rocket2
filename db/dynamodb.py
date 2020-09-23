@@ -2,7 +2,7 @@ import boto3
 import logging
 
 from boto3.dynamodb.conditions import Attr
-from functools import reduce
+from functools import reduce, wraps
 from app.model import User, Team, Project
 from typing import Tuple, List, Type, TypeVar
 from config import Config
@@ -10,6 +10,21 @@ from db.facade import DBFacade
 
 T = TypeVar('T', User, Team, Project)
 
+
+def fragment(items_per_call=100):
+    def decor_fragment(func):
+        @wraps(func)
+        def wrapper_fragment(*args, **kwargs):
+            results = []
+            for i in range(0, len(args[2]), items_per_call):
+                results.extend(
+                    func(args[0],
+                         args[1],
+                         args[2][i: i + items_per_call])
+                )
+            return results
+        return wrapper_fragment
+    return decor_fragment
 
 class DynamoDB(DBFacade):
     """
@@ -243,6 +258,7 @@ class DynamoDB(DBFacade):
 
         return list(map(Model.from_dict, resp['Items']))
 
+    @fragment(100)
     def query_or(self,
                  Model: Type[T],
                  params: List[Tuple[str, str]] = []) -> List[T]:
