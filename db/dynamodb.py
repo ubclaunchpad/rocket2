@@ -26,6 +26,7 @@ def fragment(items_per_call=100):
         return wrapper_fragment
     return decor_fragment
 
+
 class DynamoDB(DBFacade):
     """
     Handles calls to database through API.
