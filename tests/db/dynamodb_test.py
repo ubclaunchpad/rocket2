@@ -245,6 +245,22 @@ class TestDynamoDB(TestCase):
             self.assertIn(user, users)
 
     @pytest.mark.db
+    def test_query_or_lotsa_users(self):
+        uids = list(map(str, range(250)))
+        users = [create_test_admin(i) for i in uids]
+
+        # Bulk store to save on time
+        table_name = self.ddb.CONST.get_table_name(User)
+        table = self.ddb.ddb.Table(table_name)
+        with table.batch_writer() as batch:
+            for user in users:
+                batch.put_item(Item=User.to_dict(user))
+
+        params = [('slack_id', uid) for uid in uids]
+        queried_users = self.ddb.query_or(User, params)
+        self.assertCountEqual(queried_users, users)
+
+    @pytest.mark.db
     def test_query_team(self):
         """Test to see if we can store and query the same team."""
         team = create_test_team('1', 'rocket2.0', 'Rocket 2.0')
