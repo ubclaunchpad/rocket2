@@ -29,7 +29,7 @@ class DBFacade(ABC):
         :param obj: Object to store in database
         :return: True if object was stored, and false otherwise
         """
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def retrieve(self, Model: Type[T], k: str) -> T:
@@ -41,7 +41,7 @@ class DBFacade(ABC):
         :raise: LookupError if key is not found
         :return: a model ``Model`` if key is found
         """
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def bulk_retrieve(self, Model: Type[T], ks: List[str]) -> List[T]:
@@ -55,7 +55,7 @@ class DBFacade(ABC):
         :param ks: retrieve based on this key (or ID)
         :return: a list of models ``Model``
         """
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def query(self,
@@ -91,7 +91,7 @@ class DBFacade(ABC):
         :param params: list of tuples to match
         :return: a list of ``Model`` that fit the query parameters
         """
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def query_or(self,
@@ -131,7 +131,7 @@ class DBFacade(ABC):
         :param params: list of tuples to match
         :return: a list of ``Model`` that fit the query parameters
         """
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def delete(self, Model: Type[T], k: str):
@@ -141,4 +141,4 @@ class DBFacade(ABC):
         :param Model: table type to remove the object from
         :param k: ID or key of the object to remove (must be primary key)
         """
-        pass
+        raise NotImplementedError

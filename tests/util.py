@@ -29,6 +29,7 @@ def create_test_admin(slack_id: str) -> User:
     u.email = 'admin@ubc.ca'
     u.name = 'Iemann Atmin'
     u.github_username = 'kibbles'
+    u.github_id = '123453'
     u.image_url = 'https:///via.placeholder.com/150'
     u.major = 'Computer Science'
     u.permissions_level = Permissions.admin

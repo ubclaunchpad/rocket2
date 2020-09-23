@@ -10,11 +10,9 @@ from app.controller.webhook.github.events.base import GitHubEventHandler
 class OrganizationEventHandler(GitHubEventHandler):
     """Encapsulate the handler methods for GitHub organization events."""
 
-    @property
-    def supported_action_list(self) -> List[str]:
-        """Provide a list of all actions this handler can handle."""
-        return ["member_removed",
-                "member_added"]
+    invite_text = 'user {} invited to {}'
+    supported_action_list = ['member_removed', 'member_added',
+                             'member_invited']
 
     def handle(self, payload: Dict[str, Any]) -> ResponseTuple:
         """
@@ -27,7 +25,7 @@ class OrganizationEventHandler(GitHubEventHandler):
         """
         action = payload["action"]
         github_user = payload["membership"]["user"]
-        github_id = github_user["id"]
+        github_id = str(github_user["id"])
         github_username = github_user["login"]
         organization = payload["organization"]["login"]
         logging.info("Github Organization webhook triggered with"
@@ -102,5 +100,5 @@ class OrganizationEventHandler(GitHubEventHandler):
                        github_username: str,
                        organization: str) -> ResponseTuple:
         """Help organization function if payload action is invited."""
-        logging.info(f"user {github_username} invited to {organization}")
-        return f"user {github_username} invited to {organization}", 200
+        logging.info(f'user {github_username} invited to {organization}')
+        return self.invite_text.format(github_username, organization), 200

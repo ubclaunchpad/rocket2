@@ -1,72 +1,45 @@
-"""Test token command parsing."""
 import jwt
 
 from app.controller.command.commands import TokenCommand
 from app.controller.command.commands.token import TokenCommandConfig
 from datetime import timedelta
-from db import DBFacade
+from tests.memorydb import MemoryDB
+from tests.util import create_test_admin
 from app.model import User, Permissions
-from unittest import mock, TestCase
+from unittest import TestCase
+
+
+def extract_jwt(msg):
+    '''Hacky way to get returned token out when testing TokenCommand.'''
+    parts = msg.split('```')
+    return parts[1].strip()
 
 
 class TestTokenCommand(TestCase):
-    """Test case for TokenCommand class."""
-
     def setUp(self):
-        """Set up the test case environment."""
-        self.mock_facade = mock.MagicMock(DBFacade)
-        self.testcommand = TokenCommand(self.mock_facade,
-                                        TokenCommandConfig(timedelta(days=7),
-                                                           "secret"))
+        self.u = User('U12345')
+        self.admin = create_test_admin('Uadmin')
+        self.db = MemoryDB(users=[self.u, self.admin])
+
+        self.testcommand = TokenCommand(
+            self.db,
+            TokenCommandConfig(timedelta(days=7), 'secret')
+        )
 
     def test_handle_nonexistent_member(self):
-        """Test handle() when given a nonexistent member."""
-        self.mock_facade.retrieve.side_effect = LookupError
-        ret_val, ret_code = self.testcommand.handle("", "nonexistent")
-        assert ret_val == "Requesting user not found!"
-        assert ret_code == 200
+        ret_val, ret_code = self.testcommand.handle('', 'nonexistent')
+        self.assertEqual(ret_val, TokenCommand.lookup_error)
+        self.assertEqual(ret_code, 200)
 
-    def test_handle_member(self):
-        """Test handle() when given a user with member permissions."""
-        user = User("U12345")
-        user.permissions_level = Permissions.member
-        self.mock_facade.retrieve.return_value = user
-        ret_val, ret_code = self.testcommand.handle("", user.slack_id)
-        assert ret_val == "You do not have the sufficient " \
-                          "permission level for this command!"
-        assert ret_code == 200
+    def test_handle_member_request(self):
+        ret_val, ret_code = self.testcommand.handle('', self.u.slack_id)
+        self.assertEqual(ret_val, TokenCommand.permission_error)
+        self.assertEqual(ret_code, 200)
 
-    def test_handle_team_lead(self):
-        """Test handle() when given a user with team lead permissions."""
-        user = User("U12345")
-        user.permissions_level = Permissions.team_lead
-        self.mock_facade.retrieve.return_value = user
-        ret_msg, ret_code = \
-            self.testcommand.handle("", user.slack_id)
-        token = self.__parse_token(ret_msg)
-        decoded = jwt.decode(token,
-                             "secret",
-                             algorithms='HS256')
-        assert decoded['user_id'] == user.slack_id
-        assert decoded['permissions'] == Permissions.team_lead.value
-        assert ret_code == 200
-
-    def test_handle_admin(self):
-        """Test handle() when given a user with admin permissions."""
-        user = User("U12345")
-        user.permissions_level = Permissions.admin
-        self.mock_facade.retrieve.return_value = user
-        ret_msg, ret_code = \
-            self.testcommand.handle("", user.slack_id)
-        token = self.__parse_token(ret_msg)
-        decoded = jwt.decode(token,
-                             "secret",
-                             algorithms='HS256')
-        assert decoded['user_id'] == user.slack_id
-        assert decoded['permissions'] == Permissions.admin.value
-        assert ret_code == 200
-
-    def __parse_token(self, msg):
-        """Hacky way to get returned token out when testing TokenCommand."""
-        parts = msg.split("```")
-        return parts[1].strip()
+    def test_handle_non_member_request(self):
+        ret_msg, ret_code = self.testcommand.handle('', self.admin.slack_id)
+        token = extract_jwt(ret_msg)
+        decoded = jwt.decode(token, 'secret', algorithms='HS256')
+        self.assertEqual(decoded['user_id'], self.admin.slack_id)
+        self.assertEqual(decoded['permissions'], Permissions.admin.value)
+        self.assertEqual(ret_code, 200)

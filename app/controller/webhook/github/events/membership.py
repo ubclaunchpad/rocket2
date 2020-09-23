@@ -2,18 +2,14 @@
 import logging
 from app.model import User, Team
 from app.controller import ResponseTuple
-from typing import Dict, Any, List
+from typing import Dict, Any
 from app.controller.webhook.github.events.base import GitHubEventHandler
 
 
 class MembershipEventHandler(GitHubEventHandler):
     """Encapsulate the handler methods for GitHub membership events."""
 
-    @property
-    def supported_action_list(self) -> List[str]:
-        """Provide a list of all actions this handler can handle."""
-        return ["removed",
-                "added"]
+    supported_action_list = ['removed', 'added']
 
     def handle(self,
                payload: Dict[str, Any]) -> ResponseTuple:
