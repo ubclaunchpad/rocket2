@@ -20,7 +20,6 @@ The following permission scopes are required:
 - `channels:read`
 - `channels:manage`
 - `chats:write`
-- `incoming-webhooks`
 - `users.profile:read`
 - `users:read`
 - `commands`
