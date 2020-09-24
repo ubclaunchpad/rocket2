@@ -37,6 +37,8 @@ The following permission scopes are required:
 - `users.profile:read`
 - `users:read`
 - `commands`
+- `groups:read`
+- `im:write`
 
 You must also configure a slash command integration as well (under "Slash
 commands") for the URL path `/slack/commands` of your Rocket instance.
