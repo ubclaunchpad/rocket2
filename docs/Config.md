@@ -71,3 +71,12 @@ The region where the AWS instance is located (leave these as they are).
 
 Point all AWS DynamoDB requests to `http://localhost:8000`. Optional, and
 defaults to `False`.
+
+## GCP\_SERVICE\_ACCOUNT\_CREDENTIALS
+
+Service Account credentials for Google Cloud API access. Optional, and defaults
+to disabling related features.
+
+Required permissions when credentials are provided:
+
+- Drive API - used for synchronizing Drive folder permissions

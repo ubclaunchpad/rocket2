@@ -64,5 +64,6 @@ class TestTeamModel(TestCase):
             " 'display_name': 'Brussel Sprouts'," \
             " 'platform': 'web'," \
             " 'team_leads': {'U0G9QF9C6'}," \
-            " 'members': {'U0G9QF9C6'}}"
+            " 'members': {'U0G9QF9C6'}," \
+            " 'folder': ''}"
         self.assertEqual(str(self.brussel_sprouts), expected)

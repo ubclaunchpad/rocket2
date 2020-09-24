@@ -32,10 +32,13 @@ class Config:
         'AWS_PROJECTS_TABLE': 'aws_projects_tablename',
         'AWS_REGION': 'aws_region',
         'AWS_LOCAL': 'aws_local',
+
+        'GCP_SERVICE_ACCOUNT_CREDENTIALS': 'gcp_service_account_credentials',
     }
     OPTIONALS = {
         'AWS_LOCAL': 'False',
-        'GITHUB_DEFAULT_TEAM_NAME': 'all'
+        'GITHUB_DEFAULT_TEAM_NAME': 'all',
+        'GCP_SERVICE_ACCOUNT_CREDENTIALS': '',
     }
 
     def __init__(self):
@@ -90,6 +93,8 @@ class Config:
         self.aws_projects_tablename = ''
         self.aws_region = ''
         self.aws_local: bool = False
+
+        self.gcp_service_account_credentials = ''
 
 
 class MissingConfigError(Exception):

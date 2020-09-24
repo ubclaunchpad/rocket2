@@ -28,6 +28,8 @@ class TestConfig(TestCase):
             'AWS_PROJECTS_TABLE': 'projects',
             'AWS_REGION': 'us-west-2',
             'AWS_LOCAL': 'True',
+
+            'GCP_SERVICE_ACCOUNT_CREDENTIALS': '{"hello":"world"}',
         }
         self.incomplete_config = {
             'GITHUB_APP_ID': '2024',
@@ -47,7 +49,10 @@ class TestConfig(TestCase):
     def test_complete_config(self):
         """Test a few things from the completed config object."""
         os.environ = self.complete_config
-        self.assertTrue(Config().aws_local)
+        conf = Config()
+        self.assertTrue(conf.aws_local)
+        self.assertEqual(conf.gcp_service_account_credentials,
+                         '{"hello":"world"}')
 
     def test_incomplete_config(self):
         """Test a few things from an incompleted config object."""
