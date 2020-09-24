@@ -39,10 +39,10 @@ steps to set it up.
 Follow the link [here][make-slack-app] to create a new Slack app - you can name
 it whatever you like - and install it to the appropriate workspace.
 
-### 3.1: Add a Bot User
+### 3.1: Add a Bot Token
 
-In "Add features and functionality", add a bot user. Since this is just for
-testing, you can name the bot user whatever you like.
+In "OAuth and Permissions", select the Bot Token Scopes described in
+[the Slack configuration docs]()
 
 ### 3.2: Install Slack App
 
@@ -257,6 +257,7 @@ Remember to rebulid your Docker image every time you make a change!
 [config]: Config.html
 [create-workspace]: https://slack.com/create
 [make-slack-app]: https://api.slack.com/apps
+[slack-configuration]: Config.html#slack-api-token
 [download-ngrok]: https://ngrok.com/
 [github-token]: https://github.com/settings/tokens
 [docker-env-file]: https://docs.docker.com/engine/reference/commandline/run/#set-environment-variables--e---env---env-file

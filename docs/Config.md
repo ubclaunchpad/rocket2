@@ -12,8 +12,18 @@ your slack app (api.slack.com/apps).
 
 ## SLACK\_API\_TOKEN
 
-The slack api token of your slack bot. Can be found under OAuth & Permissions
+The Slack API token of your Slack bot. Can be found under OAuth & Permissions
 tab of your slack app (under the name "Bot user OAuth access token").
+
+The following permission scopes are required:
+
+- `channels:read`
+- `channels:manage`
+- `chats:write`
+- `incoming-webhooks`
+- `users.profile:read`
+- `users:read`
+- `commands`
 
 ## SLACK\_NOFICIATION\_CHANNEL
 
