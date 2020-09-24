@@ -13,6 +13,12 @@ generate such a string:
 awk '{printf "%s\\n", $0}' $FILE
 ```
 
+For JSON variables, you can just remove the newlines:
+
+```bash
+awk '{printf "%s", $0}' $FILE
+```
+
 ## SLACK\_SIGNING\_SECRET
 
 Signing secret of the slack app. Can be found in the basic information tab of
