@@ -3,7 +3,7 @@
 We use environmental variables for all of our configuration-related things. A
 sample `.env` file (which is what `pipenv` looks for when it tries to launch)
 can be found at `sample-env`. Here is how each variable works. **Note: all
-variables are strings**
+variables are strings**.
 
 ## SLACK\_SIGNING\_SECRET
 
@@ -37,7 +37,7 @@ announcements in.
 
 ## GITHUB\_APP\_ID
 
-The id of your Github app (found under your Github organization settings ->
+The ID of your Github app (found under your Github organization settings ->
 Developer Settings -> Github Apps -> Edit).
 
 ## GITHUB\_ORG\_NAME
@@ -47,7 +47,14 @@ the organization.
 
 ## GITHUB\_WEBHOOK\_ENDPT
 
-The path Github posts webhooks to.
+The path GitHub posts webhooks to. Note that the following events must be
+enabled (configured in GitHub app settings > "Permissions & events" >
+"Subscribe to events"):
+
+- Membership
+- Organization
+- Team
+- Team add
 
 ## GITHUB\_WEBHOOK\_SECRET
 
@@ -60,6 +67,12 @@ The Github app signing key (can be found under Github organization settings ->
 Developer Settings -> Github Apps -> Edit (at the bottom you generate and
 download the key)). Paste the contents of the file as a string. See
 [deployment](Deployment.html#github-key) for troubleshooting.
+
+The following permissions must be set to "Read & Write" for the associated
+GitHub app (configured in GitHub app settings > "Permissions & events" >
+"Organization permissions"):
+
+- Organization members
 
 ## AWS\_ACCESS\_KEYID
 

@@ -1,3 +1,5 @@
+# Refer to https://rocket2.readthedocs.io/en/latest/docs/Config.html
+
 SLACK_NOTIFICATION_CHANNEL='#rocket2'
 SLACK_ANNOUNCEMENT_CHANNEL='#rocket2-announcements'
 SLACK_SIGNING_SECRET=''
