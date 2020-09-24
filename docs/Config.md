@@ -3,7 +3,21 @@
 We use environmental variables for all of our configuration-related things. A
 sample `.env` file (which is what `pipenv` looks for when it tries to launch)
 can be found at `sample-env`. Here is how each variable works. **Note: all
-variables are strings**
+variables are strings**.
+
+For variables that require newlines (such as signing keys), replace the
+newlines with `\n`. You can use the following command on most systems to
+generate such a string:
+
+```bash
+awk '{printf "%s\\n", $0}' $FILE
+```
+
+For JSON variables, you can just remove the newlines:
+
+```bash
+awk '{printf "%s", $0}' $FILE
+```
 
 ## SLACK\_SIGNING\_SECRET
 
@@ -12,8 +26,22 @@ your slack app (api.slack.com/apps).
 
 ## SLACK\_API\_TOKEN
 
-The slack api token of your slack bot. Can be found under OAuth & Permissions
+The Slack API token of your Slack bot. Can be found under OAuth & Permissions
 tab of your slack app (under the name "Bot user OAuth access token").
+
+The following permission scopes are required:
+
+- `channels:read`
+- `channels:manage`
+- `chats:write`
+- `users.profile:read`
+- `users:read`
+- `commands`
+- `groups:read`
+- `im:write`
+
+You must also configure a slash command integration as well (under "Slash
+commands") for the URL path `/slack/commands` of your Rocket instance.
 
 ## SLACK\_NOFICIATION\_CHANNEL
 
@@ -27,7 +55,7 @@ announcements in.
 
 ## GITHUB\_APP\_ID
 
-The id of your Github app (found under your Github organization settings ->
+The ID of your Github app (found under your Github organization settings ->
 Developer Settings -> Github Apps -> Edit).
 
 ## GITHUB\_ORG\_NAME
@@ -37,7 +65,17 @@ the organization.
 
 ## GITHUB\_WEBHOOK\_ENDPT
 
-The path Github posts webhooks to.
+The path GitHub posts webhooks to. Note that the following events must be
+enabled (configured in GitHub app settings > "Permissions & events" >
+"Subscribe to events"):
+
+- Membership
+- Organization
+- Team
+- Team add
+
+When configuring webhooks, provide the URL path `/slack/commands` of your
+Rocket instance.
 
 ## GITHUB\_WEBHOOK\_SECRET
 
@@ -50,6 +88,12 @@ The Github app signing key (can be found under Github organization settings ->
 Developer Settings -> Github Apps -> Edit (at the bottom you generate and
 download the key)). Paste the contents of the file as a string. See
 [deployment](Deployment.html#github-key) for troubleshooting.
+
+The following permissions must be set to "Read & Write" for the associated
+GitHub app (configured in GitHub app settings > "Permissions & events" >
+"Organization permissions"):
+
+- Organization members
 
 ## AWS\_ACCESS\_KEYID
 
