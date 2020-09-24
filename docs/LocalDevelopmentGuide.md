@@ -7,11 +7,15 @@ With this guide, you can be talking to your locally-hosted Slack bot in no time!
 > **Warning**: This only works smoothly with a Unix machine (macOS or Linux
 > variants). Windows users may be in for more pain than expected.
 
-## 1: Install ngrok
+## 1: Install a tunnel
 
 Slack requires that all webhooks are passed through HTTPS. This is rather
 inconvenient if you just want to test while running on your local computer.
-Luckily, we have ngrok, a forwarding service that hosts a public HTTPS URL that
+There are several ways to get around this.
+
+### Ngrok
+
+Ngrok is a forwarding service that hosts a public HTTPS URL that
 passes to your local computer. Sign up for ngrok and download it
 [here][download-ngrok].
 
@@ -20,8 +24,11 @@ passed to your local port 5000. As long as you run Rocket on port 5000 (see
 below), you can then access it through the HTTPS URL that ngrok gives you. Note
 that it is very important to use the HTTPS URL, *not* the HTTP URL.
 
-An alternative to `ngrok` is [`localtunnel`](https://github.com/localtunnel/localtunnel),
-which lets you use the same subdomain every time.
+### Localtunnel
+
+An alternative to Ngrok is [localtunnel](https://github.com/localtunnel/localtunnel),
+which works similarly to Ngrok but allows you to use the same domain every
+time. For example:
 
 ```bash
 $ lt --port 5000 --subdomain my-amazing-rocket2
