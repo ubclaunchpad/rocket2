@@ -138,29 +138,30 @@ Please [read the configuration docs][config] for more details.
 
 This section assumes you already have installed Docker. Assuming you are in the
 directory containing the Dockerfile, all you need to do to build and run is the
-following two commands:
+following two commands (run from the root of your project directory):
 
 ```bash
-docker build -t rocket2-dev-img .
-docker run --rm -it \
-  --env-file .env \
-  -p 0.0.0.0:5000:5000 \
-  rocket2-dev-img
-# optionally include `--network="host"` for local dynamoDB
+scripts/docker_build.sh
+scripts/docker_run_local.sh --env-file .env
 ```
 
-Note that the options passed to `-p` in `docker run` tell Docker what port
-to run Rocket on. `0.0.0.0` is the IP address (in this case, localhost),
+Optionally, for [local DynamoDB](#using-local-aws):
+
+```bash
+scripts/docker_run_local.sh --env-file .env --network="host"
+```
+
+The option [`--env-file`][docker-env-file]
+lets you pass in your [configuration options][config].
+
+For the curious, you can take a look at the contents of the referenced scripts
+above. Note that the options passed to `-p` in `docker run` tell Docker what
+port to run Rocket on. `0.0.0.0` is the IP address (in this case, localhost),
 the first `5000` is the port exposed inside the container, and the second
 `5000` is the port exposed outside the container. The port exposed outside
 the container can be changed (for instance, if port 5000 is already
 in use in your local development environment), but in that case ensure that
-ngrok is running on the same port. The option [`--env-file`][docker-env-file]
-lets you pass in your [configuration options][config].
-
-Also note that, for your convenience, we have provided two scripts,
-`scripts/docker_build.sh` and `scripts/docker_run_local.sh`, that run these
-exact commands.
+your tunnel is running on the same port.
 
 ### 6.1: [Optional] Running without Docker
 
