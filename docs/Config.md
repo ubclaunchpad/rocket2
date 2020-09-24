@@ -5,6 +5,14 @@ sample `.env` file (which is what `pipenv` looks for when it tries to launch)
 can be found at `sample-env`. Here is how each variable works. **Note: all
 variables are strings**.
 
+For variables that require newlines (such as signing keys), replace the
+newlines with `\n`. You can use the following command on most systems to
+generate such a string:
+
+```bash
+awk '{printf "%s\\n", $0}' $FILE
+```
+
 ## SLACK\_SIGNING\_SECRET
 
 Signing secret of the slack app. Can be found in the basic information tab of
@@ -23,6 +31,9 @@ The following permission scopes are required:
 - `users.profile:read`
 - `users:read`
 - `commands`
+
+You must also configure a slash command integration as well (under "Slash
+commands") for the URL path `/slack/commands` of your Rocket instance.
 
 ## SLACK\_NOFICIATION\_CHANNEL
 
@@ -54,6 +65,9 @@ enabled (configured in GitHub app settings > "Permissions & events" >
 - Organization
 - Team
 - Team add
+
+When configuring webhooks, provide the URL path `/slack/commands` of your
+Rocket instance.
 
 ## GITHUB\_WEBHOOK\_SECRET
 
