@@ -7,11 +7,15 @@ With this guide, you can be talking to your locally-hosted Slack bot in no time!
 > **Warning**: This only works smoothly with a Unix machine (macOS or Linux
 > variants). Windows users may be in for more pain than expected.
 
-## 1: Install ngrok
+## 1: Set up a HTTPS Tunnel
 
 Slack requires that all webhooks are passed through HTTPS. This is rather
 inconvenient if you just want to test while running on your local computer.
-Luckily, we have ngrok, a forwarding service that hosts a public HTTPS URL that
+There are several ways to get around this.
+
+### Ngrok
+
+Ngrok is a forwarding service that hosts a public HTTPS URL that
 passes to your local computer. Sign up for ngrok and download it
 [here][download-ngrok].
 
@@ -20,12 +24,15 @@ passed to your local port 5000. As long as you run Rocket on port 5000 (see
 below), you can then access it through the HTTPS URL that ngrok gives you. Note
 that it is very important to use the HTTPS URL, *not* the HTTP URL.
 
-An alternative to `ngrok` is [`localtunnel`](https://github.com/localtunnel/localtunnel),
-which lets you use the same subdomain every time.
+### Localtunnel
+
+An alternative to Ngrok is [localtunnel](https://GitHub.com/localtunnel/localtunnel),
+which works similarly to Ngrok but allows you to use the same domain every
+time. For example:
 
 ```bash
 $ lt --port 5000 --subdomain my-amazing-rocket2
-your url is: https://my-amazing-rocket2.localtunnel.me
+your url is: https://my-amazing-rocket2.loca.lt
 ```
 
 ## 2: Create a Slack Workspace
@@ -39,16 +46,18 @@ steps to set it up.
 Follow the link [here][make-slack-app] to create a new Slack app - you can name
 it whatever you like - and install it to the appropriate workspace.
 
-### 3.1: Add a Bot User
+### 3.1: Add a Bot Token
 
-In "Add features and functionality", add a bot user. Since this is just for
-testing, you can name the bot user whatever you like.
+In "OAuth and Permissions", select the Bot Token Scopes described in
+[the Slack configuration docs](slack-configuration).
 
 ### 3.2: Install Slack App
 
 In "Install your app to your workspace," click the button to install to your
 workspace. This will take you to a permissions page for the workspace - make
 sure this is for the correct workspace, and allow the app to connect.
+
+Once this is done, you will be provided with an API token.
 
 ### 3.3: Determine Credentials
 
@@ -59,13 +68,17 @@ configuration step later.
 
 ## 4: Gain Access to AWS
 
-Rocket makes use of AWS DynamoDB as its database, and for testing you will want
-to test on the "real" DynamoDB. If you do not already have access to DynamoDB,
-you can use it as part of the free tier of AWS. Create an AWS account for
-yourself, then go to the IAM service and create a new user. The user name
-doesn't particularly matter (though `rocket2-dev-$NAME` is recommended), but
-make sure you check "programmatic access." In permissions, go to "Attach
-existing permissions directly" and add the following policies:
+Rocket makes use of AWS DynamoDB as its database. There is also an optional
+logging component that leverages AWS CloudWatch.
+
+### Using Real AWS
+
+If you do not already have access to DynamoDB and CloudWatch, you can use it as
+part of the free tier of AWS. Create an AWS account for yourself, then go to
+the IAM service and create a new user. The user name doesn't particularly
+matter (though `rocket2-dev-$NAME` is recommended), but make sure you check
+"programmatic access." In permissions, go to "Attach existing permissions
+directly" and add the following policies:
 
 - `AmazonDynamoDBFullAccess`
 - `CloudWatchLogsFullAccess`
@@ -76,32 +89,26 @@ We send our logs to CloudWatch for easier storage and querying.
 Finally, copy the provided access key ID and secret access key after creating
 the new user.
 
-Note: if you are in the `brussel-sprouts` Github team, you should already have
+Note: if you are in the `brussel-sprouts` GitHub team, you should already have
 AWS credentials. Just ask.
+
+### Using Local AWS
 
 Alternatively, just set up [DynamoDB locally][localdynamodb] (the Docker-based
 setup is probably the easiest) and set `AWS_LOCAL=True`.
 
-## 5: Set Up Config
+CloudWatch integration is not currently supported in this manner.
 
-Our repo already contains `sample-env`, the main environmental configuration
-file for the entire app, as well as the `credentials/` directory, where you
-will put credential files like the Github app private key. The file is split
-into section. There is a general section (which should be the top bit), a
-section on everything slack related, a section on Github and Github apps,
-and a section on AWS. [Please read the section about the configuration
-system.][config]
+### 5: Set up a GitHub App and organization
 
-### 5.1: Set up Github App and organization
+Create a Rocket 2 Github under an appropriate testing organization. Make sure
+to install the GitHub App to the organization in addition to registering it.
+All this can be done from a GitHub organization's Settings > GitHub Apps page.
 
-Register Rocket 2 as a Github App under an appropriate testing organization
-(our team has one of these set up already). Make sure to install the Github App
-to the organization in addition to registering it.
-
-Under "Private keys", click "Generate a new private key". This will generate
-and allow you to download a new secret key for Rocket 2. Save this to the
-`credentials/` directory as `github_signing_key.pem` - it should already be in
-the PEM file format, bracketed by:
+In the GitHub app's settings, go to "Private keys" and click "Generate a new
+private key". This will generate and allow you to download a new secret key for
+Rocket 2. Save this to the `credentials/` directory as `gh_signing_key.pem` -
+it should already be in the PEM file format, bracketed by:
 
 ```
 -----BEGIN RSA PRIVATE KEY-----
@@ -109,49 +116,52 @@ the PEM file format, bracketed by:
 -----END RSA PRIVATE KEY-----
 ```
 
-Authenticating Rocket 2 as a Github App and obtaining an access token for the
-Github API should be automated, once the signing key is available.
+Authenticating Rocket 2 as a GitHub App and obtaining an access token for the
+GitHub API should be automated, once the signing key is available. Refer to
+the [GitHub key configuration docs](Config.md#github-key) for the required
+permissions.
 
-After doing this, remember to put your ngrok HTTPS URL with `/webhook` appended
-at the end, into the "Webhook URL" box. After doing this, you must go to the
-app's "Permissions & Events" tab and set the following as Read & Write:
+After doing this, remember to put your tunneled HTTPS URL with `/webhook`
+appended at the end into the "Webhook URL" box. Refer to the
+[GitHub webhook configuration docs](Config.md#github-webhook-endpt) for the
+required subscriptions.
 
-- Organization members
+## 6: Set Up Configuration
 
-After doing so, please check the checkboxes below:
+Our repo already contains `sample-env`, the main environmental configuration
+file for the entire app, as well as the `credentials/` directory, where you
+will put credential files like the GitHub app private key.
 
-- Membership
-- Organization
-- Team
-- Team add
+Please [read the configuration docs][config] for more details.
 
-## 6: Build and Run Container
+## 7: Build and Run Rocket 2
 
 This section assumes you already have installed Docker. Assuming you are in the
 directory containing the Dockerfile, all you need to do to build and run is the
-following two commands:
+following two commands (run from the root of your project directory):
 
 ```bash
-docker build -t rocket2-dev-img .
-docker run --rm -it \
-  --env-file .env \
-  -p 0.0.0.0:5000:5000 \
-  rocket2-dev-img
-# optionally include `--network="host"` for local dynamoDB
+scripts/docker_build.sh
+scripts/docker_run_local.sh --env-file .env
 ```
 
-Note that the options passed to `-p` in `docker run` tell Docker what port
-to run Rocket on. `0.0.0.0` is the IP address (in this case, localhost),
+Optionally, for [local DynamoDB](#using-local-aws):
+
+```bash
+scripts/docker_run_local.sh --env-file .env --network="host"
+```
+
+The option [`--env-file`][docker-env-file]
+lets you pass in your [configuration options][config].
+
+For the curious, you can take a look at the contents of the referenced scripts
+above. Note that the options passed to `-p` in `docker run` tell Docker what
+port to run Rocket on. `0.0.0.0` is the IP address (in this case, localhost),
 the first `5000` is the port exposed inside the container, and the second
 `5000` is the port exposed outside the container. The port exposed outside
 the container can be changed (for instance, if port 5000 is already
 in use in your local development environment), but in that case ensure that
-ngrok is running on the same port. The option [`--env-file`][docker-env-file]
-lets you pass in your [configuration options][config].
-
-Also note that, for your convenience, we have provided two scripts,
-`scripts/docker_build.sh` and `scripts/docker_run_local.sh`, that run these
-exact commands.
+your tunnel is running on the same port.
 
 ### 6.1: [Optional] Running without Docker
 
@@ -257,7 +267,8 @@ Remember to rebulid your Docker image every time you make a change!
 [config]: Config.html
 [create-workspace]: https://slack.com/create
 [make-slack-app]: https://api.slack.com/apps
+[slack-configuration]: Config.html#slack-api-token
 [download-ngrok]: https://ngrok.com/
-[github-token]: https://github.com/settings/tokens
+[GitHub-token]: https://GitHub.com/settings/tokens
 [docker-env-file]: https://docs.docker.com/engine/reference/commandline/run/#set-environment-variables--e---env---env-file
 [localdynamodb]: index.html#running-dynamodb-locally
