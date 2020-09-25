@@ -4,9 +4,7 @@ set -euxo pipefail
 REPO_ROOT=$(git rev-parse --show-toplevel)
 pushd "${REPO_ROOT}"
 
-pipenv run pycodestyle .
-pipenv run flake8 .
-pipenv run mypy .
+make lint
 
 # We use a script to check if dynamodb is running locally
 COV_OPTIONS="--mypy --cov=./ --cov-branch --cov-config .coveragerc"

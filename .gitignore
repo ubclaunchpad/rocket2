@@ -15,5 +15,7 @@ DynamoDB/
 
 # Docs generation files
 _build/
-/credentials/
 .mypy_cache/
+
+# Credentials
+/credentials/

@@ -21,6 +21,8 @@ cryptography = "*"
 requests = "*"
 apscheduler = "*"
 watchtower = "==0.7.3"
+google-api-python-client = "*"
+google-auth-oauthlib = "*"
 
 [dev-packages]
 awscli = "*"
