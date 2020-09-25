@@ -68,6 +68,7 @@ class Team(RocketModel):
                    d['github_team_name'],
                    d.get('display_name', ''))
         team.platform = d.get('platform', '')
+        team.folder = d.get('folder', '')
         team.team_leads = set(d.get('team_leads', []))
         members = set(d.get('members', []))
         for member in members:
@@ -98,6 +99,7 @@ class Team(RocketModel):
         place_if_filled('platform', team.platform)
         place_if_filled('members', team.members)
         place_if_filled('team_leads', team.team_leads)
+        place_if_filled('folder', team.folder)
 
         return tdict
 
