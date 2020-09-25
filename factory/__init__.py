@@ -63,10 +63,15 @@ def make_gcp_client(config: Config) -> Optional[GCPInterface]:
         logging.info("Google Cloud client not provided, disabling")
         return None
 
+    scopes = ['https://www.googleapis.com/auth/drive']
+
     try:
         raw_credentials = json.loads(config.gcp_service_account_credentials)
-        credentials = gcp_service_account.Credentials.\
-            from_service_account_info(raw_credentials)
+        credentials = gcp_service_account.Credentials\
+            .from_service_account_info(raw_credentials, scopes=scopes)
+        if len(config.gcp_service_account_subject) > 0:
+            credentials = credentials.with_subject(
+                config.gcp_service_account_subject)
     except Exception as e:
         logging.error(f"Unable to load GCP credentials, disabling: {e}")
         return None
@@ -74,7 +79,7 @@ def make_gcp_client(config: Config) -> Optional[GCPInterface]:
     # Build appropriate service clients.
     # See https://github.com/googleapis/google-api-python-client/blob/master/docs/dyn/index.md # noqa
     drive = gcp_build('drive', 'v3', credentials=credentials)
-    return GCPInterface(drive)
+    return GCPInterface(drive, subject=config.gcp_service_account_subject)
 
 
 def create_signing_token() -> str:

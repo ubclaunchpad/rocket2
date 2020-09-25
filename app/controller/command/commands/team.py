@@ -623,7 +623,7 @@ class TeamCommand(Command):
             self.refresh_all_team()
 
             # enforce Drive permissions
-            self.refresh_drive_permissions()
+            self.refresh_all_drive_permissions()
         except GithubAPIException as e:
             logging.error("team refresh unsuccessful due to github error")
             return "Refresh teams was unsuccessful with " \
@@ -670,9 +670,9 @@ class TeamCommand(Command):
         else:
             logging.error(f'Could not create {all_name}. Aborting.')
 
-    def refresh_drive_permissions(self):
+    def refresh_all_drive_permissions(self):
         """
-        Refresh Google Drive permissions based on user role. If no GCP client
+        Refresh Google Drive permissions for all teams. If no GCP client
         is provided, this function is a no-op.
         """
 
@@ -682,17 +682,37 @@ class TeamCommand(Command):
 
         all_teams: List[Team] = self.facade.query(Team)
         for t in all_teams:
-            if len(t.folder) == 0:
+            self.refresh_drive_permissions(t)
+
+    def refresh_drive_permissions(self, t: Team):
+        """
+        Refresh Google Drive permissions for provided team. If no GCP client
+        is provided, this function is a no-op.
+        """
+
+        if self.gcp is None:
+            logging.debug("GCP not enabled, skipping drive permissions")
+            return
+
+        if len(t.folder) == 0:
+            return
+
+        # Generate who to share with
+        emails: List[str] = []
+        for github_id in t.members:
+            users = self.facade. \
+                query(User, [('github_user_id', github_id)])
+            if len(users) != 1:
+                logging.error(f"None/multiple users for GitHub ID {github_id}")
                 continue
+            user = users[0]
+            if len(user.email) > 0:
+                emails.append(user.email)
 
-            emails: List[str] = []
-            for m in t.members:
-                if len(m.email) > 0:
-                    emails.append(m.email)
-
-            if len(emails) > 0:
-                logging.info("Synchronizing permissions for "
-                             + f"{t.github_team_name}'s folder ({t.folder}) "
-                             + f"to {emails}")
-                self.gcp.set_drive_permissions(
-                    t.folder, t.github_team_name, emails)
+        # Sync permissions
+        if len(emails) > 0:
+            logging.info("Synchronizing permissions for "
+                         + f"{t.github_team_name}'s folder ({t.folder}) "
+                         + f"to {emails}")
+            self.gcp.set_drive_permissions(
+                t.github_team_name, t.folder, emails)
