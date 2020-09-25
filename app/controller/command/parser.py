@@ -7,7 +7,8 @@ from app.controller.command.commands.token import TokenCommandConfig
 from db.facade import DBFacade
 from interface.slack import Bot
 from interface.github import GithubInterface
-from typing import Dict, Any
+from interface.gcp import GCPInterface
+from typing import Dict, Any, Optional
 import utils.slack_parse as util
 import logging
 from utils.slack_msg_fmt import wrap_slack_code
@@ -24,15 +25,19 @@ class CommandParser:
                  db_facade: DBFacade,
                  bot: Bot,
                  gh_interface: GithubInterface,
-                 token_config: TokenCommandConfig):
+                 token_config: TokenCommandConfig,
+                 gcp: Optional[GCPInterface] = None):
         """Initialize the dictionary of command handlers."""
         self.commands: Dict[str, Command] = {}
         self.__facade = db_facade
         self.__bot = bot
         self.__github = gh_interface
+        self.__gcp = gcp
         self.commands["user"] = UserCommand(self.__facade, self.__github)
         self.commands["team"] = TeamCommand(config, self.__facade,
-                                            self.__github, self.__bot)
+                                            self.__github,
+                                            self.__bot,
+                                            gcp=self.__gcp)
         self.commands["token"] = TokenCommand(self.__facade, token_config)
         self.commands["project"] = ProjectCommand(self.__facade)
         self.commands["karma"] = KarmaCommand(self.__facade)

@@ -23,6 +23,7 @@ class Team(RocketModel):
         self.platform = ""
         self.team_leads: Set[str] = set()
         self.members: Set[str] = set()
+        self.folder = ""
 
     def get_attachment(self):
         """Return slack-formatted attachment (dictionary) for team."""
@@ -31,6 +32,7 @@ class Team(RocketModel):
             ('Github Team Name', self.github_team_name),
             ('Display Name', self.display_name),
             ('Platform', self.platform),
+            ('Folder', self.folder),
             ('Team Leads', '\n'.join(self.team_leads)),
             ('Members', '\n'.join(self.members))
         ]
@@ -66,6 +68,7 @@ class Team(RocketModel):
                    d['github_team_name'],
                    d.get('display_name', ''))
         team.platform = d.get('platform', '')
+        team.folder = d.get('folder', '')
         team.team_leads = set(d.get('team_leads', []))
         members = set(d.get('members', []))
         for member in members:
@@ -96,6 +99,7 @@ class Team(RocketModel):
         place_if_filled('platform', team.platform)
         place_if_filled('members', team.members)
         place_if_filled('team_leads', team.team_leads)
+        place_if_filled('folder', team.folder)
 
         return tdict
 

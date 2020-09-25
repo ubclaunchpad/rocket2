@@ -16,7 +16,6 @@ help:
 lint:
 	pipenv run pycodestyle .
 	pipenv run flake8 .
-	pipenv run pydocstyle .
 	pipenv run mypy .
 
 # Catch-all target: route all unknown targets to Sphinx using the new

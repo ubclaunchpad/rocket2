@@ -8,10 +8,11 @@ from db.facade import DBFacade
 from db.utils import get_team_by_name
 from interface.github import GithubAPIException, GithubInterface
 from interface.slack import SlackAPIError
+from interface.gcp import GCPInterface
 from config import Config
 from app.model import Team, User
 from utils.slack_parse import check_permissions
-from typing import Any, List
+from typing import Any, List, Optional
 
 
 class TeamCommand(Command):
@@ -27,19 +28,22 @@ class TeamCommand(Command):
                  config: Config,
                  db_facade: DBFacade,
                  gh: GithubInterface,
-                 sc: Any):
+                 sc: Any,
+                 gcp: Optional[GCPInterface] = None):
         """
         Initialize team command parser.
 
         :param db_facade: Given Dynamo_DB Facade
         :param gh: Given Github Interface
         :param sc: Given Slack Client Interface
+        "param gcp: Given GCP client
         """
         logging.info("Initializing TeamCommand instance")
         self.facade = db_facade
         self.gh = gh
         self.config = config
         self.sc = sc
+        self.gcp = gcp
         self.desc = "for dealing with teams"
         self.parser = ArgumentParser(prog="/rocket")
         self.parser.add_argument("team")
@@ -93,6 +97,8 @@ class TeamCommand(Command):
         parser_create.add_argument("--lead", type=str, action='store',
                                    help="Add given user as team lead"
                                         "to created team.")
+        parser_create.add_argument("--folder", type=str, action='store',
+                                   help="Drive folder ID for this team.")
 
         """Parser for add command."""
         parser_add = subparsers.add_parser("add")
@@ -128,6 +134,8 @@ class TeamCommand(Command):
                                  help="Display name the team should have.")
         parser_edit.add_argument("--platform", type=str, action='store',
                                  help="Platform the team should have.")
+        parser_edit.add_argument("--folder", type=str, action='store',
+                                 help="Drive folder ID for this team.")
 
         """Parser for lead command."""
         parser_lead = subparsers.add_parser("lead")
@@ -202,7 +210,8 @@ class TeamCommand(Command):
                 "name": args.name,
                 "platform": args.platform,
                 "channel": args.channel,
-                "lead": args.lead
+                "lead": args.lead,
+                "folder": args.folder,
             }
             return self.create_helper(param_list, user_id)
 
@@ -224,7 +233,8 @@ class TeamCommand(Command):
             param_list = {
                 "team_name": args.team_name,
                 "name": args.name,
-                "platform": args.platform
+                "platform": args.platform,
+                "folder": args.folder,
             }
             return self.edit_helper(param_list, user_id)
 
@@ -318,6 +328,9 @@ class TeamCommand(Command):
             if param_list["platform"] is not None:
                 msg += f"platform: {param_list['platform']}, "
                 team.platform = param_list['platform']
+            if param_list["folder"] is not None:
+                msg += f"folder: {param_list['folder']}"
+                team.folder = param_list['folder']
             if param_list["channel"] is not None:
                 msg += "added channel, "
                 for member_id in self.sc.get_channel_users(
@@ -467,6 +480,9 @@ class TeamCommand(Command):
             if param_list['platform'] is not None:
                 msg += f"platform: {param_list['platform']}"
                 team.platform = param_list['platform']
+            if param_list['folder'] is not None:
+                msg += f"folder: {param_list['folder']}"
+                team.folder = param_list['folder']
             self.facade.store(team)
             ret = {'attachments': [team.get_attachment()], 'text': msg}
             return ret, 200
@@ -605,6 +621,9 @@ class TeamCommand(Command):
 
             # add all members (if not already added) to the 'all' team
             self.refresh_all_team()
+
+            # enforce Drive permissions
+            self.refresh_all_drive_permissions()
         except GithubAPIException as e:
             logging.error("team refresh unsuccessful due to github error")
             return "Refresh teams was unsuccessful with " \
@@ -650,3 +669,50 @@ class TeamCommand(Command):
             self.facade.store(team_all)
         else:
             logging.error(f'Could not create {all_name}. Aborting.')
+
+    def refresh_all_drive_permissions(self):
+        """
+        Refresh Google Drive permissions for all teams. If no GCP client
+        is provided, this function is a no-op.
+        """
+
+        if self.gcp is None:
+            logging.debug("GCP not enabled, skipping drive permissions")
+            return
+
+        all_teams: List[Team] = self.facade.query(Team)
+        for t in all_teams:
+            self.refresh_drive_permissions(t)
+
+    def refresh_drive_permissions(self, t: Team):
+        """
+        Refresh Google Drive permissions for provided team. If no GCP client
+        is provided, this function is a no-op.
+        """
+
+        if self.gcp is None:
+            logging.debug("GCP not enabled, skipping drive permissions")
+            return
+
+        if len(t.folder) == 0:
+            return
+
+        # Generate who to share with
+        emails: List[str] = []
+        for github_id in t.members:
+            users = self.facade. \
+                query(User, [('github_user_id', github_id)])
+            if len(users) != 1:
+                logging.error(f"None/multiple users for GitHub ID {github_id}")
+                continue
+            user = users[0]
+            if len(user.email) > 0:
+                emails.append(user.email)
+
+        # Sync permissions
+        if len(emails) > 0:
+            logging.info("Synchronizing permissions for "
+                         + f"{t.github_team_name}'s folder ({t.folder}) "
+                         + f"to {emails}")
+            self.gcp.set_drive_permissions(
+                t.github_team_name, t.folder, emails)

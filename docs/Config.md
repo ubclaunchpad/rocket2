@@ -115,3 +115,22 @@ The region where the AWS instance is located (leave these as they are).
 
 Point all AWS DynamoDB requests to `http://localhost:8000`. Optional, and
 defaults to `False`.
+
+## GCP\_SERVICE\_ACCOUNT\_CREDENTIALS
+
+Service Account credentials for Google Cloud API access. Optional, and defaults
+to disabling related features.
+
+Required scopes when credentials are provided:
+
+- `https://www.googleapis.com/auth/drive` - used for synchronizing Drive folder permissions
+
+For GSuite users, refer to [this guide](https://developers.google.com/identity/protocols/oauth2/service-account)
+to set up service account access to your domain.
+
+## GCP\_SERVICE\_ACCOUNT\_SUBJECT
+
+User to emulate for GCP requests. Optional, and defaults to using your service
+account's identity. This feature requires domain-wide authority to be
+delegated to your service account - refer to
+[this guide](https://developers.google.com/identity/protocols/oauth2/service-account#delegatingauthority).
