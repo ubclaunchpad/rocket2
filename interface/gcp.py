@@ -3,8 +3,6 @@ from typing import Any, List
 from googleapiclient.discovery import Resource
 import logging
 
-default_share_msg = "Rocket has shared a folder with you!"
-
 
 class GCPInterface:
     """Utility class for calling Google Cloud Platform (GCP) APIs."""
@@ -69,7 +67,7 @@ class GCPInterface:
                 self.drive.permissions()\
                     .create(fileId=drive_id,
                             body=body,
-                            emailMessage=default_share_msg,
+                            emailMessage=new_share_message(scope),
                             sendNotificationEmail=True,
                             supportsAllDrives=True)\
                     .execute()
@@ -94,6 +92,10 @@ class GCPInterface:
                 logging.error(f"Failed to delete permission {p_id} for drive "
                               + f"item ({scope}, {drive_id}): {e}")
         logging.info(f"Deleted {deleted_shares} permissions for {scope}")
+
+
+def new_share_message(scope):
+    return f"Rocket has shared a folder with you for team '{scope}'!"
 
 
 def new_create_permission_body(email):
