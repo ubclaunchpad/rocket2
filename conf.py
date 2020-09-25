@@ -13,7 +13,6 @@ documentation root, use os.path.abspath to make it absolute, like shown here.
 """
 import os
 import sys
-import sphinx
 sys.path.insert(0, os.path.abspath('.'))
 
 
@@ -24,9 +23,9 @@ copyright = '2018, UBC Launch Pad'
 author = 'UBC Launch Pad'
 
 # The short X.Y version
-version = '0.0'
+version = '1.0'
 # The full version, including alpha/beta/rc tags
-release = '0.0.0-alpha'
+release = '1.0.0'
 
 
 # -- General configuration ---------------------------------------------------
@@ -41,14 +40,13 @@ release = '0.0.0-alpha'
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx_autodoc_typehints',
-    'm2r',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['docs/_templates']
 
 # The suffix(es) of source filenames.
-source_suffix = ['.rst', '.md']
+source_suffix = ['.rst']
 
 # The master toctree document.
 master_doc = 'index'
@@ -172,24 +170,6 @@ epub_title = project
 
 # A list of files that should not be packed into the epub file.
 epub_exclude_files = ['search.html']
-
-
-def monkeypatch(cls):
-    """ decorator to monkey-patch methods """
-    def decorator(f):
-        method = f.__name__
-        old_method = getattr(cls, method)
-        setattr(cls, method, lambda self, *args, **kwargs: f(old_method, self, *args, **kwargs))
-    return decorator
-
-# workaround until https://github.com/miyakogi/m2r/pull/55 is merged
-@monkeypatch(sphinx.registry.SphinxComponentRegistry)
-def add_source_parser(_old_add_source_parser, self, *args, **kwargs):
-    # signature is (parser: Type[Parser], **kwargs), but m2r expects
-    # the removed (str, parser: Type[Parser], **kwargs).
-    if isinstance(args[0], str):
-        args = args[1:]
-    return _old_add_source_parser(self, *args, **kwargs)
 
 
 # -- Extension configuration -------------------------------------------------
