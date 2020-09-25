@@ -703,11 +703,13 @@ class TeamCommand(Command):
             users = self.facade. \
                 query(User, [('github_user_id', github_id)])
             if len(users) != 1:
-                logging.error(f"None/multiple users for GitHub ID {github_id}")
-                continue
-            user = users[0]
-            if len(user.email) > 0:
-                emails.append(user.email)
+                logging.warn(f"None/multiple users for GitHub ID {github_id}")
+
+            # For now, naiively iterate over all users, due to
+            # https://github.com/ubclaunchpad/rocket2/issues/493
+            for user in users:
+                if len(user.email) > 0:
+                    emails.append(user.email)
 
         # Sync permissions
         if len(emails) > 0:
