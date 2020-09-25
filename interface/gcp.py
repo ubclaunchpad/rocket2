@@ -21,6 +21,8 @@ class GCPInterface:
         In all cases of API errors, we log and continue, to try and get close
         to the desired state of permissions.
         """
+        logging.info(f"Preparing to update permissions for {drive_id} "
+                     + f"({scope}) for {len(emails)} emails")
 
         # List existing permissions - we use this to avoid duplicate
         # permissions, and to delete ones that should not longer exist.
@@ -41,9 +43,11 @@ class GCPInterface:
         except Exception as e:
             logging.error("Failed to load permissions for drive item"
                           + f"({scope}, {drive_id}): {e}")
+        logging.info(f"Found {len(existing)} permissions for {scope}")
 
         # Ensure the folder is shared with everyone as required.
         # See http://googleapis.github.io/google-api-python-client/docs/dyn/drive_v3.permissions.html#create # noqa
+        created_shares = 0
         for email in emails:
             if email in existing:
                 continue
@@ -56,19 +60,24 @@ class GCPInterface:
                                                 emailMessage=default_share_msg,
                                                 sendNotificationEmail=True,
                                                 supportsAllDrives=True)
+                created_shares += 1
             except Exception as e:
                 logging.error("Failed to share drive item"
                               + f"({scope}, {drive_id}) with {email}: {e}")
+        logging.info(f"Created {created_shares} permissions for {scope}")
 
         # Delete old permissions
         # See http://googleapis.github.io/google-api-python-client/docs/dyn/drive_v3.permissions.html#delete # noqa
+        deleted_shares = 0
         for p in to_delete:
             try:
                 self.drive.permissions().delete(p,
                                                 supportsAllDrives=True)
+                deleted_shares += 1
             except Exception as e:
                 logging.error(f"Failed to delete permission {p} for drive item"
                               + f" ({scope}, {drive_id}): {e}")
+        logging.info(f"Deleted {deleted_shares} permissions for {scope}")
 
 
 def new_create_permission_body(scope, email):
