@@ -121,6 +121,16 @@ defaults to `False`.
 Service Account credentials for Google Cloud API access. Optional, and defaults
 to disabling related features.
 
-Required permissions when credentials are provided:
+Required scopes when credentials are provided:
 
-- Drive API - used for synchronizing Drive folder permissions
+- `https://www.googleapis.com/auth/drive` - used for synchronizing Drive folder permissions
+
+For GSuite users, refer to [this guide](https://developers.google.com/identity/protocols/oauth2/service-account)
+to set up service account access to your domain.
+
+## GCP\_SERVICE\_ACCOUNT\_SUBJECT
+
+User to emulate for GCP requests. Optional, and defaults to using your service
+account's identity. This feature requires domain-wide authority to be
+delegated to your service account - refer to
+[this guide](https://developers.google.com/identity/protocols/oauth2/service-account#delegatingauthority).
