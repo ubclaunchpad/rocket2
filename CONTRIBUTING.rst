@@ -83,8 +83,6 @@ The Github build checks for:
    `pycodestyle <http://pycodestyle.pycqa.org/en/latest/>`__)
 -  Correctly-formatted docstrings (via
    `pydocstyle <http://www.pydocstyle.org/en/2.1.1/>`__)
--  Correctly-formatted Markdown documentation (via
-   `mdl <https://github.com/markdownlint/markdownlint>`__)
 
 All of these checks are conveniently done using the
 ``scripts/build_check.sh`` as mentioned above.
