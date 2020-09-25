@@ -5,7 +5,6 @@ REPO_ROOT=$(git rev-parse --show-toplevel)
 pushd "${REPO_ROOT}"
 
 make lint
-mdl .
 
 # We use a script to check if dynamodb is running locally
 COV_OPTIONS="--mypy --cov=./ --cov-branch --cov-config .coveragerc"

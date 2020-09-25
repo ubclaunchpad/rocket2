@@ -23,9 +23,9 @@ copyright = '2018, UBC Launch Pad'
 author = 'UBC Launch Pad'
 
 # The short X.Y version
-version = '0.0'
+version = '1.0'
 # The full version, including alpha/beta/rc tags
-release = '0.0.0-alpha'
+release = '1.0.0'
 
 
 # -- General configuration ---------------------------------------------------
@@ -40,14 +40,13 @@ release = '0.0.0-alpha'
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx_autodoc_typehints',
-    'm2r',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['docs/_templates']
 
 # The suffix(es) of source filenames.
-source_suffix = ['.rst', '.md']
+source_suffix = ['.rst']
 
 # The master toctree document.
 master_doc = 'index'
