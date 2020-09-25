@@ -4,37 +4,37 @@
     :hidden:
 
     self
-    CONTRIBUTING.md
-    LICENSE.md
+    CONTRIBUTING
+    LICENSE
 
 .. toctree::
     :caption: Tutorials
     :hidden:
 
-    docs/GettingStarted.md
-    docs/Testing.md
-    docs/LocalDevelopmentGuide.md
-    docs/Scheduler.md
+    docs/GettingStarted
+    docs/Testing
+    docs/LocalDevelopmentGuide
+    docs/Scheduler
 
 .. toctree::
     :caption: How Everything Works
     :hidden:
 
-    docs/Scripts.md
-    docs/Database.md
-    docs/Config.md
-    docs/Requirements.md
-    docs/Deployment.md
-    docs/Qna.md
+    docs/Scripts
+    docs/Database
+    docs/Config
+    docs/Requirements
+    docs/Deployment
+    docs/Qna
 
 .. toctree::
     :caption: Plugin Reference
     :hidden:
 
-    docs/UserCommands.md
-    docs/TeamCommands.md
-    docs/ProjectCommands.md
-    docs/KarmaCommands.md
+    docs/UserCommands
+    docs/TeamCommands
+    docs/ProjectCommands
+    docs/KarmaCommands
 
 .. toctree::
     :caption: API Documentation
