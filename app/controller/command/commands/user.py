@@ -10,7 +10,7 @@ from interface.github import GithubAPIException, GithubInterface
 from interface.gcp import GCPInterface
 from interface.gcp_utils import sync_user_email_perms
 from app.model import User, Permissions
-from typing import Dict, cast
+from typing import Dict, cast, Optional
 from utils.slack_parse import escape_email
 
 
@@ -27,7 +27,7 @@ class UserCommand(Command):
     def __init__(self,
                  db_facade: DBFacade,
                  github_interface: GithubInterface,
-                 gcp: GCPInterface):
+                 gcp: Optional[GCPInterface]):
         """Initialize user command."""
         logging.info("Initializing UserCommand instance")
         self.parser = ArgumentParser(prog="/rocket")

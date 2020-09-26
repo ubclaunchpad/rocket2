@@ -1,11 +1,14 @@
 """Utilities for common-used interactions with Google API."""
 import logging
+from typing import List, Optional
 from interface.gcp import GCPInterface
 from db import DBFacade
 from app.model import User, Team
 
 
-def sync_user_email_perms(gcp: GCPInterface, db: DBFacade, user: User):
+def sync_user_email_perms(gcp: Optional[GCPInterface],
+                          db: DBFacade,
+                          user: User):
     """
     Refresh Google Drive permissions for a provided user. If no GCP client is
     provided, this function is a no-op.
@@ -25,7 +28,9 @@ def sync_user_email_perms(gcp: GCPInterface, db: DBFacade, user: User):
         sync_team_email_perms(gcp, db, team)
 
 
-def sync_team_email_perms(gcp: GCPInterface, db: DBFacade, team: Team):
+def sync_team_email_perms(gcp: Optional[GCPInterface],
+                          db: DBFacade,
+                          team: Team):
     """
     Refresh Google Drive permissions for provided team. If no GCP client
     is provided, this function is a no-op.
