@@ -27,20 +27,39 @@ class GCPInterface:
         existing: List[str] = []  # emails
         to_delete: List[str] = []  # permission IDs
         try:
+            perm_fields = [
+                "permissions/id",
+                "permissions/emailAddress",
+                "permissions/role",
+                "permissions/permissionDetails/*",
+                "permissions/teamDrivePermissionDetails/*",
+            ]
             # pylint: disable=no-member
             list_res = self.drive.permissions()\
                 .list(fileId=drive_id,
                       supportsAllDrives=True,
-                      fields="permissions(id, emailAddress, role)")\
+                      fields=", ".join(perm_fields))\
                 .execute()
             permissions: List[Any] = list_res['permissions']
             logging.info(f"{scope} drive currently shared with {permissions}")
             for p in permissions:
+                is_inherited = False
+                if 'permissionDetails' in p:
+                    details: List[Any] = p['permissionDetails']
+                    for d in details:
+                        if d.inherited:
+                            is_inherited = True
+
                 if 'emailAddress' in p:
                     email: str = p['emailAddress']
-                    if email in emails:
-                        # track permission we do not need to recreate
+                    if is_inherited:
+                        # Don't touch inherited permissions
                         existing.append(email)
+                    elif email in emails:
+                        # TODO: uncomment, commenting to recreate shares
+                        # track permission we do not need to recreate
+                        # existing.append(email)
+                        pass
                     elif email == self.subject:
                         # do not remove actor from shared
                         continue
