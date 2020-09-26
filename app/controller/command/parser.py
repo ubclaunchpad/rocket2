@@ -33,7 +33,9 @@ class CommandParser:
         self.__bot = bot
         self.__github = gh_interface
         self.__gcp = gcp
-        self.commands["user"] = UserCommand(self.__facade, self.__github)
+        self.commands["user"] = UserCommand(self.__facade,
+                                            self.__github,
+                                            self.__gcp)
         self.commands["team"] = TeamCommand(config, self.__facade,
                                             self.__github,
                                             self.__bot,
