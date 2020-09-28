@@ -1,10 +1,6 @@
-name: Master
+name: Pull request
 
-on:
-  push:
-    branches:
-    - master
-    - ec2-release
+on: pull_request
 
 jobs:
   pipeline:
@@ -14,7 +10,7 @@ jobs:
     - name: Set up Python 3.8
       uses: actions/setup-python@v1
       with:
-          python-version: 3.8
+        python-version: 3.8
     - name: Install Dependencies
       run: |
         sudo apt-get update
@@ -29,4 +25,4 @@ jobs:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       run: |
         scripts/build_check.sh
-        pipenv run codecov
+        pipenv run codecov --required
