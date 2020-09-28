@@ -10,7 +10,7 @@ class SlackEventsHandler:
     """Encapsulate the handlers for all Slack events."""
 
     welcome = 'Welcome to UBC Launch Pad! Please type `/rocket user edit '\
-        '--github <YOUR GITHUB USERNAME>` to add yourself to the GitHub '\
+        '--github $GITHUB_USERNAME` to add yourself to the GitHub '\
         'organization.'
 
     def __init__(self,
