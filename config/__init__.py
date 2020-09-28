@@ -21,6 +21,8 @@ class Config:
         'GITHUB_APP_ID': 'github_app_id',
         'GITHUB_ORG_NAME': 'github_org_name',
         'GITHUB_DEFAULT_TEAM_NAME': 'github_team_all',
+        'GITHUB_ADMIN_TEAM_NAME': 'github_team_admin',
+        'GITHUB_LEADS_TEAM_NAME': 'github_team_leads',
         'GITHUB_WEBHOOK_ENDPT': 'github_webhook_endpt',
         'GITHUB_WEBHOOK_SECRET': 'github_webhook_secret',
         'GITHUB_KEY': 'github_key',
@@ -39,6 +41,8 @@ class Config:
     OPTIONALS = {
         'AWS_LOCAL': 'False',
         'GITHUB_DEFAULT_TEAM_NAME': 'all',
+        'GITHUB_ADMIN_TEAM_NAME': '',
+        'GITHUB_LEADS_TEAM_NAME': '',
         'GCP_SERVICE_ACCOUNT_CREDENTIALS': '',
         'GCP_SERVICE_ACCOUNT_SUBJECT': '',
     }
@@ -84,6 +88,8 @@ class Config:
         self.github_app_id = ''
         self.github_org_name = ''
         self.github_team_all = ''
+        self.github_team_admin = ''
+        self.github_team_leads = ''
         self.github_webhook_endpt = ''
         self.github_webhook_secret = ''
         self.github_key = ''

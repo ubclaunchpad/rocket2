@@ -4,6 +4,7 @@ import shlex
 from argparse import ArgumentParser, _SubParsersAction
 from app.controller import ResponseTuple
 from app.controller.command.commands.base import Command
+from app.model.permissions import Permissions
 from db.facade import DBFacade
 from db.utils import get_team_by_name
 from interface.github import GithubAPIException, GithubInterface
@@ -385,8 +386,9 @@ class TeamCommand(Command):
         """
         try:
             command_user = self.facade.retrieve(User, user_id)
+            command_team = param_list['team_name']
             teams = self.facade.query(Team, [('github_team_name',
-                                              param_list['team_name'])])
+                                              command_team)])
             if len(teams) != 1:
                 return self.lookup_error, 200
             team = teams[0]
@@ -397,7 +399,20 @@ class TeamCommand(Command):
             team.add_member(user.github_id)
             self.gh.add_team_member(user.github_username, team.github_team_id)
             self.facade.store(team)
-            msg = "Added User to " + param_list['team_name']
+
+            # If this team is a team with special permissions, promote the user
+            promoted_level = Permissions.member
+            if command_team == self.config.github_team_admin:
+                promoted_level = Permissions.admin
+            elif command_team == self.config.github_team_leads:
+                promoted_level = Permissions.team_lead
+
+            msg = "Added User to " + command_team
+            if promoted_level != Permissions.member:
+                logging.info(f"Promoting {command_user} to {promoted_level}")
+                user.permissions_level = promoted_level
+                self.facade.store(user)
+                msg += f" and promoted user to {promoted_level}"
             ret = {'attachments': [team.get_attachment()], 'text': msg}
             return ret, 200
 
@@ -424,8 +439,9 @@ class TeamCommand(Command):
         """
         try:
             command_user = self.facade.retrieve(User, user_id)
+            command_team = param_list['team_name']
             teams = self.facade.query(Team, [('github_team_name',
-                                              param_list['team_name'])])
+                                              command_team)])
             if len(teams) != 1:
                 return self.lookup_error, 200
             team = teams[0]
@@ -442,7 +458,17 @@ class TeamCommand(Command):
             self.gh.remove_team_member(user.github_username,
                                        team.github_team_id)
             self.facade.store(team)
-            msg = "Removed User from " + param_list['team_name']
+
+            msg = "Removed User from " + command_team
+
+            # If this team is a team with special permissions, demote the user
+            if command_team == self.config.github_team_admin\
+                    or command_team == self.config.github_team_leads:
+                logging.info(f"Demoting {command_user} to member")
+                user.permissions_level = Permissions.member
+                self.facade.store(user)
+                msg += " and demoted user"
+
             ret = {'attachments': [team.get_attachment()], 'text': msg}
             return ret, 200
 

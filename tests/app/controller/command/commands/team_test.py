@@ -18,9 +18,10 @@ class TestTeamCommand(TestCase):
         self.admin = create_test_admin('Uadmin')
         self.t0 = Team("BRS", "brs", "web")
         self.t1 = Team("OTEAM", "other team", "android")
+        self.t2 = Team("LEADS", "leads", "")
         self.db = MemoryDB(
             users=[self.u0, self.u1, self.admin],
-            teams=[self.t0, self.t1])
+            teams=[self.t0, self.t1, self.t2])
 
         self.sc = mock.MagicMock()
         self.testcommand = TeamCommand(self.config, self.db, self.gh, self.sc)
@@ -28,6 +29,7 @@ class TestTeamCommand(TestCase):
         self.maxDiff = None
 
         self.config.github_team_all = 'all'
+        self.config.github_team_leads = 'leads'
 
     def test_get_help(self):
         subcommands = list(self.testcommand.subparser.choices.keys())
@@ -70,7 +72,8 @@ class TestTeamCommand(TestCase):
     def test_handle_list(self):
         attachment = [
             self.t0.get_basic_attachment(),
-            self.t1.get_basic_attachment()
+            self.t1.get_basic_attachment(),
+            self.t2.get_basic_attachment(),
         ]
         with self.app.app_context():
             resp, code = self.testcommand.handle('team list', self.u0.slack_id)
@@ -237,6 +240,23 @@ class TestTeamCommand(TestCase):
                               (self.testcommand.lookup_error, 200))
         self.gh.add_team_member.assert_not_called()
 
+    def test_handle_add_promote(self):
+        self.u0.github_username = 'myuser'
+        self.u0.github_id = 'otherID'
+        self.t2.github_team_id = 'githubid'
+        with self.app.app_context():
+            resp, code = self.testcommand.handle(
+                f'team add leads {self.u0.slack_id}',
+                self.admin.slack_id)
+            expect_msg = 'Added User to leads and promoted user to team_lead'
+            expect = {'attachments': [self.t2.get_attachment()],
+                      'text': expect_msg}
+            self.assertDictEqual(resp, expect)
+            self.assertEqual(code, 200)
+        self.assertTrue(self.t2.has_member("otherID"))
+        self.assertEquals(self.u0.permissions_level, Permissions.team_lead)
+        self.gh.add_team_member.assert_called_once_with('myuser', 'githubid')
+
     def test_handle_remove(self):
         self.u0.github_id = 'githubID'
         self.u0.github_username = 'myuser'
@@ -267,6 +287,24 @@ class TestTeamCommand(TestCase):
             self.u0.github_username,
             self.t0.github_team_id)
         self.gh.remove_team_member.assert_not_called()
+
+    def test_handle_remove_demote(self):
+        self.u0.github_username = 'myuser'
+        self.u0.github_id = 'otherID'
+        self.t2.add_member(self.u0.github_id)
+        with self.app.app_context():
+            resp, code = self.testcommand.handle(
+                f'team remove leads {self.u0.slack_id}',
+                self.admin.slack_id)
+            expect_msg = 'Removed User from leads and demoted user'
+            expect = {'attachments': [self.t2.get_attachment()],
+                      'text': expect_msg}
+            self.assertDictEqual(resp, expect)
+            self.assertEqual(code, 200)
+        self.assertEquals(self.u0.permissions_level, Permissions.member)
+        self.gh.remove_team_member.assert_called_once_with(
+                self.u0.github_username,
+                self.t2.github_team_id)
 
     def test_handle_remove_not_admin(self):
         with self.app.app_context():
