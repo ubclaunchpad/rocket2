@@ -6,7 +6,7 @@ from app.controller import ResponseTuple
 from app.controller.command.commands.base import Command
 from app.model.permissions import Permissions
 from db.facade import DBFacade
-from db.utils import get_team_by_name
+from db.utils import get_team_by_name, get_team_members
 from interface.github import GithubAPIException, GithubInterface
 from interface.slack import SlackAPIError
 from interface.gcp import GCPInterface
@@ -649,6 +649,9 @@ class TeamCommand(Command):
             # add all members (if not already added) to the 'all' team
             self.refresh_all_team()
 
+            # promote members inside special teams
+            self.refresh_all_rocket_permissions()
+
             # enforce Drive permissions
             self.refresh_all_drive_permissions()
         except GithubAPIException as e:
@@ -696,6 +699,41 @@ class TeamCommand(Command):
             self.facade.store(team_all)
         else:
             logging.error(f'Could not create {all_name}. Aborting.')
+
+    def refresh_all_rocket_permissions(self):
+        """
+        Refresh Rocket permissions for members in teams like
+        GITHUB_ADMIN_TEAM_NAME and GITHUB_LEADS_TEAM_NAME.
+
+        It only ever promotes users, and does not demote users.
+        """
+        teams = [
+            {
+                'name': self.config.github_team_admin,
+                'permission': Permissions.admin,
+            },
+            {
+                'name': self.config.github_team_leads,
+                'permission': Permissions.team_lead,
+            }
+        ]
+        for t in teams:
+            if len(t['name']) == 0:
+                continue
+
+            team = None
+            try:
+                team = get_team_by_name(self.facade, t['name'])
+            except LookupError:
+                t_id = str(self.gh.org_create_team(t['name']))
+                logging.info(f'team {t["name"]} created')
+                self.facade.store(Team(t_id, t['name'], t['name']))
+
+            if team is not None:
+                team_members = get_team_members(team)
+                for user in team_members:
+                    user.permissions_level = t['permission']
+                    self.facade.store(user)
 
     def refresh_all_drive_permissions(self):
         """

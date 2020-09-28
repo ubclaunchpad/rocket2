@@ -35,6 +35,25 @@ def get_team_by_name(dbf: DBFacade, gh_team_name: str) -> Team:
         return teams[0]
 
 
+def get_team_members(dbf: DBFacade, team: Team) -> List[User]:
+    """
+    Query users that are members of the given team.
+
+    :return: Users that belong to the team
+    """
+    users: List[User] = []
+    for github_id in team.members:
+        users = db.query(User, [('github_user_id', github_id)])
+        if len(users) != 1:
+            logging.warn(f"None/multiple users for GitHub ID {github_id}")
+
+        # For now, naiively iterate over all users, due to
+        # https://github.com/ubclaunchpad/rocket2/issues/493
+        for user in users:
+            users.append(user)
+    return users
+
+
 def get_users_by_ghid(dbf: DBFacade, gh_ids: List[str]) -> List[User]:
     """
     Query users by github user id.
