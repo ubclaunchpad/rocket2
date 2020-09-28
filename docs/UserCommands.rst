@@ -20,7 +20,7 @@ Add
 
 Add the current user into the database. This command by default does not
 overwrite users that have already been entered into the database. By
-using the ``-f`` flag, you force ``rocket2`` to overwrite the entry in
+using the ``-f`` flag, you force Rocket to overwrite the entry in
 the database, if any.
 
 Edit
@@ -34,10 +34,10 @@ Edit
                      [--permission {member,team_lead,admin}]
 
 Allows user to edit their Launch Pad profile. Admins and team leads can
-edit another user’s Launch Pad profile by using ``[--username SLACKID]``
+edit another user’s Launch Pad profile by using ``[--username SLACK_ID]``
 option. ``SLACK_ID`` is the ``@``-name, for easy slack autocomplete.
 
-If a user edits their Github handle, rocket will also add the handle to
+If a user edits their Github handle, Rocket will also add the handle to
 Launch Pad’s Github organization.
 
 .. code:: sh
@@ -59,7 +59,7 @@ View
 
 .. code:: sh
 
-   /rocket user view [SLACKID]
+   /rocket user view [--username SLACKID]
 
 Display information about a user. ``SLACK_ID`` is the ``@``-name, for
 easy slack autocomplete. If ``SLACK_ID`` is not specified, this command
@@ -79,7 +79,7 @@ Delete (Admin only)
 
 .. code:: sh
 
-   /rocket user delete MEMBER_ID
+   /rocket user delete SLACK_ID
 
 Permanently delete a member’s Launch Pad Profile. Can only be used by
-admins. ``MEMBER_ID`` is the ``@``-name, for easy slack autocomplete.
+admins. ``SLACK_ID`` is the ``@``-name, for easy slack autocomplete.
