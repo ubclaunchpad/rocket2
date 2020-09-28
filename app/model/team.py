@@ -157,3 +157,7 @@ class Team(RocketModel):
     def __str__(self) -> str:
         """Print information on the team class."""
         return str(self.__dict__)
+
+    def __hash__(self) -> int:
+        """Hash the team class using a dictionary."""
+        return self.__str__().__hash__()

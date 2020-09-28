@@ -1,5 +1,5 @@
 from db.facade import DBFacade
-from app.model import User, Team, Project  # , Permissions
+from app.model import User, Team, Project, Permissions
 from typing import TypeVar, List, Type, Tuple, cast, Set
 
 T = TypeVar('T', User, Team, Project)
@@ -71,6 +71,11 @@ def filter_by_matching_field(ls: List[T],
     r = []
     is_set = field_is_set(Model, field)
     attr = field_to_attr(Model, field)
+
+    # Special case for handling permission levels
+    if attr == 'permissions_level':
+        v = Permissions[v]
+
     for x in ls:
         if is_set and v in getattr(x, attr):
             r.append(x)

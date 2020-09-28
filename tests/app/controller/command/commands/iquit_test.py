@@ -57,3 +57,13 @@ class TestIQuitCommand(TestCase):
         self.assertEqual(actual.count('u3'), 1)
         self.assertEqual(actual.count('u4'), 1)
         self.assertNotEqual(actual.count('u5'), 1)
+
+    def test_cannot_find_caller(self):
+        actual, resp = self.cmd.handle('', 'unknown user')
+        self.assertEqual(actual, IQuitCommand.lookup_error)
+        self.assertEqual(resp, 200)
+
+    def test_call_as_team_lead(self):
+        actual, resp = self.cmd.handle('', 'u4')
+        self.assertTrue('replacing you with <@u5>' in actual or 'replacing you with <@u3>' in actual)
+        self.assertEqual(actual.count('u1'), 1)

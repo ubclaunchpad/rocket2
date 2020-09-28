@@ -133,3 +133,7 @@ class Project(RocketModel):
     def __str__(self) -> str:
         """Return all fields of this project, JSON format."""
         return str(self.__dict__)
+
+    def __hash__(self) -> int:
+        """Hash the project class using a dictionary."""
+        return self.__str__().__hash__()
