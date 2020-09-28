@@ -9,6 +9,7 @@ from db.utils import get_team_by_name
 from interface.github import GithubAPIException, GithubInterface
 from interface.slack import SlackAPIError
 from interface.gcp import GCPInterface
+from interface.gcp_utils import sync_team_email_perms
 from config import Config
 from app.model import Team, User
 from utils.slack_parse import check_permissions
@@ -682,39 +683,4 @@ class TeamCommand(Command):
 
         all_teams: List[Team] = self.facade.query(Team)
         for t in all_teams:
-            self.refresh_drive_permissions(t)
-
-    def refresh_drive_permissions(self, t: Team):
-        """
-        Refresh Google Drive permissions for provided team. If no GCP client
-        is provided, this function is a no-op.
-        """
-
-        if self.gcp is None:
-            logging.debug("GCP not enabled, skipping drive permissions")
-            return
-
-        if len(t.folder) == 0:
-            return
-
-        # Generate who to share with
-        emails: List[str] = []
-        for github_id in t.members:
-            users = self.facade. \
-                query(User, [('github_user_id', github_id)])
-            if len(users) != 1:
-                logging.warn(f"None/multiple users for GitHub ID {github_id}")
-
-            # For now, naiively iterate over all users, due to
-            # https://github.com/ubclaunchpad/rocket2/issues/493
-            for user in users:
-                if len(user.email) > 0:
-                    emails.append(user.email)
-
-        # Sync permissions
-        if len(emails) > 0:
-            logging.info("Synchronizing permissions for "
-                         + f"{t.github_team_name}'s folder ({t.folder}) "
-                         + f"to {emails}")
-            self.gcp.set_drive_permissions(
-                t.github_team_name, t.folder, emails)
+            sync_team_email_perms(self.gcp, self.facade, t)

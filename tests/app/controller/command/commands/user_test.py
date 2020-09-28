@@ -17,7 +17,7 @@ class TestUserCommand(TestCase):
         self.db = MemoryDB(users=[self.u0, self.u1, self.admin])
 
         self.mock_github = mock.MagicMock(GithubInterface)
-        self.testcommand = UserCommand(self.db, self.mock_github)
+        self.testcommand = UserCommand(self.db, self.mock_github, None)
         self.maxDiff = None
 
     def test_get_help(self):

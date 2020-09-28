@@ -7,8 +7,10 @@ from app.controller import ResponseTuple
 from app.controller.command.commands.base import Command
 from db.facade import DBFacade
 from interface.github import GithubAPIException, GithubInterface
+from interface.gcp import GCPInterface
+from interface.gcp_utils import sync_user_email_perms
 from app.model import User, Permissions
-from typing import Dict, cast
+from typing import Dict, cast, Optional
 from utils.slack_parse import escape_email
 
 
@@ -24,7 +26,8 @@ class UserCommand(Command):
 
     def __init__(self,
                  db_facade: DBFacade,
-                 github_interface: GithubInterface):
+                 github_interface: GithubInterface,
+                 gcp: Optional[GCPInterface]):
         """Initialize user command."""
         logging.info("Initializing UserCommand instance")
         self.parser = ArgumentParser(prog="/rocket")
@@ -33,6 +36,7 @@ class UserCommand(Command):
         self.help = self.get_help()
         self.facade = db_facade
         self.github = github_interface
+        self.gcp = gcp
 
     def init_subparsers(self) -> _SubParsersAction:
         """Initialize subparsers for user command."""
@@ -220,6 +224,8 @@ class UserCommand(Command):
                             " level.")
 
         self.facade.store(edited_user)
+        sync_user_email_perms(self.gcp, self.facade, edited_user)
+
         ret = {'attachments': [edited_user.get_attachment()]}
         if msg != "":
             # mypy doesn't like the fact that there could be different types

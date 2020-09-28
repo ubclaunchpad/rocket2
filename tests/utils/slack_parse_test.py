@@ -106,3 +106,7 @@ class TestSlackParseHelpers(TestCase):
         email = "<mailto:email@a.com|email@a.com>"
         ret = util.escape_email(email)
         self.assertEqual(ret, "email@a.com")
+
+    def test_escape_normal_email(self):
+        email = 'robert@bobheadxi.dev'
+        self.assertEqual(util.escape_email(email), email)

@@ -99,7 +99,12 @@ def escape_email(email: str) -> str:
 
         email@a.com
 
+    Does nothing if the email is not escaped.
+
     :param email: email to convert
     :return: unescaped email
     """
-    return email.split('|')[0][8:]
+    if email.startswith('<'):
+        return email.split('|')[0][8:]
+    else:
+        return email
