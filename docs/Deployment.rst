@@ -111,6 +111,16 @@ containers, you must reference them by their service name in
 ``docker-compose.yml``, *not* via localhost. This is already handled in
 ``nginx.conf``.
 
+Pure Docker
+~~~~~~~~~~~
+
+One deployment option is to use the standalone Docker image:
+
+.. code-block:: bash
+
+    docker pull ghcr.io/ubclaunchpad/rocket2:latest
+    docker run --rm -it -p 0.0.0.0:5000:5000 --env-file .env ghcr.io/ubclaunchpad/rocket2
+
 Other Build Tools
 -----------------
 
