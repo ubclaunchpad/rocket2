@@ -106,6 +106,10 @@ class TestMemoryDB(TestCase):
         us = self.db.query(User)
         self.assertCountEqual(us, list(self.users.values()))
 
+    def test_query_all_admins(self):
+        admins = self.db.query(User, [('permission_level', 'admin')])
+        self.assertIn(self.admin, admins)
+
     def test_scan_teams(self):
         ts = self.db.query_or(Team)
         self.assertCountEqual(ts, list(self.teams.values()))
