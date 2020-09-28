@@ -80,3 +80,7 @@ class TestIQuitCommand(TestCase):
         self.assertIn(
             '*Team somewhat sketch*:'
             ' cannot find your replacement; deleting team', actual)
+
+    def test_call_as_admin(self):
+        actual, resp = self.cmd.handle('', 'u1')
+        self.assertEqual(IQuitCommand.adminmsg, actual)
