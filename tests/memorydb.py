@@ -74,7 +74,7 @@ def filter_by_matching_field(ls: List[T],
 
     # Special case for handling permission levels
     if attr == 'permissions_level':
-        v = Permissions[v]
+        v = Permissions[v]  # type: ignore
 
     for x in ls:
         if is_set and v in getattr(x, attr):

@@ -34,9 +34,12 @@ class TestIQuitCommand(TestCase):
             't2': make_team('t2', ['g1', 'g3'], ['g1', 'g2', 'g3']),
             't3': make_team('t3', ['g1'], ['g1', 'g4', 'g2', 'g5', 'g6']),
             't4': make_team('t4', [], ['g6']),
-            't6': make_team('t5', ['g4'], ['g5', 'g3'])
+            't5': make_team('t5', ['g4'], ['g5', 'g3']),
+            't6': make_team('t6', ['g3', 'g4'], ['g3', 'g4']),
+            't7': make_team('t7', ['g3'], ['abacus', 'g3'])
         }
-        self.facade = MemoryDB(users=self.users.values(), teams=self.teams.values())
+        self.facade = MemoryDB(users=self.users.values(),
+                               teams=self.teams.values())
         self.cmd = IQuitCommand(self.facade)
 
     def test_get_no_duplicate_users(self):
@@ -64,6 +67,16 @@ class TestIQuitCommand(TestCase):
         self.assertEqual(resp, 200)
 
     def test_call_as_team_lead(self):
+        self.teams['t6'].github_team_name = 'pretty bad lol'
         actual, resp = self.cmd.handle('', 'u4')
-        self.assertTrue('replacing you with <@u5>' in actual or 'replacing you with <@u3>' in actual)
+        self.assertTrue('replacing you with <@u5>' in actual or
+                        'replacing you with <@u3>' in actual)
         self.assertEqual(actual.count('u1'), 1)
+        self.assertIn('cannot find your replacement; deleting team', actual)
+
+    def test_call_as_team_lead_gh_only_members(self):
+        self.teams['t7'].github_team_name = 'somewhat sketch'
+        actual, resp = self.cmd.handle('', 'u3')
+        self.assertIn(
+            '*Team somewhat sketch*:'
+            ' cannot find your replacement; deleting team', actual)
