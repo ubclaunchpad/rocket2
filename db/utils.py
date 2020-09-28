@@ -43,7 +43,7 @@ def get_team_members(dbf: DBFacade, team: Team) -> List[User]:
     """
     users: List[User] = []
     for github_id in team.members:
-        users = db.query(User, [('github_user_id', github_id)])
+        users = dbf.query(User, [('github_user_id', github_id)])
         if len(users) != 1:
             logging.warn(f"None/multiple users for GitHub ID {github_id}")
 
