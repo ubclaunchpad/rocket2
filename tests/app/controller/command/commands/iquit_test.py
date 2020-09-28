@@ -1,6 +1,7 @@
 from app.controller.command.commands import IQuitCommand
 from app.model import User, Team, Permissions
 from unittest import TestCase
+from tests.memorydb import MemoryDB
 
 
 def make_user(slack, gid, guser, perm):
@@ -18,8 +19,8 @@ def make_team(ghid, leads_ghid, members_ghid):
     return team
 
 
-class InMemoryDB:
-    def __init__(self):
+class TestIQuitCommand(TestCase):
+    def setUp(self):
         self.users = {
             'u1': make_user('u1', 'g1', 'G1', Permissions.admin),
             'u2': make_user('u2', 'g2', 'G2', Permissions.member),
@@ -35,42 +36,7 @@ class InMemoryDB:
             't4': make_team('t4', [], ['g6']),
             't6': make_team('t5', ['g4'], ['g5', 'g3'])
         }
-
-    def retrieve(self, Model, k):
-        if Model == User:
-            return self.users.get(k)
-        else:
-            return self.teams.get(k)
-
-    def query(self, Model, params=[]):
-        db = self.users if Model == User else self.teams
-        if len(params) == 0:
-            return list(db.values())
-        ret = []
-        for param in params:
-            if param[0] == 'permission_level':
-                ret.extend([o for o in db.values()
-                            if str(o.permissions_level) == param[1]])
-        return ret
-
-    def query_or(self, Model, params=[]):
-        db = self.users if Model == User else self.teams
-        if len(params) == 0:
-            return list(db.values())
-        ret = []
-        for param in params:
-            if param[0] == 'team_leads':
-                ret.extend([o for o in db.values()
-                            if param[1] in o.team_leads])
-            if param[0] == 'github_user_id':
-                ret.extend([o for o in db.values()
-                            if param[1] == o.github_id])
-        return ret
-
-
-class TestIQuitCommand(TestCase):
-    def setUp(self):
-        self.facade = InMemoryDB()
+        self.facade = MemoryDB(users=self.users.values(), teams=self.teams.values())
         self.cmd = IQuitCommand(self.facade)
 
     def test_get_no_duplicate_users(self):
