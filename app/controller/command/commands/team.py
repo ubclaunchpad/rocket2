@@ -276,25 +276,28 @@ class TeamCommand(Command):
         :return: error message if team not found,
                  otherwise return team information
         """
-        team = get_team_by_name(self.facade, team_name)
-        team_leads_set = team.team_leads
-        team_leads_list = list(map(lambda i: ('github_user_id',
-                                              str(i)), team_leads_set))
-        team_leads: List[User] = []
-        if team_leads_list:
-            team_leads = self.facade.query_or(User, team_leads_list)
-        names = set(map(lambda m: m.github_username, team_leads))
-        team.team_leads = names
+        try:
+            team = get_team_by_name(self.facade, team_name)
+            team_leads_set = team.team_leads
+            team_leads_list = list(map(lambda i: ('github_user_id',
+                                                  str(i)), team_leads_set))
+            team_leads: List[User] = []
+            if team_leads_list:
+                team_leads = self.facade.query_or(User, team_leads_list)
+            names = set(map(lambda m: m.github_username, team_leads))
+            team.team_leads = names
 
-        members_set = team.members
-        members_list = list(map(lambda i: ('github_user_id',
-                                           str(i)), members_set))
-        members: List[User] = []
-        if members_list:
-            members = self.facade.query_or(User, members_list)
-        names = set(map(lambda m: m.github_username, members))
-        team.members = names
-        return {'attachments': [team.get_attachment()]}, 200
+            members_set = team.members
+            members_list = list(map(lambda i: ('github_user_id',
+                                               str(i)), members_set))
+            members: List[User] = []
+            if members_list:
+                members = self.facade.query_or(User, members_list)
+            names = set(map(lambda m: m.github_username, members))
+            team.members = names
+            return {'attachments': [team.get_attachment()]}, 200
+        except LookupError:
+            return self.lookup_error, 200
 
     def create_helper(self, param_list, user_id) -> ResponseTuple:
         """
