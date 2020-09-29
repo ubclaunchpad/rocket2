@@ -1,10 +1,8 @@
-.. image:: ./docs/rocket-logo.png
-   :scale: 25%
-   :align: center
-
-|
-
 .. raw:: html
+
+   <p align="center">
+      <img width="25%" src="https://github.com/ubclaunchpad/rocket2/blob/master/docs/rocket-logo.png?raw=true" />
+   </p>
 
    <h1 align="center">Rocket 2</h1>
 
@@ -14,6 +12,9 @@
    </p>
 
    <p align="center">
+      <a href="https://github.com/ubclaunchpad/rocket2/actions?query=workflow%3AMaster">
+         <img src="https://github.com/ubclaunchpad/rocket2/workflows/Master/badge.svg">
+      </a>
       <a href="https://codecov.io/gh/ubclaunchpad/rocket2">
          <img src="https://codecov.io/gh/ubclaunchpad/rocket2/branch/master/graph/badge.svg">
       </a>
