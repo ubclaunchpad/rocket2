@@ -456,25 +456,30 @@ class TeamCommand(Command):
 
             msg = "Removed User from " + command_team
 
-            # If this team is a team with special permissions, demote the user
+            # If the user is being removed from a team with special
+            # permisisons, figure out a demotion strategy.
             demoted_level = None
             if command_team == self.config.github_team_leads:
-                # Leads can only be demoted to member
-                demoted_level = Permissions.member
-            if command_team == self.config.github_team_admin:
-                # If this team is admin, we need to check what they should be
-                # demoted to
-                if len(self.config.github_team_leads) > 0:
-                    try:
-                        leads = get_team_by_name(self.facade, 'leads')
-                        if leads.has_member(user.github_id):
-                            demoted_level = Permissions.team_lead
-                        else:
-                            demoted_level = Permissions.member
-                    except LookupError:
+                # If the user is currently an admin, we only demote this user
+                # if it is currently NOT and admin team member
+                if user.permissions_level == Permissions.admin \
+                        and len(self.config.github_team_admin) > 0:
+                    admins = get_team_by_name(
+                        self.facade, self.config.github_team_admin)
+                    if not admins.has_member(user.github_id):
                         demoted_level = Permissions.member
                 else:
                     demoted_level = Permissions.member
+            if command_team == self.config.github_team_admin:
+                # If the user is being removed from the admin team, we demote
+                # this user to team_lead if this user is a member of the leads
+                # team, otherwise we demote to member.
+                demoted_level = Permissions.member
+                if len(self.config.github_team_leads) > 0:
+                    leads = get_team_by_name(
+                        self.facade, self.config.github_team_leads)
+                    if leads.has_member(user.github_id):
+                        demoted_level = Permissions.team_lead
 
             if demoted_level is not None:
                 logging.info(f"Demoting {command_user} to member")
