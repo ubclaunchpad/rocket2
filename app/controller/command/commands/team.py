@@ -396,16 +396,18 @@ class TeamCommand(Command):
             team.add_member(user.github_id)
             self.gh.add_team_member(user.github_username, team.github_team_id)
             self.facade.store(team)
+            msg = "Added User to " + command_team
 
-            # If this team is a team with special permissions, promote the user
+            # If this team is a team with special permissions, promote the
+            # user to the appropriate permission
             promoted_level = Permissions.member
             if command_team == self.config.github_team_admin:
                 promoted_level = Permissions.admin
             elif command_team == self.config.github_team_leads:
                 promoted_level = Permissions.team_lead
 
-            msg = "Added User to " + command_team
-            if promoted_level != Permissions.member:
+            # Only perform promotion if it is actually a promotion.
+            if promoted_level > user.permissions_level:
                 logging.info(f"Promoting {command_user} to {promoted_level}")
                 user.permissions_level = promoted_level
                 self.facade.store(user)
