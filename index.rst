@@ -3,7 +3,7 @@
 .. toctree::
     :hidden:
 
-    self
+    🚀 Rocket 2 <self>
     CONTRIBUTING
     LICENSE
 

@@ -1,6 +1,7 @@
 from app.controller.command.commands import IQuitCommand
 from app.model import User, Team, Permissions
 from unittest import TestCase
+from tests.memorydb import MemoryDB
 
 
 def make_user(slack, gid, guser, perm):
@@ -18,8 +19,8 @@ def make_team(ghid, leads_ghid, members_ghid):
     return team
 
 
-class InMemoryDB:
-    def __init__(self):
+class TestIQuitCommand(TestCase):
+    def setUp(self):
         self.users = {
             'u1': make_user('u1', 'g1', 'G1', Permissions.admin),
             'u2': make_user('u2', 'g2', 'G2', Permissions.member),
@@ -33,44 +34,12 @@ class InMemoryDB:
             't2': make_team('t2', ['g1', 'g3'], ['g1', 'g2', 'g3']),
             't3': make_team('t3', ['g1'], ['g1', 'g4', 'g2', 'g5', 'g6']),
             't4': make_team('t4', [], ['g6']),
-            't6': make_team('t5', ['g4'], ['g5', 'g3'])
+            't5': make_team('t5', ['g4'], ['g5', 'g3']),
+            't6': make_team('t6', ['g3', 'g4'], ['g3', 'g4']),
+            't7': make_team('t7', ['g3'], ['abacus', 'g3'])
         }
-
-    def retrieve(self, Model, k):
-        if Model == User:
-            return self.users.get(k)
-        else:
-            return self.teams.get(k)
-
-    def query(self, Model, params=[]):
-        db = self.users if Model == User else self.teams
-        if len(params) == 0:
-            return list(db.values())
-        ret = []
-        for param in params:
-            if param[0] == 'permission_level':
-                ret.extend([o for o in db.values()
-                            if str(o.permissions_level) == param[1]])
-        return ret
-
-    def query_or(self, Model, params=[]):
-        db = self.users if Model == User else self.teams
-        if len(params) == 0:
-            return list(db.values())
-        ret = []
-        for param in params:
-            if param[0] == 'team_leads':
-                ret.extend([o for o in db.values()
-                            if param[1] in o.team_leads])
-            if param[0] == 'github_user_id':
-                ret.extend([o for o in db.values()
-                            if param[1] == o.github_id])
-        return ret
-
-
-class TestIQuitCommand(TestCase):
-    def setUp(self):
-        self.facade = InMemoryDB()
+        self.facade = MemoryDB(users=self.users.values(),
+                               teams=self.teams.values())
         self.cmd = IQuitCommand(self.facade)
 
     def test_get_no_duplicate_users(self):
@@ -91,3 +60,27 @@ class TestIQuitCommand(TestCase):
         self.assertEqual(actual.count('u3'), 1)
         self.assertEqual(actual.count('u4'), 1)
         self.assertNotEqual(actual.count('u5'), 1)
+
+    def test_cannot_find_caller(self):
+        actual, resp = self.cmd.handle('', 'unknown user')
+        self.assertEqual(actual, IQuitCommand.lookup_error)
+        self.assertEqual(resp, 200)
+
+    def test_call_as_team_lead(self):
+        self.teams['t6'].github_team_name = 'pretty bad lol'
+        actual, resp = self.cmd.handle('', 'u4')
+        self.assertTrue('replacing you with <@u5>' in actual or
+                        'replacing you with <@u3>' in actual)
+        self.assertEqual(actual.count('u1'), 1)
+        self.assertIn('cannot find your replacement; deleting team', actual)
+
+    def test_call_as_team_lead_gh_only_members(self):
+        self.teams['t7'].github_team_name = 'somewhat sketch'
+        actual, resp = self.cmd.handle('', 'u3')
+        self.assertIn(
+            '*Team somewhat sketch*:'
+            ' cannot find your replacement; deleting team', actual)
+
+    def test_call_as_admin(self):
+        actual, resp = self.cmd.handle('', 'u1')
+        self.assertEqual(IQuitCommand.adminmsg, actual)
