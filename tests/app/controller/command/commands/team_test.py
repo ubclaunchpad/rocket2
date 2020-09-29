@@ -19,9 +19,10 @@ class TestTeamCommand(TestCase):
         self.t0 = Team("BRS", "brs", "web")
         self.t1 = Team("OTEAM", "other team", "android")
         self.t2 = Team("LEADS", "leads", "")
+        self.t3 = Team("ADMIN", "admin", "")
         self.db = MemoryDB(
             users=[self.u0, self.u1, self.admin],
-            teams=[self.t0, self.t1, self.t2])
+            teams=[self.t0, self.t1, self.t2, self.t3])
 
         self.sc = mock.MagicMock()
         self.testcommand = TeamCommand(self.config, self.db, self.gh, self.sc)
@@ -30,6 +31,7 @@ class TestTeamCommand(TestCase):
 
         self.config.github_team_all = 'all'
         self.config.github_team_leads = 'leads'
+        self.config.github_team_admin = 'admin'
 
     def test_get_help(self):
         subcommands = list(self.testcommand.subparser.choices.keys())
@@ -74,6 +76,7 @@ class TestTeamCommand(TestCase):
             self.t0.get_basic_attachment(),
             self.t1.get_basic_attachment(),
             self.t2.get_basic_attachment(),
+            self.t3.get_basic_attachment(),
         ]
         with self.app.app_context():
             resp, code = self.testcommand.handle('team list', self.u0.slack_id)
@@ -305,6 +308,25 @@ class TestTeamCommand(TestCase):
         self.gh.remove_team_member.assert_called_once_with(
                 self.u0.github_username,
                 self.t2.github_team_id)
+
+    def test_handle_remove_demote_to_team_lead(self):
+        self.u0.github_username = 'myuser'
+        self.u0.github_id = 'otherID'
+        self.t2.add_member(self.u0.github_id)
+        self.t3.add_member(self.u0.github_id)
+        with self.app.app_context():
+            resp, code = self.testcommand.handle(
+                f'team remove admin {self.u0.slack_id}',
+                self.admin.slack_id)
+            expect_msg = 'Removed User from admin and demoted user'
+            expect = {'attachments': [self.t3.get_attachment()],
+                      'text': expect_msg}
+            self.assertDictEqual(resp, expect)
+            self.assertEqual(code, 200)
+        self.assertEquals(self.u0.permissions_level, Permissions.team_lead)
+        self.gh.remove_team_member.assert_called_once_with(
+                self.u0.github_username,
+                self.t3.github_team_id)
 
     def test_handle_remove_not_admin(self):
         with self.app.app_context():
