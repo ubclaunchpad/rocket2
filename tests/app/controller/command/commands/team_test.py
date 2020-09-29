@@ -260,6 +260,26 @@ class TestTeamCommand(TestCase):
         self.assertEquals(self.u0.permissions_level, Permissions.team_lead)
         self.gh.add_team_member.assert_called_once_with('myuser', 'githubid')
 
+    def test_handle_add_promote_current_admin(self):
+        self.u0.github_username = 'myuser'
+        self.u0.github_id = 'otherID'
+        self.t2.github_team_id = 'githubid'
+        # existing admin member should not be "promoted" to lead
+        self.u0.permissions_level = Permissions.admin
+        self.t3.add_member(self.u0.github_id)
+        with self.app.app_context():
+            resp, code = self.testcommand.handle(
+                f'team add leads {self.u0.slack_id}',
+                self.admin.slack_id)
+            expect_msg = 'Added User to leads'
+            expect = {'attachments': [self.t2.get_attachment()],
+                      'text': expect_msg}
+            self.assertDictEqual(resp, expect)
+            self.assertEqual(code, 200)
+        self.assertTrue(self.t2.has_member("otherID"))
+        self.assertEquals(self.u0.permissions_level, Permissions.admin)
+        self.gh.add_team_member.assert_called_once_with('myuser', 'githubid')
+
     def test_handle_remove(self):
         self.u0.github_id = 'githubID'
         self.u0.github_username = 'myuser'
@@ -327,6 +347,28 @@ class TestTeamCommand(TestCase):
         self.gh.remove_team_member.assert_called_once_with(
                 self.u0.github_username,
                 self.t3.github_team_id)
+
+    def test_handle_remove_demote_to_admin(self):
+        self.u0.github_username = 'myuser'
+        self.u0.github_id = 'otherID'
+        self.u0.permissions_level = Permissions.admin
+        self.t2.add_member(self.u0.github_id)
+        self.t3.add_member(self.u0.github_id)
+        with self.app.app_context():
+            # Leads member should not be demoted if they are also a admin
+            # member
+            resp, code = self.testcommand.handle(
+                f'team remove leads {self.u0.slack_id}',
+                self.admin.slack_id)
+            expect_msg = 'Removed User from leads'
+            expect = {'attachments': [self.t2.get_attachment()],
+                      'text': expect_msg}
+            self.assertDictEqual(resp, expect)
+            self.assertEqual(code, 200)
+        self.assertEquals(self.u0.permissions_level, Permissions.admin)
+        self.gh.remove_team_member.assert_called_once_with(
+                self.u0.github_username,
+                self.t2.github_team_id)
 
     def test_handle_remove_not_admin(self):
         with self.app.app_context():
