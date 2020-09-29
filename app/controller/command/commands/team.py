@@ -276,10 +276,8 @@ class TeamCommand(Command):
         :return: error message if team not found,
                  otherwise return team information
         """
-        teams = self.facade.query(Team, [('github_team_name', team_name)])
-        if len(teams) != 1:
-            return self.lookup_error, 200
-        team_leads_set = teams[0].team_leads
+        team = get_team_by_name(self.facade, command_team)
+        team_leads_set = team.team_leads
         team_leads_list = list(map(lambda i: ('github_user_id',
                                               str(i)), team_leads_set))
         team_leads: List[User] = []
@@ -387,11 +385,7 @@ class TeamCommand(Command):
         try:
             command_user = self.facade.retrieve(User, user_id)
             command_team = param_list['team_name']
-            teams = self.facade.query(Team, [('github_team_name',
-                                              command_team)])
-            if len(teams) != 1:
-                return self.lookup_error, 200
-            team = teams[0]
+            team = get_team_by_name(self.facade, command_team)
             if not check_permissions(command_user, team):
                 return self.permission_error, 200
 
@@ -440,11 +434,7 @@ class TeamCommand(Command):
         try:
             command_user = self.facade.retrieve(User, user_id)
             command_team = param_list['team_name']
-            teams = self.facade.query(Team, [('github_team_name',
-                                              command_team)])
-            if len(teams) != 1:
-                return self.lookup_error, 200
-            team = teams[0]
+            team = get_team_by_name(self.facade, command_team)
             if not check_permissions(command_user, team):
                 return self.permission_error, 200
 
@@ -493,11 +483,7 @@ class TeamCommand(Command):
         """
         try:
             command_user = self.facade.retrieve(User, user_id)
-            teams = self.facade.query(Team, [('github_team_name',
-                                              param_list['team_name'])])
-            if len(teams) != 1:
-                return self.lookup_error, 200
-            team = teams[0]
+            team = get_team_by_name(self.facade, command_team)
             if not check_permissions(command_user, team):
                 return self.permission_error, 200
             msg = f"Team edited: {param_list['team_name']}, "
@@ -530,11 +516,7 @@ class TeamCommand(Command):
         """
         try:
             command_user = self.facade.retrieve(User, user_id)
-            teams = self.facade.query(Team, [('github_team_name',
-                                              param_list['team_name'])])
-            if len(teams) != 1:
-                return self.lookup_error, 200
-            team = teams[0]
+            team = get_team_by_name(self.facade, command_team)
             if not check_permissions(command_user, team):
                 return self.permission_error, 200
             user = self.facade.retrieve(User, param_list["username"])
@@ -576,11 +558,7 @@ class TeamCommand(Command):
         """
         try:
             command_user = self.facade.retrieve(User, user_id)
-            teams = self.facade.query(Team, [('github_team_name',
-                                              team_name)])
-            if len(teams) != 1:
-                return self.lookup_error, 200
-            team = teams[0]
+            team = get_team_by_name(self.facade, command_team)
             if not check_permissions(command_user, team):
                 return self.permission_error, 200
             self.facade.delete(Team, team.github_team_id)
