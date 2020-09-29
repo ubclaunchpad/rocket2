@@ -224,7 +224,10 @@ class UserCommand(Command):
                             " level.")
 
         self.facade.store(edited_user)
-        sync_user_email_perms(self.gcp, self.facade, edited_user)
+
+        # Sync permissions only if email was updated
+        if param_list["email"]:
+            sync_user_email_perms(self.gcp, self.facade, edited_user)
 
         ret = {'attachments': [edited_user.get_attachment()]}
         if msg != "":
