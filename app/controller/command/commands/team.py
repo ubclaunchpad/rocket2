@@ -687,15 +687,16 @@ class TeamCommand(Command):
 
         It only ever promotes users, and does not demote users.
         """
+        # provide teams from low permissions level to high
         teams = [
+            {
+                'name': self.config.github_team_leads,
+                'permission': Permissions.team_lead,
+            },
             {
                 'name': self.config.github_team_admin,
                 'permission': Permissions.admin,
             },
-            {
-                'name': self.config.github_team_leads,
-                'permission': Permissions.team_lead,
-            }
         ]
         for t in teams:
             if len(t['name']) == 0:
