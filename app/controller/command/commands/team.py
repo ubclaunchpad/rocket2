@@ -727,16 +727,17 @@ class TeamCommand(Command):
         ]
         logging.info(f'refreshing Rocket permissions for teams {teams}')
         for t in teams:
-            if len(t['name']) == 0:
+            team_name = t['name']
+            if len(team_name) == 0:
                 continue
 
             team = None
             try:
-                team = get_team_by_name(self.facade, t['name'])
+                team = get_team_by_name(self.facade, team_name)
             except LookupError:
-                t_id = str(self.gh.org_create_team(t['name']))
-                logging.info(f'team {t["name"]} created')
-                self.facade.store(Team(t_id, t['name'], t['name']))
+                t_id = str(self.gh.org_create_team(team_name))
+                logging.info(f'team {team_name} created')
+                self.facade.store(Team(t_id, team_name, team_name))
 
             if team is not None:
                 team_members = get_team_members(team)
