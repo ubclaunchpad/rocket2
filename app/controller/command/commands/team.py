@@ -683,7 +683,11 @@ class TeamCommand(Command):
         """
         all_name = self.config.github_team_all
         team_all = None
+        if len(all_name) == 0:
+            logging.info('no "all" team configured, skipping refresh')
+            return
 
+        logging.info(f'refreshing all team {all_name}')
         try:
             team_all = get_team_by_name(self.facade, all_name)
         except LookupError:
