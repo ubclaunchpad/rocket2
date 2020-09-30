@@ -744,7 +744,7 @@ class TeamCommand(Command):
                 self.facade.store(Team(t_id, team_name, team_name))
 
             if team is not None:
-                team_members = get_team_members(team)
+                team_members = get_team_members(self.facade, team)
                 updated = []
                 for user in team_members:
                     if user.permissions_level < t['permission']:
