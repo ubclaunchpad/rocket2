@@ -740,8 +740,9 @@ class TeamCommand(Command):
             if team is not None:
                 team_members = get_team_members(team)
                 for user in team_members:
-                    user.permissions_level = t['permission']
-                    self.facade.store(user)
+                    if user.permissions_level < t['permission']:
+                        user.permissions_level = t['permission']
+                        self.facade.store(user)
 
     def refresh_all_drive_permissions(self):
         """
