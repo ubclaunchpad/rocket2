@@ -77,7 +77,12 @@ class CommandParser:
             v = self.get_help()
         elif s[0] in self.commands:
             v = self.commands[s[0]].handle(cmd_txt, user)
-            cmd_name = s[0]
+
+            # Hack to only grab first 2 command/subcommand pair
+            if '-' in s[1]:
+                cmd_name = s[0]
+            else:
+                cmd_name = ' '.join(s[0:2])
         elif is_slack_id(s[0]):
             logging.info('mention command activated')
             v = self.commands['mention'].handle(cmd_txt, user)

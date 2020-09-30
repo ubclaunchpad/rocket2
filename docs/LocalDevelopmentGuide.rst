@@ -194,10 +194,16 @@ following policies:
 
 -  ``AmazonDynamoDBFullAccess``
 -  ``CloudWatchLogsFullAccess``
+-  ``CloudWatchPutMetricData``
+
+You will have to create ``CloudWatchPutMetricData``. You can do this by going
+to IAM -> Policies -> Create Policy. Choose service ``CloudWatch``. Choose
+action ``PutMetricData``. Everything else should be set correctly - you can
+create the policy with that.
 
 As you may have noticed, we not only want to use DynamoDB, but also
 CloudWatch. We send our logs to CloudWatch for easier storage and
-querying.
+querying. We also use it to track metrics.
 
 Finally, copy the provided access key ID and secret access key after
 creating the new user.
