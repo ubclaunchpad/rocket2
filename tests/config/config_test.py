@@ -34,7 +34,7 @@ class TestConfig(TestCase):
         }
         self.incomplete_config = {
             'GITHUB_APP_ID': '2024',
-            'GITHUB_ORG_NAME': 'ubclaunchpad',
+            'GITHUB_ORG_NAME': '',
             'GITHUB_WEBHOOK_ENDPT': '/webhook',
             'GITHUB_WEBHOOK_SECRET': 'oiarstierstiemoiarno',
             'GITHUB_KEY': 'BEGIN END',
@@ -62,7 +62,8 @@ class TestConfig(TestCase):
             Config()
 
         missing_fields = ['SLACK_NOTIFICATION_CHANNEL', 'SLACK_SIGNING_SECRET',
-                          'SLACK_API_TOKEN', 'SLACK_ANNOUNCEMENT_CHANNEL']
+                          'SLACK_API_TOKEN', 'SLACK_ANNOUNCEMENT_CHANNEL',
+                          'GITHUB_ORG_NAME']
         optional_fields = ['AWS_LOCAL']
         e = e.exception
         for field in missing_fields:
