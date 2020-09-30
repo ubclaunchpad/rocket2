@@ -94,7 +94,7 @@ bot.send_to_channel('rocket2 has restarted successfully! :clap: :clap:',
 @app.route('/')
 def check():
     """Display a Rocket status image."""
-    logging.info('Served check()')
+    logging.debug('Served check()')
     return "🚀"
 
 
@@ -107,7 +107,7 @@ def handle_commands():
     verified = slack_events_adapter.server.verify_signature(
         timestamp, slack_signature)
     if verified:
-        logging.info("Slack signature verified")
+        logging.debug("Slack signature verified")
         txt = request.form['text']
         uid = request.form['user_id']
         logging.info(f"@{uid}: {request.form['command']} {txt}")
@@ -140,7 +140,7 @@ def handle_team_join(event):
     verified = slack_events_adapter.server.verify_signature(
         timestamp, slack_signature)
     if verified:
-        logging.info("Slack signature verified")
+        logging.debug("Slack signature verified")
         slack_events_handler.handle_team_join(event)
     else:
         logging.error("Slack signature could not be verified")
