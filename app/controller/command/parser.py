@@ -8,9 +8,11 @@ from db.facade import DBFacade
 from interface.slack import Bot
 from interface.github import GithubInterface
 from interface.gcp import GCPInterface
+from interface.cloudwatch_metrics import CWMetrics
 from typing import Dict, Any, Optional
 import utils.slack_parse as util
 import logging
+import time
 from utils.slack_msg_fmt import wrap_slack_code
 from utils.slack_parse import is_slack_id
 from config import Config
@@ -26,6 +28,7 @@ class CommandParser:
                  bot: Bot,
                  gh_interface: GithubInterface,
                  token_config: TokenCommandConfig,
+                 metrics: CWMetrics,
                  gcp: Optional[GCPInterface] = None):
         """Initialize the dictionary of command handlers."""
         self.commands: Dict[str, Command] = {}
@@ -33,6 +36,7 @@ class CommandParser:
         self.__bot = bot
         self.__github = gh_interface
         self.__gcp = gcp
+        self.__metrics = metrics
         self.commands["user"] = UserCommand(self.__facade,
                                             self.__github,
                                             self.__gcp)
@@ -59,20 +63,31 @@ class CommandParser:
                  ``flask.Response`` object), and the second element
                  is the response status code
         """
+        start_time_ms = time.time() * 1000
+
         # Slightly hacky way to deal with Apple platform
         # smart punctuation messing with argparse.
         cmd_txt = ''.join(map(util.regularize_char, cmd_txt))
         cmd_txt = util.escaped_id_to_id(cmd_txt)
         cmd_txt = util.ios_dash(cmd_txt)
         s = cmd_txt.split(' ', 1)
-        if s[0] == "help" or s[0] is None:
-            logging.info("Help command was called")
+        cmd_name = 'help'
+        if s[0] == 'help' or s[0] is None:
+            logging.info('Help command was called')
             v = self.get_help()
         elif s[0] in self.commands:
             v = self.commands[s[0]].handle(cmd_txt, user)
+
+            # Hack to only grab first 2 command/subcommand pair
+            s = cmd_txt.split(' ')
+            if '-' in s[1]:
+                cmd_name = s[0]
+            else:
+                cmd_name = ' '.join(s[0:2])
         elif is_slack_id(s[0]):
-            logging.info("mention command activated")
-            v = self.commands["mention"].handle(cmd_txt, user)
+            logging.info('mention command activated')
+            v = self.commands['mention'].handle(cmd_txt, user)
+            cmd_name = 'mention'
         else:
             logging.error("app command triggered incorrectly")
             v = self.get_help()
@@ -80,6 +95,11 @@ class CommandParser:
             response_data: Any = {'text': v[0]}
         else:
             response_data = v[0]
+
+        # Submit metrics
+        duration_taken_ms = time.time() * 1000 - start_time_ms
+        self.__metrics.submit_cmd_mstime(cmd_name, duration_taken_ms)
+
         if response_url != "":
             requests.post(url=response_url, json=response_data)
         else:

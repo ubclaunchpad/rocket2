@@ -35,6 +35,15 @@ def get_team_by_name(dbf: DBFacade, gh_team_name: str) -> Team:
         return teams[0]
 
 
+def get_team_members(dbf: DBFacade, team: Team) -> List[User]:
+    """
+    Query users that are members of the given team.
+
+    :return: Users that belong to the team
+    """
+    return get_users_by_ghid(dbf, list(team.members))
+
+
 def get_users_by_ghid(dbf: DBFacade, gh_ids: List[str]) -> List[User]:
     """
     Query users by github user id.

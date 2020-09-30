@@ -12,6 +12,7 @@ from db.dynamodb import DynamoDB
 from interface.github import GithubInterface, DefaultGithubFactory
 from interface.slack import Bot
 from interface.gcp import GCPInterface
+from interface.cloudwatch_metrics import CWMetrics
 from slack import WebClient
 from app.controller.webhook.github import GitHubWebhookHandler
 from app.controller.webhook.slack import SlackEventsHandler
@@ -40,9 +41,12 @@ def make_command_parser(config: Config, gh: GithubInterface) \
               config.slack_notification_channel)
     # TODO: make token config expiry configurable
     token_config = TokenCommandConfig(timedelta(days=7), config.github_key)
+    # Metrics
+    metrics = CWMetrics(config)
     # Create GCP client (optional)
     gcp_client = make_gcp_client(config)
-    return CommandParser(config, facade, bot, gh, token_config, gcp=gcp_client)
+    return CommandParser(config, facade, bot, gh, token_config, metrics,
+                         gcp=gcp_client)
 
 
 def make_github_webhook_handler(gh: GithubInterface,

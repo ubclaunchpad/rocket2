@@ -72,6 +72,29 @@ GITHUB_ORG_NAME
 The name of your Github organization (the string in the URL whenever you
 go to the organization.
 
+GITHUB_DEFAULT_TEAM_NAME
+------------------------
+
+The name of the GitHub team in your organization that all users should
+be added to. Optional, defaults to ``all``.
+
+GITHUB_ADMIN_TEAM_NAME
+----------------------
+
+The name of the GitHub team in your organization that should be automatically
+promoted to Rocket administrators. Optional.
+
+Note that this does not mean all Rocket administrators will be added to this
+team.
+
+GITHUB_LEADS_TEAM_NAME
+----------------------
+
+The name of the GitHub team in your organization that should be automatically
+promoted to Rocket team leads. Optional.
+
+Note that this does not mean all Rocket team leads will be added to this team.
+
 GITHUB_WEBHOOK_ENDPT
 --------------------
 

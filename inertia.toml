@@ -1,5 +1,6 @@
 name = "rocket2"
 url = "git@github.com:ubclaunchpad/rocket2.git"
+version = "v0.6.1"
 
 [[profile]]
   name = "default"

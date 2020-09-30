@@ -4,8 +4,9 @@ import shlex
 from argparse import ArgumentParser, _SubParsersAction
 from app.controller import ResponseTuple
 from app.controller.command.commands.base import Command
+from app.model.permissions import Permissions
 from db.facade import DBFacade
-from db.utils import get_team_by_name
+from db.utils import get_team_by_name, get_team_members
 from interface.github import GithubAPIException, GithubInterface
 from interface.slack import SlackAPIError
 from interface.gcp import GCPInterface
@@ -275,27 +276,28 @@ class TeamCommand(Command):
         :return: error message if team not found,
                  otherwise return team information
         """
-        teams = self.facade.query(Team, [('github_team_name', team_name)])
-        if len(teams) != 1:
-            return self.lookup_error, 200
-        team_leads_set = teams[0].team_leads
-        team_leads_list = list(map(lambda i: ('github_user_id',
-                                              str(i)), team_leads_set))
-        team_leads: List[User] = []
-        if team_leads_list:
-            team_leads = self.facade.query_or(User, team_leads_list)
-        names = set(map(lambda m: m.github_username, team_leads))
-        teams[0].team_leads = names
+        try:
+            team = get_team_by_name(self.facade, team_name)
+            team_leads_set = team.team_leads
+            team_leads_list = list(map(lambda i: ('github_user_id',
+                                                  str(i)), team_leads_set))
+            team_leads: List[User] = []
+            if team_leads_list:
+                team_leads = self.facade.query_or(User, team_leads_list)
+            names = set(map(lambda m: m.github_username, team_leads))
+            team.team_leads = names
 
-        members_set = teams[0].members
-        members_list = list(map(lambda i: ('github_user_id',
-                                           str(i)), members_set))
-        members: List[User] = []
-        if members_list:
-            members = self.facade.query_or(User, members_list)
-        names = set(map(lambda m: m.github_username, members))
-        teams[0].members = names
-        return {'attachments': [teams[0].get_attachment()]}, 200
+            members_set = team.members
+            members_list = list(map(lambda i: ('github_user_id',
+                                               str(i)), members_set))
+            members: List[User] = []
+            if members_list:
+                members = self.facade.query_or(User, members_list)
+            names = set(map(lambda m: m.github_username, members))
+            team.members = names
+            return {'attachments': [team.get_attachment()]}, 200
+        except LookupError:
+            return self.lookup_error, 200
 
     def create_helper(self, param_list, user_id) -> ResponseTuple:
         """
@@ -385,11 +387,8 @@ class TeamCommand(Command):
         """
         try:
             command_user = self.facade.retrieve(User, user_id)
-            teams = self.facade.query(Team, [('github_team_name',
-                                              param_list['team_name'])])
-            if len(teams) != 1:
-                return self.lookup_error, 200
-            team = teams[0]
+            command_team = param_list['team_name']
+            team = get_team_by_name(self.facade, command_team)
             if not check_permissions(command_user, team):
                 return self.permission_error, 200
 
@@ -397,7 +396,22 @@ class TeamCommand(Command):
             team.add_member(user.github_id)
             self.gh.add_team_member(user.github_username, team.github_team_id)
             self.facade.store(team)
-            msg = "Added User to " + param_list['team_name']
+            msg = "Added User to " + command_team
+
+            # If this team is a team with special permissions, promote the
+            # user to the appropriate permission
+            promoted_level = Permissions.member
+            if command_team == self.config.github_team_admin:
+                promoted_level = Permissions.admin
+            elif command_team == self.config.github_team_leads:
+                promoted_level = Permissions.team_lead
+
+            # Only perform promotion if it is actually a promotion.
+            if promoted_level > user.permissions_level:
+                logging.info(f"Promoting {command_user} to {promoted_level}")
+                user.permissions_level = promoted_level
+                self.facade.store(user)
+                msg += f" and promoted user to {promoted_level}"
             ret = {'attachments': [team.get_attachment()], 'text': msg}
             return ret, 200
 
@@ -424,11 +438,8 @@ class TeamCommand(Command):
         """
         try:
             command_user = self.facade.retrieve(User, user_id)
-            teams = self.facade.query(Team, [('github_team_name',
-                                              param_list['team_name'])])
-            if len(teams) != 1:
-                return self.lookup_error, 200
-            team = teams[0]
+            command_team = param_list['team_name']
+            team = get_team_by_name(self.facade, command_team)
             if not check_permissions(command_user, team):
                 return self.permission_error, 200
 
@@ -442,7 +453,39 @@ class TeamCommand(Command):
             self.gh.remove_team_member(user.github_username,
                                        team.github_team_id)
             self.facade.store(team)
-            msg = "Removed User from " + param_list['team_name']
+
+            msg = "Removed User from " + command_team
+
+            # If the user is being removed from a team with special
+            # permisisons, figure out a demotion strategy.
+            demoted_level = None
+            if command_team == self.config.github_team_leads:
+                # If the user is currently an admin, we only demote this user
+                # if it is currently NOT and admin team member
+                if user.permissions_level == Permissions.admin \
+                        and len(self.config.github_team_admin) > 0:
+                    admins = get_team_by_name(
+                        self.facade, self.config.github_team_admin)
+                    if not admins.has_member(user.github_id):
+                        demoted_level = Permissions.member
+                else:
+                    demoted_level = Permissions.member
+            if command_team == self.config.github_team_admin:
+                # If the user is being removed from the admin team, we demote
+                # this user to team_lead if this user is a member of the leads
+                # team, otherwise we demote to member.
+                demoted_level = Permissions.member
+                if len(self.config.github_team_leads) > 0:
+                    leads = get_team_by_name(
+                        self.facade, self.config.github_team_leads)
+                    if leads.has_member(user.github_id):
+                        demoted_level = Permissions.team_lead
+
+            if demoted_level is not None:
+                logging.info(f"Demoting {command_user} to member")
+                user.permissions_level = demoted_level
+                self.facade.store(user)
+                msg += " and demoted user"
             ret = {'attachments': [team.get_attachment()], 'text': msg}
             return ret, 200
 
@@ -467,14 +510,11 @@ class TeamCommand(Command):
         """
         try:
             command_user = self.facade.retrieve(User, user_id)
-            teams = self.facade.query(Team, [('github_team_name',
-                                              param_list['team_name'])])
-            if len(teams) != 1:
-                return self.lookup_error, 200
-            team = teams[0]
+            command_team = param_list['team_name']
+            team = get_team_by_name(self.facade, command_team)
             if not check_permissions(command_user, team):
                 return self.permission_error, 200
-            msg = f"Team edited: {param_list['team_name']}, "
+            msg = f"Team edited: {command_team}, "
             if param_list['name'] is not None:
                 msg += f"name: {param_list['name']}, "
                 team.display_name = param_list['name']
@@ -504,11 +544,8 @@ class TeamCommand(Command):
         """
         try:
             command_user = self.facade.retrieve(User, user_id)
-            teams = self.facade.query(Team, [('github_team_name',
-                                              param_list['team_name'])])
-            if len(teams) != 1:
-                return self.lookup_error, 200
-            team = teams[0]
+            command_team = param_list['team_name']
+            team = get_team_by_name(self.facade, command_team)
             if not check_permissions(command_user, team):
                 return self.permission_error, 200
             user = self.facade.retrieve(User, param_list["username"])
@@ -520,7 +557,7 @@ class TeamCommand(Command):
                     team.discard_team_lead(user.github_id)
                 self.facade.store(team)
                 msg = f"User removed as team lead from" \
-                      f" {param_list['team_name']}"
+                      f" {command_team}"
             else:
                 if not team.has_member(user.github_id):
                     team.add_member(user.github_id)
@@ -529,7 +566,7 @@ class TeamCommand(Command):
                 team.add_team_lead(user.github_id)
                 self.facade.store(team)
                 msg = f"User added as team lead to" \
-                      f" {param_list['team_name']}"
+                      f" {command_team}"
             ret = {'attachments': [team.get_attachment()], 'text': msg}
             return ret, 200
         except LookupError:
@@ -550,11 +587,7 @@ class TeamCommand(Command):
         """
         try:
             command_user = self.facade.retrieve(User, user_id)
-            teams = self.facade.query(Team, [('github_team_name',
-                                              team_name)])
-            if len(teams) != 1:
-                return self.lookup_error, 200
-            team = teams[0]
+            team = get_team_by_name(self.facade, team_name)
             if not check_permissions(command_user, team):
                 return self.permission_error, 200
             self.facade.delete(Team, team.github_team_id)
@@ -623,6 +656,9 @@ class TeamCommand(Command):
             # add all members (if not already added) to the 'all' team
             self.refresh_all_team()
 
+            # promote members inside special teams
+            self.refresh_all_rocket_permissions()
+
             # enforce Drive permissions
             self.refresh_all_drive_permissions()
         except GithubAPIException as e:
@@ -647,7 +683,11 @@ class TeamCommand(Command):
         """
         all_name = self.config.github_team_all
         team_all = None
+        if len(all_name) == 0:
+            logging.info('no "all" team configured, skipping refresh')
+            return
 
+        logging.info(f'refreshing all team {all_name}')
         try:
             team_all = get_team_by_name(self.facade, all_name)
         except LookupError:
@@ -671,6 +711,51 @@ class TeamCommand(Command):
         else:
             logging.error(f'Could not create {all_name}. Aborting.')
 
+    def refresh_all_rocket_permissions(self):
+        """
+        Refresh Rocket permissions for members in teams like
+        GITHUB_ADMIN_TEAM_NAME and GITHUB_LEADS_TEAM_NAME.
+
+        It only ever promotes users, and does not demote users.
+        """
+        # provide teams from low permissions level to high
+        teams = [
+            {
+                'name': self.config.github_team_leads,
+                'permission': Permissions.team_lead,
+            },
+            {
+                'name': self.config.github_team_admin,
+                'permission': Permissions.admin,
+            },
+        ]
+        logging.info(f'refreshing Rocket permissions for teams {teams}')
+        for t in teams:
+            team_name = t['name']
+            if len(team_name) == 0:
+                continue
+
+            team = None
+            try:
+                team = get_team_by_name(self.facade, team_name)
+            except LookupError:
+                t_id = str(self.gh.org_create_team(team_name))
+                logging.info(f'team {team_name} created')
+                self.facade.store(Team(t_id, team_name, team_name))
+
+            if team is not None:
+                team_members = get_team_members(self.facade, team)
+                updated = []
+                for user in team_members:
+                    if user.permissions_level < t['permission']:
+                        user.permissions_level = t['permission']
+                        updated.append(user)
+                        self.facade.store(user)
+                if len(updated) > 0:
+                    logging.info(f'updated users {updated}')
+                else:
+                    logging.info('no users updated')
+
     def refresh_all_drive_permissions(self):
         """
         Refresh Google Drive permissions for all teams. If no GCP client
@@ -682,5 +767,23 @@ class TeamCommand(Command):
             return
 
         all_teams: List[Team] = self.facade.query(Team)
+        leads_team: Team = None
+        admin_team: Team = None
         for t in all_teams:
+            if t.github_team_name == self.config.github_team_leads:
+                leads_team = t
+                continue
+            if t.github_team_name == self.config.github_team_admin:
+                admin_team = t
+                continue
             sync_team_email_perms(self.gcp, self.facade, t)
+
+        # Workaround for https://github.com/ubclaunchpad/rocket2/issues/497:
+        # We sort the teams such that special-permissions teams are sync'd
+        # last, so that inherited permissions are not overwritten in child
+        # folders.
+        #
+        # TODO: If a proper fix is implemented, remove this and related code
+        for t in [leads_team, admin_team]:
+            if t is not None:
+                sync_team_email_perms(self.gcp, self.facade, t)
