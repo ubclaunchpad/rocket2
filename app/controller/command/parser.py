@@ -79,6 +79,7 @@ class CommandParser:
             v = self.commands[s[0]].handle(cmd_txt, user)
 
             # Hack to only grab first 2 command/subcommand pair
+            s = cmd_txt.split(' ')
             if '-' in s[1]:
                 cmd_name = s[0]
             else:
