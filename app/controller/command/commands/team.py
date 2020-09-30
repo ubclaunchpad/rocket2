@@ -747,7 +747,10 @@ class TeamCommand(Command):
                         user.permissions_level = t['permission']
                         updated.append(user)
                         self.facade.store(user)
-                logging.info(f'updated users {updated}')
+                if len(updated) > 0:
+                    logging.info(f'updated users {updated}')
+                else:
+                    logging.info('no users updated')
 
     def refresh_all_drive_permissions(self):
         """
