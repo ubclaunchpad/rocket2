@@ -725,6 +725,7 @@ class TeamCommand(Command):
                 'permission': Permissions.admin,
             },
         ]
+        logging.info(f'refreshing Rocket permissions for teams {teams}')
         for t in teams:
             if len(t['name']) == 0:
                 continue
@@ -739,10 +740,13 @@ class TeamCommand(Command):
 
             if team is not None:
                 team_members = get_team_members(team)
+                updated = []
                 for user in team_members:
                     if user.permissions_level < t['permission']:
                         user.permissions_level = t['permission']
+                        updated.append(user)
                         self.facade.store(user)
+                logging.info(f'updated users {updated}')
 
     def refresh_all_drive_permissions(self):
         """
