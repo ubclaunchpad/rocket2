@@ -3,6 +3,7 @@ import logging
 from typing import List, Optional
 from interface.gcp import GCPInterface
 from db import DBFacade
+from db.utils import get_team_members
 from app.model import User, Team
 
 
@@ -43,17 +44,11 @@ def sync_team_email_perms(gcp: Optional[GCPInterface],
         return
 
     # Generate who to share with
+    team_members = get_team_members(db, team)
     emails: List[str] = []
-    for github_id in team.members:
-        users = db.query(User, [('github_user_id', github_id)])
-        if len(users) != 1:
-            logging.warn(f"None/multiple users for GitHub ID {github_id}")
-
-        # For now, naiively iterate over all users, due to
-        # https://github.com/ubclaunchpad/rocket2/issues/493
-        for user in users:
-            if len(user.email) > 0:
-                emails.append(user.email)
+    for user in team_members:
+        if len(user.email) > 0:
+            emails.append(user.email)
 
     # Sync permissions
     if len(emails) > 0:
