@@ -10,8 +10,9 @@ class TestParser(TestCase):
         self.gh = mock.Mock()
         self.token_conf = mock.Mock()
         self.bot = mock.Mock()
+        self.metrics = mock.Mock()
         self.parser = CommandParser(self.conf, self.dbf, self.bot, self.gh,
-                                    self.token_conf)
+                                    self.token_conf, self.metrics)
         self.usercmd = mock.Mock()
         self.mentioncmd = mock.Mock()
         self.mentioncmd.get_help.return_value = ('', 200)
