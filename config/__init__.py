@@ -60,6 +60,11 @@ class Config:
         for var_name, var in self.ENV_NAMES.items():
             try:
                 data = os.environ[var_name]
+                if len(data) == 0:
+                    if var_name in self.OPTIONALS:
+                        data = self.OPTIONALS[var_name]
+                    else:
+                        missing_config_fields.append(var_name)
                 setattr(self, var, data)
             except KeyError:
                 if var_name in self.OPTIONALS:

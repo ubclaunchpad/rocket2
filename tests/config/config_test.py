@@ -19,6 +19,7 @@ class TestConfig(TestCase):
             'GITHUB_ORG_NAME': 'ubclaunchpad',
             'GITHUB_WEBHOOK_ENDPT': '/webhook',
             'GITHUB_WEBHOOK_SECRET': 'oiarstierstiemoiarno',
+            'GITHUB_DEFAULT_TEAM_NAME': '',
             'GITHUB_KEY': 'BEGIN END',
 
             'AWS_ACCESS_KEYID': '324098102',
