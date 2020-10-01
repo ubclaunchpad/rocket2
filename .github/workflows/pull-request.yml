@@ -29,12 +29,14 @@ jobs:
         key: ${{ runner.os }}-build-pip-${{ hashFiles('Pipfile*') }}
         restore-keys: |
           ${{ runner.os }}-build-pip-
+    - name: Cache local DDB
+      uses: actions/cache@v2
+      with:
+        path: DynamoDB
+        key: ddb
     - name: Install Dependencies
-      env:
-        PIPENV_CACHE_DIR: ${{ secrets.PIPENV_CACHE_DIR }}
       run: |
         python -m pip install --upgrade pipenv
-        pip install pipenv
         pipenv install --dev
     - name: Start local DynamoDB
       run: scripts/download_dynamodb_and_run.sh
