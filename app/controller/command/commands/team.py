@@ -25,6 +25,8 @@ class TeamCommand(Command):
     permission_error = "You do not have the sufficient " \
                        "permission level for this command!"
     lookup_error = "Lookup error: Object not found!"
+    no_ghusername_error = "Couldn't add user because they haven't set a "\
+        "Github username."
 
     def __init__(self,
                  config: Config,
@@ -393,6 +395,8 @@ class TeamCommand(Command):
                 return self.permission_error, 200
 
             user = self.facade.retrieve(User, param_list['username'])
+            if len(user.github_id) == 0:
+                return self.no_ghusername_error, 200
             team.add_member(user.github_id)
             self.gh.add_team_member(user.github_username, team.github_team_id)
             self.facade.store(team)

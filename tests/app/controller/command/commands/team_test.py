@@ -218,6 +218,14 @@ class TestTeamCommand(TestCase):
         self.assertTrue(self.t0.has_member("otherID"))
         self.gh.add_team_member.assert_called_once_with('myuser', 'githubid')
 
+    def test_handle_add_but_forgot_githubid(self):
+        self.t0.github_team_id = 'githubid'
+        self.gh.add_team_member.side_effect = GithubAPIException('error')
+        self.assertTupleEqual(self.testcommand.handle(
+            f'team add brs {self.u0.slack_id}',
+            self.admin.slack_id),
+                              (TeamCommand.no_ghusername_error, 200))
+
     def test_handle_add_not_admin(self):
         """Test team command add parser with insufficient permission."""
         self.t0.github_team_id = 'githubid'
@@ -229,7 +237,7 @@ class TestTeamCommand(TestCase):
 
     def test_handle_add_github_error(self):
         self.t0.github_team_id = 'githubid'
-        self.u0.github_username = 'myuser'
+        self.u0.github_id = 'myuser'
         self.gh.add_team_member.side_effect = GithubAPIException('error')
         self.assertTupleEqual(self.testcommand.handle(
             f'team add brs {self.u0.slack_id}',
