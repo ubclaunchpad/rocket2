@@ -50,6 +50,9 @@ class CommandParser:
         self.commands["mention"] = MentionCommand(self.__facade)
         self.commands["i-quit"] = IQuitCommand(self.__facade)
 
+        # Disable project commands (delete when we enable it again)
+        del self.commands['project']
+
     def handle_app_command(self,
                            cmd_txt: str,
                            user: str,
