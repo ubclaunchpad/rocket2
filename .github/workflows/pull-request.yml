@@ -15,7 +15,7 @@ jobs:
       with:
         python-version: 3.8
     - name: Cache Dependencies
-      uses: action/cache@v2
+      uses: actions/cache@v2
       with:
         path: ${{ secrets.PIPENV_CACHE_DIR }}
         key: ${{ runner.os }}-build-${{ hashFiles('Pipfile*') }}
