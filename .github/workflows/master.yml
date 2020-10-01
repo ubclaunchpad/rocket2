@@ -15,7 +15,7 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: Set up Python 3.8
-      uses: actions/setup-python@v1
+      uses: actions/setup-python@v2
       with:
           python-version: 3.8
     - name: Cache Dependencies
@@ -29,7 +29,7 @@ jobs:
     - name: Install Dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y default-jre rubygems
+        sudo apt-get install -y default-jre
         python -m pip install --upgrade pipenv
         pip install pipenv
         pipenv install --dev
