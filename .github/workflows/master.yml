@@ -28,7 +28,6 @@ jobs:
           ${{ runner.os }}-
     - name: Install Dependencies
       run: |
-        sudo apt-get update
         python -m pip install --upgrade pipenv
         pip install pipenv
         pipenv install --dev
