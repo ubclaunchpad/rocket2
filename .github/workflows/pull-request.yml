@@ -4,6 +4,7 @@ on: pull_request
 
 env:
   PIPENV_CACHE_DIR: ${{ secrets.PIPENV_CACHE_DIR }}
+  PIPENV_IGNORE_PIPFILE: true
 
 jobs:
   pipeline:
