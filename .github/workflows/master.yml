@@ -44,4 +44,4 @@ jobs:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       run: |
         scripts/build_check.sh
-        pipenv run codecov
+        pipenv run codecov --required
