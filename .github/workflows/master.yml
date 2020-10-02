@@ -6,39 +6,20 @@ on:
     - master
     - ec2-release
 
-env:
-  PIPENV_CACHE_DIR: ${{ secrets.PIPENV_CACHE_DIR }}
-
 jobs:
   pipeline:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
     - name: Set up Python 3.8
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v1
       with:
           python-version: 3.8
-    - name: Cache Pipfile Dependencies
-      uses: actions/cache@v2
-      with:
-        path: ${{ secrets.PIPENV_CACHE_DIR }}
-        key: ${{ runner.os }}-build-pipfile-${{ hashFiles('Pipfile*') }}
-        restore-keys: |
-          ${{ runner.os }}-build-pipfile-
-    - name: Cache pip Dependencies
-      uses: actions/cache@v2
-      with:
-        path: ~/.cache/pip
-        key: ${{ runner.os }}-build-pip-${{ hashFiles('Pipfile*') }}
-        restore-keys: |
-          ${{ runner.os }}-build-pip-
-    - name: Cache local DDB
-      uses: actions/cache@v2
-      with:
-        path: DynamoDB
-        key: ddb
     - name: Install Dependencies
       run: |
+        sudo apt-get update
+        sudo apt-get install -y default-jre rubygems
+        python -m pip install --upgrade pipenv
         pip install pipenv
         pipenv install --dev
     - name: Start local DynamoDB
@@ -48,4 +29,4 @@ jobs:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       run: |
         scripts/build_check.sh
-        pipenv run codecov --required
+        pipenv run codecov
