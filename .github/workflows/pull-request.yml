@@ -11,7 +11,7 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: Set up Python 3.8
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v1
       with:
         python-version: 3.8
     - name: Cache Pipfile Dependencies
@@ -35,6 +35,7 @@ jobs:
         key: ddb
     - name: Install Dependencies
       run: |
+        python -m pip install --upgrade pipenv
         pip install pipenv
         pipenv install --dev
     - name: Start local DynamoDB
