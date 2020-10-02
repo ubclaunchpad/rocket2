@@ -265,7 +265,7 @@ class TestTeamCommand(TestCase):
             self.assertDictEqual(resp, expect)
             self.assertEqual(code, 200)
         self.assertTrue(self.t2.has_member("otherID"))
-        self.assertEquals(self.u0.permissions_level, Permissions.team_lead)
+        self.assertEqual(self.u0.permissions_level, Permissions.team_lead)
         self.gh.add_team_member.assert_called_once_with('myuser', 'githubid')
 
     def test_handle_add_promote_current_admin(self):
@@ -285,7 +285,7 @@ class TestTeamCommand(TestCase):
             self.assertDictEqual(resp, expect)
             self.assertEqual(code, 200)
         self.assertTrue(self.t2.has_member("otherID"))
-        self.assertEquals(self.u0.permissions_level, Permissions.admin)
+        self.assertEqual(self.u0.permissions_level, Permissions.admin)
         self.gh.add_team_member.assert_called_once_with('myuser', 'githubid')
 
     def test_handle_remove(self):
@@ -332,7 +332,7 @@ class TestTeamCommand(TestCase):
                       'text': expect_msg}
             self.assertDictEqual(resp, expect)
             self.assertEqual(code, 200)
-        self.assertEquals(self.u0.permissions_level, Permissions.member)
+        self.assertEqual(self.u0.permissions_level, Permissions.member)
         self.gh.remove_team_member.assert_called_once_with(
                 self.u0.github_username,
                 self.t2.github_team_id)
@@ -351,7 +351,7 @@ class TestTeamCommand(TestCase):
                       'text': expect_msg}
             self.assertDictEqual(resp, expect)
             self.assertEqual(code, 200)
-        self.assertEquals(self.u0.permissions_level, Permissions.team_lead)
+        self.assertEqual(self.u0.permissions_level, Permissions.team_lead)
         self.gh.remove_team_member.assert_called_once_with(
                 self.u0.github_username,
                 self.t3.github_team_id)
@@ -373,7 +373,7 @@ class TestTeamCommand(TestCase):
                       'text': expect_msg}
             self.assertDictEqual(resp, expect)
             self.assertEqual(code, 200)
-        self.assertEquals(self.u0.permissions_level, Permissions.admin)
+        self.assertEqual(self.u0.permissions_level, Permissions.admin)
         self.gh.remove_team_member.assert_called_once_with(
                 self.u0.github_username,
                 self.t2.github_team_id)
