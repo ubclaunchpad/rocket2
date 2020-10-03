@@ -206,10 +206,10 @@ class UserCommand(Command):
             member_of_str = '\n'.join(sorted(member_of))
             lead_of_str = '\n'.join(sorted(lead_of))
             ret += f'''
-Membership in:
+*Membership in:*
 {member_of_str}
 
-Leading teams:
+*Leading teams:*
 {lead_of_str}
 '''
         else:

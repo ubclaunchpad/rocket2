@@ -274,8 +274,8 @@ class TestUserCommand(TestCase):
         self.assertIn(f'*Name:* {self.u0.name}', ret)
         self.assertIn(f'*Email:* {self.u0.email}', ret)
         self.assertIn('*Permissions level:* member', ret)
-        self.assertIn(f'Membership in:\n{team_names}', ret)
-        self.assertIn(f'Leading teams:\n- {self.t1.github_team_name}', ret)
+        self.assertIn(f'*Membership in:*\n{team_names}', ret)
+        self.assertIn(f'*Leading teams:*\n- {self.t1.github_team_name}', ret)
 
     def test_handle_deepdive_user_no_exists(self):
         ret, code = self.testcommand.handle('user deepdive UXXXXXXXX',
