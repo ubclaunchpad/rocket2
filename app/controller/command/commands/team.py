@@ -337,16 +337,31 @@ class TeamCommand(Command):
                 msg += f"folder: {param_list['folder']}"
                 team.folder = param_list['folder']
             if param_list["channel"] is not None:
-                msg += "added channel, "
-                for member_id in self.sc.get_channel_users(
-                        param_list["channel"]):
+                msg += "added channel"
+                channel_users = self.sc.get_channel_users(
+                    param_list['channel'])
+                users_no_ghid = []
+                for member_id in channel_users:
                     try:
                         member = self.facade.retrieve(User, member_id)
+                        if not member.github_username:
+                            users_no_ghid.append(member_id)
+                            continue
                         self.gh.add_team_member(member.github_username,
                                                 team_id)
                         team.add_member(member.github_id)
-                    except LookupError:
-                        pass
+                    except (LookupError, GithubAPIException):
+                        users_no_ghid.append(member_id)
+
+                if users_no_ghid:
+                    users_escaped = ' '.join(
+                        [f'<@{uid}>' for uid in users_no_ghid])
+                    no_gh_reminder =\
+                        ' (users who forgot to set Github accounts or forgot '\
+                        'to register into database: ' +\
+                        users_escaped + ')'
+                    msg += no_gh_reminder
+                msg += ', '
             else:
                 self.gh.add_team_member(command_user.github_username, team_id)
                 team.add_member(command_user.github_id)
