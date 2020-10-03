@@ -360,7 +360,7 @@ class TeamCommand(Command):
                     users_escaped = ' '.join(
                         [f'<@{uid}>' for uid in users_no_ghid])
                     no_gh_reminder =\
-                        '(users who forgot to set Github accounts or forgot '\
+                        ' (users who forgot to set Github accounts or forgot '\
                         'to register into database: ' +\
                         users_escaped + ')'
                     msg += no_gh_reminder
