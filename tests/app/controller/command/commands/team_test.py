@@ -157,9 +157,11 @@ class TestTeamCommand(TestCase):
             self.admin.github_username,
             '8934095')
 
+        self.u0.github_id = '093293124'
+        self.u0.github_username = 'someperson'
         inputstring += " --channel 'channelID'"
         outputstring += "added channel, "
-        self.sc.get_channel_users.return_value = ['someID', 'otherID']
+        self.sc.get_channel_users.return_value = ['U123456789']
         self.assertTupleEqual(self.testcommand.handle(inputstring,
                                                       self.admin.slack_id),
                               (outputstring, 200))
@@ -171,6 +173,18 @@ class TestTeamCommand(TestCase):
         self.assertTupleEqual(self.testcommand.handle(inputstring,
                                                       self.admin.slack_id),
                               (outputstring, 200))
+
+    def test_handle_create_no_gh_for_single_user_in_channel(self):
+        self.gh.org_create_team.return_value = '8934095'
+        inputstring = "team create b-s --name 'B S'"
+
+        self.gh.add_team_member.side_effect = GithubAPIException('bad')
+        inputstring += " --channel 'channelID'"
+        self.sc.get_channel_users.return_value = [
+            'U123456789', 'U234567891']
+        ret, code = self.testcommand.handle(inputstring, self.admin.slack_id)
+        self.assertIn('U123456789', ret)
+        self.assertIn('U234567891', ret)
 
     def test_handle_create_not_admin(self):
         self.u0.github_username = 'githubuser'
