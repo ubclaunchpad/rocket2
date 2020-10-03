@@ -9,7 +9,7 @@ from db.facade import DBFacade
 from interface.github import GithubAPIException, GithubInterface
 from interface.gcp import GCPInterface
 from interface.gcp_utils import sync_user_email_perms
-from app.model import User, Permissions
+from app.model import User, Team, Permissions
 from typing import Dict, cast, Optional
 from utils.slack_parse import escape_email
 
@@ -21,6 +21,8 @@ class UserCommand(Command):
     permission_error = "You do not have the sufficient " \
                        "permission level for this command!"
     lookup_error = "Lookup error! User not found!"
+    noghid_deepdive = 'Specified user does not have a Github account'\
+        'registered with Rocket.'
     delete_text = "Deleted user with Slack ID: "
     desc = f"for dealing with {command_name}s"
 
@@ -51,6 +53,13 @@ class UserCommand(Command):
             add_argument("--username", metavar="USERNAME",
                          type=str, action='store',
                          help="Use if using slack id instead of username.")
+
+        # Parser for deepdive command
+        parser_deepdive = subparsers.add_parser('deepdive')
+        parser_deepdive.set_defaults(which='deepdive',
+                                     help='See team memberships of user.')
+        parser_deepdive.add_argument('slackid', type=str, action='store',
+                                     help='User you want to look up.')
 
         """Parser for add command."""
         parser_add = subparsers.add_parser("add")
@@ -139,6 +148,9 @@ class UserCommand(Command):
         if args.which == "view":
             return self.view_helper(user_id, args.username)
 
+        elif args.which == 'deepdive':
+            return self.deepdive_helper(args.slackid)
+
         elif args.which == "add":
             return self.add_helper(user_id, args.force)
 
@@ -160,6 +172,54 @@ class UserCommand(Command):
 
         else:
             return self.get_help(), 200
+
+    def deepdive_helper(self, slackid: str) -> ResponseTuple:
+        """
+        Check team membership of user, produce user info and membership info.
+
+        If the user does not have a Github ID to look up, just display user
+        info and say that the user doesn't have a good Github ID.
+
+        :param slackid: Slack ID of user to look up
+        :return: user info and membership info if user is found, or error
+                    message if we cannot find the user in question
+        """
+        try:
+            user = self.facade.retrieve(User, slackid)
+        except LookupError:
+            return self.lookup_error, 200
+
+        ret = f'''
+*Name:* {user.name if user.name else 'n/a'}
+*Github name:* {user.github_username if user.github_username else 'n/a'}
+*Email:* {user.email if user.email else 'n/a'}
+*Permissions level:* {str(user.permissions_level)}
+'''
+
+        if user.github_username:
+            membership = self.facade.query_or(
+                Team, [('members', user.github_id),
+                       ('team_leads', user.github_id)])
+            member_of = ['- ' + t.github_team_name for t in membership]
+            lead_of = ['- ' + t.github_team_name for t in membership
+                       if t.is_team_lead(user.github_id)]
+            member_of_str = '\n'.join(sorted(member_of))
+            lead_of_str = '\n'.join(sorted(lead_of))
+            ret += f'''
+Membership in:
+{member_of_str}
+
+Leading teams:
+{lead_of_str}
+'''
+        else:
+            ret += f'''
+{self.noghid_deepdive}
+'''
+
+        return {'blocks': [{'type': 'section', 'text': {
+            'type': 'mrkdwn',
+            'text': ret}}]}, 200
 
     def edit_helper(self,
                     user_id: str,

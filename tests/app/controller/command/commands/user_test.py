@@ -3,7 +3,7 @@ from tests.memorydb import MemoryDB
 from tests.util import create_test_admin
 from flask import Flask
 from interface.github import GithubInterface, GithubAPIException
-from app.model import User, Permissions
+from app.model import User, Team, Permissions
 from unittest import mock, TestCase
 
 
@@ -13,8 +13,11 @@ class TestUserCommand(TestCase):
 
         self.u0 = User('U0G9QF9C6')
         self.u1 = User('Utheomadude')
+        self.t0 = Team("BRS", "brs", "web")
+        self.t1 = Team("OTEAM", "other team", "android")
         self.admin = create_test_admin('Uadmin')
-        self.db = MemoryDB(users=[self.u0, self.u1, self.admin])
+        self.db = MemoryDB(users=[self.u0, self.u1, self.admin],
+                           teams=[self.t0, self.t1])
 
         self.mock_github = mock.MagicMock(GithubInterface)
         self.testcommand = UserCommand(self.db, self.mock_github, None)
@@ -252,3 +255,42 @@ class TestUserCommand(TestCase):
                 self.assertEqual(1, ret.count("usage"))
                 self.assertIn(subcommand, ret)
                 self.assertEqual(code, 200)
+
+    def test_handle_deepdive(self):
+        self.u0.name = 'John Peters'
+        self.u0.email = 'john.peter@hotmail.com'
+        self.u0.github_id = '328593'
+        self.u0.github_username = 'some_user'
+        self.t0.add_member(self.u0.github_id)
+        self.t1.add_team_lead(self.u0.github_id)
+        team_names = '\n'.join(
+            ['- ' + t.github_team_name for t in [self.t0, self.t1]]
+        )
+
+        ret, code = self.testcommand.handle('user deepdive U0G9QF9C6',
+                                            self.u1.slack_id)
+        ret = ret['blocks'][0]['text']['text']
+        self.assertIn(f'*Github name:* {self.u0.github_username}', ret)
+        self.assertIn(f'*Name:* {self.u0.name}', ret)
+        self.assertIn(f'*Email:* {self.u0.email}', ret)
+        self.assertIn('*Permissions level:* member', ret)
+        self.assertIn(f'Membership in:\n{team_names}', ret)
+        self.assertIn(f'Leading teams:\n- {self.t1.github_team_name}', ret)
+
+    def test_handle_deepdive_user_no_exists(self):
+        ret, code = self.testcommand.handle('user deepdive UXXXXXXXX',
+                                            self.u1.slack_id)
+        self.assertEqual(UserCommand.lookup_error, ret)
+
+    def test_handle_deepdive_no_ghid(self):
+        self.u0.name = 'John Peters'
+        self.u0.email = 'john.peter@hotmail.com'
+
+        ret, code = self.testcommand.handle('user deepdive U0G9QF9C6',
+                                            self.u1.slack_id)
+        ret = ret['blocks'][0]['text']['text']
+        self.assertIn('*Github name:* n/a', ret)
+        self.assertIn(f'*Name:* {self.u0.name}', ret)
+        self.assertIn(f'*Email:* {self.u0.email}', ret)
+        self.assertIn('*Permissions level:* member', ret)
+        self.assertIn(UserCommand.noghid_deepdive, ret)
