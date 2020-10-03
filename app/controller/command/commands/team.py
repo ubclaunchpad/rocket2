@@ -350,11 +350,9 @@ class TeamCommand(Command):
                         self.gh.add_team_member(member.github_username,
                                                 team_id)
                         team.add_member(member.github_id)
-                    # except (LookupError, GithubAPIException):
-                    except LookupError:
+                    except (LookupError, GithubAPIException):
                         if member_id not in users_no_ghid:
                             users_no_ghid.append(member_id)
-                        pass
 
                 if users_no_ghid:
                     users_escaped = ' '.join(
