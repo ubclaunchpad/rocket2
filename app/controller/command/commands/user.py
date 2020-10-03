@@ -58,8 +58,9 @@ class UserCommand(Command):
         parser_deepdive = subparsers.add_parser('deepdive')
         parser_deepdive.set_defaults(which='deepdive',
                                      help='See team memberships of user.')
-        parser_deepdive.add_argument('slackid', type=str, action='store',
-                                     help='User you want to look up.')
+        parser_deepdive.add_argument(
+            'someid', type=str, action='store',
+            help='Slack ID/Github username of user you want to look up.')
 
         """Parser for add command."""
         parser_add = subparsers.add_parser("add")
@@ -149,7 +150,7 @@ class UserCommand(Command):
             return self.view_helper(user_id, args.username)
 
         elif args.which == 'deepdive':
-            return self.deepdive_helper(args.slackid)
+            return self.deepdive_helper(args.someid)
 
         elif args.which == "add":
             return self.add_helper(user_id, args.force)
@@ -173,21 +174,25 @@ class UserCommand(Command):
         else:
             return self.get_help(), 200
 
-    def deepdive_helper(self, slackid: str) -> ResponseTuple:
+    def deepdive_helper(self, someid: str) -> ResponseTuple:
         """
         Check team membership of user, produce user info and membership info.
 
         If the user does not have a Github ID to look up, just display user
         info and say that the user doesn't have a good Github ID.
 
-        :param slackid: Slack ID of user to look up
+        :param someid: Slack ID/Github username of user to look up
         :return: user info and membership info if user is found, or error
                     message if we cannot find the user in question
         """
         try:
-            user = self.facade.retrieve(User, slackid)
+            user = self.facade.retrieve(User, someid)
         except LookupError:
-            return self.lookup_error, 200
+            ghusers = self.facade.query(User, [('github', someid)])
+            if len(ghusers) != 1:
+                return self.lookup_error, 200
+            else:
+                user = ghusers[0]
 
         ret = f'''
 *Name:* {user.name if user.name else 'n/a'}

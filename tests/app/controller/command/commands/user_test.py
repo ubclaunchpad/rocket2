@@ -277,6 +277,27 @@ class TestUserCommand(TestCase):
         self.assertIn(f'*Membership in:*\n{team_names}', ret)
         self.assertIn(f'*Leading teams:*\n- {self.t1.github_team_name}', ret)
 
+    def test_handle_deepdive_with_ghusername(self):
+        self.u0.name = 'John Peters'
+        self.u0.email = 'john.peter@hotmail.com'
+        self.u0.github_id = '328593'
+        self.u0.github_username = 'some_user'
+        self.t0.add_member(self.u0.github_id)
+        self.t1.add_team_lead(self.u0.github_id)
+        team_names = '\n'.join(
+            ['- ' + t.github_team_name for t in [self.t0, self.t1]]
+        )
+
+        ret, code = self.testcommand.handle('user deepdive some_user',
+                                            self.u1.slack_id)
+        ret = ret['blocks'][0]['text']['text']
+        self.assertIn(f'*Github name:* {self.u0.github_username}', ret)
+        self.assertIn(f'*Name:* {self.u0.name}', ret)
+        self.assertIn(f'*Email:* {self.u0.email}', ret)
+        self.assertIn('*Permissions level:* member', ret)
+        self.assertIn(f'*Membership in:*\n{team_names}', ret)
+        self.assertIn(f'*Leading teams:*\n- {self.t1.github_team_name}', ret)
+
     def test_handle_deepdive_user_no_exists(self):
         ret, code = self.testcommand.handle('user deepdive UXXXXXXXX',
                                             self.u1.slack_id)
