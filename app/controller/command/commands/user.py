@@ -52,7 +52,11 @@ class UserCommand(Command):
         parser_view. \
             add_argument("--username", metavar="USERNAME",
                          type=str, action='store',
-                         help="Use if using slack id instead of username.")
+                         help="Query user by Slack ID")
+        parser_view. \
+            add_argument("--github", metavar="GITHUB",
+                         type=str, action='store',
+                         help="Query user by GitHub username")
 
         # Parser for deepdive command
         parser_deepdive = subparsers.add_parser('deepdive')
@@ -147,7 +151,10 @@ class UserCommand(Command):
             return self.get_help(subcommand=present_subcommand), 200
 
         if args.which == "view":
-            return self.view_helper(user_id, args.username)
+            return self.view_helper(user_id, {
+                'username': args.username,
+                'github': args.github,
+            })
 
         elif args.which == 'deepdive':
             return self.deepdive_helper(args.someid)
@@ -330,7 +337,7 @@ class UserCommand(Command):
 
     def view_helper(self,
                     user_id: str,
-                    slack_id: str) -> ResponseTuple:
+                    param_list: Dict[str, str]) -> ResponseTuple:
         """
         View user info from database.
 
@@ -343,10 +350,20 @@ class UserCommand(Command):
                  about the user
         """
         try:
-            if slack_id is None:
-                user = self.facade.retrieve(User, user_id)
+            user: User = None
+            if param_list['username'] is not None:
+                user = self.facade.retrieve(User, param_list['username'])
+            elif param_list['github'] is not None:
+                ghusers = self.facade.query(
+                    User, [('github', param_list['github'])])
+                if len(ghusers) == 0:
+                    raise LookupError
+                elif len(ghusers) > 1:
+                    return f'Multiple users found: f{ghusers}', 200
+                else:
+                    user = ghusers[0]
             else:
-                user = self.facade.retrieve(User, slack_id)
+                user = self.facade.retrieve(User, user_id)
 
             return {'attachments': [user.get_attachment()]}, 200
         except LookupError:

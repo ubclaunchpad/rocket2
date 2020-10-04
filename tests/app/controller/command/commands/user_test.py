@@ -83,10 +83,23 @@ class TestUserCommand(TestCase):
             self.assertDictEqual(resp, expect)
             self.assertEqual(code, 200)
 
-    def test_handle_view_other_user(self):
+    def test_handle_view_other_user_by_slack(self):
         user = User("ABCDE8FA9")
         self.db.store(user)
         command = 'user view --username ' + user.slack_id
+        user_attaches = [user.get_attachment()]
+        with self.app.app_context():
+            # jsonify requires translating the byte-string
+            resp, code = self.testcommand.handle(command, self.u0.slack_id)
+            expect = {'attachments': user_attaches}
+            self.assertDictEqual(resp, expect)
+            self.assertEqual(code, 200)
+
+    def test_handle_view_other_user_by_github(self):
+        user = User("ABCDE8FA9")
+        user.github_username = 'MYGITHUB'
+        self.db.store(user)
+        command = 'user view --github ' + user.github_username
         user_attaches = [user.get_attachment()]
         with self.app.app_context():
             # jsonify requires translating the byte-string
