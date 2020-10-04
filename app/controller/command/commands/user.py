@@ -360,26 +360,22 @@ class UserCommand(Command):
             user: User = None
             if param_list['username'] is not None:
                 user = self.facade.retrieve(User, param_list['username'])
-            elif param_list['github'] is not None:
-                users = self.facade.query(
-                    User, [('github', param_list['github'])])
-                if len(users) == 0:
-                    raise LookupError
-                elif len(users) > 1:
-                    return f'Multiple users found: f{users}', 200
-                else:
-                    user = users[0]
-            elif param_list['email'] is not None:
-                users = self.facade.query(
-                    User, [('email', param_list['email'])])
-                if len(users) == 0:
-                    raise LookupError
-                elif len(users) > 1:
-                    return f'Multiple users found: f{users}', 200
-                else:
-                    user = users[0]
-            else:
+            elif param_list['github'] is None and param_list['email'] is None:
                 user = self.facade.retrieve(User, user_id)
+            else:
+                query = []
+                if param_list['github'] is not None:
+                    query.append(('github', param_list['github']))
+                if param_list['email'] is not None:
+                    query.append(('email', param_list['email']))
+
+                users = self.facade.query(User, query)
+                if len(users) == 0:
+                    raise LookupError
+                elif len(users) > 1:
+                    return f'Multiple users found: f{users}', 200
+                else:
+                    user = users[0]
 
             return {'attachments': [user.get_attachment()]}, 200
         except LookupError:
