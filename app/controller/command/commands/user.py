@@ -375,7 +375,7 @@ class UserCommand(Command):
                 elif len(users) > 1:
                     return {
                         'text': 'Warning - multiple users found!',
-                        'attachments': [u.get_attachment for u in users]
+                        'attachments': [u.get_attachment() for u in users]
                     }, 200
                 else:
                     user = users[0]
