@@ -312,13 +312,10 @@ class TestUserCommand(TestCase):
             ['- ' + t.github_team_name for t in [self.t0, self.t1]]
         )
 
-        ret, code = self.testcommand.handle('user deepdive U0G9QF9C6',
-                                            self.u1.slack_id)
-        ret = ret['blocks'][0]['text']['text']
-        self.assertIn(f'*Github name:* {self.u0.github_username}', ret)
-        self.assertIn(f'*Name:* {self.u0.name}', ret)
-        self.assertIn(f'*Email:* {self.u0.email}', ret)
-        self.assertIn('*Permissions level:* member', ret)
+        ret, code = self.testcommand.handle(
+            'user view --inspect --username U0G9QF9C6',
+            self.u1.slack_id)
+        ret = ret['attachments'][1]['text']
         self.assertIn(f'*Membership in:*\n{team_names}', ret)
         self.assertIn(f'*Leading teams:*\n- {self.t1.github_team_name}', ret)
 
@@ -333,30 +330,25 @@ class TestUserCommand(TestCase):
             ['- ' + t.github_team_name for t in [self.t0, self.t1]]
         )
 
-        ret, code = self.testcommand.handle('user deepdive some_user',
-                                            self.u1.slack_id)
-        ret = ret['blocks'][0]['text']['text']
-        self.assertIn(f'*Github name:* {self.u0.github_username}', ret)
-        self.assertIn(f'*Name:* {self.u0.name}', ret)
-        self.assertIn(f'*Email:* {self.u0.email}', ret)
-        self.assertIn('*Permissions level:* member', ret)
+        ret, code = self.testcommand.handle(
+            'user view --inspect --github some_user',
+            self.u1.slack_id)
+        ret = ret['attachments'][1]['text']
         self.assertIn(f'*Membership in:*\n{team_names}', ret)
         self.assertIn(f'*Leading teams:*\n- {self.t1.github_team_name}', ret)
 
     def test_handle_deepdive_user_no_exists(self):
-        ret, code = self.testcommand.handle('user deepdive UXXXXXXXX',
-                                            self.u1.slack_id)
+        ret, code = self.testcommand.handle(
+            'user view --inspect --username UXXXXXXXX',
+            self.u1.slack_id)
         self.assertEqual(UserCommand.lookup_error, ret)
 
     def test_handle_deepdive_no_ghid(self):
         self.u0.name = 'John Peters'
         self.u0.email = 'john.peter@hotmail.com'
 
-        ret, code = self.testcommand.handle('user deepdive U0G9QF9C6',
-                                            self.u1.slack_id)
-        ret = ret['blocks'][0]['text']['text']
-        self.assertIn('*Github name:* n/a', ret)
-        self.assertIn(f'*Name:* {self.u0.name}', ret)
-        self.assertIn(f'*Email:* {self.u0.email}', ret)
-        self.assertIn('*Permissions level:* member', ret)
+        ret, code = self.testcommand.handle(
+            'user view --inspect --username U0G9QF9C6',
+            self.u1.slack_id)
+        ret = ret['attachments'][1]['text']
         self.assertIn(UserCommand.noghid_deepdive, ret)
