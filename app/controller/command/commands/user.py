@@ -57,6 +57,10 @@ class UserCommand(Command):
             add_argument("--github", metavar="GITHUB",
                          type=str, action='store',
                          help="Query user by GitHub username")
+        parser_view. \
+            add_argument("--email", metavar="EMAIL",
+                         type=str, action='store',
+                         help="Query user by email address")
 
         # Parser for deepdive command
         parser_deepdive = subparsers.add_parser('deepdive')
@@ -151,9 +155,12 @@ class UserCommand(Command):
             return self.get_help(subcommand=present_subcommand), 200
 
         if args.which == "view":
+            email = escape_email(args.email) if \
+                args.email is not None else None
             return self.view_helper(user_id, {
                 'username': args.username,
                 'github': args.github,
+                'email': email,
             })
 
         elif args.which == 'deepdive':
@@ -354,14 +361,23 @@ class UserCommand(Command):
             if param_list['username'] is not None:
                 user = self.facade.retrieve(User, param_list['username'])
             elif param_list['github'] is not None:
-                ghusers = self.facade.query(
+                users = self.facade.query(
                     User, [('github', param_list['github'])])
-                if len(ghusers) == 0:
+                if len(users) == 0:
                     raise LookupError
-                elif len(ghusers) > 1:
-                    return f'Multiple users found: f{ghusers}', 200
+                elif len(users) > 1:
+                    return f'Multiple users found: f{users}', 200
                 else:
-                    user = ghusers[0]
+                    user = users[0]
+            elif param_list['email'] is not None:
+                users = self.facade.query(
+                    User, [('email', param_list['email'])])
+                if len(users) == 0:
+                    raise LookupError
+                elif len(users) > 1:
+                    return f'Multiple users found: f{users}', 200
+                else:
+                    user = users[0]
             else:
                 user = self.facade.retrieve(User, user_id)
 

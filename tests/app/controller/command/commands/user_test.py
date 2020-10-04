@@ -108,6 +108,19 @@ class TestUserCommand(TestCase):
             self.assertDictEqual(resp, expect)
             self.assertEqual(code, 200)
 
+    def test_handle_view_other_user_by_email(self):
+        user = User("ABCDE8FA9")
+        user.email = 'me@email.com'
+        self.db.store(user)
+        command = 'user view --email ' + user.email
+        user_attaches = [user.get_attachment()]
+        with self.app.app_context():
+            # jsonify requires translating the byte-string
+            resp, code = self.testcommand.handle(command, self.u0.slack_id)
+            expect = {'attachments': user_attaches}
+            self.assertDictEqual(resp, expect)
+            self.assertEqual(code, 200)
+
     def test_handle_view_lookup_error(self):
         command = 'user view --username ABCDE8FA9'
         self.assertTupleEqual(self.testcommand.handle(command,
