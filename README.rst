@@ -12,8 +12,8 @@
    </p>
 
    <p align="center">
-      <a href="https://github.com/ubclaunchpad/rocket2/actions?query=workflow%3AMaster">
-         <img src="https://github.com/ubclaunchpad/rocket2/workflows/Master/badge.svg">
+      <a href="https://github.com/ubclaunchpad/rocket2/actions?query=workflow%3APipeline">
+         <img src="https://github.com/ubclaunchpad/rocket2/workflows/Pipeline/badge.svg">
       </a>
       <a href="https://codecov.io/gh/ubclaunchpad/rocket2">
          <img src="https://codecov.io/gh/ubclaunchpad/rocket2/branch/master/graph/badge.svg">
