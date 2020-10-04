@@ -155,12 +155,10 @@ class UserCommand(Command):
             return self.get_help(subcommand=present_subcommand), 200
 
         if args.which == "view":
-            email = escape_email(args.email) if \
-                args.email is not None else None
             return self.view_helper(user_id, {
                 'username': args.username,
                 'github': args.github,
-                'email': email,
+                'email': args.email,
             })
 
         elif args.which == 'deepdive':
@@ -357,23 +355,26 @@ class UserCommand(Command):
                  about the user
         """
         try:
-            user: User = None
-            if param_list['username'] is not None:
+            if param_list['username']:
                 user = self.facade.retrieve(User, param_list['username'])
-            elif param_list['github'] is None and param_list['email'] is None:
+            # If no query parameters are provided, get the sender
+            elif not param_list['github'] and not param_list['email']:
                 user = self.facade.retrieve(User, user_id)
             else:
                 query = []
-                if param_list['github'] is not None:
+                if param_list['github']:
                     query.append(('github', param_list['github']))
-                if param_list['email'] is not None:
-                    query.append(('email', param_list['email']))
+                if param_list['email']:
+                    query.append(('email', escape_email(param_list['email'])))
 
                 users = self.facade.query(User, query)
                 if len(users) == 0:
                     raise LookupError
                 elif len(users) > 1:
-                    return f'Multiple users found: f{users}', 200
+                    return {
+                        'text': 'Warning - multiple users found!',
+                        'attachments': [u.get_attachment for u in users]
+                    }, 200
                 else:
                     user = users[0]
 
