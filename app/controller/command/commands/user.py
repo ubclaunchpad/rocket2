@@ -52,7 +52,15 @@ class UserCommand(Command):
         parser_view. \
             add_argument("--username", metavar="USERNAME",
                          type=str, action='store',
-                         help="Use if using slack id instead of username.")
+                         help="Query user by Slack ID")
+        parser_view. \
+            add_argument("--github", metavar="GITHUB",
+                         type=str, action='store',
+                         help="Query user by GitHub username")
+        parser_view. \
+            add_argument("--email", metavar="EMAIL",
+                         type=str, action='store',
+                         help="Query user by email address")
 
         # Parser for deepdive command
         parser_deepdive = subparsers.add_parser('deepdive')
@@ -147,7 +155,11 @@ class UserCommand(Command):
             return self.get_help(subcommand=present_subcommand), 200
 
         if args.which == "view":
-            return self.view_helper(user_id, args.username)
+            return self.view_helper(user_id, {
+                'username': args.username,
+                'github': args.github,
+                'email': args.email,
+            })
 
         elif args.which == 'deepdive':
             return self.deepdive_helper(args.someid)
@@ -330,23 +342,43 @@ class UserCommand(Command):
 
     def view_helper(self,
                     user_id: str,
-                    slack_id: str) -> ResponseTuple:
+                    param_list: Dict[str, str]) -> ResponseTuple:
         """
         View user info from database.
 
-        If slack_id is None, return information of ``user_id``, else return
-        information of ``slack_id``.
+        If no parameters are provided, returns information of ``user_id``. If
+        ``param_list['username']`` is provided, returns the specific user
+        matching the Slack ID provided, otherwise returns all users that match
+        all traits of other provided parameters (e.g. ``github`` and ``email``)
 
         :param user_id: Slack ID of user who is calling command
-        :param slack_id: Slack ID of user whose info is being retrieved
+        :param param_list: List of user parameters defining the query
         :return: error message if user not found in database, else information
-                 about the user
+                 about the user, or users.
         """
         try:
-            if slack_id is None:
+            if param_list['username']:
+                user = self.facade.retrieve(User, param_list['username'])
+            # If no query parameters are provided, get the sender
+            elif not param_list['github'] and not param_list['email']:
                 user = self.facade.retrieve(User, user_id)
             else:
-                user = self.facade.retrieve(User, slack_id)
+                query = []
+                if param_list['github']:
+                    query.append(('github', param_list['github']))
+                if param_list['email']:
+                    query.append(('email', escape_email(param_list['email'])))
+
+                users = self.facade.query(User, query)
+                if len(users) == 0:
+                    raise LookupError
+                elif len(users) > 1:
+                    return {
+                        'text': 'Warning - multiple users found!',
+                        'attachments': [u.get_attachment() for u in users]
+                    }, 200
+                else:
+                    user = users[0]
 
             return {'attachments': [user.get_attachment()]}, 200
         except LookupError:
