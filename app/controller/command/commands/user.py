@@ -44,31 +44,21 @@ class UserCommand(Command):
         """Initialize subparsers for user command."""
         subparsers = self.parser.add_subparsers(dest="which")
 
-        """Parser for view command."""
-        parser_view = subparsers. \
-            add_parser("view")
+        # Parser for view command
+        parser_view = subparsers.add_parser("view")
         parser_view.set_defaults(which="view",
                                  help="View information about a given user.")
-        parser_view. \
-            add_argument("--username", metavar="USERNAME",
-                         type=str, action='store',
-                         help="Query user by Slack ID")
-        parser_view. \
-            add_argument("--github", metavar="GITHUB",
-                         type=str, action='store',
-                         help="Query user by GitHub username")
-        parser_view. \
-            add_argument("--email", metavar="EMAIL",
-                         type=str, action='store',
-                         help="Query user by email address")
-
-        # Parser for deepdive command
-        parser_deepdive = subparsers.add_parser('deepdive')
-        parser_deepdive.set_defaults(which='deepdive',
-                                     help='See team memberships of user.')
-        parser_deepdive.add_argument(
-            'someid', type=str, action='store',
-            help='Slack ID/Github username of user you want to look up.')
+        parser_view.add_argument("--username", metavar="USERNAME",
+                                 type=str, action='store',
+                                 help="Query user by Slack ID")
+        parser_view.add_argument("--github", metavar="GITHUB",
+                                 type=str, action='store',
+                                 help="Query user by GitHub username")
+        parser_view.add_argument("--email", metavar="EMAIL",
+                                 type=str, action='store',
+                                 help="Query user by email address")
+        parser_view.add_argument('--inspect', action='store_true',
+                                 help='See team memberships of user')
 
         """Parser for add command."""
         parser_add = subparsers.add_parser("add")
@@ -159,10 +149,8 @@ class UserCommand(Command):
                 'username': args.username,
                 'github': args.github,
                 'email': args.email,
+                'inspect': args.inspect,
             })
-
-        elif args.which == 'deepdive':
-            return self.deepdive_helper(args.someid)
 
         elif args.which == "add":
             return self.add_helper(user_id, args.force)
@@ -186,9 +174,9 @@ class UserCommand(Command):
         else:
             return self.get_help(), 200
 
-    def deepdive_helper(self, someid: str) -> ResponseTuple:
+    def deepdive_helper(self, user: User):
         """
-        Check team membership of user, produce user info and membership info.
+        Return an attachment that is the membership info.
 
         If the user does not have a Github ID to look up, just display user
         info and say that the user doesn't have a good Github ID.
@@ -197,22 +185,6 @@ class UserCommand(Command):
         :return: user info and membership info if user is found, or error
                     message if we cannot find the user in question
         """
-        try:
-            user = self.facade.retrieve(User, someid)
-        except LookupError:
-            ghusers = self.facade.query(User, [('github', someid)])
-            if len(ghusers) != 1:
-                return self.lookup_error, 200
-            else:
-                user = ghusers[0]
-
-        ret = f'''
-*Name:* {user.name if user.name else 'n/a'}
-*Github name:* {user.github_username if user.github_username else 'n/a'}
-*Email:* {user.email if user.email else 'n/a'}
-*Permissions level:* {str(user.permissions_level)}
-'''
-
         if user.github_username:
             membership = self.facade.query_or(
                 Team, [('members', user.github_id),
@@ -222,7 +194,7 @@ class UserCommand(Command):
                        if t.is_team_lead(user.github_id)]
             member_of_str = '\n'.join(sorted(member_of))
             lead_of_str = '\n'.join(sorted(lead_of))
-            ret += f'''
+            ret = f'''
 *Membership in:*
 {member_of_str}
 
@@ -230,13 +202,14 @@ class UserCommand(Command):
 {lead_of_str}
 '''
         else:
-            ret += f'''
+            ret = f'''
 {self.noghid_deepdive}
 '''
 
-        return {'blocks': [{'type': 'section', 'text': {
-            'type': 'mrkdwn',
-            'text': ret}}]}, 200
+        return {
+            'mrkdwn_in': ['text'],
+            'text': ret
+        }
 
     def edit_helper(self,
                     user_id: str,
@@ -380,7 +353,13 @@ class UserCommand(Command):
                 else:
                     user = users[0]
 
-            return {'attachments': [user.get_attachment()]}, 200
+            if param_list['inspect']:
+                return {'attachments': [
+                    user.get_attachment(),
+                    self.deepdive_helper(user)
+                ]}, 200
+            else:
+                return {'attachments': [user.get_attachment()]}, 200
         except LookupError:
             return self.lookup_error, 200
 
