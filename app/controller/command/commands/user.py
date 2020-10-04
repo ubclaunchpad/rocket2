@@ -346,13 +346,15 @@ class UserCommand(Command):
         """
         View user info from database.
 
-        If slack_id is None, return information of ``user_id``, else return
-        information of ``slack_id``.
+        If no parameters are provided, returns information of ``user_id``. If
+        ``param_list['username']`` is provided, returns the specific user
+        matching the Slack ID provided, otherwise returns all users that match
+        all traits of other provided parameters (e.g. ``github`` and ``email``)
 
         :param user_id: Slack ID of user who is calling command
-        :param slack_id: Slack ID of user whose info is being retrieved
+        :param param_list: List of user parameters defining the query
         :return: error message if user not found in database, else information
-                 about the user
+                 about the user, or users.
         """
         try:
             if param_list['username']:
