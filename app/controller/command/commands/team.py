@@ -786,23 +786,5 @@ class TeamCommand(Command):
             return
 
         all_teams: List[Team] = self.facade.query(Team)
-        leads_team: Team = None
-        admin_team: Team = None
         for t in all_teams:
-            if t.github_team_name == self.config.github_team_leads:
-                leads_team = t
-                continue
-            if t.github_team_name == self.config.github_team_admin:
-                admin_team = t
-                continue
             sync_team_email_perms(self.gcp, self.facade, t)
-
-        # Workaround for https://github.com/ubclaunchpad/rocket2/issues/497:
-        # We sort the teams such that special-permissions teams are sync'd
-        # last, so that inherited permissions are not overwritten in child
-        # folders.
-        #
-        # TODO: If a proper fix is implemented, remove this and related code
-        for t in [leads_team, admin_team]:
-            if t is not None:
-                sync_team_email_perms(self.gcp, self.facade, t)

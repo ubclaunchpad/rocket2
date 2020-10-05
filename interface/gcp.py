@@ -3,6 +3,11 @@ from typing import Any, List
 from googleapiclient.discovery import Resource
 import logging
 
+# Set to False to resolve https://github.com/ubclaunchpad/rocket2/issues/510
+# temporarily. Longer-term fix is being tracked in the actual problem,
+# https://github.com/ubclaunchpad/rocket2/issues/497
+DELETE_OLD_DRIVE_PERMISSIONS = False
+
 
 class GCPInterface:
     """Utility class for calling Google Cloud Platform (GCP) APIs."""
@@ -12,7 +17,11 @@ class GCPInterface:
         self.drive = drive_client
         self.subject = subject
 
-    def set_drive_permissions(self, scope, drive_id, emails: List[str]):
+    def set_drive_permissions(self,
+                              scope,
+                              drive_id,
+                              emails: List[str],
+                              delete_permissions=DELETE_OLD_DRIVE_PERMISSIONS):
         """
         Creates permissions for the given emails, and removes everyone not
         on the list.
@@ -79,19 +88,22 @@ class GCPInterface:
 
         # Delete old permissions
         # See http://googleapis.github.io/google-api-python-client/docs/dyn/drive_v3.permissions.html#delete # noqa
-        deleted_shares = 0
-        for p_id in to_delete:
-            try:
-                self.drive.permissions()\
-                    .delete(fileId=drive_id,
-                            permissionId=p_id,
-                            supportsAllDrives=True)\
-                    .execute()
-                deleted_shares += 1
-            except Exception as e:
-                logging.error(f"Failed to delete permission {p_id} for drive "
-                              + f"item ({scope}, {drive_id}): {e}")
-        logging.info(f"Deleted {deleted_shares} permissions for {scope}")
+        if delete_permissions is True:
+            deleted_shares = 0
+            for p_id in to_delete:
+                try:
+                    self.drive.permissions()\
+                        .delete(fileId=drive_id,
+                                permissionId=p_id,
+                                supportsAllDrives=True)\
+                        .execute()
+                    deleted_shares += 1
+                except Exception as e:
+                    logging.error(f"Failed to delete permission {p_id} for "
+                                  + f"drive item ({scope}, {drive_id}): {e}")
+            logging.info(f"Deleted {deleted_shares} permissions for {scope}")
+        else:
+            logging.info("DELETE_OLD_DRIVE_PERMISSIONS is set to false")
 
 
 def new_share_message(scope):
