@@ -17,7 +17,11 @@ class GCPInterface:
         self.drive = drive_client
         self.subject = subject
 
-    def set_drive_permissions(self, scope, drive_id, emails: List[str]):
+    def set_drive_permissions(self,
+                              scope,
+                              drive_id,
+                              emails: List[str],
+                              delete_permissions=DELETE_OLD_DRIVE_PERMISSIONS):
         """
         Creates permissions for the given emails, and removes everyone not
         on the list.
@@ -84,7 +88,7 @@ class GCPInterface:
 
         # Delete old permissions
         # See http://googleapis.github.io/google-api-python-client/docs/dyn/drive_v3.permissions.html#delete # noqa
-        if DELETE_OLD_DRIVE_PERMISSIONS is True:
+        if delete_permissions is True:
             deleted_shares = 0
             for p_id in to_delete:
                 try:

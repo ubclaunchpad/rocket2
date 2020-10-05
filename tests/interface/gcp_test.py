@@ -48,7 +48,7 @@ class TestGCPInterface(TestCase):
         self.gcp.set_drive_permissions('team', 'abcde', [
             'robert@bobheadxi.dev',
             'not-team@ubclaunchpad.com',
-        ])
+        ], delete_permissions=True)
 
         # initial list
         mock_perms.list.assert_called()
