@@ -99,7 +99,7 @@ class GCPInterface:
                                   + f"drive item ({scope}, {drive_id}): {e}")
             logging.info(f"Deleted {deleted_shares} permissions for {scope}")
         else:
-            logging.info(f"DELETE_OLD_DRIVE_PERMISSIONS is set to false")
+            logging.info("DELETE_OLD_DRIVE_PERMISSIONS is set to false")
 
 
 def new_share_message(scope):
