@@ -5,8 +5,9 @@
 <!--
 e.g. "Affects #123"
 
-Create a copy of that line for each Github Issue affected,
-and replace "Affects" with "Closes" if merging this will close the relevant ticket.
+Create a copy of that line for each Github Issue affected, and replace
+"Affects" with "Closes" if merging this will close the relevant ticket. If this
+change is not for a particular ticket, just write "n/a" instead.
 -->
 
 ## Details
