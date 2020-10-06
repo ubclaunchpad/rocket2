@@ -7,21 +7,32 @@ assignees: ''
 
 ---
 
-**Describe the bug**
-A clear and concise description of what the bug is.
+## Summary
 
-**To Reproduce**
+<!--
+A clear and concise description of what the bug is.
+-->
+
+## Reproduction steps
+
+<!--
 Steps to reproduce the behavior:
+
 1. Go to '...'
 2. Click on '....'
 3. Scroll down to '....'
 4. See error
+5. -->
 
-**Expected behavior**
+## Expected behaviour
+
+<!--
 A clear and concise description of what you expected to happen.
-
-**Screenshots**
 If applicable, add screenshots to help explain your problem.
+-->
 
-**Additional context**
+## Context
+
+<!--
 Add any other context about the problem here.
+-->

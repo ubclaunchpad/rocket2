@@ -7,15 +7,23 @@ assignees: ''
 
 ---
 
-**Please give a one-sentence summary of the feature you would like to see.**
+## Summary
 
+<!--
 E.g. "we should be able to give nicknames to other Rocket 2 users."
+-->
 
-**Please give as many details as possible about the requirements for the feature.**
+## Requirements
 
+<!--
 E.g. "every user should be able to have an arbitrary number of nicknames, and users should be able to give each other nicknames."
 
-**Please list any additional context.**
+Implementation details could also go here.
+-->
 
+## Context
+
+<!--
 For instance, if this was requested by a Launch Pad president, if it has been discussed somewhere else like Slack, etc.
 E.g. "nicknames are required for the new website."
+-->
