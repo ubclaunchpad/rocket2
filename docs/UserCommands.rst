@@ -53,17 +53,30 @@ Admins can easily promote other admins or team leads.
 .. code:: sh
 
    /rocket user edit --username @s_universe --permission admin
+   /rocket user edit --username @s_universe --permission team_lead
+   # Demotion
+   /rocket user edit --username @s_universe --permission member
 
 View
 ~~~~
 
 .. code:: sh
 
-   /rocket user view [--username SLACKID]
+   /rocket user view [--username SLACKID] [--github GITHUB]
+                     [--email EMAIL] [--inspect]
 
-Display information about a user. ``SLACK_ID`` is the ``@``-name, for
-easy slack autocomplete. If ``SLACK_ID`` is not specified, this command
-displays information about the one who ran the command instead.
+Display information about a user. ``SLACKID`` is the ``@``-name, for
+easy slack autocomplete. If ``SLACKID`` is not specified, this command
+displays information about the one who ran the command instead. You can also
+specify a user's Github username or a user's email.
+
+If the `--inspect` flag is used, this command lists the teams that the user
+is a part of, along with the teams that this user is leading, if any.
+
+.. code:: sh
+
+    # Lookup via Github username, listing teams user is a part of
+    /rocket user view --github octoverse --inspect
 
 Help
 ~~~~
@@ -81,5 +94,5 @@ Delete (Admin only)
 
    /rocket user delete SLACK_ID
 
-Permanently delete a member’s Launch Pad Profile. Can only be used by
+Permanently delete a member’s Launch Pad profile. Can only be used by
 admins. ``SLACK_ID`` is the ``@``-name, for easy slack autocomplete.
