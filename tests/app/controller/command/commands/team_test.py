@@ -149,21 +149,20 @@ class TestTeamCommand(TestCase):
         self.u0.github_id = '093293124'
         self.u0.github_username = 'someperson'
 
-        self.sc.get_channel_users.return_value = ['U123456789']
+        self.sc.get_channel_users.return_value = [self.u0.slack_id]
 
         self.gh.org_create_team.return_value = int(tid)
         self.gh.has_team_member.return_value = False
 
         self.cmd.handle(inputstring, self.admin.slack_id)
 
+        # The new team must be retrieved
         team: Team = self.db.retrieve(Team, tid)
         self.assertEqual(team.github_team_name, 'b-s')
         self.assertEqual(team.display_name, 'B S')
+        self.assertEqual(team.platform, 'web')
         self.assertSetEqual(team.members, set([self.u0.github_id]))
         self.assertSetEqual(team.team_leads, set([self.u0.github_id]))
-        self.assertEqual(team.platform, 'web')
-
-        self.gh.org_create_team.assert_called()
 
     def test_handle_create_no_gh_for_users_in_channel(self):
         self.gh.org_create_team.return_value = 8934095
@@ -410,8 +409,6 @@ class TestTeamCommand(TestCase):
         self.u0.github_id = 'githubID'
         self.u0.github_username = 'myuser'
         with self.app.app_context():
-            self.assertFalse(self.t0.has_team_lead(self.u0.github_id))
-            self.assertFalse(self.t0.has_member(self.u0.github_id))
             _, code = self.cmd.handle(cmdtxt, self.admin.slack_id)
             self.assertEqual(code, 200)
             self.assertTrue(self.t0.has_team_lead(self.u0.github_id))
@@ -428,7 +425,6 @@ class TestTeamCommand(TestCase):
         self.t0.add_member(self.u0.github_id)
         self.t0.add_team_lead(self.u0.github_id)
         with self.app.app_context():
-            self.assertTrue(self.t0.has_team_lead(self.u0.github_id))
             _, code = self.cmd.handle(cmdtxt, self.admin.slack_id)
             self.assertEqual(code, 200)
             self.assertFalse(self.t0.has_team_lead(self.u0.github_id))
