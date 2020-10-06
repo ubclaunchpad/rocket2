@@ -141,36 +141,29 @@ class TestTeamCommand(TestCase):
 
     def test_handle_create(self):
         inputstring = "team create b-s --name 'B S'"
+        inputstring += ' --platform web'
+        inputstring += " --channel 'channelID'"
+        inputstring += f' --lead {self.u0.slack_id}'
         tid = '8934095'
+
+        self.u0.github_id = '093293124'
+        self.u0.github_username = 'someperson'
+
+        self.sc.get_channel_users.return_value = ['U123456789']
+
         self.gh.org_create_team.return_value = int(tid)
+        self.gh.has_team_member.return_value = False
+
         self.cmd.handle(inputstring, self.admin.slack_id)
+
         team: Team = self.db.retrieve(Team, tid)
         self.assertEqual(team.github_team_name, 'b-s')
         self.assertEqual(team.display_name, 'B S')
-
-        inputstring += ' --platform web'
-        self.cmd.handle(inputstring, self.admin.slack_id)
-        team: Team = self.db.retrieve(Team, tid)
-        self.assertEqual(team.platform, 'web')
-        self.gh.org_create_team.assert_called()
-        self.gh.add_team_member.assert_called_with(
-            self.admin.github_username, tid)
-
-        inputstring += " --channel 'channelID'"
-        self.u0.github_id = '093293124'
-        self.u0.github_username = 'someperson'
-        self.sc.get_channel_users.return_value = ['U123456789']
-        self.cmd.handle(inputstring, self.admin.slack_id)
-        team: Team = self.db.retrieve(Team, tid)
         self.assertSetEqual(team.members, set([self.u0.github_id]))
-        self.sc.get_channel_users.assert_called_once_with('channelID')
-        self.gh.add_team_member.assert_called()
-
-        inputstring += f' --lead {self.u0.slack_id}'
-        self.gh.has_team_member.return_value = False
-        self.cmd.handle(inputstring, self.admin.slack_id)
-        team: Team = self.db.retrieve(Team, tid)
         self.assertSetEqual(team.team_leads, set([self.u0.github_id]))
+        self.assertEqual(team.platform, 'web')
+
+        self.gh.org_create_team.assert_called()
 
     def test_handle_create_no_gh_for_users_in_channel(self):
         self.gh.org_create_team.return_value = 8934095
@@ -461,7 +454,7 @@ class TestTeamCommand(TestCase):
                                    'following error: error', 200))
 
     def test_handle_lead_user_error(self):
-        cmdtxt = f'team lead --remove '
+        cmdtxt = 'team lead --remove '
         cmdtxt += f'{self.t0.github_team_name} {self.u0.slack_id}'
         with self.app.app_context():
             self.assertTupleEqual(self.cmd.handle(cmdtxt, self.admin.slack_id),
