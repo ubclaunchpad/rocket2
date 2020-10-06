@@ -508,14 +508,14 @@ class TestTeamCommand(TestCase):
         self.db.teams['OTEAM'] = team2
 
         self.gh.org_get_teams.return_value = [team_update, team2]
-        attach = team_update.get_attachment()
+        attachments = [team_update.get_attachment()]
 
         status = '1 teams changed, 0 added, 0 deleted. Wonderful.'
         with self.app.app_context():
             resp, code = self.cmd.handle('team refresh',
                                          self.admin.slack_id)
-            expect = {'attachments': [attach], 'text': status}
-            self.assertDictEqual(resp, expect)
+            self.assertCountEqual(resp['attachments'], attachments)
+            self.assertEqual(resp['text'], status)
             self.assertEqual(code, 200)
             self.assertEqual(team, team_update)
 
@@ -530,14 +530,13 @@ class TestTeamCommand(TestCase):
         # In this case, github does not have team2!
         self.gh.org_get_teams.return_value = [team]
         self.gh.org_create_team.return_value = 12345
-        attach = team.get_attachment()
-        attach2 = team2.get_attachment()
+        attachments = [team.get_attachment(), team2.get_attachment()]
 
         status = '0 teams changed, 1 added, 1 deleted. Wonderful.'
         with self.app.app_context():
             resp, code = self.cmd.handle('team refresh',
                                          self.admin.slack_id)
-            expect = {'attachments': [attach2, attach], 'text': status}
-            self.assertDictEqual(resp, expect)
+            self.assertCountEqual(resp['attachments'], attachments)
+            self.assertEqual(resp['text'], status)
             self.assertEqual(code, 200)
             self.assertEqual(len(self.db.teams), 2)
