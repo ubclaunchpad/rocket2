@@ -127,6 +127,10 @@ ngrok gives you. Note that it is very important to use the HTTPS URL,
 Localtunnel
 ~~~~~~~~~~~
 
+    Note: Localtunnel has reliability issues, which include crashing
+    Rocket 2 after issuing a single command sometimes (for no discernable
+    reason). Tread with caution.
+
 An alternative to Ngrok is
 `localtunnel <https://GitHub.com/localtunnel/localtunnel>`__, which
 works similarly to Ngrok but allows you to use the same domain every
@@ -207,9 +211,6 @@ querying. We also use it to track metrics.
 
 Finally, copy the provided access key ID and secret access key after
 creating the new user.
-
-Note: if you are in the ``brussel-sprouts`` GitHub team, you should
-already have AWS credentials. Just ask.
 
 Using Local AWS
 ~~~~~~~~~~~~~~~

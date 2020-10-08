@@ -94,6 +94,17 @@ def get_key(m: T) -> str:
 
 
 class MemoryDB(DBFacade):
+    """
+    An in-memory database.
+
+    To be used only in testing. **Do not attempt to use it in production.**
+    Used when a test requires a database, but when we aren't specifically
+    testing database functionalities.
+
+    **Stored objects can be mutated by external references if you don't drop
+    the reference after storing.**
+    """
+
     def __init__(self,
                  users: List[User] = [],
                  teams: List[Team] = [],
