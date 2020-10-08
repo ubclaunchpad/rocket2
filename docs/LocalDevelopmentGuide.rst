@@ -127,8 +127,9 @@ ngrok gives you. Note that it is very important to use the HTTPS URL,
 Localtunnel
 ~~~~~~~~~~~
 
-    Note: We no longer recommend localtunnel because of reliability issues.
-    Tread with caution.
+    Note: Localtunnel has reliability issues, which include crashing
+    Rocket 2 after issuing a single command sometimes (for no discernable
+    reason). Tread with caution.
 
 An alternative to Ngrok is
 `localtunnel <https://GitHub.com/localtunnel/localtunnel>`__, which
