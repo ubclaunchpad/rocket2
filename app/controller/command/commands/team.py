@@ -417,6 +417,9 @@ class TeamCommand(Command):
             self.facade.store(team)
             msg = "Added User to " + command_team
 
+            # Update drive shares
+            sync_team_email_perms(self.gcp, self.facade, team)
+
             # If this team is a team with special permissions, promote the
             # user to the appropriate permission
             promoted_level = Permissions.member
@@ -474,6 +477,9 @@ class TeamCommand(Command):
             self.facade.store(team)
 
             msg = "Removed User from " + command_team
+
+            # Update drive shares
+            sync_team_email_perms(self.gcp, self.facade, team)
 
             # If the user is being removed from a team with special
             # permisisons, figure out a demotion strategy.
@@ -544,6 +550,11 @@ class TeamCommand(Command):
                 msg += f"folder: {param_list['folder']}"
                 team.folder = param_list['folder']
             self.facade.store(team)
+
+            # Update drive shares if folder was changed
+            if param_list['folder']:
+                sync_team_email_perms(self.gcp, self.facade, team)
+
             ret = {'attachments': [team.get_attachment()], 'text': msg}
             return ret, 200
         except LookupError:
