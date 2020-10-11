@@ -159,7 +159,7 @@ appropriate workspace.
 ~~~~~~~~~~~~~~~~~~~~
 
 In “OAuth and Permissions”, select the Bot Token Scopes described in
-`the Slack configuration docs <slack-configuration>`__.
+`the Slack configuration docs <Config.html#slack-api-token>`__.
 
 3.2: Install Slack App
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -244,12 +244,12 @@ bracketed by:
 Authenticating Rocket 2 as a GitHub App and obtaining an access token
 for the GitHub API should be automated, once the signing key is
 available. Refer to the `GitHub key configuration
-docs <Config.md#github-key>`__ for the required permissions.
+docs <Config.html#github-key>`__ for the required permissions.
 
 After doing this, remember to put your tunneled HTTPS URL with
 ``/webhook`` appended at the end into the “Webhook URL” box. Refer to
 the `GitHub webhook configuration
-docs <Config.md#github-webhook-endpt>`__ for the required subscriptions.
+docs <Config.html#github-webhook-endpt>`__ for the required subscriptions.
 
 6: Set Up Configuration
 -----------------------
