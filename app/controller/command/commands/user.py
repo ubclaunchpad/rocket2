@@ -227,8 +227,8 @@ class UserCommand(Command):
 
         :param user_id: Slack ID of user who is calling the command
         :param param_list: List of user parameters that are to be edited
-        :return: returns error message if not admin and command
-                   edits another user, returns edit message if user is edited
+        :return: error message if not admin and command edits another user,
+            or the edit message if user is edited
         """
         is_admin = False
         edited_user = None

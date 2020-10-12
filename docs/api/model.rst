@@ -24,6 +24,7 @@ Permissions
 
 .. autoclass:: app.model.permissions.Permissions
     :members:
+    :special-members:
 
     .. autoattribute:: member
     .. autoattribute:: team_lead
