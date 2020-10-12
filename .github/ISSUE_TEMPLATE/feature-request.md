@@ -1,8 +1,8 @@
 ---
-name: Feature Request
+name: Feature request
 about: Suggest an idea for Rocket 2
 title: ''
-labels: feature request
+labels: 'theme:feature'
 assignees: ''
 
 ---
