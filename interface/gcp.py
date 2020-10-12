@@ -18,16 +18,24 @@ class GCPInterface:
         self.subject = subject
 
     def set_drive_permissions(self,
-                              scope,
-                              drive_id,
+                              team_name: str,
+                              drive_id: str,
                               emails: List[str],
                               delete_permissions=DELETE_OLD_DRIVE_PERMISSIONS):
         """
-        Creates permissions for the given emails, and removes everyone not
-        on the list.
+        Create permissions for the given emails, and removes everyone not on
+        the list.
 
         In all cases of API errors, we log and continue, to try and get close
         to the desired state of permissions.
+
+        :param team_name: name of the team for the drive permissions; serves
+            aesthetic purposes only
+        :param drive_id: id of the Google Drive object to share
+        :param emails: a list of emails to share with
+        :param bool delete_permissions: option whether we delete the old
+            permissions in favour of the new emails (previously added emails
+            would be removed if they aren't in the `emails` parameter)
         """
 
         # List existing permissions - we use this to avoid duplicate
@@ -43,7 +51,8 @@ class GCPInterface:
                       fields="permissions(id, emailAddress, role)")\
                 .execute()
             permissions: List[Any] = list_res['permissions']
-            logging.info(f"{scope} drive currently shared with {permissions}")
+            logging.info(
+                f'{team_name} drive currently shared with {permissions}')
             for p in permissions:
                 if 'emailAddress' in p:
                     email: str = p['emailAddress']
@@ -58,9 +67,9 @@ class GCPInterface:
                         to_delete.append(p['id'])
         except Exception as e:
             logging.error("Failed to load permissions for drive item"
-                          + f"({scope}, {drive_id}): {e}")
+                          + f"({team_name}, {drive_id}): {e}")
 
-        logging.info(f"Found {len(existing)} permissions for {scope} "
+        logging.info(f"Found {len(existing)} permissions for {team_name} "
                      + "that do not require updating")
 
         # Ensure the folder is shared with everyone as required.
@@ -76,15 +85,15 @@ class GCPInterface:
                 self.drive.permissions()\
                     .create(fileId=drive_id,
                             body=body,
-                            emailMessage=new_share_message(scope),
+                            emailMessage=new_share_message(team_name),
                             sendNotificationEmail=True,
                             supportsAllDrives=True)\
                     .execute()
                 created_shares += 1
             except Exception as e:
                 logging.error("Failed to share drive item"
-                              + f"({scope}, {drive_id}) with {email}: {e}")
-        logging.info(f"Created {created_shares} permissions for {scope}")
+                              + f"({team_name}, {drive_id}) with {email}: {e}")
+        logging.info(f"Created {created_shares} permissions for {team_name}")
 
         # Delete old permissions
         # See http://googleapis.github.io/google-api-python-client/docs/dyn/drive_v3.permissions.html#delete # noqa
@@ -99,15 +108,17 @@ class GCPInterface:
                         .execute()
                     deleted_shares += 1
                 except Exception as e:
-                    logging.error(f"Failed to delete permission {p_id} for "
-                                  + f"drive item ({scope}, {drive_id}): {e}")
-            logging.info(f"Deleted {deleted_shares} permissions for {scope}")
+                    logging.error(
+                        f'Failed to delete permission {p_id} for '
+                        + f'drive item ({team_name}, {drive_id}): {e}')
+            logging.info(
+                f'Deleted {deleted_shares} permissions for {team_name}')
         else:
             logging.info("DELETE_OLD_DRIVE_PERMISSIONS is set to false")
 
 
-def new_share_message(scope):
-    return f"Rocket has shared a folder with you for team '{scope}'!"
+def new_share_message(team_name):
+    return f"Rocket has shared a folder with you for team '{team_name}'!"
 
 
 def new_create_permission_body(email):

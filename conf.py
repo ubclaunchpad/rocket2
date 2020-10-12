@@ -23,9 +23,9 @@ copyright = '2018, UBC Launch Pad'
 author = 'UBC Launch Pad'
 
 # The short X.Y version
-version = '1.0'
+version = '2.0'
 # The full version, including alpha/beta/rc tags
-release = '1.0.0'
+release = '2.0.0'
 
 
 # -- General configuration ---------------------------------------------------
@@ -41,6 +41,9 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx_autodoc_typehints',
 ]
+
+# Config options for the extensions
+typehints_fully_qualified = True
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['docs/_templates']

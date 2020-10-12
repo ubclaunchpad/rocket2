@@ -9,7 +9,7 @@ model that will be stored onto the database.
 
 So you just joined Launchpad and want to add yourself to Rocket2. You go
 on slack and starts to talk to the Rocket2 bot, but what should you say?
-To get started, here’s a command you can enter:
+To get started, here's a command you can enter:
 
 command
 ~~~~~~~
@@ -23,7 +23,7 @@ A slack user calls Rocket2 to edit their information.
    /rocket user edit --name "Steven Universe" --email "su@gmail.com"
 
 Yay! You have done what you were told to do, but wait! As a curious
-software developer, you’re curious about what makes Rocket2 tick. How
+software developer, you're curious about what makes Rocket2 tick. How
 exactly is your information saved onto Rocket2? Well, for every member
 added to Rocket2, a user model gets created.
 
@@ -43,12 +43,12 @@ Unfilled parameters will remain empty.
    User.is_valid(steven_universe) # returns true
 
    # To get a user's permission level.
-   steven_universe.permissions_level # returns Permissions_member
+   steven_universe.permissions_level # returns Permissions.member
 
 Launchpad is growing every year, so there are a lot of user, hence a lot
 of user models. We have to be able to keep track and organize everyone,
-so that’s where database comes in. We create a table for every type of
-model, so in this case we’ll create a user table to store all users.
+so that's where database comes in. We create a table for every type of
+model, so in this case we'll create a user table to store all users.
 
 database (db)
 ~~~~~~~~~~~~~
@@ -70,11 +70,11 @@ the future, this allows us to easily switch to using other databases.
 
    # To query an user based on a parameter, a list of matching Users will be
    # returned.
-   facade.query(User, ['name', 'Steven Universe']) # returns [steven_universe]
+   facade.query(User, [('name', 'Steven Universe')]) # returns [steven_universe]
 
    # To query an user based on a non-existent parameter, an empty list will be
    # returned.
-   facade.query(User, ['email', 'fakeemail@gmail.com']) # returns []
+   facade.query(User, [('email', 'fakeemail@gmail.com')]) # returns []
 
    # To query an user without parameters, all the users will be returned
    facade.query(User, []) # returns [steven_universe, second_user]
@@ -88,7 +88,7 @@ right place.
 
 A very good example module can be found in the
 ``app/scheduler/modules/random_channel.py`` source file. I recommend
-that you read it before starting development (don’t worry, it’s very
+that you read it before starting development (don't worry, it's very
 short).
 
 Structure
@@ -126,7 +126,7 @@ every time the rest of the arguments fit. ``day_of_week`` means which
 day it is supposed to fire. ``hour`` means which hour on that day it is
 supposed to fire. And every job has to have a name, which is specified
 in the ``name`` argument. For a more detailed look at the different
-types of arguments and different trigger types that aren’t discussed
+types of arguments and different trigger types that aren't discussed
 here, have a look at the `APScheduler
 documentation <https://apscheduler.readthedocs.io/en/latest/modules/triggers/interval.html?highlight=intervaltrigger#apscheduler.triggers.interval.IntervalTrigger>`__.
 
@@ -147,4 +147,4 @@ within the function ``__init_periodic_tasks``. You can see that we
 already have initialized our beloved ``RandomChannelPromoter`` in that
 function, so just follow along with your own module.
 
-And look! That wasn’t all that bad now wasn’t it??
+And look! That wasn't all that bad now wasn't it??

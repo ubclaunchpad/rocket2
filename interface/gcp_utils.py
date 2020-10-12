@@ -1,4 +1,4 @@
-"""Utilities for common-used interactions with Google API."""
+"""Utilities for common interactions with Google API."""
 import logging
 from typing import List, Optional
 from interface.gcp import GCPInterface
@@ -15,7 +15,12 @@ def sync_user_email_perms(gcp: Optional[GCPInterface],
     provided, this function is a no-op.
 
     Finds folders for user by checking all teams the user is a part of, and
-    calling ``sync_team_email_perms()``.
+    calling :func:`sync_team_email_perms`.
+
+    :param gcp: the interface to do this from; can be `None` to function as
+        no-op
+    :param db: the database facade interface
+    :param user: user model to refresh Google Drive permissions
     """
     if gcp is None:
         logging.debug('GCP not enabled, skipping drive permissions')
@@ -35,6 +40,12 @@ def sync_team_email_perms(gcp: Optional[GCPInterface],
     """
     Refresh Google Drive permissions for provided team. If no GCP client
     is provided, this function is a no-op.
+
+    :param gcp: the interface to do this from; can be `None` to function as
+        no-op
+    :param db: the database facade interface
+    :param team: refresh Google Drive permissions based on team model; if there
+        is no folder for the team model, functions as no-op
     """
     if gcp is None:
         logging.debug("GCP not enabled, skipping drive permissions")

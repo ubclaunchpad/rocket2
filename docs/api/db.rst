@@ -10,13 +10,13 @@ Commonly used database utilities
 Database Facade
 ---------------
 
-.. automodule:: db.facade
+.. autoclass:: db.facade.DBFacade
     :members:
 
 DynamoDB
 --------
 
-.. automodule:: db.dynamodb
+.. autoclass:: db.dynamodb.DynamoDB
     :members:
 
 MemoryDB

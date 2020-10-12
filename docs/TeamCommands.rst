@@ -52,7 +52,7 @@ Create a new team with a Github team name and optional display name. The
 user who runs the command will be automatically added to team as Team
 Lead. If the ``--lead`` flag is used, user with ``SLACK_ID`` will be
 added as Team Lead instead. If the ``--channel`` flag is used, all
-members in specified channel will be added. ‘SLACK_ID’ is the
+members in specified channel will be added. 'SLACK_ID' is the
 ``@``-name, for easy slack autocomplete.
 
 We use Github API to create the team on Github.
@@ -114,7 +114,7 @@ Lead (Team Lead\* and Admin only)
 Adds a user as Team Lead, and adds them to team if not already added. If
 ``--remove`` flag is used, will remove user as Team Lead, but not from
 the team. Team Leads can only promote/demote users in teams that they
-are part of, but admins can promote/demote users in any team. ‘SLACK_ID’
+are part of, but admins can promote/demote users in any team. 'SLACK_ID'
 is the ``@``-name, for easy slack autocomplete.
 
 Delete (Team Lead\* and Admin only)

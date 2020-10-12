@@ -36,9 +36,9 @@ for local instances of DynamoDB is in use.
 -  Exits with 0 if the port is in use.
 -  Exits with 1 if there is an issue connecting with the port you
    provided.
--  Exits with 2 if the ‘port’ you provided couldn’t be converted to an
+-  Exits with 2 if the port you provided couldn't be converted to an
    integer.
--  Exits with 3 if you didn’t provide exactly 1 argument.
+-  Exits with 3 if you didn't provide exactly 1 argument.
 -  Exits with 4 if the port is not already in use.
 
 update.sh

@@ -57,7 +57,7 @@ Before You Open a Pull Request
 -  Your code is presentable and you have **not** committed extra files
    (think your credentials, IDE config files, cached directories, build
    directories, etc.)
--  You’ve written unit tests for the changes you’ve made, and that they
+-  You've written unit tests for the changes you've made, and that they
    cover all the code you wrote (or effectively all, given the
    circumstances)
 
@@ -123,7 +123,7 @@ Assuming you are on your working branch:
    git rebase master
 
 If you have changed files that were also changed in the intervening
-merge, ``git rebase`` may report merge conflicts. If this happens, don’t
+merge, ``git rebase`` may report merge conflicts. If this happens, don't
 panic! Use ``git status`` and ``git diff`` to determine which files
 conflict and where, use an editor to fix the conflicts, then stage the
 formerly-conflicting files with ``git add FILE``. Finally, use

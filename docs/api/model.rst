@@ -4,23 +4,23 @@ Models
 User
 ----
 
-.. automodule:: app.model.user
+.. autoclass:: app.model.user.User
     :members:
 
 Team
 ----
 
-.. automodule:: app.model.team
+.. autoclass:: app.model.team.Team
     :members:
 
 Project
 -------
 
-.. automodule:: app.model.project
+.. autoclass:: app.model.project.Project
     :members:
 
 Permissions
 -----------
 
-.. automodule:: app.model.permissions
+.. autoclass:: app.model.permissions.Permissions
     :members:

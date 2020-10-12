@@ -144,7 +144,7 @@ time. For example:
 2: Create a Slack Workspace
 ---------------------------
 
-For testing, it’s useful to have your own Slack workspace set up. If you
+For testing, it's useful to have your own Slack workspace set up. If you
 do not already have one, go `here <https://slack.com/create>`__ to
 create one, and follow the steps to set it up.
 
@@ -158,13 +158,13 @@ appropriate workspace.
 3.1: Add a Bot Token
 ~~~~~~~~~~~~~~~~~~~~
 
-In “OAuth and Permissions”, select the Bot Token Scopes described in
+In "OAuth and Permissions", select the Bot Token Scopes described in
 `the Slack configuration docs <Config.html#slack-api-token>`__.
 
 3.2: Install Slack App
 ~~~~~~~~~~~~~~~~~~~~~~
 
-In “Install your app to your workspace,” click the button to install to
+In "Install your app to your workspace," click the button to install to
 your workspace. This will take you to a permissions page for the
 workspace - make sure this is for the correct workspace, and allow the
 app to connect.
@@ -174,7 +174,7 @@ Once this is done, you will be provided with an API token.
 3.3: Determine Credentials
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Make note of the app’s signing secret, found in Settings -> Basic
+Make note of the app's signing secret, found in Settings -> Basic
 Information -> App Credentials, and the bot user OAuth access token,
 found in Features -> OAuth & Permissions -> Tokens for Your Workspace.
 These will be needed for the configuration step later.
@@ -191,9 +191,9 @@ Using Real AWS
 If you do not already have access to DynamoDB and CloudWatch, you can
 use it as part of the free tier of AWS. Create an AWS account for
 yourself, then go to the IAM service and create a new user. The user
-name doesn’t particularly matter (though ``rocket2-dev-$NAME`` is
-recommended), but make sure you check “programmatic access.” In
-permissions, go to “Attach existing permissions directly” and add the
+name doesn't particularly matter (though ``rocket2-dev-$NAME`` is
+recommended), but make sure you check "programmatic access." In
+permissions, go to "Attach existing permissions directly" and add the
 following policies:
 
 -  ``AmazonDynamoDBFullAccess``
@@ -226,11 +226,11 @@ CloudWatch integration is not currently supported in this manner.
 
 Create a Rocket 2 Github under an appropriate testing organization. Make
 sure to install the GitHub App to the organization in addition to
-registering it. All this can be done from a GitHub organization’s
+registering it. All this can be done from a GitHub organization's
 Settings > GitHub Apps page.
 
-In the GitHub app’s settings, go to “Private keys” and click “Generate a
-new private key”. This will generate and allow you to download a new
+In the GitHub app's settings, go to "Private keys" and click "Generate a
+new private key". This will generate and allow you to download a new
 secret key for Rocket 2. Save this to the ``credentials/`` directory as
 ``gh_signing_key.pem`` - it should already be in the PEM file format,
 bracketed by:
@@ -247,7 +247,7 @@ available. Refer to the `GitHub key configuration
 docs <Config.html#github-key>`__ for the required permissions.
 
 After doing this, remember to put your tunneled HTTPS URL with
-``/webhook`` appended at the end into the “Webhook URL” box. Refer to
+``/webhook`` appended at the end into the "Webhook URL" box. Refer to
 the `GitHub webhook configuration
 docs <Config.html#github-webhook-endpt>`__ for the required subscriptions.
 
@@ -314,7 +314,7 @@ running.
 7.1: Add Event Subscriptions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-In “Add features and functionality”, add event subscriptions. In
+In "Add features and functionality", add event subscriptions. In
 particular, under Request URL, submit the ngrok HTTPS URL with
 ``/slack/events`` appended to the end. Note that ngrok will generate a
 new HTTPS URL every time it runs, so you will have to repeat this step
@@ -326,11 +326,11 @@ list of these.
 7.2: Add Slash Command
 ~~~~~~~~~~~~~~~~~~~~~~
 
-In “Add features and functionality”, add a slash command. In particular,
+In "Add features and functionality", add a slash command. In particular,
 under Request URL, submit the ngrok HTTPS URL with ``/slack/commands``
 appended to the end. For the actual command, anything will work, though
 the final app will use ``/rocket``. Make sure you tick the box marked
-“Escape channels, users, and links sent to your app”, or else none of
+"Escape channels, users, and links sent to your app", or else none of
 the @ signs will work properly!
 
 8: Testing
@@ -353,7 +353,7 @@ If you see a list of options, Rocket is working!
 8.1: Setting Up Admin Permissions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-We currently haven’t finished the command to add a user to the database
+We currently haven't finished the command to add a user to the database
 or make them an admin, so we have to do it manually.
 
 First, determine your Slack ID by reading the logs. The logs are
@@ -364,7 +364,7 @@ formatted like so:
    {slackid_making_the_command}:{command_itself}
 
 The Slack IDs of other users will appear when you type ``@`` followed by
-whatever the user’s handle is. Slack automatically converts that handle
+whatever the user's handle is. Slack automatically converts that handle
 into an ID.
 
 Then, you have an option of either using the AWS command-line interface
@@ -390,8 +390,8 @@ Replace ``USERS_TABLE`` with whatever name you set in ``config.toml``.
 
 Alternatively, you can directly edit the DynamoDB table via the AWS web
 interface. Go to the DynamoDB service in the AWS web interface and open
-the appropriate table. Click on the Items tab and then on “Create item”.
-Make sure there’s a column for ``slack_id`` and ``permission_level``,
+the appropriate table. Click on the Items tab and then on "Create item".
+Make sure there's a column for ``slack_id`` and ``permission_level``,
 where ``slack_id`` is a ``String`` with the appropriate value and
 ``permission_level`` is a ``String`` with the value ``admin``.
 

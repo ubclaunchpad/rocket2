@@ -15,7 +15,7 @@ Hosting
 Rocket 2 is currently hosted by an AWS EC2 t2.micro instance. Since this
 is a single-threaded application with a single worker thread, there is
 not much of a reason to go for anything more. **Note: Adding more worker
-threads may cause “minor” issues such as the scheduler running more than
+threads may cause "minor" issues such as the scheduler running more than
 once, weird exceptions, and may prevent the server from running in some
 cases, which is why increasing the number of worker threads beyond 1 is
 not recommended.**
@@ -28,9 +28,9 @@ should first be able to set up a Rocket 2 instance for testing on a
 local computer with ``ngrok`` forwarding. If you have successfully set
 up an instance on a remote computer, you may still want to have a look.
 
-For those of you who don’t want too much of a hassle, hosting via Heroku
+For those of you who don't want too much of a hassle, hosting via Heroku
 is also a valid option, as Heroku does continuous deployment without the
-need of setting up Inertia, and also has built-in SSL so you don’t need
+need of setting up Inertia, and also has built-in SSL so you don't need
 to set anything up. Be wary, however, that Heroku is almost twice as
 expensive as an AWS EC2 t2.micro instance.
 
@@ -44,10 +44,10 @@ SSL
 Before deploying for the first time, you must set up SSL and
 configuration for Nginx, which we are using as a proxy server. This can
 be done by running the ``scripts/setup_deploy.sh`` script. This runs the
-official `Let’s Encrypt <https://letsencrypt.org/>`__ container to
+official `Let's Encrypt <https://letsencrypt.org/>`__ container to
 request SSL certificates, sets up a cronjob to periodically re-validate
 them, and copies ``nginx.conf`` to the correct location. Do note that
-the Let’s Encrypt container needs to use port 443, so if you have
+the Let's Encrypt container needs to use port 443, so if you have
 another process or container using that port, you will need to kill it
 before running the set up script.
 
@@ -55,7 +55,7 @@ Inertia
 ~~~~~~~
 
 For UBC Launch Pad, we continuously deploy off the ``ec2-release``
-branch on Github using UBC Launch Pad’s
+branch on Github using UBC Launch Pad's
 `Inertia <https://github.com/ubclaunchpad/inertia>`__. This will pull
 the repo when changes are merged, rebuild the containers from
 ``docker-compose.yml``, and redeploy.

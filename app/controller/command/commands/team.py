@@ -40,7 +40,7 @@ class TeamCommand(Command):
         :param db_facade: Given Dynamo_DB Facade
         :param gh: Given Github Interface
         :param sc: Given Slack Client Interface
-        "param gcp: Given GCP client
+        :param gcp: Given GCP client
         """
         logging.info("Initializing TeamCommand instance")
         self.facade = db_facade

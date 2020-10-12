@@ -37,7 +37,12 @@ class DynamoDB(DBFacade):
     """
 
     class Const:
-        """A bunch of static constants and functions."""
+        """
+        A bunch of static constants and functions.
+
+        Used to convert between Python objects and the DDB table names, object
+        attributes and table column names.
+        """
 
         def __init__(self, config: Config):
             """Initialize the constants."""
@@ -50,7 +55,7 @@ class DynamoDB(DBFacade):
             Convert class into corresponding table name.
 
             :param cls: Either ``User``, ``Team``, or ``Project``
-            :raise: TypeError if it is not either User, Team, or Project
+            :raises: TypeError if it is not either User, Team, or Project
             :return: table name string
             """
             if cls == User:
@@ -67,7 +72,7 @@ class DynamoDB(DBFacade):
             Get primary key of the table name.
 
             :param cls: the name of the table
-            :raise: TypeError if table does not exist
+            :raises: TypeError if table does not exist
             :return: primary key of the table
             """
             if table_name == self.users_table:
@@ -84,8 +89,8 @@ class DynamoDB(DBFacade):
             Get class attributes that are sets.
 
             :param cls: the table name
-            :raise: TypeError if table does not exist
-            :return: list of strings of set attributes
+            :raises: TypeError if table does not exist
+            :return: set attributes
             """
             if table_name == self.users_table:
                 return []
