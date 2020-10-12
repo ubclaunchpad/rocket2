@@ -10,6 +10,6 @@ jobs:
     steps:
       - uses: alex-page/github-project-automation-plus@v0.3.0
         with:
-          project: Rocket 2
+          project: Rocket 2 Planning
           column: Needs triage
           repo-token: ${{ secrets.GITHUB_TOKEN }}
