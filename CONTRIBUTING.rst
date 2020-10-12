@@ -1,11 +1,14 @@
-Contributing
-============
+Contribution Guide
+==================
 
 This document contains important details for anyone contributing to
 Rocket 2.
 
-Opening an Issue
-----------------
+Issues
+------
+
+Creating an Issue
+~~~~~~~~~~~~~~~~~
 
 If you see a bug or have a feature request, please `open an
 issue <https://github.com/ubclaunchpad/rocket2/issues>`__! That being
@@ -18,31 +21,35 @@ on an issue, please assign yourself to it, and unassign yourself if you stop
 working on it.**
 
 Task Triage and Planning
-------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 All newly created issues are automatically added to the
-`Rocket 2 project board <https://github.com/ubclaunchpad/rocket2/projects/1>`_.
-The life of an issue goes roughly as follows:
+`Rocket 2 Planning project board <https://github.com/ubclaunchpad/rocket2/projects/1>`_.
+Issues start in the *Needs triage* column. From here, they are moved to either:
 
-Issues start in *Needs triage*. From here, they are moved to either:
+- ❄️ *Icebox*: deprioritized tasks are tracked here
+- 🗂 *Backlog*: this means that we want to get around to this task at some point
 
-- *Icebox*: deprioritized tasks are tracked here
-- *Backlog*: this means that we want to get around to this task at some point
-
-From the *Backlog*, we start moving tasks into *Planned*, which is typically
+From the *Backlog*, we start moving tasks into 🚀 *Planned*, which is typically
 around when discussions around design and potential implementation happens.
-When work begins in earnest, the issue should be moved to *In progress*,
+When work begins in earnest, the issue should be moved to 🏃‍♂️ *In progress*,
 where it will stay until a pull request lands closing the issue, at which
-point it will automatically be moved to *Done*.
+point it will automatically be moved to ✅ *Done*.
 
-Development Documentation
--------------------------
+We do not use the planning project to track pull requests - instead, relevant
+pull requests should be attached to their respective issues.
+
+Development
+-----------
 
 Please refer to the `local development guide <https://rocket2.readthedocs.io/en/latest/docs/LocalDevelopmentGuide.html>`_
-to get started! 
+to get started with making changes to Rocket 2!
 
-Before-Pull-Request checklist
------------------------------
+Pull Requests
+-------------
+
+Before You Open a Pull Request
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 -  All tests and style and docs checks pass (``scripts/build_check.sh``)
 -  The GitHub build passes (GitHub will build your commit when you push
@@ -60,7 +67,7 @@ code coverage, but you can easily check the code coverage using the
 the unit tests are run.
 
 Submitting a Pull Request
--------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 We appreciate pull requests of any size or scope.
 
@@ -102,7 +109,7 @@ it can be merged into ``master``. Please do so with an ordinary merge
 commit, not a rebase or squash merge.
 
 Updating an Outdated Pull Request
----------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If changes have been merged between when you started work on your branch
 and when your pull request was approved, you will have to update your
