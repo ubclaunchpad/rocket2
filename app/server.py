@@ -1,15 +1,13 @@
 """Flask server instance."""
 from factory import make_command_parser, make_github_webhook_handler, \
-    make_slack_events_handler, make_github_interface
+    make_slack_events_handler, make_github_interface, make_event_scheduler
 from flask import Flask, request
 from logging.config import dictConfig
 from slackeventsapi import SlackEventAdapter
-from apscheduler.schedulers.background import BackgroundScheduler
 import logging
 import structlog
 from flask_talisman import Talisman
 from config import Config
-from app.scheduler import Scheduler
 from interface.slack import Bot
 from slack import WebClient
 from boto3.session import Session
@@ -81,8 +79,7 @@ slack_events_handler = make_slack_events_handler(config)
 slack_events_adapter = SlackEventAdapter(config.slack_signing_secret,
                                          "/slack/events",
                                          app)
-sched = Scheduler(BackgroundScheduler(timezone="America/Los_Angeles"),
-                  (app, config))
+sched = make_event_scheduler(app, config)
 sched.start()
 
 bot = Bot(WebClient(config.slack_api_token),

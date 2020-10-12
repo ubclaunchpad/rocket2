@@ -17,7 +17,7 @@ class Config:
         'SLACK_API_TOKEN': 'slack_api_token',
         'SLACK_NOTIFICATION_CHANNEL': 'slack_notification_channel',
         'SLACK_ANNOUNCEMENT_CHANNEL': 'slack_announcement_channel',
-
+        'SLACK_PAIRING_CHANNEL': 'slack_pairing_channel',
         'GITHUB_APP_ID': 'github_app_id',
         'GITHUB_ORG_NAME': 'github_org_name',
         'GITHUB_DEFAULT_TEAM_NAME': 'github_team_all',
@@ -89,7 +89,7 @@ class Config:
         self.slack_api_token = ''
         self.slack_notification_channel = ''
         self.slack_announcement_channel = ''
-
+        self.slack_pairing_channel = ''
         self.github_app_id = ''
         self.github_org_name = ''
         self.github_team_all = ''
