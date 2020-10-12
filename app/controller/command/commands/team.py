@@ -55,7 +55,11 @@ class TeamCommand(Command):
         self.help = self.get_help()
 
     def init_subparsers(self) -> _SubParsersAction:
-        """Initialize subparsers for team command."""
+        """
+        Initialize subparsers for team command.
+
+        :meta private:
+        """
         subparsers = self.parser.add_subparsers(dest="which")
 
         """Parser for list command."""
@@ -635,7 +639,8 @@ class TeamCommand(Command):
         Ensure that the local team database is the same as GitHub's.
 
         In the event that our local team database is outdated compared to
-        the teams on GitHub, this command can be called to fix things.
+        the teams on GitHub, this command can be called to fix these
+        inconsistencies.
 
         :return: error message if user has insufficient permission level
                  otherwise returns success messages with # of teams changed

@@ -102,21 +102,22 @@ class DynamoDB(DBFacade):
                 raise TypeError('Table name does not correspond to anything')
 
     def __init__(self, config: Config):
-        """Initialize facade using DynamoDB settings.
+        """
+        Initialize facade using DynamoDB settings.
 
         To avoid local tests failure when the DynamoDb server is used,
-        a testing environment variable is set.
-        When testing environmental variable is true,
-        the local dynamodb is run.
-        When testing environmental variable is true,
-        the server dynamodb is run.
+        an environment variable ``config.aws_local`` is read.
 
-        boto3.resource() takes in a service_name, region_name, and endpoint_url
-        (only for local dynamodb).
-        service_name: The name of a service, "dynamodb" in this case.
-        region_name:  The name of the region associated with the client.
-        A list of different regions can be obtained online.
-        endpoint_url: The complete URL to use for the constructed client.
+        .. code:: python
+
+            if config.aws_local:
+                # Connect to locally-run instance of DynamoDB
+                pass
+            else:
+                # Connect to remote instance of DynamoDB
+                pass
+
+        :param config: configuration used to initialize
         """
         logging.info("Initializing DynamoDb")
         self.users_table = config.aws_users_tablename

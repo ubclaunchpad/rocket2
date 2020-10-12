@@ -30,7 +30,11 @@ class KarmaCommand(Command):
         self.help = self.get_help()
 
     def init_subparsers(self) -> _SubParsersAction:
-        """Initialize subparsers for karma command."""
+        """
+        Initialize subparsers for karma command.
+
+        :meta private:
+        """
         subparsers: _SubParsersAction = \
             self.parser.add_subparsers(dest="which")
 

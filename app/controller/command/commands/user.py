@@ -41,7 +41,11 @@ class UserCommand(Command):
         self.gcp = gcp
 
     def init_subparsers(self) -> _SubParsersAction:
-        """Initialize subparsers for user command."""
+        """
+        Initialize subparsers for user command.
+
+        :meta private:
+        """
         subparsers = self.parser.add_subparsers(dest="which")
 
         # Parser for view command

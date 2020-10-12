@@ -44,6 +44,7 @@ extensions = [
 
 # Config options for the extensions
 typehints_fully_qualified = True
+always_document_param_types = True
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['docs/_templates']

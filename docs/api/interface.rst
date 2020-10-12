@@ -4,7 +4,7 @@ Interface
 Amazon CloudWatch
 -----------------
 
-.. automodule:: interface.cloudwatch_metrics
+.. autoclass:: interface.cloudwatch_metrics.CWMetrics
     :members:
 
 Github
