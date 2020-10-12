@@ -281,7 +281,7 @@ Optionally, for `local DynamoDB <#using-local-aws>`__:
    scripts/docker_run_local.sh --env-file .env --network="host"
 
 The option
-```--env-file`` <https://docs.docker.com/engine/reference/commandline/run/#set-environment-variables--e---env---env-file>`__
+`--env-file <https://docs.docker.com/engine/reference/commandline/run/#set-environment-variables--e---env---env-file>`__
 lets you pass in your `configuration options <Config.html>`__.
 
 For the curious, you can take a look at the contents of the referenced
