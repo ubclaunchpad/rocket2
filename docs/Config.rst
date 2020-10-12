@@ -1,5 +1,5 @@
-The Configuration System
-========================
+Configuration Reference
+=======================
 
 We use environmental variables for all of our configuration-related
 things. A sample ``.env`` file (which is what ``pipenv`` looks for when

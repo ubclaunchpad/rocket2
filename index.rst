@@ -5,30 +5,27 @@
 
     🚀 Rocket 2 <self>
     CONTRIBUTING
-    LICENSE
 
 .. toctree::
-    :caption: Tutorials
+    :caption: Development
     :hidden:
 
-    docs/GettingStarted
-    docs/Testing
     docs/LocalDevelopmentGuide
-    docs/Scheduler
+    docs/Scripts
+    docs/Testing
+    docs/DevelopmentTutorials
 
 .. toctree::
-    :caption: How Everything Works
+    :caption: How Rocket 2 Works
     :hidden:
 
-    docs/Scripts
-    docs/Database
+    docs/Architecture
     docs/Config
-    docs/Requirements
+    docs/Database
     docs/Deployment
-    docs/Qna
 
 .. toctree::
-    :caption: Plugin Reference
+    :caption: Usage
     :hidden:
 
     docs/UserCommands
@@ -37,12 +34,19 @@
     docs/KarmaCommands
 
 .. toctree::
-    :caption: API Documentation
+    :caption: Internal
     :maxdepth: 2
     :glob:
     :hidden:
 
     docs/api/*
+
+.. toctree::
+    :caption: Other
+    :hidden:
+
+    LICENSE
+    CODE_OF_CONDUCT
 
 Indices and tables
 ==================
