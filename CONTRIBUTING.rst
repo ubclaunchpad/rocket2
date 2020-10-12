@@ -12,37 +12,40 @@ issue <https://github.com/ubclaunchpad/rocket2/issues>`__! That being
 said, make sure to do a quick search first - there may already be an
 issue that covers it.
 
-When creating a new issue, please add a label describing the issue; the
-most relevant are probably “Bug” and “Feature request”.
+When creating a new issue, please use the existing templates, and make sure
+the appropriate labels are attached to the issue. **If you are going to work
+on an issue, please assign yourself to it, and unassign yourself if you stop
+working on it.**
 
-**If you are going to work on an issue, please assign yourself to it,
-and unassign yourself if you stop working on it.**
+Task Triage and Planning
+------------------------
 
-If you are not planning to work on a new issue, please also add it to
-the Rocket 2.0 project; this will automatically add it to our Kanban
-board’s backlog, where we can review it in a future sprint.
+All newly created issues are automatically added to the
+`Rocket 2 project board <https://github.com/ubclaunchpad/rocket2/projects/1>`_.
+The life of an issue goes roughly as follows:
 
-Setting up branches
--------------------
+Issues start in *Needs triage*. From here, they are moved to either:
 
-Before you make any changes, you should first set up your own branch. It
-is common convention to name your branch:
+- *Icebox*: deprioritized tasks are tracked here
+- *Backlog*: this means that we want to get around to this task at some point
 
-::
+From the *Backlog*, we start moving tasks into *Planned*, which is typically
+around when discussions around design and potential implementation happens.
+When work begins in earnest, the issue should be moved to *In progress*,
+where it will stay until a pull request lands closing the issue, at which
+point it will automatically be moved to *Done*.
 
-   <username>/#<issue-number>-<description-of-fix>
+Development Documentation
+-------------------------
 
-So if your issue is `#153 Read from
-configuration <https://github.com/ubclaunchpad/rocket2/issues/153>`__,
-you would name it ``rwblickhan/#153-read-from-config``. The name needs
-to be concise, descriptive, and, well, have your name and number, so to
-speak.
+Please refer to the `local development guide <https://rocket2.readthedocs.io/en/latest/docs/LocalDevelopmentGuide.html>`_
+to get started! 
 
 Before-Pull-Request checklist
 -----------------------------
 
 -  All tests and style and docs checks pass (``scripts/build_check.sh``)
--  The Github build passes (Github will build your commit when you push
+-  The GitHub build passes (GitHub will build your commit when you push
    it)
 -  Your code is presentable and you have **not** committed extra files
    (think your credentials, IDE config files, cached directories, build
@@ -51,9 +54,10 @@ Before-Pull-Request checklist
    cover all the code you wrote (or effectively all, given the
    circumstances)
 
-We use ``codecov`` to check code coverage, but you can easily check the
-code coverage using the ``scripts/build_check.sh`` script. The coverage
-should be displayed after the unit tests are run.
+We use `codecov <https://codecov.io/gh/ubclaunchpad/rocket2>`_ to check
+code coverage, but you can easily check the code coverage using the
+``scripts/build_check.sh`` script. The coverage should be displayed after
+the unit tests are run.
 
 Submitting a Pull Request
 -------------------------
@@ -65,14 +69,18 @@ the pull request template with as much detail as you can. In particular,
 all pull requests should be linked to one or more issues - if a relevant
 issue does not exist, please create one as described above.
 
-All pull requests must be code reviewed. Currently the code is owned by
-the
-`brussel-sprouts <https://github.com/orgs/ubclaunchpad/teams/brussel-sprouts>`__
-team at UBC Launch Pad; at least one member of the team must approve the
-pull request before it can be merged.
+Note that you may open a pull request at any point during your progress -
+if a pull request is being opened as a request for feedback and help rather
+than a request for review and merge, then please open the pull request as
+a `draft pull request <https://docs.github.com/en/free-pro-team@latest/github/collaborating-with-issues-and-pull-requests/about-pull-requests#draft-pull-requests>`.
 
-All pull requests must pass our Github build before they can be merged.
-The Github build checks for:
+All pull requests must be code reviewed before being merged. Currently the
+code is primarily owned by the
+`rocket2 <https://github.com/orgs/ubclaunchpad/teams/rocket2>`__
+team at UBC Launch Pad.
+
+All pull requests must pass our GitHub build before they can be merged.
+The GitHub build checks for:
 
 -  Passing unit tests (via `pytest <https://pytest.org>`__)
 -  Minimum code coverage of unit tests (via
@@ -89,19 +97,9 @@ All of these checks are conveniently done using the
 
 Remember to add the label ``Ready for Review``.
 
-After your pull request has been approved and the Github build passes,
+After your pull request has been approved and the GitHub build passes,
 it can be merged into ``master``. Please do so with an ordinary merge
 commit, not a rebase or squash merge.
-
-Work in progress (WIP) pull requests
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Sometimes, it may be more appropriate to submit a pull request that you
-are working on, just to say that you are working on something (or so
-that you can get some initial feedback on your work). In that case, it
-can be a good idea to submit a pull request marked WIP. The convention
-here is to prepend ``[WIP]`` in the title of the request, and to further
-mark it with the label ``WIP``.
 
 Updating an Outdated Pull Request
 ---------------------------------

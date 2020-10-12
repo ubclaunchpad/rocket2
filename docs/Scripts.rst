@@ -1,5 +1,5 @@
-Scripts for Development
-=======================
+Development Scripts
+===================
 
 There are a few scripts in the ``scripts/`` directory that aid in the
 development of this project.
