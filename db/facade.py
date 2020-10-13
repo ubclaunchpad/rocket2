@@ -142,3 +142,13 @@ class DBFacade(ABC):
         :param k: ID or key of the object to remove (must be primary key)
         """
         raise NotImplementedError
+    
+    @abstractmethod
+    def delete_all(self, Model: Type[T]):
+        """
+        Remove all entries from a table
+
+        :param Model: The table to remove all entries of
+        """
+
+        raise NotImplementedError

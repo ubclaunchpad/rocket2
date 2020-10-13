@@ -3,14 +3,15 @@ from slack import WebClient
 from interface.slack import Bot
 from random import shuffle
 from .base import ModuleBase
-from typing import Dict, List, Tuple, Any
+from typing import Dict, List, Tuple, Any, Set
 from flask import Flask
 from config import Config
 from db.facade import DBFacade
+from app.model import Pairing
 import logging
 
 
-class Pairing(ModuleBase):
+class PairingSchedule(ModuleBase):
     """Module that matches 2 launchpad members each week"""
 
     NAME = 'Match launch pad members randomly'
@@ -46,18 +47,55 @@ class Pairing(ModuleBase):
     def __pair_users(self, users: List[str]) -> List[List[str]]:
         """
         Creates pairs of users that haven't been matched before
+
+        :param users: A list of slack ids of all users to match
+
+        If a pairing cannot be done, then the history of pairings is
+        purged, and the algorithm is run again.
         """
+        # TODO: Clean this up into a more concrete algorithm
         shuffle(users)
+        already_added = set()
         pairs = []
-        pair = []
         for i, user in enumerate(users):
-            pair.append(user)
-            if i % 2 != 0:
-                pairs.append(pair)
-                pair = []
+            if user in already_added:
+                continue
+            previously_paired = self.__get_previous_pairs(user)
+            for j in range(i + 1, len(users)):
+                other_user = users[j]
+                if other_user not in previously_paired and other_user not in already_added:
+                    self.__persist_pairing(user, other_user)
+                    pairs.append([user, other_user])
+                    already_added.add(user)
+                    already_added.add(other_user)
+                    break
+        not_paired = list(filter(lambda user: user not in already_added, users))
         # If we have an odd number of people that is not 1
         # We put the odd person out in one of the groups
         # So we might have a group of 3
-        if len(pair) == 1 and len(pairs) > 0:
-            pairs[len(pairs) - 1].append(pair[0])
-        return pairs
+        if len(not_paired) == 1 and len(pairs) > 0:
+            pairs[len(pairs) - 1].append(not_paired[0])
+        elif len(not_paired) > 1:
+            self.__purge_pairings()
+            return self.__pair_users(users)
+        else:
+            return pairs
+
+    def __get_previous_pairs(self, user: str) -> Set[str]:
+        logging.info(f"Getting previous pairs for {user}")
+        pairings = self.facade.query_or(Pairing, [('user1_slack_id', user), ('user2_slack_id', user)])
+        res = set()
+        for pairing in pairings:
+            other = pairing.user1_slack_id if pairing.user2_slack_id == user else pairing.user2_slack_id
+            res.add(other)
+        logging.info(f"Previous pairings are {res}")
+        return res
+    
+    def __persist_pairing(self, user1_slack_id: str, user2_slack_id: str):
+        pairing = Pairing(user1_slack_id, user2_slack_id)
+        reverse_pairing = Pairing(user2_slack_id, user1_slack_id)
+        self.facade.store(pairing)
+        self.facade.store(reverse_pairing)
+
+    def __purge_pairings(self):
+        self.facade.delete_all(Pairing)

@@ -23,7 +23,7 @@ class Pairing(RocketModel):
         self.pairing_id = str(uuid.uuid4())
         self.user1_slack_id = user1_slack_id
         self.user2_slack_id = user2_slack_id
-        self.ttl = "" # TODO
+        self.ttl = "TODO" # TODO
 
     def get_attachment(self) -> Dict[str, Any]:
         """Return slack-formatted attachment (dictionary) for pairing."""

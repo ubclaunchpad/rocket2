@@ -92,7 +92,7 @@ class DynamoDB(DBFacade):
             :raise: TypeError if table does not exist
             :return: list of strings of set attributes
             """
-            if table_name == self.users_table or table_name == self.projects_table:
+            if table_name == self.users_table or table_name == self.pairings_table:
                 return []
             elif table_name == self.teams_table:
                 return ['team_leads', 'members']
@@ -209,7 +209,7 @@ class DynamoDB(DBFacade):
 
     def store(self, obj: T) -> bool:
         Model = obj.__class__
-        if Model not in [User, Team, Project]:
+        if Model not in [User, Team, Project, Pairing]:
             logging.error(f"Cannot store object {str(obj)}")
             raise RuntimeError(f'Cannot store object{str(obj)}')
 
@@ -309,3 +309,11 @@ class DynamoDB(DBFacade):
                 self.CONST.get_key(table_name): k
             }
         )
+
+    def delete_all(self, Model: Type[T]):
+        logging.info(f"Deleting {Model.__name__}")
+        table_name = self.CONST.get_table_name(Model)
+        table = self.ddb.Table(table_name)
+        table.delete()
+        table.wait_until_not_exists()
+        self.__create_table(table_name)

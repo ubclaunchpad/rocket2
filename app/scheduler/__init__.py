@@ -3,7 +3,7 @@ import atexit
 from flask import Flask
 from apscheduler.schedulers.background import BackgroundScheduler
 from .modules.random_channel import RandomChannelPromoter
-from .modules.pairing import Pairing
+from .modules.pairing import PairingSchedule
 from .modules.base import ModuleBase
 from db.facade import DBFacade
 from typing import Tuple, List
@@ -39,4 +39,4 @@ class Scheduler:
     def __init_periodic_tasks(self):
         """Add jobs that fire every interval."""
         self.__add_job(RandomChannelPromoter(*self.args))
-        self.__add_job(Pairing(*self.args, self.facade))
+        self.__add_job(PairingSchedule(*self.args, self.facade))
