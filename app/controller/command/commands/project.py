@@ -289,7 +289,7 @@ class ProjectCommand(Command):
 
         :param project_id: project ID of project to unassign team from
         :param user_id: user ID of the calling user
-        :return: returns lookup error if the project, assigned team or calling
+        :return: error string if the project, assigned team or calling
                  user could not be found, else permission error if calling
                  user is not a team lead of the team to unassign,
                  otherwise success message
@@ -321,7 +321,7 @@ class ProjectCommand(Command):
 
         :param project_id: project ID of the project in the database to edit
         :param param_list: Dict of project parameters that are to be edited
-        :return: returns edit message if project is successfully edited, or an
+        :return: edit message if project is successfully edited, or an
                  error message if the project was not found in the database
         """
         logging.debug("Handling project edit subcommand")
@@ -354,7 +354,7 @@ class ProjectCommand(Command):
         :param user_id: user ID of the calling user
         :param force: specify if an error should be raised if the project
                       is assigned to another team
-        :return: returns lookup error if the project could not be found or no
+        :return: error string if the project could not be found or no
                  team has the specified GitHub team name or if the calling
                  user is not in the database, else permission error if calling
                  user is not a team lead, else an assignment error if the
@@ -404,7 +404,7 @@ class ProjectCommand(Command):
         :param user_id: user ID of the calling user
         :param force: specify if an error should be raised if the project
                       is assigned to a team
-        :return: returns lookup error if the project, assigned team, or user
+        :return: error string if the project, assigned team, or user
                  could not be found, else an assignment error if the project
                  is assigned to a team, otherwise success message
         """

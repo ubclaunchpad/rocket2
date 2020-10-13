@@ -118,7 +118,7 @@ class MissingConfigError(Exception):
         """
         Initialize a new MissingConfigError.
 
-        :param: missing_config_fields List of missing config variables
+        :param missing_config_fields: the missing config variables
         """
         self.error = 'Please set the following env variables:\n' + \
             '\n'.join(missing_config_fields)

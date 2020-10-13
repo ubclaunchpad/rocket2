@@ -54,7 +54,7 @@ class GitHubWebhookHandler:
 
         :param request_body: Byte string of the request body
         :param xhub_signature: Hashed signature to validate
-        :return: Return True if the signature is valid, False otherwise
+        :return: True if the signature is valid, False otherwise
         """
         h = hmac.new(bytes(self.__secret, encoding='utf8'),
                      request_body, hashlib.sha1)

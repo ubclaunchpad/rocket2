@@ -84,7 +84,7 @@ class User(RocketModel):
         Convert dict response object to user model.
 
         :param d: the dictionary representing a user
-        :return: returns converted user model.
+        :return: the converted user model.
         """
         user = cls(d['slack_id'])
         user.email = d.get('email', '')
@@ -110,7 +110,7 @@ class User(RocketModel):
             - ``permissions_level``
 
         :param user: user to check
-        :return: return true if this user has no missing required fields
+        :return: true if this user has no missing required fields
         """
         return len(user.slack_id) > 0
 

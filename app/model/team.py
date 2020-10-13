@@ -62,7 +62,7 @@ class Team(RocketModel):
         Convert dict response object to team model.
 
         :param d: the dictionary representing a team
-        :return: returns converted team model.
+        :return: the converted team model.
         """
         team = cls(d['github_team_id'],
                    d['github_team_name'],
@@ -113,7 +113,7 @@ class Team(RocketModel):
             - ``github_team_id``
 
         :param team: team to check
-        :return: returns true if this team has no missing required fields
+        :return: true if this team has no missing required fields
         """
         return len(team.github_team_name) > 0 and\
             len(team.github_team_id) > 0

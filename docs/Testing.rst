@@ -12,7 +12,7 @@ Running Pytest Efficiently
 Test Driven Development… we hear professors preach about it during
 lectures but we never got an opportunity to put it to good use until
 Rocket2 came along. Unfortunately we got over excited and wrote A LOT of
-tests. Running them all every time is a bit painful, that’s where
+tests. Running them all every time is a bit painful, that's where
 ``@pytest.mark`` comes in. ``pytest.mark`` allows you to label your
 tests to run them in groups.
 

@@ -30,8 +30,8 @@ SLACK_API_TOKEN
 ---------------
 
 The Slack API token of your Slack bot. Can be found under OAuth &
-Permissions tab of your slack app (under the name “Bot user OAuth access
-token”).
+Permissions tab of your slack app (under the name "Bot user OAuth access
+token").
 
 The following permission scopes are required:
 
@@ -45,7 +45,7 @@ The following permission scopes are required:
 -  ``im:write``
 
 You must also configure a slash command integration as well (under
-“Slash commands”) for the URL path ``/slack/commands`` of your Rocket
+"Slash commands") for the URL path ``/slack/commands`` of your Rocket
 instance.
 
 SLACK_NOFICIATION_CHANNEL
@@ -99,8 +99,8 @@ GITHUB_WEBHOOK_ENDPT
 --------------------
 
 The path GitHub posts webhooks to. Note that the following events must
-be enabled (configured in GitHub app settings > “Permissions & events” >
-“Subscribe to events”):
+be enabled (configured in GitHub app settings > "Permissions & events" >
+"Subscribe to events"):
 
 -  Membership
 -  Organization
@@ -125,9 +125,9 @@ generate and download the key)). Paste the contents of the file as a
 string. See `deployment <Deployment.html#github-key>`__ for
 troubleshooting.
 
-The following permissions must be set to “Read & Write” for the
-associated GitHub app (configured in GitHub app settings > “Permissions
-& events” > “Organization permissions”):
+The following permissions must be set to "Read & Write" for the
+associated GitHub app (configured in GitHub app settings > "Permissions
+& events" > "Organization permissions"):
 
 -  Organization members
 
@@ -176,6 +176,6 @@ GCP_SERVICE_ACCOUNT_SUBJECT
 ---------------------------
 
 User to emulate for GCP requests. Optional, and defaults to using your
-service account’s identity. This feature requires domain-wide authority
+service account's identity. This feature requires domain-wide authority
 to be delegated to your service account - refer to `this
 guide <https://developers.google.com/identity/protocols/oauth2/service-account#delegatingauthority>`__.
