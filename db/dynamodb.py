@@ -80,7 +80,7 @@ class DynamoDB(DBFacade):
             elif table_name == self.projects_table:
                 return 'project_id'
             elif table_name == self.pairings_table:
-                return 'pairing_id
+                return 'pairing_id'
             else:
                 raise TypeError('Table name does not correspond to anything')
 
