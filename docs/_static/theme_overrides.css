@@ -11,3 +11,11 @@
        overflow: visible !important;
     }
 }
+
+.invisible {
+	display: none;
+}
+
+.center {
+	text-align: center;
+}
