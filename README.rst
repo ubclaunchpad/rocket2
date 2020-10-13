@@ -1,8 +1,8 @@
-.. image:: docs/rocket-logo.png
-    :width: 25%
-    :align: center
-
 .. raw:: html
+
+    <p align="center">
+        <img width="25%" src="https://github.com/ubclaunchpad/rocket2/blob/master/docs/rocket-logo.png?raw=true" />
+    </p>
 
     <h1 align="center">Rocket 2</h1>
 
