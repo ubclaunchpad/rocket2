@@ -6,11 +6,10 @@
 
     <h1 align="center">Rocket 2</h1>
 
-.. rst-class:: center
-
-Rocket 2 is the official `UBC Launch Pad`_ Slack bot and team management platform.
-
-.. raw:: html
+    <p align="center">
+        Rocket 2 is the official <a href="https://ubclaunchpad.com">UBC Launch Pad</a>
+        Slack bot and team management platform.
+    </p>
 
    <p align="center">
       <a href="https://github.com/ubclaunchpad/rocket2/actions?query=workflow%3APipeline">
@@ -57,14 +56,6 @@ engineering club.
      - **Hackable and extensible** - an open codebase makes it easy to add commands, scheduled modules, and more!
 
 |
-
-.. rst-class:: invisible
-
-🚀 Rocket 2
------------
-
-.. Nothing in here is seen because it is invisible. But it is necessary because we want the breadcrumb above
-.. to read "Rocket 2".
 
 📦 Usage
 --------
