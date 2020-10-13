@@ -11,7 +11,7 @@ and :py:mod:`app.controller.webhook.slack.core`.
 We store our data in an Amazon DynamoDB, which can be accessed directly by the
 database facade :py:class:`db.dynamodb.DynamoDB`.
 
-We treat Github itself as the sole source of truth. Any modifications done on the
+We treat GitHub itself as the sole source of truth. Any modifications done on the
 Github side (e.g. changing team names, adding/removing team members,
 creating/deleting teams, etc.) is reflected into the database.
 Whenever an attempt is made at modifying the existing teams (e.g. using a slash
