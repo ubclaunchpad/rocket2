@@ -37,6 +37,7 @@ services:
             - AWS_SECRET_KEY=${AWS_SECRET_KEY}
             - AWS_USERS_TABLE=${AWS_USERS_TABLE}
             - AWS_TEAMS_TABLE=${AWS_TEAMS_TABLE}
+            - AWS_PAIRINGS_TABLE=${AWS_PAIRINGS_TABLE}
             - AWS_PROJECTS_TABLE=${AWS_PROJECTS_TABLE}
             - AWS_REGION=${AWS_REGION}
             - AWS_LOCAL=${AWS_LOCAL}

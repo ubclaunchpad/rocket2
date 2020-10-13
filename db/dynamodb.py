@@ -3,7 +3,7 @@ import logging
 
 from boto3.dynamodb.conditions import Attr
 from functools import reduce, wraps
-from app.model import User, Team, Project
+from app.model import User, Team, Project, Pairing
 from typing import Tuple, List, Type, TypeVar
 from config import Config
 from db.facade import DBFacade
@@ -44,6 +44,7 @@ class DynamoDB(DBFacade):
             self.users_table: str = config.aws_users_tablename
             self.teams_table: str = config.aws_teams_tablename
             self.projects_table: str = config.aws_projects_tablename
+            self.pairings_table: str = config.aws_pairings_tablename
 
         def get_table_name(self, cls: Type[T]) -> str:
             """
@@ -59,6 +60,8 @@ class DynamoDB(DBFacade):
                 return self.teams_table
             elif cls == Project:
                 return self.projects_table
+            elif cls == Pairing:
+                return self.pairings_table
             else:
                 raise TypeError('Type of class one of [User, Team, Project]')
 
@@ -76,6 +79,8 @@ class DynamoDB(DBFacade):
                 return 'github_team_id'
             elif table_name == self.projects_table:
                 return 'project_id'
+            elif table_name == self.pairings_table:
+                return 'pairing_id
             else:
                 raise TypeError('Table name does not correspond to anything')
 
@@ -87,7 +92,7 @@ class DynamoDB(DBFacade):
             :raise: TypeError if table does not exist
             :return: list of strings of set attributes
             """
-            if table_name == self.users_table:
+            if table_name == self.users_table or table_name == self.projects_table:
                 return []
             elif table_name == self.teams_table:
                 return ['team_leads', 'members']
@@ -117,6 +122,7 @@ class DynamoDB(DBFacade):
         self.users_table = config.aws_users_tablename
         self.teams_table = config.aws_teams_tablename
         self.projects_table = config.aws_projects_tablename
+        self.pairings_table = config.aws_pairings_tablename
         self.CONST = DynamoDB.Const(config)
 
         if config.aws_local:
@@ -143,6 +149,9 @@ class DynamoDB(DBFacade):
             self.__create_table(self.teams_table)
         if not self.check_valid_table(self.projects_table):
             self.__create_table(self.projects_table)
+        if not self.check_valid_table(self.pairings_table):
+            self.__create_table(self.pairings_table)
+            self.__enable_ttl(self.pairings_table)
 
     def __create_table(self, table_name: str, key_type: str = 'S'):
         """
@@ -152,7 +161,6 @@ class DynamoDB(DBFacade):
         only be called on initialization.
 
         :param table_name: name of the table to create
-        :param primary_key: name of the primary key for the table
         :param key_type: type of primary key (S, N, B)
         """
         logging.info(f"Creating table '{table_name}'")
@@ -176,6 +184,17 @@ class DynamoDB(DBFacade):
                 'WriteCapacityUnits': 1
             }
         )
+
+    def __enable_ttl(self, table_name: str):
+        """
+        Enable automatically dropping entries on TTL expiry
+
+        **Note**: This function should **not** be called externally, and should
+        only be called on initialization.
+
+        :param table_name: name of the table to enable ttl for
+        """
+        # Stub
 
     def check_valid_table(self, table_name: str) -> bool:
         """
