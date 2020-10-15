@@ -1,3 +1,9 @@
+..
+   WARNING - when making changes to this file, make sure that it works as a
+   GitHub README as well! Some things that are known to not work:
+    * variety of RST features (image widths, centering, etc.) - use raw HTML
+    * relative links - use full links
+
 .. raw:: html
 
     <p align="center">
@@ -67,9 +73,9 @@ the `Launch Pad handbook`_.
 To set up a Rocket instance for your organization, refer to the `deployment`_
 and `configuration`_ documentation.
 
-.. _deployment: docs/Deployment.html
-.. _configuration: docs/Config.html
-.. _command reference pages: docs/UserCommands.html
+.. _deployment: https://rocket2.readthedocs.io/en/latest/docs/Deployment.html
+.. _configuration: https://rocket2.readthedocs.io/en/latest/docs/Config.html
+.. _command reference pages: https://rocket2.readthedocs.io/en/latest/docs/UserCommands.html
 .. _Launch Pad handbook: https://docs.ubclaunchpad.com/handbook/tools/slack#rocket
 
 |
