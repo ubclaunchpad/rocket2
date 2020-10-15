@@ -105,8 +105,12 @@ All of these checks are conveniently done using the
 Remember to add the label ``Ready for Review``.
 
 After your pull request has been approved and the GitHub build passes,
-it can be merged into ``master``. Please do so with an ordinary merge
-commit, not a rebase or squash merge.
+it can be merged into ``master``. Please do so with a squash merge, not a
+rebase or normal merge. The squash commit should contain information about
+your changes. This is so that the project history doesn't get too muddled up,
+and each change is explicitly tied to a pull request and relevant discussion.
+
+For more details, see `rocket2#560 <https://github.com/ubclaunchpad/rocket2/issues/560>`_.
 
 Updating an Outdated Pull Request
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
