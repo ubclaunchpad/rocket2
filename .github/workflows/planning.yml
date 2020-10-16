@@ -23,7 +23,7 @@ jobs:
           column: 'Needs triage'
           # secrets.GITHUB_TOKEN is supposed to work, but doesn't seem to,
           # so a PAT with repo access is provided.
-          repo-token: ${{ secrets.GH_REPO_TOKEN }}
+          repo-token: ${{ secrets.LP_GH_PUBLIC_REPO_TOKEN }}
 
   issue-planned:
     if: ${{ github.event.action == 'assigned' }}
@@ -33,4 +33,4 @@ jobs:
         with:
           project: $PROJECT_NAME
           column: '🚀 Planned'
-          repo-token: ${{ secrets.GH_REPO_TOKEN }}
+          repo-token: ${{ secrets.LP_GH_PUBLIC_REPO_TOKEN }}
