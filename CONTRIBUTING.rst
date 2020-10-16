@@ -37,6 +37,11 @@ issue should be moved manually to 🏃‍♂️ *In progress*, where it will sta
 pull request lands closing the issue, at which point it will automatically be
 moved to ✅ *Done*.
 
+Automated movement of issues in the project is done through a mix of the
+built-in `projects automation <https://docs.github.com/en/free-pro-team@latest/github/managing-your-work-on-github/configuring-automation-for-project-boards>`_
+and our own
+`Planning automation <https://github.com/ubclaunchpad/rocket2/actions?query=workflow%3APipeline>`_.
+
 We do not use the planning project to track pull requests - instead, relevant
 pull requests should be attached to their respective issues.
 
