@@ -39,7 +39,7 @@ class GCPInterface:
         """
         Retrieves list of permissions present on the given Drive item. It
         pages through all results and returns a subset of permission fields,
-        as defined in `GCPPermission`.
+        as defined in :class:`GCPDrivePermission`.
         """
         perms: List[GCPDrivePermission] = []
         page_count = 0
@@ -93,11 +93,11 @@ class GCPInterface:
         """
         Create permissions for the given emails on the given Drive item, and
         removes everyone not on the list, to ensure the state of shares on the
-        Drive item matches the emai list provided.
+        Drive item matches the email list provided.
 
         It respects permissions inherited by one level of parents of the given
         Drive item - permissions inherited from two levels of parents are at
-        risk of being deleted it the user is not on the provided email list.
+        risk of being deleted if the user is not on the provided email list.
 
         In all cases of API errors, we log and continue, to try and get as
         close to the desired state of permissions as possible.
