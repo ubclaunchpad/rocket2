@@ -72,6 +72,20 @@ class GCPInterface:
                      + f"pages for {drive_id}")
         return perms
 
+    def get_parents_permissions(self,
+                                drive_id: str) -> List[GCPDrivePermission]:
+        """
+        Retrieves list of permissions associated with one level of parents to
+        the given Drive.
+        """
+        parents = self.get_drive_parents(drive_id)
+        perms: List[GCPDrivePermission] = []
+        for parent_id in parents:
+            parent_perms = self.get_drive_permissions(parent_id)
+            for p in parent_perms:
+                perms.append(p)
+        return perms
+
     def ensure_drive_permissions(self,
                                  team_name: str,
                                  drive_id: str,
@@ -96,11 +110,8 @@ class GCPInterface:
         # Get parents so that we do not remove or duplicate inherited shares.
         inherited: List[str] = []  # emails
         try:
-            parents = self.get_drive_parents(drive_id)
-            for parent_id in parents:
-                perms = self.get_drive_permissions(parent_id)
-                for p in perms:
-                    inherited.append(p.email)
+            parents_perms = self.get_parents_permissions(drive_id)
+            inherited = [p.email for p in parents_perms]
         except Exception as e:
             logging.warn("Unable to fetch parents for drive item"
                          + f"({team_name}, {drive_id}): {e}")
