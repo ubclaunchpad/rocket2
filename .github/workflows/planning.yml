@@ -1,0 +1,36 @@
+# This workflow file defines automation for managing Rocket 2 planning,
+# primarily via the Rocket 2 Planning board:
+# https://github.com/ubclaunchpad/rocket2/projects/1?fullscreen=true
+name: Planning
+
+on:
+  issues:
+    types:
+    - opened
+    - assigned
+
+env:
+  PROJECT_NAME: 'Rocket 2 Planning'
+
+jobs:
+  move-issue-to-project:
+    if: ${{ github.event.action == 'opened' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: alex-page/github-project-automation-plus@v0.3.0
+        with:
+          project: $PROJECT_NAME
+          column: 'Needs triage'
+          # secrets.GITHUB_TOKEN is supposed to work, but doesn't seem to,
+          # so a PAT with repo access is provided.
+          repo-token: ${{ secrets.GH_REPO_TOKEN }}
+
+  issue-planned:
+    if: ${{ github.event.action == 'assigned' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: alex-page/github-project-automation-plus@v0.3.0
+        with:
+          project: $PROJECT_NAME
+          column: '🚀 Planned'
+          repo-token: ${{ secrets.GH_REPO_TOKEN }}

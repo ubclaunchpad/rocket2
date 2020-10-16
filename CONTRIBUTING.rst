@@ -30,11 +30,12 @@ Issues start in the *Needs triage* column. From here, they are moved to either:
 - ❄️ *Icebox*: deprioritized tasks are tracked here
 - 🗂 *Backlog*: this means that we want to get around to this task at some point
 
-From the *Backlog*, we start moving tasks into 🚀 *Planned*, which is typically
-around when discussions around design and potential implementation happens.
-When work begins in earnest, the issue should be moved to 🏃‍♂️ *In progress*,
-where it will stay until a pull request lands closing the issue, at which
-point it will automatically be moved to ✅ *Done*.
+From the *Backlog*, we start assigning people to work on tasks, which moves
+tasks into 🚀 *Planned*, which is typically around when discussions around
+design and potential implementation happens. When work begins in earnest, the
+issue should be moved manually to 🏃‍♂️ *In progress*, where it will stay until a
+pull request lands closing the issue, at which point it will automatically be
+moved to ✅ *Done*.
 
 We do not use the planning project to track pull requests - instead, relevant
 pull requests should be attached to their respective issues.
