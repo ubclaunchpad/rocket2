@@ -8,6 +8,7 @@ on:
     types:
     - opened
     - assigned
+    - unassigned
 
 env:
   PROJECT_NAME: 'Rocket 2 Planning'
@@ -33,4 +34,14 @@ jobs:
         with:
           project: $PROJECT_NAME
           column: '🚀 Planned'
+          repo-token: ${{ secrets.LP_GH_PUBLIC_REPO_TOKEN }}
+
+  issue-unplanned:
+    if: ${{ github.event.action == 'unassigned' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: alex-page/github-project-automation-plus@v0.3.0
+        with:
+          project: $PROJECT_NAME
+          column: '🗂 Backlog'
           repo-token: ${{ secrets.LP_GH_PUBLIC_REPO_TOKEN }}
