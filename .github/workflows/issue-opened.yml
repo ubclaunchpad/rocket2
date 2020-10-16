@@ -12,4 +12,6 @@ jobs:
         with:
           project: Rocket 2 Planning
           column: Needs triage
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          # secrets.GITHUB_TOKEN is supposed to work, but doesn't seem to,
+          # so a PAT with repo access is provided. 
+          repo-token: ${{ secrets.GH_REPO_TOKEN }}
