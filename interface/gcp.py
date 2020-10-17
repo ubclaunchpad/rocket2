@@ -192,7 +192,6 @@ def new_share_message(team_name):
 def new_create_permission_body(email):
     return {
         "emailAddress": email,
-        "photoLink": "https://github.com/ubclaunchpad/rocket2/blob/master/docs/rocket-logo.png?raw=true",  # noqa
         "role": "writer",
         "type": "user",
         "sendNotificationEmail": True,
