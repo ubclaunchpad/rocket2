@@ -1,5 +1,6 @@
 """Utility classes for interacting with Slack API."""
 from slack import WebClient
+from slack.web.base_client import SlackResponse
 from typing import Dict, Any, List, cast
 import logging
 
@@ -16,11 +17,11 @@ class Bot:
     def send_dm(self, message: str, slack_user_id: str):
         """Send direct message to user with id of slack_user_id."""
         logging.debug(f"Sending direct message to {slack_user_id}")
-        response = self.sc.chat_postMessage(
+        response = cast(SlackResponse, self.sc.chat_postMessage(
             channel=slack_user_id,
             text=message,
             as_user=True
-        )
+        ))
         if not response['ok']:
             logging.error(f"Direct message to {slack_user_id} failed with "
                           f"error: {response['error']}")
@@ -32,11 +33,11 @@ class Bot:
                         attachments: List[Any] = []):
         """Send message to channel with name channel_name."""
         logging.debug(f"Sending message to channel {channel_name}")
-        response = self.sc.chat_postMessage(
+        response = cast(SlackResponse, self.sc.chat_postMessage(
             channel=channel_name,
             attachments=attachments,
             text=message
-        )
+        ))
         if not response['ok']:
             logging.error(f"Message to channel {channel_name} failed with "
                           f"error: {response['error']}")
@@ -45,9 +46,9 @@ class Bot:
     def get_channel_users(self, channel_id: str) -> Dict[str, Any]:
         """Retrieve list of user IDs from channel with channel_id."""
         logging.debug(f"Retrieving user IDs from channel {channel_id}")
-        response = self.sc.conversations_members(
+        response = cast(SlackResponse, self.sc.conversations_members(
             channel=channel_id
-        )
+        ))
         if not response['ok']:
             logging.error("User retrieval "
                           f"from channel {channel_id} failed with "
@@ -62,7 +63,7 @@ class Bot:
 
     def get_channels(self) -> List[Any]:
         """Retrieve list of channel objects."""
-        resp = self.sc.conversations_list()
+        resp = cast(SlackResponse, self.sc.conversations_list())
         if not resp['ok']:
             logging.error(f"Channel retrieval failed with "
                           f"error: {resp['error']}")
@@ -78,10 +79,10 @@ class Bot:
         """
         logging.debug("Attempting to create channel with name {}".
                       format(channel_name))
-        response = self.sc.channels_create(
+        response = cast(SlackResponse, self.sc.channels_create(
             name=channel_name,
             validate=True
-        )
+        ))
         if not response['ok']:
             if response['error'] == "name_taken":
                 logging.warning("Channel with name {} "
