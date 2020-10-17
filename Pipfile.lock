@@ -66,10 +66,10 @@
         },
         "botocore": {
             "hashes": [
-                "sha256:4cdb114947391c88787df3e2f6a9f53ee15f1e2fef8691963e959858a034bb02",
-                "sha256:5b1c189a74e4ecc5fcc833b8c8a12c6040c03b5330401a8a8f459f0dba098826"
+                "sha256:de5f9fc0c7e88ee7ba831fa27475be258ae09ece99143ed623d3618a3c84ee2c",
+                "sha256:e224754230e7e015836ba20037cac6321e8e2ce9b8627c14d579fcb37249decd"
             ],
-            "version": "==1.18.17"
+            "version": "==1.18.18"
         },
         "cachetools": {
             "hashes": [
@@ -275,6 +275,7 @@
         },
         "iniconfig": {
             "hashes": [
+                "sha256:011e24c64b7f47f6ebd835bb12a743f2fbe9a26d4cecaa7f53bc4f35ee9da8b3",
                 "sha256:bc3af051d7d14b2ee5ef9969666def0cd1a000e121eaea580d4a313df4b37f32"
             ],
             "version": "==1.1.1"
@@ -679,10 +680,10 @@
         },
         "botocore": {
             "hashes": [
-                "sha256:4cdb114947391c88787df3e2f6a9f53ee15f1e2fef8691963e959858a034bb02",
-                "sha256:5b1c189a74e4ecc5fcc833b8c8a12c6040c03b5330401a8a8f459f0dba098826"
+                "sha256:de5f9fc0c7e88ee7ba831fa27475be258ae09ece99143ed623d3618a3c84ee2c",
+                "sha256:e224754230e7e015836ba20037cac6321e8e2ce9b8627c14d579fcb37249decd"
             ],
-            "version": "==1.18.17"
+            "version": "==1.18.18"
         },
         "certifi": {
             "hashes": [
@@ -799,6 +800,7 @@
         },
         "iniconfig": {
             "hashes": [
+                "sha256:011e24c64b7f47f6ebd835bb12a743f2fbe9a26d4cecaa7f53bc4f35ee9da8b3",
                 "sha256:bc3af051d7d14b2ee5ef9969666def0cd1a000e121eaea580d4a313df4b37f32"
             ],
             "version": "==1.1.1"
@@ -1147,11 +1149,11 @@
         },
         "sphinx-autodoc-typehints": {
             "hashes": [
-                "sha256:89e19370a55db4aef1be2094d8fb1fb500ca455c55b3fcc8d2600ff805227e04",
-                "sha256:bbf0b203f1019b0f9843ee8eef0cff856dc04b341f6dbe1113e37f2ebf243e11"
+                "sha256:244ba6d3e2fdb854622f643c7763d6f95b6886eba24bec28e86edf205e4ddb20",
+                "sha256:da049791d719f4c9813642496ee4764203e317f0697eb75446183fa2a68e3f77"
             ],
             "index": "pypi",
-            "version": "==1.11.0"
+            "version": "==1.11.1"
         },
         "sphinx-rtd-theme": {
             "hashes": [
