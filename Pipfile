@@ -26,7 +26,7 @@ google-auth-oauthlib = "*"
 
 [dev-packages]
 awscli = "*"
-codecov = "==2.1.7"
+codecov = "==2.1.10"
 flake8 = "*"
 ipython = "*"
 pycodestyle = "*"
