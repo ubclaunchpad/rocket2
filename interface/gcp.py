@@ -1,5 +1,5 @@
 """Utility classes for interacting with Google APIs"""
-from typing import Any, List
+from typing import Any, List, Iterator
 from googleapiclient.discovery import Resource
 import logging
 
@@ -41,31 +41,33 @@ class GCPInterface:
         pages through all results and returns a subset of permission fields,
         as defined in :class:`GCPDrivePermission`.
         """
-        perms: List[GCPDrivePermission] = []
-        page_count = 0
         fields = [
             "permissions/id",
             "permissions/emailAddress",
         ]
-        # See http://googleapis.github.io/google-api-python-client/docs/dyn/drive_v3.permissions.html#list # noqa
-        # pylint: disable=no-member
-        next_page_req = self.drive.permissions()\
-            .list(fileId=drive_id,
-                  fields=", ".join(fields),
-                  pageSize=50)
-        while next_page_req is not None:
-            list_res = next_page_req.execute()
-            permissions: List[Any] = list_res['permissions']
-            for p in permissions:
-                if 'emailAddress' in p:
-                    perm = GCPDrivePermission(p['id'], p['emailAddress'])
-                    perms.append(perm)
 
-            # set state for the next page
-            # see https://googleapis.github.io/google-api-python-client/docs/dyn/drive_v3.permissions.html#list_next # noqa
+        def paginated_permissions() -> Iterator[Any]:
+            # See http://googleapis.github.io/google-api-python-client/docs/dyn/drive_v3.permissions.html#list # noqa
             # pylint: disable=no-member
-            next_page_req = self.drive.permissions()\
-                .list_next(next_page_req, list_res)
+            req = self.drive.permissions()\
+                .list(fileId=drive_id,
+                      fields=', '.join(fields),
+                      pageSize=50)
+            while req is not None:
+                resp = req.execute()
+                for perm in resp['permissions']:
+                    yield perm
+                # see https://googleapis.github.io/google-api-python-client/docs/dyn/drive_v3.permissions.html#list_next # noqa
+                # pylint: disable=no-member
+                req = self.drive.permissions().list_next(req, resp)
+
+        # collect all permissions for this drive
+        perms: List[GCPDrivePermission] = []
+        page_count = 0
+        for p in paginated_permissions():
+            if 'emailAddress' in p:
+                perm = GCPDrivePermission(p['id'], p['emailAddress'])
+                perms.append(perm)
             page_count += 1
 
         logging.info(f"Found {len(perms)} permissions across {page_count} "
@@ -113,8 +115,8 @@ class GCPInterface:
             parents_perms = self.get_parents_permissions(drive_id)
             inherited = [p.email for p in parents_perms]
         except Exception as e:
-            logging.warn("Unable to fetch parents for drive item"
-                         + f"({team_name}, {drive_id}): {e}")
+            logging.warning("Unable to fetch parents for drive item"
+                            + f"({team_name}, {drive_id}): {e}")
 
         # Collect existing permissions and determine which emails to delete.
         existing: List[str] = []   # emails
