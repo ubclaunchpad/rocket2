@@ -5,8 +5,9 @@
 
 version: 2
 updates:
-  - package-ecosystem: "pip" # See documentation for possible values
-    directory: "/" # Location of package manifests
+  - package-ecosystem: "pip"
+    directory: "/"
+    versioning-strategy: "lockfile-only" # only Pipfile.lock changes
     commit-message:
       prefix: "deps"
     schedule:
