@@ -1,12 +1,15 @@
 """Utility classes for interacting with Google APIs"""
-from typing import Any, List
+from typing import Any, List, Iterator
 from googleapiclient.discovery import Resource
 import logging
 
-# Set to False to resolve https://github.com/ubclaunchpad/rocket2/issues/510
-# temporarily. Longer-term fix is being tracked in the actual problem,
-# https://github.com/ubclaunchpad/rocket2/issues/497
-DELETE_OLD_DRIVE_PERMISSIONS = False
+
+class GCPDrivePermission:
+    """Represents a 'share' on a Google Drive item."""
+
+    def __init__(self, id: str, email: str):
+        self.id = id
+        self.email = email
 
 
 class GCPInterface:
@@ -17,54 +20,123 @@ class GCPInterface:
         self.drive = drive_client
         self.subject = subject
 
-    def set_drive_permissions(self,
-                              team_name: str,
-                              drive_id: str,
-                              emails: List[str],
-                              delete_permissions=DELETE_OLD_DRIVE_PERMISSIONS):
+    def get_drive_parents(self, drive_id: str) -> List[str]:
         """
-        Create permissions for the given emails, and removes everyone not on
-        the list.
+        Retrieves list of parents of the given Drive folder, returned as ID
+        strings.
+        """
+        # pylint: disable=no-member
+        file = self.drive.files()\
+            .get(fileId=drive_id, fields="parents")\
+            .execute()
+        if 'parents' in file:
+            parents: List[str] = file['parents']
+            if len(parents) > 0:
+                return parents
+        return []
 
-        In all cases of API errors, we log and continue, to try and get close
-        to the desired state of permissions.
+    def get_drive_permissions(self, drive_id: str) -> List[GCPDrivePermission]:
+        """
+        Retrieves list of permissions present on the given Drive item. It
+        pages through all results and returns a subset of permission fields,
+        as defined in :class:`GCPDrivePermission`.
+        """
+        fields = [
+            "permissions/id",
+            "permissions/emailAddress",
+        ]
+
+        def paginated_permissions() -> Iterator[Any]:
+            # See http://googleapis.github.io/google-api-python-client/docs/dyn/drive_v3.permissions.html#list # noqa
+            # pylint: disable=no-member
+            req = self.drive.permissions()\
+                .list(fileId=drive_id,
+                      fields=', '.join(fields),
+                      pageSize=50)
+            while req is not None:
+                resp = req.execute()
+                for perm in resp['permissions']:
+                    yield perm
+                # see https://googleapis.github.io/google-api-python-client/docs/dyn/drive_v3.permissions.html#list_next # noqa
+                # pylint: disable=no-member
+                req = self.drive.permissions().list_next(req, resp)
+
+        # collect all permissions for this drive
+        perms: List[GCPDrivePermission] = []
+        page_count = 0
+        for p in paginated_permissions():
+            if 'emailAddress' in p:
+                perm = GCPDrivePermission(p['id'], p['emailAddress'])
+                perms.append(perm)
+            page_count += 1
+
+        logging.info(f"Found {len(perms)} permissions across {page_count} "
+                     + f"pages for {drive_id}")
+        return perms
+
+    def get_parents_permissions(self,
+                                drive_id: str) -> List[GCPDrivePermission]:
+        """
+        Retrieves list of permissions associated with one level of parents to
+        the given Drive.
+        """
+        parents = self.get_drive_parents(drive_id)
+        perms: List[GCPDrivePermission] = []
+        for parent_id in parents:
+            parent_perms = self.get_drive_permissions(parent_id)
+            for p in parent_perms:
+                perms.append(p)
+        return perms
+
+    def ensure_drive_permissions(self,
+                                 team_name: str,
+                                 drive_id: str,
+                                 emails: List[str]):
+        """
+        Create permissions for the given emails on the given Drive item, and
+        removes everyone not on the list, to ensure the state of shares on the
+        Drive item matches the email list provided.
+
+        It respects permissions inherited by one level of parents of the given
+        Drive item - permissions inherited from two levels of parents are at
+        risk of being deleted if the user is not on the provided email list.
+
+        In all cases of API errors, we log and continue, to try and get as
+        close to the desired state of permissions as possible.
 
         :param team_name: name of the team for the drive permissions; serves
             aesthetic purposes only
         :param drive_id: id of the Google Drive object to share
         :param emails: a list of emails to share with
-        :param bool delete_permissions: option whether we delete the old
-            permissions in favour of the new emails (previously added emails
-            would be removed if they aren't in the `emails` parameter)
         """
+        # Get parents so that we do not remove or duplicate inherited shares.
+        inherited: List[str] = []  # emails
+        try:
+            parents_perms = self.get_parents_permissions(drive_id)
+            inherited = [p.email for p in parents_perms]
+        except Exception as e:
+            logging.warning("Unable to fetch parents for drive item"
+                            + f"({team_name}, {drive_id}): {e}")
 
-        # List existing permissions - we use this to avoid duplicate
-        # permissions, and to delete ones that should not longer exist.
-        # See http://googleapis.github.io/google-api-python-client/docs/dyn/drive_v3.permissions.html#list # noqa
-        existing: List[str] = []  # emails
+        # Collect existing permissions and determine which emails to delete.
+        existing: List[str] = []   # emails
         to_delete: List[str] = []  # permission IDs
         try:
-            # pylint: disable=no-member
-            list_res = self.drive.permissions()\
-                .list(fileId=drive_id,
-                      supportsAllDrives=True,
-                      fields="permissions(id, emailAddress, role)")\
-                .execute()
-            permissions: List[Any] = list_res['permissions']
-            logging.info(
-                f'{team_name} drive currently shared with {permissions}')
-            for p in permissions:
-                if 'emailAddress' in p:
-                    email: str = p['emailAddress']
-                    if email in emails:
-                        # track permission we do not need to recreate
-                        existing.append(email)
-                    elif email == self.subject:
-                        # do not remove actor from shared
-                        continue
-                    else:
-                        # delete unknown emails
-                        to_delete.append(p['id'])
+            perms = self.get_drive_permissions(drive_id)
+            for p in perms:
+                if p.email in emails:
+                    # keep shares that should exist
+                    existing.append(p.email)
+                elif p.email == self.subject:
+                    # do not remove actor from shared (actor needs permissions
+                    # on this Drive item to perform a share)
+                    continue
+                elif p.email in inherited:
+                    # do not remove inherited permissions
+                    continue
+                else:
+                    # delete unknown permissions
+                    to_delete.append(p.id)
         except Exception as e:
             logging.error("Failed to load permissions for drive item"
                           + f"({team_name}, {drive_id}): {e}")
@@ -76,7 +148,8 @@ class GCPInterface:
         # See http://googleapis.github.io/google-api-python-client/docs/dyn/drive_v3.permissions.html#create # noqa
         created_shares = 0
         for email in emails:
-            if email in existing:
+            # Do not re-share (causes email spam)
+            if email in existing or email in inherited:
                 continue
 
             body = new_create_permission_body(email)
@@ -86,8 +159,7 @@ class GCPInterface:
                     .create(fileId=drive_id,
                             body=body,
                             emailMessage=new_share_message(team_name),
-                            sendNotificationEmail=True,
-                            supportsAllDrives=True)\
+                            sendNotificationEmail=True)\
                     .execute()
                 created_shares += 1
             except Exception as e:
@@ -95,26 +167,22 @@ class GCPInterface:
                               + f"({team_name}, {drive_id}) with {email}: {e}")
         logging.info(f"Created {created_shares} permissions for {team_name}")
 
-        # Delete old permissions
+        # Delete unknown permissions
         # See http://googleapis.github.io/google-api-python-client/docs/dyn/drive_v3.permissions.html#delete # noqa
-        if delete_permissions is True:
-            deleted_shares = 0
-            for p_id in to_delete:
-                try:
-                    self.drive.permissions()\
-                        .delete(fileId=drive_id,
-                                permissionId=p_id,
-                                supportsAllDrives=True)\
-                        .execute()
-                    deleted_shares += 1
-                except Exception as e:
-                    logging.error(
-                        f'Failed to delete permission {p_id} for '
-                        + f'drive item ({team_name}, {drive_id}): {e}')
-            logging.info(
-                f'Deleted {deleted_shares} permissions for {team_name}')
-        else:
-            logging.info("DELETE_OLD_DRIVE_PERMISSIONS is set to false")
+        deleted_shares = 0
+        for p_id in to_delete:
+            try:
+                self.drive.permissions()\
+                    .delete(fileId=drive_id,
+                            permissionId=p_id)\
+                    .execute()
+                deleted_shares += 1
+            except Exception as e:
+                logging.error(
+                    f'Failed to delete permission {p_id} for '
+                    + f'drive item ({team_name}, {drive_id}): {e}')
+        logging.info(
+            f'Deleted {deleted_shares} permissions for {team_name}')
 
 
 def new_share_message(team_name):
@@ -124,8 +192,8 @@ def new_share_message(team_name):
 def new_create_permission_body(email):
     return {
         "emailAddress": email,
+        "photoLink": "https://github.com/ubclaunchpad/rocket2/blob/master/docs/rocket-logo.png?raw=true",  # noqa
         "role": "writer",
         "type": "user",
         "sendNotificationEmail": True,
-        "supportsAllDrives": True,
     }
