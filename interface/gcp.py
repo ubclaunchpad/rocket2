@@ -172,7 +172,7 @@ class GCPInterface:
                 deleted_shares.append(perm.email)
             except Exception as e:
                 logging.error(
-                    f'Failed to delete permission {p_id} for '
+                    f'Failed to delete permission {perm.id} for '
                     + f'drive item ({team_name}, {drive_id}): {e}')
         logging.info(f"Deleted {len(deleted_shares)} permissions for "
                      + f"{team_name} ({', '.join(deleted_shares)})")
