@@ -113,7 +113,7 @@ class GCPInterface:
 
         # Collect existing permissions and determine which emails to delete.
         existing: List[str] = []   # emails
-        to_delete: List[str] = []  # permission IDs
+        to_delete: List[GCPDrivePermission] = []
         try:
             perms = self.get_drive_permissions(drive_id)
             for p in perms:
@@ -129,7 +129,7 @@ class GCPInterface:
                     continue
                 else:
                     # delete unknown permissions
-                    to_delete.append(p.id)
+                    to_delete.append(p)
         except Exception as e:
             logging.error("Failed to load permissions for drive item"
                           + f"({team_name}, {drive_id}): {e}")
@@ -162,20 +162,20 @@ class GCPInterface:
 
         # Delete unknown permissions
         # See http://googleapis.github.io/google-api-python-client/docs/dyn/drive_v3.permissions.html#delete # noqa
-        deleted_shares = 0
-        for p_id in to_delete:
+        deleted_shares = []
+        for perm in to_delete:
             try:
                 self.drive.permissions()\
                     .delete(fileId=drive_id,
-                            permissionId=p_id)\
+                            permissionId=perm.id)\
                     .execute()
-                deleted_shares += 1
+                deleted_shares.append(perm.email)
             except Exception as e:
                 logging.error(
                     f'Failed to delete permission {p_id} for '
                     + f'drive item ({team_name}, {drive_id}): {e}')
-        logging.info(
-            f'Deleted {deleted_shares} permissions for {team_name}')
+        logging.info(f"Deleted {len(deleted_shares)} permissions for "
+                     + f"{team_name} ({', '.join(deleted_shares)})")
 
 
 def new_share_message(team_name):
