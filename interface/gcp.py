@@ -9,7 +9,7 @@ class GCPDrivePermission:
 
     def __init__(self, id: str, email: str):
         self.id = id
-        self.email = email
+        self.email = email.lower()
 
 
 class GCPInterface:

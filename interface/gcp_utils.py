@@ -59,7 +59,7 @@ def sync_team_email_perms(gcp: Optional[GCPInterface],
     emails: List[str] = []
     for user in team_members:
         if len(user.email) > 0:
-            emails.append(user.email)
+            emails.append(user.email.lower())
 
     # Sync permissions
     if len(emails) > 0:
