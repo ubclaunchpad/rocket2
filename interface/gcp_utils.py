@@ -1,7 +1,7 @@
 """Utilities for common interactions with Google API."""
 import logging
 from typing import List, Optional
-from interface.gcp import GCPInterface
+from interface.gcp import GCPInterface, standardize_email
 from db import DBFacade
 from db.utils import get_team_members
 from app.model import User, Team
@@ -59,7 +59,11 @@ def sync_team_email_perms(gcp: Optional[GCPInterface],
     emails: List[str] = []
     for user in team_members:
         if len(user.email) > 0:
-            emails.append(user.email.lower())
+            try:
+                emails.append(standardize_email(email))
+            except Exception as e:
+                logging.warn(f'Found malformed email {user.email} for user '
+                             + f'{user.github_username}: {e}')
 
     # Sync permissions
     if len(emails) > 0:

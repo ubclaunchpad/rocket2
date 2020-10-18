@@ -47,7 +47,8 @@ class TestGCPInterface(TestCase):
                 {
                     # should be removed (does not exist in email list)
                     "id": "2",
-                    "emailAddress": "strategy@ubclaunchpad.com",
+                    # see gcp_utils.standardize_email
+                    "emailAddress": "strat.Egy@ubclaunchpad.com",
                 },
                 {
                     # should not be removed (actor)

@@ -9,7 +9,7 @@ class GCPDrivePermission:
 
     def __init__(self, id: str, email: str):
         self.id = id
-        self.email = email.lower()
+        self.email = standardize_email(email)
 
 
 class GCPInterface:
@@ -189,3 +189,15 @@ def new_create_permission_body(email):
         "type": "user",
         "sendNotificationEmail": True,
     }
+
+def standardize_email(email: str) -> str:
+    """
+    Standardize email by:
+
+    * lowercasing: https://stackoverflow.com/questions/9807909/are-email-addresses-case-sensitive # noqa
+    * removing dots: https://support.google.com/mail/answer/7436150?hl=en#:~:text=If%20someone%20accidentally%20adds%20dots,john.smith%40gmail.com # noqa
+    """
+    split = email.split('@')
+    if len(split) != 2:
+        raise Exception(f'malformed email: split on @ has {len(split)} parts')
+    return f'{split[0].lower().replace(".", "")}@{split[1].lower()}'
