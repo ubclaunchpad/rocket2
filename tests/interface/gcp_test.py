@@ -93,9 +93,9 @@ class TestGCPInterface(TestCase):
         # perms listing
         mock_perms.list.assert_has_calls([
             mock.call(fileId='parent-drive',
-                      fields=mock.ANY, pageSize=mock.ANY),
+                      fields=mock.ANY),
             mock.call(fileId='target-drive',
-                      fields=mock.ANY, pageSize=mock.ANY),
+                      fields=mock.ANY),
         ])
         mock_perms_list_parent.execute.assert_called()
         mock_perms_list_target.execute.assert_called()

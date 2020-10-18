@@ -64,7 +64,6 @@ def sync_team_email_perms(gcp: Optional[GCPInterface],
     # Sync permissions
     if len(emails) > 0:
         logging.info("Synchronizing permissions for "
-                     + f"{team.github_team_name}'s folder ({team.folder}) "
-                     + f"to {emails}")
+                     + f"{team.github_team_name}'s folder ({team.folder})")
         gcp.ensure_drive_permissions(
             team.github_team_name, team.folder, emails)

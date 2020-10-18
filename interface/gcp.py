@@ -1,5 +1,5 @@
 """Utility classes for interacting with Google APIs"""
-from typing import Any, List, Iterator
+from typing import List, Iterator
 from googleapiclient.discovery import Resource
 import logging
 
@@ -133,13 +133,12 @@ class GCPInterface:
         except Exception as e:
             logging.error("Failed to load permissions for drive item"
                           + f"({team_name}, {drive_id}): {e}")
-
         logging.info(f"Found {len(existing)} permissions for {team_name} "
                      + "that do not require updating")
 
         # Ensure the folder is shared with everyone as required.
         # See http://googleapis.github.io/google-api-python-client/docs/dyn/drive_v3.permissions.html#create # noqa
-        created_shares = 0
+        created_shares = []
         for email in emails:
             # Do not re-share (causes email spam)
             if email in existing or email in inherited:
@@ -154,11 +153,12 @@ class GCPInterface:
                             emailMessage=new_share_message(team_name),
                             sendNotificationEmail=True)\
                     .execute()
-                created_shares += 1
+                created_shares.append(email)
             except Exception as e:
                 logging.error("Failed to share drive item"
                               + f"({team_name}, {drive_id}) with {email}: {e}")
-        logging.info(f"Created {created_shares} permissions for {team_name}")
+        logging.info(f"Created {len(created_shares)} permissions for "
+                     + f"{team_name} ({', '.join(created_shares)})")
 
         # Delete unknown permissions
         # See http://googleapis.github.io/google-api-python-client/docs/dyn/drive_v3.permissions.html#delete # noqa
