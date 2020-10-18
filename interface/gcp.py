@@ -46,32 +46,25 @@ class GCPInterface:
             "permissions/emailAddress",
         ]
 
-        def paginated_permissions() -> Iterator[Any]:
+        def paginated_permissions() -> Iterator[GCPDrivePermission]:
             # See http://googleapis.github.io/google-api-python-client/docs/dyn/drive_v3.permissions.html#list # noqa
             # pylint: disable=no-member
             req = self.drive.permissions()\
                 .list(fileId=drive_id,
-                      fields=', '.join(fields),
-                      pageSize=50)
+                      fields=', '.join(fields))
             while req is not None:
                 resp = req.execute()
-                for perm in resp['permissions']:
-                    yield perm
+                for p in resp['permissions']:
+                    if 'emailAddress' in p:
+                        perm = GCPDrivePermission(p['id'], p['emailAddress'])
+                        yield perm
                 # see https://googleapis.github.io/google-api-python-client/docs/dyn/drive_v3.permissions.html#list_next # noqa
                 # pylint: disable=no-member
                 req = self.drive.permissions().list_next(req, resp)
 
         # collect all permissions for this drive
-        perms: List[GCPDrivePermission] = []
-        page_count = 0
-        for p in paginated_permissions():
-            if 'emailAddress' in p:
-                perm = GCPDrivePermission(p['id'], p['emailAddress'])
-                perms.append(perm)
-            page_count += 1
-
-        logging.info(f"Found {len(perms)} permissions across {page_count} "
-                     + f"pages for {drive_id}")
+        perms = [p for p in paginated_permissions()]
+        logging.info(f"Found {len(perms)} permissions for {drive_id}")
         return perms
 
     def get_parents_permissions(self,
