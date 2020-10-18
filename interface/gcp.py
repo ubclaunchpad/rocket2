@@ -190,6 +190,7 @@ def new_create_permission_body(email):
         "sendNotificationEmail": True,
     }
 
+
 def standardize_email(email: str) -> str:
     """
     Standardize email by:
