@@ -103,7 +103,8 @@ proxy, as well as building and running a Rocket 2 container. The Nginx
 proxy exposes ports 80 and 443, for HTTP/S, which must also be
 accessible from the outside world. The Rocket 2 container exposes port
 5000, as Gunicorn is listening on this port; this should *not* be
-accessible to the outside world.
+accessible to the outside world. We use `certbot` for periodic certificate
+renewals.
 
 Note that Docker Compose has a rather complex networking utility. In
 particular, note that to access HTTP endpoints in other composed
