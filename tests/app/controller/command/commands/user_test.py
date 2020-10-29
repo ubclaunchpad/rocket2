@@ -77,11 +77,10 @@ class TestUserCommand(TestCase):
         user_attaches = [self.u0.get_attachment()]
         with self.app.app_context():
             # jsonify requires translating the byte-string
-            resp, code = self.testcommand.handle('user view',
-                                                 self.u0.slack_id)
+            resp, _ = self.testcommand.handle('user view',
+                                              self.u0.slack_id)
             expect = {'attachments': user_attaches}
             self.assertDictEqual(resp, expect)
-            self.assertEqual(code, 200)
 
     def test_handle_view_other_user_by_slack(self):
         user = User("ABCDE8FA9")
@@ -90,10 +89,9 @@ class TestUserCommand(TestCase):
         user_attaches = [user.get_attachment()]
         with self.app.app_context():
             # jsonify requires translating the byte-string
-            resp, code = self.testcommand.handle(command, self.u0.slack_id)
+            resp, _ = self.testcommand.handle(command, self.u0.slack_id)
             expect = {'attachments': user_attaches}
             self.assertDictEqual(resp, expect)
-            self.assertEqual(code, 200)
 
     def test_handle_view_other_user_by_github(self):
         user = User("ABCDE8FA9")
@@ -103,10 +101,9 @@ class TestUserCommand(TestCase):
         user_attaches = [user.get_attachment()]
         with self.app.app_context():
             # jsonify requires translating the byte-string
-            resp, code = self.testcommand.handle(command, self.u0.slack_id)
+            resp, _ = self.testcommand.handle(command, self.u0.slack_id)
             expect = {'attachments': user_attaches}
             self.assertDictEqual(resp, expect)
-            self.assertEqual(code, 200)
 
     def test_handle_view_other_user_by_email(self):
         user = User("ABCDE8FA9")
@@ -116,10 +113,9 @@ class TestUserCommand(TestCase):
         user_attaches = [user.get_attachment()]
         with self.app.app_context():
             # jsonify requires translating the byte-string
-            resp, code = self.testcommand.handle(command, self.u0.slack_id)
+            resp, _ = self.testcommand.handle(command, self.u0.slack_id)
             expect = {'attachments': user_attaches}
             self.assertDictEqual(resp, expect)
-            self.assertEqual(code, 200)
 
     def test_handle_view_multiple_users(self):
         user = User("ABCDE8FA9")
@@ -132,13 +128,12 @@ class TestUserCommand(TestCase):
         user_attaches = [user.get_attachment(), user2.get_attachment()]
         with self.app.app_context():
             # jsonify requires translating the byte-string
-            resp, code = self.testcommand.handle(command, self.u0.slack_id)
+            resp, _ = self.testcommand.handle(command, self.u0.slack_id)
             expect = {
                 'text': 'Warning - multiple users found!',
                 'attachments': user_attaches,
             }
             self.assertDictEqual(resp, expect)
-            self.assertEqual(code, 200)
 
     def test_handle_view_lookup_error(self):
         command = 'user view --username ABCDE8FA9'
@@ -171,40 +166,37 @@ class TestUserCommand(TestCase):
 
     def test_handle_edit_name(self):
         with self.app.app_context():
-            resp, code = self.testcommand.handle('user edit --name rob',
-                                                 self.u0.slack_id)
+            resp, _ = self.testcommand.handle('user edit --name rob',
+                                              self.u0.slack_id)
             expect = {'title': 'Name', 'value': 'rob', 'short': True}
             self.assertIn(expect, resp['attachments'][0]['fields'])
-            self.assertEqual(code, 200)
 
     def test_handle_edit_github(self):
         """Test that editing github username sends request to interface."""
         self.mock_github.org_add_member.return_value = "123"
         with self.app.app_context():
-            resp, code = self.testcommand.handle("user edit --github rob",
-                                                 self.u0.slack_id)
+            resp, _ = self.testcommand.handle("user edit --github rob",
+                                              self.u0.slack_id)
             expect0 = {'title': 'Github Username',
                        'value': 'rob',
                        'short': True}
             expect1 = {'title': 'Github ID', 'value': '123', 'short': True}
             self.assertIn(expect0, resp['attachments'][0]['fields'])
             self.assertIn(expect1, resp['attachments'][0]['fields'])
-            self.assertEqual(code, 200)
         self.mock_github.org_add_member.assert_called_once_with("rob")
 
     def test_handle_edit_github_error(self):
         self.mock_github.org_add_member.side_effect = GithubAPIException("")
 
         with self.app.app_context():
-            resp, code = self.testcommand.handle('user edit --github rob',
-                                                 self.u0.slack_id)
+            resp, _ = self.testcommand.handle('user edit --github rob',
+                                              self.u0.slack_id)
             expect = {
                 'attachments': [self.u0.get_attachment()],
                 'text': '\nError adding user rob to GitHub organization'
             }
 
             self.assertDictEqual(resp, expect)
-            self.assertEqual(code, 200)
 
     def test_handle_edit_all_fields(self):
         user = User(self.u0.slack_id)
@@ -219,7 +211,7 @@ class TestUserCommand(TestCase):
         expect = {'attachments': [user.get_attachment()]}
         self.mock_github.org_add_member.return_value = "123"
         with self.app.app_context():
-            resp, code = self.testcommand.handle(
+            resp, _ = self.testcommand.handle(
                 "user edit "
                 "--name rob "
                 "--email <mailto:rob@rob.com|rob@rob.com> --pos dev --github"
@@ -227,7 +219,6 @@ class TestUserCommand(TestCase):
                 " --bio 'Im a human lol'",
                 self.u0.slack_id)
             self.assertDictEqual(resp, expect)
-            self.assertEqual(code, 200)
 
     def test_handle_edit_not_admin(self):
         """Test user command with editor user that is not admin."""
@@ -242,7 +233,7 @@ class TestUserCommand(TestCase):
 
     def test_handle_edit_make_admin(self):
         with self.app.app_context():
-            resp, code = self.testcommand.handle(
+            resp, _ = self.testcommand.handle(
                 f"user edit --username {self.u0.slack_id} "
                 "--permission admin",
                 self.admin.slack_id)
@@ -250,18 +241,16 @@ class TestUserCommand(TestCase):
                       'value': 'admin',
                       'short': True}
             self.assertIn(expect, resp['attachments'][0]['fields'])
-            self.assertEqual(code, 200)
 
     def test_handle_edit_make_self_admin_no_perms(self):
         with self.app.app_context():
-            resp, code = self.testcommand.handle(
+            resp, _ = self.testcommand.handle(
                 "user edit --permission admin", self.u0.slack_id)
             expect = {
                 'attachments': [self.u0.get_attachment()],
                 'text': "\nCannot change own permission: user isn't admin."
             }
             self.assertDictEqual(resp, expect)
-            self.assertEqual(code, 200)
 
     def test_handle_edit_lookup_error_editee(self):
         self.assertEqual(self.testcommand.handle(
@@ -280,15 +269,13 @@ class TestUserCommand(TestCase):
                          (UserCommand.lookup_error, 200))
 
     def test_handle_command_help(self):
-        ret, code = self.testcommand.handle('user help', self.u0.slack_id)
+        ret, _ = self.testcommand.handle('user help', self.u0.slack_id)
         self.assertEqual(ret, self.testcommand.get_help())
-        self.assertEqual(code, 200)
 
     def test_handle_multiple_subcommands(self):
         """Test handling multiple observed subcommands."""
-        ret, code = self.testcommand.handle('user edit view', self.u0.slack_id)
+        ret, _ = self.testcommand.handle('user edit view', self.u0.slack_id)
         self.assertEqual(ret, self.testcommand.get_help())
-        self.assertEqual(code, 200)
 
     def test_handle_subcommand_help(self):
         subcommands = list(self.testcommand.subparser.choices.keys())
@@ -296,10 +283,9 @@ class TestUserCommand(TestCase):
             cmd_args = ['--help', '-h', '--invalid argument']
             for arg in cmd_args:
                 command = f'user {subcommand} {arg}'
-                ret, code = self.testcommand.handle(command, self.u0.slack_id)
+                ret, _ = self.testcommand.handle(command, self.u0.slack_id)
                 self.assertEqual(1, ret.count("usage"))
                 self.assertIn(subcommand, ret)
-                self.assertEqual(code, 200)
 
     def test_handle_view_inspect(self):
         self.u0.name = 'John Peters'

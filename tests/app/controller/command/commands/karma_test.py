@@ -31,9 +31,8 @@ class KarmaCommandTest(TestCase):
     def test_handle_view(self):
         self.u1.karma = 15
         cmd = f'karma view {self.u1.slack_id}'
-        resp, code = self.testcommand.handle(cmd, self.u0.slack_id)
+        resp, _ = self.testcommand.handle(cmd, self.u0.slack_id)
         self.assertIn(str(self.u1.karma), resp)
-        self.assertEqual(code, 200)
 
     def test_handle_view_lookup_error(self):
         cmd = 'karma view ABCDE8FA9'
@@ -44,9 +43,8 @@ class KarmaCommandTest(TestCase):
         self.u0.karma = 2019
         self.u1.karma = 2048
         with self.app.app_context():
-            resp, code = self.testcommand.handle(
+            resp, _ = self.testcommand.handle(
                 'karma reset --all', self.admin.slack_id)
-            self.assertEqual(code, 200)
 
         self.assertEqual(self.u0.karma, KarmaCommand.karma_default_amount)
         self.assertEqual(self.u1.karma, KarmaCommand.karma_default_amount)
@@ -54,9 +52,8 @@ class KarmaCommandTest(TestCase):
     def test_handle_reset_all_not_as_admin(self):
         self.u1.karma = 20
         with self.app.app_context():
-            resp, code = self.testcommand.handle(
+            resp, _ = self.testcommand.handle(
                 'karma reset --all', self.u0.slack_id)
-            self.assertEqual(code, 200)
             self.assertEqual(KarmaCommand.permission_error, resp)
 
         self.assertNotEqual(self.u1.karma, KarmaCommand.karma_default_amount)
