@@ -301,7 +301,7 @@ class TestUserCommand(TestCase):
                 self.assertIn(subcommand, ret)
                 self.assertEqual(code, 200)
 
-    def test_handle_deepdive(self):
+    def test_handle_view_inspect(self):
         self.u0.name = 'John Peters'
         self.u0.email = 'john.peter@hotmail.com'
         self.u0.github_id = '328593'
@@ -312,14 +312,14 @@ class TestUserCommand(TestCase):
             ['- ' + t.github_team_name for t in [self.t0, self.t1]]
         )
 
-        ret, code = self.testcommand.handle(
+        ret, _ = self.testcommand.handle(
             'user view --inspect --username U0G9QF9C6',
             self.u1.slack_id)
         ret = ret['attachments'][1]['text']
         self.assertIn(f'*Membership in:*\n{team_names}', ret)
         self.assertIn(f'*Leading teams:*\n- {self.t1.github_team_name}', ret)
 
-    def test_handle_deepdive_with_ghusername(self):
+    def test_handle_view_inspect_with_ghusername(self):
         self.u0.name = 'John Peters'
         self.u0.email = 'john.peter@hotmail.com'
         self.u0.github_id = '328593'
@@ -330,25 +330,25 @@ class TestUserCommand(TestCase):
             ['- ' + t.github_team_name for t in [self.t0, self.t1]]
         )
 
-        ret, code = self.testcommand.handle(
+        ret, _ = self.testcommand.handle(
             'user view --inspect --github some_user',
             self.u1.slack_id)
         ret = ret['attachments'][1]['text']
         self.assertIn(f'*Membership in:*\n{team_names}', ret)
         self.assertIn(f'*Leading teams:*\n- {self.t1.github_team_name}', ret)
 
-    def test_handle_deepdive_user_no_exists(self):
-        ret, code = self.testcommand.handle(
+    def test_handle_view_inspect_user_no_exists(self):
+        ret, _ = self.testcommand.handle(
             'user view --inspect --username UXXXXXXXX',
             self.u1.slack_id)
         self.assertEqual(UserCommand.lookup_error, ret)
 
-    def test_handle_deepdive_no_ghid(self):
+    def test_handle_view_inspect_no_ghid(self):
         self.u0.name = 'John Peters'
         self.u0.email = 'john.peter@hotmail.com'
 
-        ret, code = self.testcommand.handle(
+        ret, _ = self.testcommand.handle(
             'user view --inspect --username U0G9QF9C6',
             self.u1.slack_id)
         ret = ret['attachments'][1]['text']
-        self.assertIn(UserCommand.noghid_deepdive, ret)
+        self.assertIn(UserCommand.viewinspect_noghid, ret)

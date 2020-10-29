@@ -21,7 +21,7 @@ class UserCommand(Command):
     permission_error = "You do not have the sufficient " \
                        "permission level for this command!"
     lookup_error = "Lookup error! User not found!"
-    noghid_deepdive = 'Specified user does not have a Github account'\
+    viewinspect_noghid = 'Specified user does not have a Github account'\
         'registered with Rocket.'
     delete_text = "Deleted user with Slack ID: "
     desc = f"for dealing with {command_name}s"
@@ -178,7 +178,7 @@ class UserCommand(Command):
         else:
             return self.get_help(), 200
 
-    def deepdive_helper(self, user: User):
+    def viewinspect_helper(self, user: User):
         """
         Return an attachment that is the membership info.
 
@@ -207,7 +207,7 @@ class UserCommand(Command):
 '''
         else:
             ret = f'''
-{self.noghid_deepdive}
+{self.viewinspect_noghid}
 '''
 
         return {
@@ -360,7 +360,7 @@ class UserCommand(Command):
             if param_list['inspect']:
                 return {'attachments': [
                     user.get_attachment(),
-                    self.deepdive_helper(user)
+                    self.viewinspect_helper(user)
                 ]}, 200
             else:
                 return {'attachments': [user.get_attachment()]}, 200
