@@ -213,7 +213,7 @@ class TestTeamHandles(TestCase):
         self.db.teams = {}
         rsp, code = self.webhook_handler.handle(self.deleted_payload)
         self.assertEqual(rsp, f'team with github id {self.teamid} not found')
-        self.assertEqual(code, 404)
+        self.assertEqual(code, 200)
 
     def test_handle_team_event_edit_team(self):
         rsp, code = self.webhook_handler.handle(self.edited_payload)
@@ -224,7 +224,7 @@ class TestTeamHandles(TestCase):
         self.db.teams = {}
         rsp, code = self.webhook_handler.handle(self.edited_payload)
         self.assertEqual(rsp, f'team with github id {self.teamid} not found')
-        self.assertEqual(code, 404)
+        self.assertEqual(code, 200)
 
     def test_handle_team_event_add_to_repo(self):
         rsp, code = self.webhook_handler.handle(self.added_to_repo_payload)
@@ -241,4 +241,5 @@ class TestTeamHandles(TestCase):
     def test_handle_team_event_empty_payload(self):
         """Test empty/invalid payloads can be handled."""
         rsp, code = self.webhook_handler.handle(self.empty_payload)
-        self.assertEqual(rsp, 'invalid payload')
+        self.assertEqual(rsp, 'Unsupported action triggered, ignoring.')
+        self.assertEqual(code, 202)

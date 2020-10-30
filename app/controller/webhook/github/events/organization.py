@@ -42,7 +42,7 @@ class OrganizationEventHandler(GitHubEventHandler):
         else:
             logging.error("organization webhook triggered,"
                           f" invalid action specified: {str(payload)}")
-            return "invalid organization webhook triggered", 405
+            return "Unsupported action triggered, ignoring.", 202
 
     def handle_remove(self,
                       member_list: List[User],
@@ -61,10 +61,10 @@ class OrganizationEventHandler(GitHubEventHandler):
             logging.error("Error: found github ID connected to"
                           " multiple slack IDs")
             return ("Error: found github ID connected to multiple slack"
-                    " IDs", 412)
+                    " IDs", 200)
         else:
             logging.error(f"could not find user {github_id}")
-            return f"could not find user {github_username}", 404
+            return f"could not find user {github_username}", 200
 
     def handle_added(self,
                      github_id: str,
