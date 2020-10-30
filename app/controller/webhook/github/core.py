@@ -44,9 +44,9 @@ class GitHubWebhookHandler:
             for event_handler in self.__event_handlers:
                 if action in event_handler.supported_action_list:
                     return event_handler.handle(payload)
-            return "Unsupported payload received", 500
+            return "Unsupported payload received, ignoring.", 202
         else:
-            return "Hashed signature is not valid", 403
+            return "Hashed signature is not valid", 400
 
     def verify_hash(self, request_body: bytes, xhub_signature: str):
         """

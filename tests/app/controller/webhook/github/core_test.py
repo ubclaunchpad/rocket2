@@ -92,8 +92,8 @@ class TestGithubWebhookCore(TestCase):
         """Test that the handle function can handle unknown events."""
         mock_verify_hash.return_value = True
         rsp, code = self.webhook_handler.handle(None, None, {"action": ""})
-        self.assertEqual(rsp, 'Unsupported payload received')
-        self.assertEqual(code, 500)
+        self.assertEqual(rsp, 'Unsupported payload received, ignoring.')
+        self.assertEqual(code, 202)
 
     @mock.patch('app.controller.webhook.github.'
                 'core.GitHubWebhookHandler.verify_hash')
@@ -103,4 +103,4 @@ class TestGithubWebhookCore(TestCase):
         rsp, code = self.webhook_handler.handle(None, None,
                                                 {"action": "member_added"})
         self.assertEqual(rsp, 'Hashed signature is not valid')
-        self.assertEqual(code, 403)
+        self.assertEqual(code, 400)

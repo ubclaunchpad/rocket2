@@ -51,7 +51,7 @@ class TeamEventHandler(GitHubEventHandler):
                                                      payload)
         else:
             logging.error(f"invalid payload received: {str(payload)}")
-            return "invalid payload", 405
+            return "Unsupported action triggered, ignoring.", 202
 
     def team_created(self,
                      github_id: str,
@@ -87,7 +87,7 @@ class TeamEventHandler(GitHubEventHandler):
             return f"deleted team with github id {github_id}", 200
         except LookupError:
             logging.error(f"team with github id {github_id} not found.")
-            return f"team with github id {github_id} not found", 404
+            return f"team with github id {github_id} not found", 200
 
     def team_edited(self,
                     github_id: str,
@@ -106,7 +106,7 @@ class TeamEventHandler(GitHubEventHandler):
             return f"updated team with id {github_id}", 200
         except LookupError:
             logging.error(f"team with github id {github_id} not found.")
-            return f"team with github id {github_id} not found", 404
+            return f"team with github id {github_id} not found", 200
 
     def team_added_to_repository(self,
                                  github_id: str,

@@ -124,7 +124,7 @@ class TestMembershipHandles(TestCase):
         self.db.users = {}
         rsp, code = self.webhook_handler.handle(self.add_payload)
         self.assertEqual(rsp, f'could not find user {self.member}')
-        self.assertEqual(code, 404)
+        self.assertEqual(code, 200)
 
     def test_handle_mem_event_rm_member(self):
         self.t.add_member(self.u.github_id)
@@ -138,13 +138,13 @@ class TestMembershipHandles(TestCase):
         self.assertEqual(
             rsp,
             f'slack user {self.u.slack_id} not in {self.team}')
-        self.assertEqual(code, 404)
+        self.assertEqual(code, 200)
 
     def test_handle_mem_event_rm_member_missing_from_db(self):
         self.db.users = {}
         rsp, code = self.webhook_handler.handle(self.rm_payload)
         self.assertEqual(rsp, f'could not find user {self.memberid}')
-        self.assertEqual(code, 404)
+        self.assertEqual(code, 200)
 
     def test_handle_mem_event_rm_multiple_members(self):
         clone = User('Uclones')
@@ -154,9 +154,9 @@ class TestMembershipHandles(TestCase):
         rsp, code = self.webhook_handler.handle(self.rm_payload)
         self.assertEqual(
             rsp, 'Error: found github ID connected to multiple slack IDs')
-        self.assertEqual(code, 412)
+        self.assertEqual(code, 200)
 
     def test_handle_mem_event_invalid_action(self):
         rsp, code = self.webhook_handler.handle(self.empty_payload)
-        self.assertEqual(rsp, 'invalid membership webhook triggered')
-        self.assertEqual(code, 405)
+        self.assertEqual(rsp, 'Unsupported action triggered, ignoring.')
+        self.assertEqual(code, 202)
