@@ -582,11 +582,11 @@
         },
         "slackclient": {
             "hashes": [
-                "sha256:07ec0340753987154f60820e0b9f98e111a5b18a4b17cfd5f352a6f649e9163a",
-                "sha256:cc36bbf804a658caaccdf81333d2951c43c21f13deca8a6f4c00505b727c572e"
+                "sha256:07ec8fa76f6aa64852210ae235ff9e637ba78124e06c0b07a7eeea4abb955965",
+                "sha256:2d68d668c02f4038299897e5c4723ab85dd40a3548354924b24f333a435856f8"
             ],
             "index": "pypi",
-            "version": "==2.9.2"
+            "version": "==2.9.3"
         },
         "slackeventsapi": {
             "hashes": [
