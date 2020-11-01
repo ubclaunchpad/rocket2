@@ -29,7 +29,8 @@ class PairingSchedule(ModuleBase):
 
     def get_job_args(self) -> Dict[str, Any]:
         """Get job configuration arguments for apscheduler."""
-        logging.info(f"Running pairing at cron job: {self.config.slack_pairing_frequency}")
+        logging.info(f"Running pairing at cron job: \
+            {self.config.slack_pairing_frequency}")
         cron_frequency = self.config.slack_pairing_frequency.split(' ')
         return {'trigger':      'cron',
                 'minute':        cron_frequency[0],
