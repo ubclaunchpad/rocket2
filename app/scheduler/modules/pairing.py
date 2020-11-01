@@ -12,9 +12,9 @@ import logging
 
 
 class PairingSchedule(ModuleBase):
-    """Module that matches 2 Launch Pad members each week"""
+    """Module that pairs members each ``SLACK_PAIRING_FREQUENCY``"""
 
-    NAME = 'Match launch pad members randomly'
+    NAME = 'Pair members randomly for meetups'
 
     def __init__(self,
                  flask_app: Flask,

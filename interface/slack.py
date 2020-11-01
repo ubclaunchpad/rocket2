@@ -142,7 +142,8 @@ class Bot:
 
         :return the slack id of the channel
         """
-        # We strip away the "#" in case it was provided with the channel name
+        # We strip away the "#" in case it was provided with the channel name,
+        # such as in values returned from Slack's ``conversations_list`` API.
         channel_name = channel_name.replace("#", "")
         logging.debug(f"Attempting to get the id of channel {channel_name}")
         channels = list(

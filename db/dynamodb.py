@@ -201,7 +201,7 @@ class DynamoDB(DBFacade):
 
         :param table_name: name of the table to enable ttl for
         """
-        # Stub
+        # TODO
 
     def check_valid_table(self, table_name: str) -> bool:
         """
