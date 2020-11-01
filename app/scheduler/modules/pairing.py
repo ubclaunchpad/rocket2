@@ -1,4 +1,4 @@
-"""Match two Launchpad member for a private conversation"""
+"""Match two Launch Pad member for a private conversation"""
 from slack import WebClient
 from interface.slack import Bot
 from random import shuffle
@@ -12,7 +12,7 @@ import logging
 
 
 class PairingSchedule(ModuleBase):
-    """Module that matches 2 launchpad members each week"""
+    """Module that matches 2 Launch Pad members each week"""
 
     NAME = 'Match launch pad members randomly'
 
