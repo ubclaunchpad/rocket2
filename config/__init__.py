@@ -46,6 +46,8 @@ class Config:
         'GITHUB_LEADS_TEAM_NAME': '',
         'GCP_SERVICE_ACCOUNT_CREDENTIALS': '',
         'GCP_SERVICE_ACCOUNT_SUBJECT': '',
+        'SLACK_PAIRING_CHANNEL': '',
+        'AWS_PAIRINGS_TABLE': '',
     }
 
     def __init__(self):

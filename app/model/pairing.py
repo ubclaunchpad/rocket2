@@ -15,7 +15,8 @@ class Pairing(RocketModel):
         """
         Initialize the pairing.
 
-        The generated ``pairing_id`` property is meant to uniquely represent a pairing.
+        The generated ``pairing_id`` property is meant to uniquely
+        represent a pairing.
 
         :param user1_slack_id: The slack ID of the first user
         :param user2_slack_id: The slack ID of the second user

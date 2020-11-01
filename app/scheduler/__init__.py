@@ -39,4 +39,7 @@ class Scheduler:
     def __init_periodic_tasks(self):
         """Add jobs that fire every interval."""
         self.__add_job(RandomChannelPromoter(*self.args))
-        self.__add_job(PairingSchedule(*self.args, self.facade))
+        # Feature toggle the pairings based on the
+        # existence of the `SLACK_PAIRING_CHANNEL` env variable
+        if len(self.args[1].slack_pairing_channel) != 0:
+            self.__add_job(PairingSchedule(*self.args, self.facade))
