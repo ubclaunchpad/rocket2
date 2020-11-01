@@ -33,9 +33,10 @@ class TestPairingSchedule(TestCase):
         ]
 
         self.pairing.do_it()
-        self.slackbot.create_private_chat.assert_called_with(
-            ['user1', 'user2']
-        )
+        args = self.slackbot.create_private_chat.call_args.args[0]
+        assert 'user1' in args
+        assert 'user2' in args
+        assert len(args) == 2
 
     def test_pairing_many(self):
         """Test pairing many people together"""
@@ -61,15 +62,17 @@ class TestPairingSchedule(TestCase):
         users = ['user1', 'user2']
         self.slackbot.get_channel_users.return_value = users
         self.pairing.do_it()
-        self.slackbot.create_private_chat.assert_called_with(
-            ['user1', 'user2']
-        )
+        args = self.slackbot.create_private_chat.call_args.args[0]
+        assert 'user1' in args
+        assert 'user2' in args
+        assert len(args) == 2
         # Now the db has the pairing of user1 and user2
         self.pairing.do_it()
         # Since they are the only ones, they get matched again
-        self.slackbot.create_private_chat.assert_called_with(
-            ['user1', 'user2']
-        )
+        args = self.slackbot.create_private_chat.call_args.args[0]
+        assert 'user1' in args
+        assert 'user2' in args
+        assert len(args) == 2
 
     def test_pairing_odd(self):
         """Test pairing users, when one group has an odd number of users"""
@@ -77,6 +80,8 @@ class TestPairingSchedule(TestCase):
         users = ['user1', 'user2', 'user3']
         self.slackbot.get_channel_users.return_value = users
         self.pairing.do_it()
-        self.slackbot.create_private_chat.assert_called_with(
-            users
-        )
+        args = self.slackbot.create_private_chat.call_args.args[0]
+        assert 'user1' in args
+        assert 'user2' in args
+        assert 'user3' in args
+        assert len(args) == 3
