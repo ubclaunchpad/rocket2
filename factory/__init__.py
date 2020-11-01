@@ -88,6 +88,7 @@ def make_gcp_client(config: Config) -> Optional[GCPInterface]:
     drive = gcp_build('drive', 'v3', credentials=credentials)
     return GCPInterface(drive, subject=config.gcp_service_account_subject)
 
+
 def make_event_scheduler(app: Flask, config: Config) -> Scheduler:
     background_scheduler = BackgroundScheduler(timezone="America/Los_Angeles")
     facade = make_dbfacade(config)

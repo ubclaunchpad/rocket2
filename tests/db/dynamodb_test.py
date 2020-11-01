@@ -19,6 +19,7 @@ class TestDDBConstants(TestCase):
         self.config.aws_users_tablename = 'users'
         self.config.aws_teams_tablename = 'teams'
         self.config.aws_projects_tablename = 'projects'
+        self.config.aws_pairings_tablename = 'pairings'
         self.const = DynamoDB.Const(self.config)
 
     def test_get_bad_table_name(self):
@@ -43,6 +44,7 @@ class TestDynamoDB(TestCase):
         self.config.aws_users_tablename = 'users_test'
         self.config.aws_teams_tablename = 'teams_test'
         self.config.aws_projects_tablename = 'projects_test'
+        self.config.aws_pairings_tablename = 'pairings_test'
         self.config.aws_local = True
         self.ddb = DynamoDB(self.config)
 

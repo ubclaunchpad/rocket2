@@ -8,7 +8,7 @@ from typing import Tuple, List, Type, TypeVar
 from config import Config
 from db.facade import DBFacade
 
-T = TypeVar('T', User, Team, Project)
+T = TypeVar('T', User, Team, Project, Pairing)
 
 
 def fragment(items_per_call=100):
@@ -92,7 +92,8 @@ class DynamoDB(DBFacade):
             :raise: TypeError if table does not exist
             :return: list of strings of set attributes
             """
-            if table_name == self.users_table or table_name == self.pairings_table:
+            if table_name == self.users_table or \
+               table_name == self.pairings_table:
                 return []
             elif table_name == self.teams_table:
                 return ['team_leads', 'members']

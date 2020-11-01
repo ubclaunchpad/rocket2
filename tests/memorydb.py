@@ -1,8 +1,8 @@
 from db.facade import DBFacade
-from app.model import User, Team, Project, Permissions
+from app.model import User, Team, Project, Permissions, Pairing
 from typing import TypeVar, List, Type, Tuple, cast, Set
 
-T = TypeVar('T', User, Team, Project)
+T = TypeVar('T', User, Team, Project, Pairing)
 
 
 # Convert DB field names to python attribute names
@@ -91,6 +91,8 @@ def get_key(m: T) -> str:
         return cast(Team, m).github_team_id
     elif isinstance(m, Project):
         return cast(Project, m).project_id
+    elif isinstance(m, Pairing):
+        return cast(Pairing, m).pairing_id
 
 
 class MemoryDB(DBFacade):
@@ -173,3 +175,6 @@ class MemoryDB(DBFacade):
         d = self.get_db(Model)
         if k in d:
             d.pop(k)
+
+    def delete_all(self, Model: Type[T]):
+        pass

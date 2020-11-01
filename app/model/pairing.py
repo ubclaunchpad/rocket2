@@ -1,5 +1,5 @@
 """Represent a Pairing between two users."""
-from typing import List, Dict, Any, TypeVar, Type
+from typing import Dict, Any, TypeVar, Type
 import uuid
 from app.model.base import RocketModel
 
@@ -23,7 +23,7 @@ class Pairing(RocketModel):
         self.pairing_id = str(uuid.uuid4())
         self.user1_slack_id = user1_slack_id
         self.user2_slack_id = user2_slack_id
-        self.ttl = "TODO" # TODO
+        self.ttl = "TODO"  # TODO
 
     def get_attachment(self) -> Dict[str, Any]:
         """Return slack-formatted attachment (dictionary) for pairing."""
@@ -92,7 +92,7 @@ class Pairing(RocketModel):
         :return: true if this pairing has no missing fields
         """
         return len(p.pairing_id) > 0 and\
-            len(p.user1_slack_id) > 0 and len(p.user2_slack_id)
+            len(p.user1_slack_id) > 0 and len(p.user2_slack_id) > 0
 
     def __eq__(self, other: object) -> bool:
         """Return true if this pairing is equal to the other pairing."""
