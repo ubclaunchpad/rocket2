@@ -44,6 +44,12 @@ PROJ_ATTRS = {
     'playstore_url': 'playstore_url'
 }
 
+PAIRING_ATTRS = {
+    'pairing_id': 'pairing_id',
+    'user1_slack_id': 'user1_slack_id',
+    'user2_slack_id': 'user2_slack_id'
+}
+
 
 def field_is_set(Model: Type[T], field: str) -> bool:
     if Model is Team:
@@ -61,6 +67,8 @@ def field_to_attr(Model: Type[T], field: str) -> str:
         return TEAM_ATTRS[field]
     elif Model is Project:
         return PROJ_ATTRS[field]
+    elif Model is Pairing:
+        return PAIRING_ATTRS[field]
     return field
 
 
@@ -110,17 +118,20 @@ class MemoryDB(DBFacade):
     def __init__(self,
                  users: List[User] = [],
                  teams: List[Team] = [],
-                 projs: List[Project] = []):
+                 projs: List[Project] = [],
+                 pairings: List[Pairing] = []):
         """
         Initialize with lists of objects.
 
         :param users: list of users to initialize the db
         :param teams: list of teams to initialize the db
         :param projs: list of projects to initialize the db
+        :param pairings: list of pairings to initialize the db
         """
         self.users = {u.slack_id: u for u in users}
         self.teams = {t.github_team_id: t for t in teams}
         self.projs = {p.project_id: p for p in projs}
+        self.pairings = {p.pairing_id: p for p in pairings}
 
     def get_db(self, Model: Type[T]):
         if Model is User:
@@ -129,6 +140,8 @@ class MemoryDB(DBFacade):
             return self.teams
         elif Model is Project:
             return self.projs
+        elif Model is Pairing:
+            return self.pairings
         return {}
 
     def store(self, obj: T) -> bool:
@@ -184,4 +197,5 @@ class MemoryDB(DBFacade):
             d.pop(k)
 
     def delete_all(self, Model: Type[T]):
-        pass
+        d = self.get_db(Model)
+        d.clear()

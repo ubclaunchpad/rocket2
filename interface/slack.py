@@ -123,7 +123,7 @@ class Bot:
         """
         logging.debug(
             f"Attempting to open a private conversation with users {users}")
-        response = self.sc.conversations_open(users=users)
+        response = cast(SlackResponse, self.sc.conversations_open(users=users))
         if response['ok']:
             logging.debug(
                 f"Successfly opened a converation with the name \
