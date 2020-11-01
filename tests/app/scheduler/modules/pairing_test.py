@@ -17,6 +17,7 @@ class TestPairingSchedule(TestCase):
         self.config.slack_notification_channel = ''
         self.config.slack_announcement_channel = ''
         self.config.slack_pairing_channel = ''
+        self.config.slack_pairing_frequency = '* * * * *'
         self.app = mock.Mock()
         self.slackbot = mock.Mock()
         self.db = MemoryDB()

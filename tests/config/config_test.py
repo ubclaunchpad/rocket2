@@ -15,7 +15,7 @@ class TestConfig(TestCase):
             'SLACK_NOTIFICATION_CHANNEL': '#rocket2',
             'SLACK_ANNOUNCEMENT_CHANNEL': '#ot-random',
             'SLACK_PAIRING_CHANNEL': "#pairing",
-
+            'SLACK_PAIRING_FREQUENCY': '* * * * *',
             'GITHUB_APP_ID': '2024',
             'GITHUB_ORG_NAME': 'ubclaunchpad',
             'GITHUB_WEBHOOK_ENDPT': '/webhook',

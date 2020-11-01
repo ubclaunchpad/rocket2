@@ -24,13 +24,20 @@ class PairingSchedule(ModuleBase):
         self.bot = Bot(WebClient(config.slack_api_token),
                        config.slack_notification_channel)
         self.channel_id = self.bot.get_channel_id(config.slack_pairing_channel)
+        self.config = config
         self.facade = facade
 
     def get_job_args(self) -> Dict[str, Any]:
         """Get job configuration arguments for apscheduler."""
+        logging.info(f"Running pairing at cron job: {self.config.slack_pairing_frequency}")
+        cron_frequency = self.config.slack_pairing_frequency.split(' ')
         return {'trigger':      'cron',
-                'minute': '*',
-                'name':         self.NAME}
+                'minute':        cron_frequency[0],
+                'hour':         cron_frequency[1],
+                'day':          cron_frequency[2],
+                'month':         cron_frequency[3],
+                'day_of_week':   cron_frequency[4],
+                'name':          self.NAME}
 
     def do_it(self):
         """Pair users together, and create a private chat for them"""

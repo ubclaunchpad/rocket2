@@ -23,6 +23,7 @@ class TestScheduler(TestCase):
         self.config.slack_notification_channel = "#general"
         self.config.slack_api_token = "sometoken.exe"
         self.config.slack_pairing_channel = "#general"
+        self.config.slack_pairing_frequency = "* * * * *"
 
     @patch.object(Bot, 'get_channel_id')
     def test_proper_initialization(self, other):
