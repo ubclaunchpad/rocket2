@@ -50,16 +50,14 @@ class TestTeamCommand(TestCase):
                          self.cmd.get_help(subcommand="foo"))
 
     def test_handle_help(self):
-        ret, code = self.cmd.handle("team help", self.u0.slack_id)
+        ret, _ = self.cmd.handle("team help", self.u0.slack_id)
         self.assertEqual(ret, self.cmd.get_help())
-        self.assertEqual(code, 200)
 
     def test_handle_multiple_subcommands(self):
         """Test handling multiple observed subcommands."""
-        ret, code = self.cmd.handle("team list edit",
-                                    self.u0.slack_id)
+        ret, _ = self.cmd.handle("team list edit",
+                                 self.u0.slack_id)
         self.assertEqual(ret, self.cmd.get_help())
-        self.assertEqual(code, 200)
 
     def test_handle_subcommand_help(self):
         """Test team subcommand help text."""
@@ -67,9 +65,8 @@ class TestTeamCommand(TestCase):
         for subcommand in subcommands:
             for arg in ['--help', '-h', '--invalid argument']:
                 command = f"team {subcommand} {arg}"
-                ret, code = self.cmd.handle(command, self.u0.slack_id)
+                ret, _ = self.cmd.handle(command, self.u0.slack_id)
                 self.assertEqual(1, ret.count("usage"))
-                self.assertEqual(code, 200)
 
     def test_handle_list(self):
         attachments = [
@@ -79,9 +76,8 @@ class TestTeamCommand(TestCase):
             self.t3.get_basic_attachment(),
         ]
         with self.app.app_context():
-            resp, code = self.cmd.handle('team list', self.u0.slack_id)
+            resp, _ = self.cmd.handle('team list', self.u0.slack_id)
             self.assertCountEqual(resp['attachments'], attachments)
-            self.assertEqual(code, 200)
 
     def test_handle_list_no_teams(self):
         self.db.teams = {}
@@ -91,11 +87,10 @@ class TestTeamCommand(TestCase):
 
     def test_handle_view(self):
         with self.app.app_context():
-            resp, code = self.cmd.handle('team view brs',
-                                         self.u0.slack_id)
+            resp, _ = self.cmd.handle('team view brs',
+                                      self.u0.slack_id)
             expect = {'attachments': [self.t0.get_attachment()]}
             self.assertDictEqual(resp, expect)
-            self.assertEqual(code, 200)
 
     def test_handle_view_lookup_error(self):
         self.assertTupleEqual(self.cmd.handle('team view iesesebrs',
@@ -103,10 +98,9 @@ class TestTeamCommand(TestCase):
                               (self.cmd.lookup_error, 200))
 
     def test_handle_view_noleads(self):
-        resp, code = self.cmd.handle('team view brs',
-                                     self.u0.slack_id)
+        resp, _ = self.cmd.handle('team view brs',
+                                  self.u0.slack_id)
         self.assertDictEqual(resp['attachments'][0], self.t0.get_attachment())
-        self.assertEqual(code, 200)
 
     def test_handle_delete_not_admin(self):
         self.assertTupleEqual(self.cmd.handle('team delete brs',
@@ -211,13 +205,12 @@ class TestTeamCommand(TestCase):
         self.u0.github_username = 'myuser'
         self.u0.github_id = 'otherID'
         with self.app.app_context():
-            resp, code = self.cmd.handle(
+            resp, _ = self.cmd.handle(
                 f'team add brs {self.u0.slack_id}',
                 self.admin.slack_id)
             expect = {'attachments': [self.t0.get_attachment()],
                       'text': 'Added User to brs'}
             self.assertDictEqual(resp, expect)
-            self.assertEqual(code, 200)
         self.assertTrue(self.t0.has_member("otherID"))
         self.gh.add_team_member.assert_called_once_with('myuser', 'githubid')
 
@@ -256,14 +249,13 @@ class TestTeamCommand(TestCase):
         self.u0.github_id = 'otherID'
         self.t2.github_team_id = 'githubid'
         with self.app.app_context():
-            resp, code = self.cmd.handle(
+            resp, _ = self.cmd.handle(
                 f'team add leads {self.u0.slack_id}',
                 self.admin.slack_id)
             expect_msg = 'Added User to leads and promoted user to team_lead'
             expect = {'attachments': [self.t2.get_attachment()],
                       'text': expect_msg}
             self.assertDictEqual(resp, expect)
-            self.assertEqual(code, 200)
         self.assertTrue(self.t2.has_member('otherID'))
         self.assertEqual(self.u0.permissions_level, Permissions.team_lead)
         self.gh.add_team_member.assert_called_once_with('myuser', 'githubid')
@@ -276,14 +268,13 @@ class TestTeamCommand(TestCase):
         self.u0.permissions_level = Permissions.admin
         self.t3.add_member(self.u0.github_id)
         with self.app.app_context():
-            resp, code = self.cmd.handle(
+            resp, _ = self.cmd.handle(
                 f'team add leads {self.u0.slack_id}',
                 self.admin.slack_id)
             expect_msg = 'Added User to leads'
             expect = {'attachments': [self.t2.get_attachment()],
                       'text': expect_msg}
             self.assertDictEqual(resp, expect)
-            self.assertEqual(code, 200)
         self.assertTrue(self.t2.has_member('otherID'))
         self.assertEqual(self.u0.permissions_level, Permissions.admin)
         self.gh.add_team_member.assert_called_once_with('myuser', 'githubid')
@@ -293,13 +284,12 @@ class TestTeamCommand(TestCase):
         self.u0.github_username = 'myuser'
         self.t0.add_member(self.u0.github_id)
         with self.app.app_context():
-            resp, code = self.cmd.handle(
+            resp, _ = self.cmd.handle(
                 f'team remove {self.t0.github_team_name} {self.u0.slack_id}',
                 self.admin.slack_id)
             expect = {'attachments': [self.t0.get_attachment()],
                       'text': f'Removed User from {self.t0.github_team_name}'}
             self.assertDictEqual(resp, expect)
-            self.assertEqual(code, 200)
         self.assertFalse(self.t0.has_member(self.u0.github_id))
         self.gh.remove_team_member.assert_called_once_with(
             self.u0.github_username,
@@ -325,14 +315,13 @@ class TestTeamCommand(TestCase):
         self.u0.github_id = 'otherID'
         self.t2.add_member(self.u0.github_id)
         with self.app.app_context():
-            resp, code = self.cmd.handle(
+            resp, _ = self.cmd.handle(
                 f'team remove leads {self.u0.slack_id}',
                 self.admin.slack_id)
             expect_msg = 'Removed User from leads and demoted user'
             expect = {'attachments': [self.t2.get_attachment()],
                       'text': expect_msg}
             self.assertDictEqual(resp, expect)
-            self.assertEqual(code, 200)
         self.assertEqual(self.u0.permissions_level, Permissions.member)
         self.gh.remove_team_member.assert_called_once_with(
             self.u0.github_username,
@@ -344,14 +333,13 @@ class TestTeamCommand(TestCase):
         self.t2.add_member(self.u0.github_id)
         self.t3.add_member(self.u0.github_id)
         with self.app.app_context():
-            resp, code = self.cmd.handle(
+            resp, _ = self.cmd.handle(
                 f'team remove admin {self.u0.slack_id}',
                 self.admin.slack_id)
             expect_msg = 'Removed User from admin and demoted user'
             expect = {'attachments': [self.t3.get_attachment()],
                       'text': expect_msg}
             self.assertDictEqual(resp, expect)
-            self.assertEqual(code, 200)
         self.assertEqual(self.u0.permissions_level, Permissions.team_lead)
         self.gh.remove_team_member.assert_called_once_with(
             self.u0.github_username,
@@ -366,14 +354,13 @@ class TestTeamCommand(TestCase):
         with self.app.app_context():
             # Leads member should not be demoted if they are also a admin
             # member
-            resp, code = self.cmd.handle(
+            resp, _ = self.cmd.handle(
                 f'team remove leads {self.u0.slack_id}',
                 self.admin.slack_id)
             expect_msg = 'Removed User from leads'
             expect = {'attachments': [self.t2.get_attachment()],
                       'text': expect_msg}
             self.assertDictEqual(resp, expect)
-            self.assertEqual(code, 200)
         self.assertEqual(self.u0.permissions_level, Permissions.admin)
         self.gh.remove_team_member.assert_called_once_with(
             self.u0.github_username,
@@ -409,8 +396,7 @@ class TestTeamCommand(TestCase):
         self.u0.github_id = 'githubID'
         self.u0.github_username = 'myuser'
         with self.app.app_context():
-            _, code = self.cmd.handle(cmdtxt, self.admin.slack_id)
-            self.assertEqual(code, 200)
+            self.cmd.handle(cmdtxt, self.admin.slack_id)
             self.assertTrue(self.t0.has_team_lead(self.u0.github_id))
             self.assertTrue(self.t0.has_member(self.u0.github_id))
             self.gh.add_team_member.assert_called_once_with(
@@ -425,8 +411,7 @@ class TestTeamCommand(TestCase):
         self.t0.add_member(self.u0.github_id)
         self.t0.add_team_lead(self.u0.github_id)
         with self.app.app_context():
-            _, code = self.cmd.handle(cmdtxt, self.admin.slack_id)
-            self.assertEqual(code, 200)
+            self.cmd.handle(cmdtxt, self.admin.slack_id)
             self.assertFalse(self.t0.has_team_lead(self.u0.github_id))
 
     def test_handle_lead_not_admin(self):
@@ -460,10 +445,9 @@ class TestTeamCommand(TestCase):
         cmdtxt = f'team edit {self.t0.github_team_name}'
         cmdtxt += ' --name brS --platform web'
         with self.app.app_context():
-            _, code = self.cmd.handle(cmdtxt, self.admin.slack_id)
+            self.cmd.handle(cmdtxt, self.admin.slack_id)
             self.assertEqual(self.t0.display_name, 'brS')
             self.assertEqual(self.t0.platform, 'web')
-            self.assertEqual(code, 200)
 
     def test_handle_edit_not_admin(self):
         cmdtxt = f'team edit {self.t0.github_team_name}'
@@ -512,11 +496,10 @@ class TestTeamCommand(TestCase):
 
         status = '1 teams changed, 0 added, 0 deleted. Wonderful.'
         with self.app.app_context():
-            resp, code = self.cmd.handle('team refresh',
-                                         self.admin.slack_id)
+            resp, _ = self.cmd.handle('team refresh',
+                                      self.admin.slack_id)
             self.assertCountEqual(resp['attachments'], attachments)
             self.assertEqual(resp['text'], status)
-            self.assertEqual(code, 200)
             self.assertEqual(team, team_update)
 
     def test_handle_refresh_addition_and_deletion(self):
@@ -534,9 +517,8 @@ class TestTeamCommand(TestCase):
 
         status = '0 teams changed, 1 added, 1 deleted. Wonderful.'
         with self.app.app_context():
-            resp, code = self.cmd.handle('team refresh',
-                                         self.admin.slack_id)
+            resp, _ = self.cmd.handle('team refresh',
+                                      self.admin.slack_id)
             self.assertCountEqual(resp['attachments'], attachments)
             self.assertEqual(resp['text'], status)
-            self.assertEqual(code, 200)
             self.assertEqual(len(self.db.teams), 2)

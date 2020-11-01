@@ -1,11 +1,14 @@
-Contributing
-============
+Contribution Guide
+==================
 
 This document contains important details for anyone contributing to
 Rocket 2.
 
-Opening an Issue
-----------------
+Issues
+------
+
+Creating an Issue
+~~~~~~~~~~~~~~~~~
 
 If you see a bug or have a feature request, please `open an
 issue <https://github.com/ubclaunchpad/rocket2/issues>`__! That being
@@ -18,31 +21,41 @@ on an issue, please assign yourself to it, and unassign yourself if you stop
 working on it.**
 
 Task Triage and Planning
-------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 All newly created issues are automatically added to the
-`Rocket 2 project board <https://github.com/ubclaunchpad/rocket2/projects/1>`_.
-The life of an issue goes roughly as follows:
+`Rocket 2 Planning project board <https://github.com/ubclaunchpad/rocket2/projects/1>`_.
+Issues start in the *Needs triage* column. From here, they are moved to either:
 
-Issues start in *Needs triage*. From here, they are moved to either:
+- ❄️ *Icebox*: deprioritized tasks are tracked here
+- 🗂 *Backlog*: this means that we want to get around to this task at some point
 
-- *Icebox*: deprioritized tasks are tracked here
-- *Backlog*: this means that we want to get around to this task at some point
+From the *Backlog*, we start assigning people to work on tasks, which moves
+tasks into 🚀 *Planned*, which is typically around when discussions around
+design and potential implementation happens. When work begins in earnest, the
+issue should be moved manually to 🏃‍♂️ *In progress*, where it will stay until a
+pull request lands closing the issue, at which point it will automatically be
+moved to ✅ *Done*.
 
-From the *Backlog*, we start moving tasks into *Planned*, which is typically
-around when discussions around design and potential implementation happens.
-When work begins in earnest, the issue should be moved to *In progress*,
-where it will stay until a pull request lands closing the issue, at which
-point it will automatically be moved to *Done*.
+Automated movement of issues in the project is done through a mix of the
+built-in `projects automation <https://docs.github.com/en/free-pro-team@latest/github/managing-your-work-on-github/configuring-automation-for-project-boards>`_
+and our own
+`Planning automation <https://github.com/ubclaunchpad/rocket2/actions?query=workflow%3APipeline>`_.
 
-Development Documentation
--------------------------
+We do not use the planning project to track pull requests - instead, relevant
+pull requests should be attached to their respective issues.
+
+Development
+-----------
 
 Please refer to the `local development guide <https://rocket2.readthedocs.io/en/latest/docs/LocalDevelopmentGuide.html>`_
-to get started! 
+to get started with making changes to Rocket 2!
 
-Before-Pull-Request checklist
------------------------------
+Pull Requests
+-------------
+
+Before You Open a Pull Request
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 -  All tests and style and docs checks pass (``scripts/build_check.sh``)
 -  The GitHub build passes (GitHub will build your commit when you push
@@ -50,7 +63,7 @@ Before-Pull-Request checklist
 -  Your code is presentable and you have **not** committed extra files
    (think your credentials, IDE config files, cached directories, build
    directories, etc.)
--  You’ve written unit tests for the changes you’ve made, and that they
+-  You've written unit tests for the changes you've made, and that they
    cover all the code you wrote (or effectively all, given the
    circumstances)
 
@@ -60,7 +73,7 @@ code coverage, but you can easily check the code coverage using the
 the unit tests are run.
 
 Submitting a Pull Request
--------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 We appreciate pull requests of any size or scope.
 
@@ -98,11 +111,15 @@ All of these checks are conveniently done using the
 Remember to add the label ``Ready for Review``.
 
 After your pull request has been approved and the GitHub build passes,
-it can be merged into ``master``. Please do so with an ordinary merge
-commit, not a rebase or squash merge.
+it can be merged into ``master``. Please do so with a squash merge, not a
+rebase or normal merge. The squash commit should contain information about
+your changes. This is so that the project history doesn't get too muddled up,
+and each change is explicitly tied to a pull request and relevant discussion.
+
+For more details, see `rocket2#560 <https://github.com/ubclaunchpad/rocket2/issues/560>`_.
 
 Updating an Outdated Pull Request
----------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If changes have been merged between when you started work on your branch
 and when your pull request was approved, you will have to update your
@@ -116,7 +133,7 @@ Assuming you are on your working branch:
    git rebase master
 
 If you have changed files that were also changed in the intervening
-merge, ``git rebase`` may report merge conflicts. If this happens, don’t
+merge, ``git rebase`` may report merge conflicts. If this happens, don't
 panic! Use ``git status`` and ``git diff`` to determine which files
 conflict and where, use an editor to fix the conflicts, then stage the
 formerly-conflicting files with ``git add FILE``. Finally, use

@@ -37,7 +37,12 @@ class DynamoDB(DBFacade):
     """
 
     class Const:
-        """A bunch of static constants and functions."""
+        """
+        A bunch of static constants and functions.
+
+        Used to convert between Python objects and the DDB table names, object
+        attributes and table column names.
+        """
 
         def __init__(self, config: Config):
             """Initialize the constants."""
@@ -51,7 +56,7 @@ class DynamoDB(DBFacade):
             Convert class into corresponding table name.
 
             :param cls: Either ``User``, ``Team``, or ``Project``
-            :raise: TypeError if it is not either User, Team, or Project
+            :raises: TypeError if it is not either User, Team, or Project
             :return: table name string
             """
             if cls == User:
@@ -70,7 +75,7 @@ class DynamoDB(DBFacade):
             Get primary key of the table name.
 
             :param cls: the name of the table
-            :raise: TypeError if table does not exist
+            :raises: TypeError if table does not exist
             :return: primary key of the table
             """
             if table_name == self.users_table:
@@ -89,8 +94,8 @@ class DynamoDB(DBFacade):
             Get class attributes that are sets.
 
             :param cls: the table name
-            :raise: TypeError if table does not exist
-            :return: list of strings of set attributes
+            :raises: TypeError if table does not exist
+            :return: set attributes
             """
             if table_name == self.users_table or \
                table_name == self.pairings_table:
@@ -103,21 +108,22 @@ class DynamoDB(DBFacade):
                 raise TypeError('Table name does not correspond to anything')
 
     def __init__(self, config: Config):
-        """Initialize facade using DynamoDB settings.
+        """
+        Initialize facade using DynamoDB settings.
 
         To avoid local tests failure when the DynamoDb server is used,
-        a testing environment variable is set.
-        When testing environmental variable is true,
-        the local dynamodb is run.
-        When testing environmental variable is true,
-        the server dynamodb is run.
+        an environment variable ``config.aws_local`` is read.
 
-        boto3.resource() takes in a service_name, region_name, and endpoint_url
-        (only for local dynamodb).
-        service_name: The name of a service, "dynamodb" in this case.
-        region_name:  The name of the region associated with the client.
-        A list of different regions can be obtained online.
-        endpoint_url: The complete URL to use for the constructed client.
+        .. code:: python
+
+            if config.aws_local:
+                # Connect to locally-run instance of DynamoDB
+                pass
+            else:
+                # Connect to remote instance of DynamoDB
+                pass
+
+        :param config: configuration used to initialize
         """
         logging.info("Initializing DynamoDb")
         self.users_table = config.aws_users_tablename

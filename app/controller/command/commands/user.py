@@ -21,7 +21,7 @@ class UserCommand(Command):
     permission_error = "You do not have the sufficient " \
                        "permission level for this command!"
     lookup_error = "Lookup error! User not found!"
-    noghid_deepdive = 'Specified user does not have a Github account'\
+    viewinspect_noghid = 'Specified user does not have a Github account'\
         'registered with Rocket.'
     delete_text = "Deleted user with Slack ID: "
     desc = f"for dealing with {command_name}s"
@@ -41,7 +41,11 @@ class UserCommand(Command):
         self.gcp = gcp
 
     def init_subparsers(self) -> _SubParsersAction:
-        """Initialize subparsers for user command."""
+        """
+        Initialize subparsers for user command.
+
+        :meta private:
+        """
         subparsers = self.parser.add_subparsers(dest="which")
 
         # Parser for view command
@@ -174,7 +178,7 @@ class UserCommand(Command):
         else:
             return self.get_help(), 200
 
-    def deepdive_helper(self, user: User):
+    def viewinspect_helper(self, user: User):
         """
         Return an attachment that is the membership info.
 
@@ -203,7 +207,7 @@ class UserCommand(Command):
 '''
         else:
             ret = f'''
-{self.noghid_deepdive}
+{self.viewinspect_noghid}
 '''
 
         return {
@@ -223,8 +227,8 @@ class UserCommand(Command):
 
         :param user_id: Slack ID of user who is calling the command
         :param param_list: List of user parameters that are to be edited
-        :return: returns error message if not admin and command
-                   edits another user, returns edit message if user is edited
+        :return: error message if not admin and command edits another user,
+            or the edit message if user is edited
         """
         is_admin = False
         edited_user = None
@@ -356,7 +360,7 @@ class UserCommand(Command):
             if param_list['inspect']:
                 return {'attachments': [
                     user.get_attachment(),
-                    self.deepdive_helper(user)
+                    self.viewinspect_helper(user)
                 ]}, 200
             else:
                 return {'attachments': [user.get_attachment()]}, 200

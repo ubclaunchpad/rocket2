@@ -44,9 +44,9 @@ class GitHubWebhookHandler:
             for event_handler in self.__event_handlers:
                 if action in event_handler.supported_action_list:
                     return event_handler.handle(payload)
-            return "Unsupported payload received", 500
+            return "Unsupported payload received, ignoring.", 202
         else:
-            return "Hashed signature is not valid", 403
+            return "Hashed signature is not valid", 400
 
     def verify_hash(self, request_body: bytes, xhub_signature: str):
         """
@@ -54,7 +54,7 @@ class GitHubWebhookHandler:
 
         :param request_body: Byte string of the request body
         :param xhub_signature: Hashed signature to validate
-        :return: Return True if the signature is valid, False otherwise
+        :return: True if the signature is valid, False otherwise
         """
         h = hmac.new(bytes(self.__secret, encoding='utf8'),
                      request_body, hashlib.sha1)

@@ -33,7 +33,7 @@ class MembershipEventHandler(GitHubEventHandler):
                                   github_username)
         else:
             logging.error(f"invalid action specified: {str(payload)}")
-            return "invalid membership webhook triggered", 405
+            return "Unsupported action triggered, ignoring.", 202
 
     def mem_remove(self,
                    github_id: str,
@@ -55,15 +55,15 @@ class MembershipEventHandler(GitHubEventHandler):
                         f"from {team_name}", 200)
             else:
                 logging.error(f"slack user {slack_id} not in {team_name}")
-                return (f"slack user {slack_id} not in {team_name}", 404)
+                return (f"slack user {slack_id} not in {team_name}", 200)
         elif len(member_list) > 1:
             logging.error("Error: found github ID connected to"
                           " multiple slack IDs")
             return ("Error: found github ID connected to multiple"
-                    " slack IDs", 412)
+                    " slack IDs", 200)
         else:
             logging.error(f"could not find user {github_id}")
-            return f"could not find user {github_id}", 404
+            return f"could not find user {github_id}", 200
 
     def mem_added(self,
                   github_id: str,
@@ -84,4 +84,4 @@ class MembershipEventHandler(GitHubEventHandler):
             return f"added slack ID{slack_ids_string}", 200
         else:
             logging.error(f"could not find user {github_id}")
-            return f"could not find user {github_username}", 404
+            return f"could not find user {github_username}", 200

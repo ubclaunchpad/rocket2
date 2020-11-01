@@ -33,7 +33,7 @@ class RocketModel(ABC):
         Convert dict response object to data model object.
 
         :param d: the dictionary representing a data model
-        :return: returns converted data model object.
+        :return: the converted data model object.
         """
         pass
 
@@ -44,6 +44,6 @@ class RocketModel(ABC):
         Return true if this data model has no missing required fields.
 
         :param model: data model object to check
-        :return: return true if this data model has no missing required fields
+        :return: true if this data model has no missing required fields
         """
         pass

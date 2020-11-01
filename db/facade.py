@@ -24,8 +24,8 @@ class DBFacade(ABC):
         """
         Store object into the correct table.
 
-        Object can be of type :class:`model.user.User`,
-        :class:`model.team.Team`, or :class:`model.project.Project`.
+        Object can be of type :class:`app.model.user.User`,
+        :class:`app.model.team.Team`, or :class:`app.model.project.Project`.
 
         :param obj: Object to store in database
         :return: True if object was stored, and false otherwise
@@ -39,7 +39,7 @@ class DBFacade(ABC):
 
         :param Model: the actual class you want to retrieve
         :param k: retrieve based on this key (or ID)
-        :raise: LookupError if key is not found
+        :raises: LookupError if key is not found
         :return: a model ``Model`` if key is found
         """
         raise NotImplementedError

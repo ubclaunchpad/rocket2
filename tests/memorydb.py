@@ -111,6 +111,13 @@ class MemoryDB(DBFacade):
                  users: List[User] = [],
                  teams: List[Team] = [],
                  projs: List[Project] = []):
+        """
+        Initialize with lists of objects.
+
+        :param users: list of users to initialize the db
+        :param teams: list of teams to initialize the db
+        :param projs: list of projects to initialize the db
+        """
         self.users = {u.slack_id: u for u in users}
         self.teams = {t.github_team_id: t for t in teams}
         self.projs = {p.project_id: p for p in projs}

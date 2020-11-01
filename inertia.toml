@@ -1,6 +1,7 @@
+# Inertia configuration - https://inertia.ubclaunchpad.com
 name = "rocket2"
 url = "git@github.com:ubclaunchpad/rocket2.git"
-version = "v0.6.1"
+version = "v0.7.0"
 
 [[profile]]
   name = "default"

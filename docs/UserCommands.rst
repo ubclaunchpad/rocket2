@@ -34,11 +34,11 @@ Edit
                      [--permission {member,team_lead,admin}]
 
 Allows user to edit their Launch Pad profile. Admins and team leads can
-edit another user’s Launch Pad profile by using ``[--username SLACK_ID]``
+edit another user's Launch Pad profile by using ``[--username SLACK_ID]``
 option. ``SLACK_ID`` is the ``@``-name, for easy slack autocomplete.
 
 If a user edits their Github handle, Rocket will also add the handle to
-Launch Pad’s Github organization.
+Launch Pad's Github organization.
 
 .. code:: sh
 
@@ -94,5 +94,5 @@ Delete (Admin only)
 
    /rocket user delete SLACK_ID
 
-Permanently delete a member’s Launch Pad profile. Can only be used by
+Permanently delete a member's Launch Pad profile. Can only be used by
 admins. ``SLACK_ID`` is the ``@``-name, for easy slack autocomplete.

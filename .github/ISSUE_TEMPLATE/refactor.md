@@ -1,8 +1,8 @@
 ---
-name: Refactoring & Cleanup
+name: Refactoring and cleanup
 about: Request refactoring or code cleanup
 title: ''
-labels: refactoring & cleanup
+labels: 'theme:refactoring'
 assignees: ''
 
 ---

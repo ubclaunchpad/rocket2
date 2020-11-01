@@ -47,16 +47,14 @@ class TestProjectCommand(TestCase):
                          self.testcommand.get_help(subcommand="foo"))
 
     def test_handle_help(self):
-        ret, code = self.testcommand.handle("project help", self.u0.slack_id)
+        ret, _ = self.testcommand.handle("project help", self.u0.slack_id)
         self.assertEqual(ret, self.testcommand.get_help())
-        self.assertEqual(code, 200)
 
     def test_handle_multiple_subcommands(self):
         """Test handling multiple observed subcommands."""
-        ret, code = self.testcommand.handle("project list edit",
-                                            self.u0.slack_id)
+        ret, _ = self.testcommand.handle("project list edit",
+                                         self.u0.slack_id)
         self.assertEqual(ret, self.testcommand.get_help())
-        self.assertEqual(code, 200)
 
     def test_handle_subcommand_help(self):
         """Test project subcommand help text."""
@@ -64,17 +62,15 @@ class TestProjectCommand(TestCase):
         for subcommand in subcommands:
             for arg in ['--help', '-h', '--invalid argument']:
                 command = f'project {subcommand} {arg}'
-                ret, code = self.testcommand.handle(command, self.u0.slack_id)
+                ret, _ = self.testcommand.handle(command, self.u0.slack_id)
                 self.assertEqual(1, ret.count('usage'))
-                self.assertEqual(code, 200)
 
     def test_handle_view(self):
         with self.app.app_context():
-            resp, code = self.testcommand.handle(
+            resp, _ = self.testcommand.handle(
                 f'project view {self.p0.project_id}', self.u0.slack_id)
             expect = {'attachments': [self.p0.get_attachment()]}
             self.assertDictEqual(resp, expect)
-            self.assertEqual(code, 200)
 
     def test_handle_view_lookup_error(self):
         self.assertTupleEqual(self.testcommand.handle(
@@ -92,10 +88,9 @@ class TestProjectCommand(TestCase):
         other_name = 'other_name'
         self.assertNotEqual(self.p0.display_name, other_name)
         with self.app.app_context():
-            _, code = self.testcommand.handle(
+            self.testcommand.handle(
                 f'project edit {self.p0.project_id} --name {other_name}',
                 self.u0.slack_id)
-            self.assertEqual(code, 200)
             self.assertEqual(self.p0.display_name, other_name)
 
     @mock.patch('app.model.project.uuid')
@@ -104,8 +99,7 @@ class TestProjectCommand(TestCase):
         self.t0.add_team_lead(self.u0.github_id)
         with self.app.app_context():
             cmd = f'project create repo-link {self.t0.github_team_name}'
-            _, code = self.testcommand.handle(cmd, self.u0.slack_id)
-            self.assertEqual(code, 200)
+            self.testcommand.handle(cmd, self.u0.slack_id)
 
         proj = self.db.retrieve(Project, '1')
         self.assertEqual(proj.github_team_id, self.t0.github_team_id)
@@ -116,8 +110,7 @@ class TestProjectCommand(TestCase):
         mock_uuid.uuid4.return_value = '1'
         with self.app.app_context():
             cmd = f'project create repo-link {self.t0.github_team_name}'
-            _, code = self.testcommand.handle(cmd, self.admin.slack_id)
-            self.assertEqual(code, 200)
+            self.testcommand.handle(cmd, self.admin.slack_id)
 
         proj = self.db.retrieve(Project, '1')
         self.assertEqual(proj.github_team_id, self.t0.github_team_id)
@@ -151,12 +144,10 @@ class TestProjectCommand(TestCase):
     def test_handle_create_with_display_name(self, mock_uuid):
         mock_uuid.uuid4.return_value = '1'
         with self.app.app_context():
-            _, code = \
-                self.testcommand.handle(
-                    f'project create repo-link {self.t0.github_team_name}'
-                    ' --name display-name',
-                    self.admin.slack_id)
-            self.assertEqual(code, 200)
+            self.testcommand.handle(
+                f'project create repo-link {self.t0.github_team_name}'
+                ' --name display-name',
+                self.admin.slack_id)
 
         proj = self.db.retrieve(Project, '1')
         self.assertEqual(proj.github_team_id, self.t0.github_team_id)
@@ -165,10 +156,9 @@ class TestProjectCommand(TestCase):
 
     def test_handle_list(self):
         with self.app.app_context():
-            resp, code = self.testcommand.handle('project list', user)
+            resp, _ = self.testcommand.handle('project list', user)
             self.assertIn(self.p0.project_id, resp)
             self.assertIn(self.p1.project_id, resp)
-            self.assertEqual(code, 200)
 
     def test_handle_list_no_projects(self):
         self.db.projs = {}

@@ -88,5 +88,5 @@ Delete (Team Lead and Admin only)
 
 Delete the project from database. An error occurs if the project is
 currently assigned. If ``-f`` flag is given, can be deleted even if a
-team is assigned. Fails if the caller is not the team lead project’s
+team is assigned. Fails if the caller is not the team lead project's
 assigned team or if the caller is not an admin.

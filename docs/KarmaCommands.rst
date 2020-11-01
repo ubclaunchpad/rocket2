@@ -1,7 +1,7 @@
 Karma Command Reference
 =======================
 
-Command to giveth or taketh away a user’s karma
+Command to giveth or taketh away a user's karma
 
 Options
 -------
@@ -16,7 +16,7 @@ Add 1 karma to user
 
    /rocket @user ++
 
-View a user’s karma
+View a user's karma
 ^^^^^^^^^^^^^^^^^^^
 
 .. code:: sh

@@ -1,8 +1,8 @@
 ---
-name: Bug Report
+name: Bug report
 about: Create a report to help Rocket 2 improve
 title: ''
-labels: bug
+labels: 'theme:bug'
 assignees: ''
 
 ---

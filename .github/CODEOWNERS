@@ -1,1 +1,5 @@
 * @ubclaunchpad/rocket2 @ubclaunchpad/leads @ubclaunchpad/exec
+
+# Assign nobody as CODEOWNER for the lockfile, which is generally updated
+# automatically by dependabot
+Pipfile.lock @ghost

@@ -10,10 +10,5 @@ docker run --rm \
   -d rocket2.ubclaunchpad.com \
   --standalone --agree-tos
 
-echo "19 0,12 * * * ${PWD}/scripts/certbot_updateall.sh" >> crontab.txt
-
-crontab crontab.txt
-rm crontab.txt
-
 mkdir -p /etc/nginx
 cp nginx.conf /etc/nginx/nginx.conf

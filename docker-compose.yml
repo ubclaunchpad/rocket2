@@ -44,3 +44,12 @@ services:
             - GCP_SERVICE_ACCOUNT_CREDENTIALS=${GCP_SERVICE_ACCOUNT_CREDENTIALS}
             - GCP_SERVICE_ACCOUNT_SUBJECT=${GCP_SERVICE_ACCOUNT_SUBJECT}
         restart: on-failure
+
+    certbot:
+        image: certbot/certbot
+        restart: on-failure
+        volumes:
+            - /etc/letsencrypt:/etc/letsencrypt
+            - /var/lib/letsencrypt:/var/lib/letsencrypt
+            - /usr/share/nginx/html:/usr/share/nginx/html
+        entrypoint: "/bin/sh -c 'trap exit TERM; sleep 12h; while :; do certbot renew --webroot -w /usr/share/nginx/html; sleep 12h & wait $${!}; done;'"
