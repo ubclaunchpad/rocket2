@@ -46,7 +46,7 @@ class ExportCommand(Command):
         # Parser for emails command
         parser_view = subparsers.add_parser("emails")
         parser_view.set_defaults(which="emails",
-                                 help="(Admin only) Export emails of all users.")
+                                 help="(Admin only)Export emails of all users")
 
         return subparsers
 
@@ -104,7 +104,8 @@ class ExportCommand(Command):
 
     def export_helper(self) -> ResponseTuple:
         """
-        Export emails of all users as a string + names of the users who do not have an email
+        Export emails of all users as a string +
+        names of the users who do not have an email
 
         """
 
@@ -125,8 +126,10 @@ class ExportCommand(Command):
                 emails += str(users[i].email)
 
         if len(ids_missing_emails) != 0:
-            ret = "```" + emails + "\n\nMembers who don't have an email: {}".format(
-                    ", ".join(map(lambda u: f"<@{u}>", ids_missing_emails))) + "```"
+            ret = "```" + emails + \
+                  "\n\nMembers who don't have an email: {}".format(
+                      ", ".join(map(lambda u: f"<@{u}>", ids_missing_emails)))\
+                        + "```"
         else:
             ret = "```" + emails + "```"
 

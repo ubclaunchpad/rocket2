@@ -1,7 +1,8 @@
 """Handle Rocket 2 commands."""
 from app.controller import ResponseTuple
-from app.controller.command.commands import UserCommand, TeamCommand, ExportCommand, \
-    TokenCommand, ProjectCommand, KarmaCommand, MentionCommand, IQuitCommand
+from app.controller.command.commands import UserCommand, TeamCommand,\
+    ExportCommand, TokenCommand, ProjectCommand, KarmaCommand,\
+    MentionCommand, IQuitCommand
 from app.controller.command.commands.base import Command
 from app.controller.command.commands.token import TokenCommandConfig
 from db.facade import DBFacade
