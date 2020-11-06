@@ -1,6 +1,6 @@
 """Handle Rocket 2 commands."""
 from app.controller import ResponseTuple
-from app.controller.command.commands import UserCommand, TeamCommand, \
+from app.controller.command.commands import UserCommand, TeamCommand, ExportCommand, \
     TokenCommand, ProjectCommand, KarmaCommand, MentionCommand, IQuitCommand
 from app.controller.command.commands.base import Command
 from app.controller.command.commands.token import TokenCommandConfig
@@ -44,6 +44,9 @@ class CommandParser:
                                             self.__github,
                                             self.__bot,
                                             gcp=self.__gcp)
+        self.commands["export"] = ExportCommand(self.__facade,
+                                                self.__bot,
+                                                self.__gcp)
         self.commands["token"] = TokenCommand(self.__facade, token_config)
         self.commands["project"] = ProjectCommand(self.__facade)
         self.commands["karma"] = KarmaCommand(self.__facade)
