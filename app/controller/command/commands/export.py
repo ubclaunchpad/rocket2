@@ -125,7 +125,8 @@ class ExportCommand(Command):
         # Check char count. Slack currently allows to send 16000 characters max
         emails_str = ",".join(emails)
 
-        # Approximate char count for the names (20 chars) of the people who are missing emails
+        # Approximate char count for the names (20 chars)
+        # of the people who are missing emails
         missing_emails_char_count = len(ids_missing_emails) * 20
 
         char_limit_exceeded = False
