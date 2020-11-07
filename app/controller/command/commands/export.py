@@ -6,9 +6,7 @@ from argparse import ArgumentParser, _SubParsersAction
 from app.controller import ResponseTuple
 from app.controller.command.commands.base import Command
 from db.facade import DBFacade
-from interface.gcp import GCPInterface
 from app.model import User, Permissions
-from typing import Optional
 from interface.slack import Bot
 
 
@@ -19,12 +17,14 @@ class ExportCommand(Command):
     permission_error = "You do not have the sufficient " \
                        "permission level for this command!"
     lookup_error = "Lookup error!"
+    no_emails_missing_msg = "All members have emails! Nice!"
+    char_limit_exceed_msg = "WARNING! Could not export all emails for " \
+                            "exceeding slack character limits :("
     desc = f"for dealing with {command_name}s"
 
     def __init__(self,
                  db_facade: DBFacade,
-                 bot: Bot,
-                 gcp: Optional[GCPInterface]):
+                 bot: Bot):
         """Initialize export command."""
         logging.info("Initializing ExportCommand instance")
         self.parser = ArgumentParser(prog="/rocket")
@@ -32,7 +32,6 @@ class ExportCommand(Command):
         self.subparser = self.init_subparsers()
         self.help = self.get_help()
         self.facade = db_facade
-        self.gcp = gcp
         self.bot = bot
 
     def init_subparsers(self) -> _SubParsersAction:
@@ -46,7 +45,8 @@ class ExportCommand(Command):
         # Parser for emails command
         parser_view = subparsers.add_parser("emails")
         parser_view.set_defaults(which="emails",
-                                 help="(Admin only)Export emails of all users")
+                                 help="(Admin only) Export emails "
+                                      "of all users")
 
         return subparsers
 
@@ -109,10 +109,10 @@ class ExportCommand(Command):
 
         """
 
-        params = [('permission_level', lvl) for lvl in ['admin', 'member']]
-        users = self.facade.query_or(User, params)
+        # get all users
+        users = self.facade.query(User)
 
-        emails = ""
+        emails = []
         ids_missing_emails = []
 
         for i in range(len(users)):
@@ -120,17 +120,38 @@ class ExportCommand(Command):
                 ids_missing_emails.append(users[i].slack_id)
                 continue
 
-            if i != len(users) - 1:
-                emails += str(users[i].email) + ", "
-            else:  # don't add , for the last member
-                emails += str(users[i].email)
+            emails.append(users[i].email)
+
+        # Check char count. Slack currently allows to send 16000 characters max
+        emails_str = ",".join(emails)
+
+        # Approximate char count for the names (20 chars) of the people who are missing emails
+        missing_emails_char_count = len(ids_missing_emails) * 20
+
+        char_limit_exceeded = False
+
+        if len(emails_str) + missing_emails_char_count > 15900:
+            emails_str = emails_str[:15900]
+            last_comma_idx = emails_str.rfind(',')
+            emails_str = emails_str[:last_comma_idx]
+            char_limit_exceeded = True
 
         if len(ids_missing_emails) != 0:
-            ret = "```" + emails + \
-                  "\n\nMembers who don't have an email: {}".format(
-                      ", ".join(map(lambda u: f"<@{u}>", ids_missing_emails)))\
-                        + "```"
+            if char_limit_exceeded:
+                ret = "```" + emails_str + "```\n\n" \
+                      + self.char_limit_exceed_msg \
+                      + "\n\nMembers who don't have an email: {}".format(
+                        ",".join(map(lambda u: f"<@{u}>", ids_missing_emails)))
+            else:
+                ret = "```" + emails_str + "```" \
+                      + "\n\nMembers who don't have an email: {}".format(
+                        ",".join(map(lambda u: f"<@{u}>", ids_missing_emails)))
         else:
-            ret = "```" + emails + "```"
+            if char_limit_exceeded:
+                ret = "```" + emails_str + "```\n\n" \
+                      + self.char_limit_exceed_msg
+            else:
+                ret = "```" + emails_str + "```" \
+                      + "\n\n" + self.no_emails_missing_msg
 
         return ret, 200

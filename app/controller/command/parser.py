@@ -46,8 +46,7 @@ class CommandParser:
                                             self.__bot,
                                             gcp=self.__gcp)
         self.commands["export"] = ExportCommand(self.__facade,
-                                                self.__bot,
-                                                self.__gcp)
+                                                self.__bot)
         self.commands["token"] = TokenCommand(self.__facade, token_config)
         self.commands["project"] = ProjectCommand(self.__facade)
         self.commands["karma"] = KarmaCommand(self.__facade)
