@@ -20,6 +20,9 @@ from config import Config
 from google.oauth2 import service_account as gcp_service_account
 from googleapiclient.discovery import build as gcp_build
 from typing import Optional
+from flask import Flask
+from app.scheduler import Scheduler
+from apscheduler.schedulers.background import BackgroundScheduler
 
 
 def make_dbfacade(config: Config) -> DBFacade:
@@ -84,6 +87,12 @@ def make_gcp_client(config: Config) -> Optional[GCPInterface]:
     # See https://github.com/googleapis/google-api-python-client/blob/master/docs/dyn/index.md # noqa
     drive = gcp_build('drive', 'v3', credentials=credentials)
     return GCPInterface(drive, subject=config.gcp_service_account_subject)
+
+
+def make_event_scheduler(app: Flask, config: Config) -> Scheduler:
+    background_scheduler = BackgroundScheduler(timezone="America/Los_Angeles")
+    facade = make_dbfacade(config)
+    return Scheduler(background_scheduler, (app, config), facade)
 
 
 def create_signing_token() -> str:

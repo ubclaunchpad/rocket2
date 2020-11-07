@@ -2,10 +2,11 @@
 from app.model.user import User
 from app.model.team import Team
 from app.model.project import Project
+from app.model.pairing import Pairing
 from typing import List, Tuple, TypeVar, Type
 from abc import ABC, abstractmethod
 
-T = TypeVar('T', User, Team, Project)
+T = TypeVar('T', User, Team, Project, Pairing)
 
 
 class DBFacade(ABC):
@@ -141,4 +142,14 @@ class DBFacade(ABC):
         :param Model: table type to remove the object from
         :param k: ID or key of the object to remove (must be primary key)
         """
+        raise NotImplementedError
+
+    @abstractmethod
+    def delete_all(self, Model: Type[T]):
+        """
+        Remove all entries from a table
+
+        :param Model: The table to remove all entries of
+        """
+
         raise NotImplementedError

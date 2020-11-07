@@ -143,3 +143,37 @@ class TestBot(TestCase):
             self.bot.create_channel(name)
         except SlackAPIError as e:
             assert e.error == "invalid_name"
+
+    def test_create_private_chat(self):
+        """Test create_private_chat()"""
+        users = ["user1", "user2", "user3"]
+        name = "ChannelName"
+        self.mock_sc.conversations_open.return_value = \
+            {"ok": True, "channel": {"name": name}}
+        error_name = "InvalidABC"
+        assert self.bot.create_private_chat(users) == name
+        try:
+            self.mock_sc.conversations_open.return_value = \
+                {"ok": False, "error": error_name}
+            self.bot.create_private_chat(users)
+        except SlackAPIError as e:
+            assert e.error == error_name
+
+    def test_get_channel_id(self):
+        """Test get_channel_id()"""
+        channel_name = "#happy"
+        id = "nice_id"
+        resp = \
+            {
+             'ok': True,
+             'channels':
+             [{'name': 'happy', 'id': id}, {'name': 'sad', 'id': 'bad_id'}]
+            }
+        self.mock_sc.conversations_list.return_value = resp
+        assert self.bot.get_channel_id(channel_name) == id
+        try:
+            resp['channels'][0]['name'] = 'angry'
+            self.mock_sc.conversations_list.return_value = resp
+            self.bot.get_channel_id(channel_name)
+        except SlackAPIError as e:
+            assert e.error == "No channels found with the name happy"

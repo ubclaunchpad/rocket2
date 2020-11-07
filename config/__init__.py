@@ -17,7 +17,8 @@ class Config:
         'SLACK_API_TOKEN': 'slack_api_token',
         'SLACK_NOTIFICATION_CHANNEL': 'slack_notification_channel',
         'SLACK_ANNOUNCEMENT_CHANNEL': 'slack_announcement_channel',
-
+        'SLACK_PAIRING_CHANNEL': 'slack_pairing_channel',
+        'SLACK_PAIRING_FREQUENCY': 'slack_pairing_frequency',
         'GITHUB_APP_ID': 'github_app_id',
         'GITHUB_ORG_NAME': 'github_org_name',
         'GITHUB_DEFAULT_TEAM_NAME': 'github_team_all',
@@ -31,6 +32,7 @@ class Config:
         'AWS_SECRET_KEY': 'aws_secret_key',
         'AWS_USERS_TABLE': 'aws_users_tablename',
         'AWS_TEAMS_TABLE': 'aws_teams_tablename',
+        'AWS_PAIRINGS_TABLE': 'aws_pairings_tablename',
         'AWS_PROJECTS_TABLE': 'aws_projects_tablename',
         'AWS_REGION': 'aws_region',
         'AWS_LOCAL': 'aws_local',
@@ -45,6 +47,9 @@ class Config:
         'GITHUB_LEADS_TEAM_NAME': '',
         'GCP_SERVICE_ACCOUNT_CREDENTIALS': '',
         'GCP_SERVICE_ACCOUNT_SUBJECT': '',
+        'SLACK_PAIRING_CHANNEL': '',
+        'AWS_PAIRINGS_TABLE': 'pairings',
+        'SLACK_PAIRING_FREQUENCY': '',
     }
 
     def __init__(self):
@@ -89,7 +94,8 @@ class Config:
         self.slack_api_token = ''
         self.slack_notification_channel = ''
         self.slack_announcement_channel = ''
-
+        self.slack_pairing_channel = ''
+        self.slack_pairing_frequency = ''
         self.github_app_id = ''
         self.github_org_name = ''
         self.github_team_all = ''
@@ -103,6 +109,7 @@ class Config:
         self.aws_secret_key = ''
         self.aws_users_tablename = ''
         self.aws_teams_tablename = ''
+        self.aws_pairings_tablename = ''
         self.aws_projects_tablename = ''
         self.aws_region = ''
         self.aws_local: bool = False

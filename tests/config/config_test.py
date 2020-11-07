@@ -14,7 +14,8 @@ class TestConfig(TestCase):
             'SLACK_API_TOKEN': 'some token idk',
             'SLACK_NOTIFICATION_CHANNEL': '#rocket2',
             'SLACK_ANNOUNCEMENT_CHANNEL': '#ot-random',
-
+            'SLACK_PAIRING_CHANNEL': "#pairing",
+            'SLACK_PAIRING_FREQUENCY': '* * * * *',
             'GITHUB_APP_ID': '2024',
             'GITHUB_ORG_NAME': 'ubclaunchpad',
             'GITHUB_WEBHOOK_ENDPT': '/webhook',
@@ -27,6 +28,7 @@ class TestConfig(TestCase):
             'AWS_USERS_TABLE': 'users',
             'AWS_TEAMS_TABLE': 'teams',
             'AWS_PROJECTS_TABLE': 'projects',
+            'AWS_PAIRINGS_TABLE': 'pairings',
             'AWS_REGION': 'us-west-2',
             'AWS_LOCAL': 'True',
 

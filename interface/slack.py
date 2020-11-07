@@ -111,6 +111,54 @@ class Bot:
             logging.error("Webhook notif failed to send due to {} error.".
                           format(se.error))
 
+    def create_private_chat(self, users: List[str]):
+        """
+        Create a private chat with the given users
+
+        :param users: the list of users to add to the private chat
+
+        :raise SlackAPIError if the slack API returned error openning the chat
+
+        :return The name of of the private chat created
+        """
+        logging.debug(
+            f"Attempting to open a private conversation with users {users}")
+        response = cast(SlackResponse, self.sc.conversations_open(users=users))
+        if response['ok']:
+            logging.debug(
+                f"Successfly opened a converation with the name \
+                    {response['channel']['name']}")
+            return response['channel']['name']
+        raise SlackAPIError(response['error'])
+
+    def get_channel_id(self, channel_name: str):
+        """
+        Retrieves a channel's id given it's name
+
+        :param channel_name: The name of the channel
+
+        :raise SlackAPIError if no channels were found with the name
+        `channel_name`
+
+        :return the slack id of the channel
+        """
+        # We strip away the "#" in case it was provided with the channel name,
+        # such as in values returned from Slack's ``conversations_list`` API.
+        channel_name = channel_name.replace("#", "")
+        logging.debug(f"Attempting to get the id of channel {channel_name}")
+        channels = list(
+            filter(lambda c: c['name'] == channel_name,
+                   self.get_channels()))
+        if len(channels) == 0:
+            raise SlackAPIError(
+                f"No channels found with the name {channel_name}")
+        if len(channels) != 1:
+            logging.warning(
+                f"Somehow there is more than one channel\
+                     with the name {channel_name}"
+                )
+        return channels[0]['id']
+
 
 class SlackAPIError(Exception):
     """Exception representing an error while calling Slack API."""
