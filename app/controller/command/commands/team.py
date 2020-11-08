@@ -309,9 +309,9 @@ class TeamCommand(Command):
         """
         Create team and calls GitHub API to create the team in GitHub.
 
-        If ``param_list[display_name] is not None``, will add a display name. If
-        ``param_list[channel] is not None``, will add all members of channel in
-        which the command was called into the team.
+        If ``param_list[display_name] is not None``, will add a display name.
+        If ``param_list[channel] is not None``, will add all members
+        of channel in which the command was called into the team.
 
         :param param_list: List of parameters for creating team
         :param user_id: Slack ID of user who called command
