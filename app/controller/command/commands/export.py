@@ -6,7 +6,7 @@ from argparse import ArgumentParser, _SubParsersAction
 from app.controller import ResponseTuple
 from app.controller.command.commands.base import Command
 from db.facade import DBFacade
-from app.model import User, Permissions
+from app.model import User, Team, Permissions
 from interface.slack import Bot
 
 
@@ -20,6 +20,10 @@ class ExportCommand(Command):
     no_emails_missing_msg = "All members have emails! Nice!"
     char_limit_exceed_msg = "WARNING! Could not export all emails for " \
                             "exceeding slack character limits :("
+    no_user_msg = "No members found for exporting emails!"
+    no_team_found_msg = "No teams exist with the provided name!"
+    multiple_team_same_name_msg = "There are more than one team with the provided name!\n" \
+                                  "Please change the team names to be unique"
     desc = f"for dealing with {command_name}s"
 
     def __init__(self,
@@ -47,6 +51,9 @@ class ExportCommand(Command):
         parser_view.set_defaults(which="emails",
                                  help="(Admin only) Export emails "
                                       "of all users")
+        parser_view.add_argument("--team", metavar="TEAM",
+                                 type=str, action='store',
+                                 help="(Admin/Lead only) Export emails by Team Name")
 
         return subparsers
 
@@ -92,25 +99,48 @@ class ExportCommand(Command):
         if args.which == "emails":
             try:
                 user_command = self.facade.retrieve(User, user_id)
-                if user_command.permissions_level == Permissions.admin:
-                    return self.export_helper()
-                else:
-                    return self.permission_error, 200
+
+                # Check if team name is provided
+                if args.team is not None:
+                    if user_command.permissions_level == Permissions.team_lead \
+                            or Permissions.admin:
+                        teams = self.facade.query_or(Team, [('github_team_name', str(args.team))])
+
+                        if len(teams) > 1:
+                            return self.multiple_team_same_name_msg, 200
+
+                        if len(teams) == 0:
+                            return self.no_team_found_msg, 200
+
+                        params = [('github_user_id', ids) for ids in list(teams[0].members)]
+                        users = self.facade.query_or(User, params)
+                        return self.export_emails_helper(users)
+                    else:
+                        return self.permission_error, 200
+                else:  # if team name is not provided, export all emails
+                    if user_command.permissions_level == Permissions.admin:
+                        users = self.facade.query(User)
+                        return self.export_emails_helper(users)
+                    else:
+                        return self.permission_error, 200
             except LookupError:
                 return self.lookup_error, 200
-
         else:
             return self.get_help(), 200
 
-    def export_helper(self) -> ResponseTuple:
+    def export_emails_helper(self,
+                             users: list) -> ResponseTuple:
         """
-        Export emails of all users as a string +
+        1. if team name not provided -> export emails of all users as a string +
+        names of the users who do not have an email
+
+        2. if team name provided -> export emails of all members of the team +
         names of the users who do not have an email
 
         """
 
-        # get all users
-        users = self.facade.query(User)
+        if len(users) == 0:
+            return self.no_user_msg, 200
 
         emails = []
         ids_missing_emails = []
