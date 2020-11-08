@@ -22,7 +22,8 @@ class ExportCommand(Command):
                             "exceeding slack character limits :("
     no_user_msg = "No members found for exporting emails!"
     no_team_found_msg = "No teams exist with the provided name!"
-    multiple_team_same_name_msg = "There are more than one team with the provided name!\n" \
+    multiple_team_same_name_msg = "There are more than one team with the " \
+                                  "provided name!\n"\
                                   "Please change the team names to be unique"
     desc = f"for dealing with {command_name}s"
 
@@ -53,7 +54,8 @@ class ExportCommand(Command):
                                       "of all users")
         parser_view.add_argument("--team", metavar="TEAM",
                                  type=str, action='store',
-                                 help="(Admin/Lead only) Export emails by Team Name")
+                                 help="(Admin/Lead only) Export emails"
+                                      " by Team Name")
 
         return subparsers
 
@@ -102,9 +104,10 @@ class ExportCommand(Command):
 
                 # Check if team name is provided
                 if args.team is not None:
-                    if user_command.permissions_level == Permissions.team_lead \
-                            or Permissions.admin:
-                        teams = self.facade.query_or(Team, [('github_team_name', str(args.team))])
+                    if user_command.permissions_level == \
+                            Permissions.team_lead or Permissions.admin:
+                        teams = self.facade.query_or(
+                            Team, [('github_team_name', str(args.team))])
 
                         if len(teams) > 1:
                             return self.multiple_team_same_name_msg, 200
@@ -112,7 +115,8 @@ class ExportCommand(Command):
                         if len(teams) == 0:
                             return self.no_team_found_msg, 200
 
-                        params = [('github_user_id', ids) for ids in list(teams[0].members)]
+                        params = [('github_user_id', ids)
+                                  for ids in list(teams[0].members)]
                         users = self.facade.query_or(User, params)
                         return self.export_emails_helper(users)
                     else:
@@ -131,11 +135,11 @@ class ExportCommand(Command):
     def export_emails_helper(self,
                              users: list) -> ResponseTuple:
         """
-        1. if team name not provided -> export emails of all users as a string +
-        names of the users who do not have an email
+        1. if team name not provided -> export emails of all users
+         as a string + names of the users who do not have an email
 
-        2. if team name provided -> export emails of all members of the team +
-        names of the users who do not have an email
+        2. if team name provided -> export emails of all members of
+         the team + names of the users who do not have an email
 
         """
 
