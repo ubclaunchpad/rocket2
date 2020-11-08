@@ -86,7 +86,7 @@ class CommandParser:
 
             # Hack to only grab first 2 command/subcommand pair
             s = cmd_txt.split(' ')
-            if '-' in s[1]:
+            if len(s) == 2 and s[1].startswith('-'):
                 cmd_name = s[0]
             else:
                 cmd_name = ' '.join(s[0:2])

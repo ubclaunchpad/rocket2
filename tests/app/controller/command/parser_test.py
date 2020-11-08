@@ -1,6 +1,7 @@
 from app.controller.command import CommandParser
 from unittest import mock, TestCase
 from app.model import User
+from interface.cloudwatch_metrics import CWMetrics
 
 
 class TestParser(TestCase):
@@ -10,7 +11,7 @@ class TestParser(TestCase):
         self.gh = mock.Mock()
         self.token_conf = mock.Mock()
         self.bot = mock.Mock()
-        self.metrics = mock.Mock()
+        self.metrics = mock.Mock(spec=CWMetrics)
         self.parser = CommandParser(self.conf, self.dbf, self.bot, self.gh,
                                     self.token_conf, self.metrics)
         self.usercmd = mock.Mock()
@@ -55,3 +56,8 @@ class TestParser(TestCase):
     def test_handle_help(self, mock_logging_error):
         self.parser.handle_app_command('help', 'UFJ42EU67', '')
         mock_logging_error.assert_not_called()
+
+    def test_handle_single_cmd_iquit(self):
+        self.parser.handle_app_command('i-quit', 'UFJ43EU67', '')
+        self.metrics.submit_cmd_mstime.assert_called_once_with(
+            'i-quit', mock.ANY)
