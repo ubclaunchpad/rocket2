@@ -23,9 +23,10 @@ class ExportCommand(Command):
     no_user_msg = "No members found for exporting emails!"
     no_team_found_msg = "No teams exist with the provided name!"
     multiple_team_same_name_msg = "There are more than one team with the " \
-                                  "provided name!\n"\
+                                  "provided name!\n" \
                                   "Please change the team names to be unique"
     desc = f"for dealing with {command_name}s"
+    MAX_CHAR_LIMIT = 15950  # Slack currently allows to send 16000 characters max
 
     def __init__(self,
                  db_facade: DBFacade,
@@ -106,18 +107,7 @@ class ExportCommand(Command):
                 if args.team is not None:
                     if user_command.permissions_level == \
                             Permissions.team_lead or Permissions.admin:
-                        teams = self.facade.query_or(
-                            Team, [('github_team_name', str(args.team))])
-
-                        if len(teams) > 1:
-                            return self.multiple_team_same_name_msg, 200
-
-                        if len(teams) == 0:
-                            return self.no_team_found_msg, 200
-
-                        params = [('github_user_id', ids)
-                                  for ids in list(teams[0].members)]
-                        users = self.facade.query_or(User, params)
+                        users = self.get_team_users(args.team)
                         return self.export_emails_helper(users)
                     else:
                         return self.permission_error, 200
@@ -131,6 +121,20 @@ class ExportCommand(Command):
                 return self.lookup_error, 200
         else:
             return self.get_help(), 200
+
+    def get_team_users(self, team_name):
+        teams = self.facade.query_or(
+            Team, [('github_team_name', str(team_name))])
+
+        if len(teams) > 1:
+            return self.multiple_team_same_name_msg, 200
+
+        if len(teams) == 0:
+            return self.no_team_found_msg, 200
+
+        params = [('github_user_id', ids)
+                  for ids in list(teams[0].members)]
+        return self.facade.query_or(User, params)
 
     def export_emails_helper(self,
                              users: list) -> ResponseTuple:
@@ -156,37 +160,29 @@ class ExportCommand(Command):
 
             emails.append(users[i].email)
 
-        # Check char count. Slack currently allows to send 16000 characters max
         emails_str = ",".join(emails)
 
-        # Approximate char count for the names (20 chars)
-        # of the people who are missing emails
-        missing_emails_char_count = len(ids_missing_emails) * 20
-
-        char_limit_exceeded = False
-
-        if len(emails_str) + missing_emails_char_count > 15900:
-            emails_str = emails_str[:15900]
-            last_comma_idx = emails_str.rfind(',')
-            emails_str = emails_str[:last_comma_idx]
-            char_limit_exceeded = True
-
         if len(ids_missing_emails) != 0:
-            if char_limit_exceeded:
-                ret = "```" + emails_str + "```\n\n" \
-                      + self.char_limit_exceed_msg \
-                      + "\n\nMembers who don't have an email: {}".format(
-                        ",".join(map(lambda u: f"<@{u}>", ids_missing_emails)))
-            else:
-                ret = "```" + emails_str + "```" \
-                      + "\n\nMembers who don't have an email: {}".format(
-                        ",".join(map(lambda u: f"<@{u}>", ids_missing_emails)))
+            ret = "```" + emails_str + "```\n\n" \
+                  + "\n\nMembers who don't have an email: {}".format(
+                ",".join(map(lambda u: f"<@{u}>", ids_missing_emails)))
+            if len(ret) >= self.MAX_CHAR_LIMIT:
+                ret = self.handle_char_limit_exceeded(ret, "\n\nMembers who")
         else:
-            if char_limit_exceeded:
-                ret = "```" + emails_str + "```\n\n" \
-                      + self.char_limit_exceed_msg
-            else:
-                ret = "```" + emails_str + "```" \
-                      + "\n\n" + self.no_emails_missing_msg
+            ret = "```" + emails_str + "```" \
+                  + "\n\n" + self.no_emails_missing_msg
+            if len(ret) >= self.MAX_CHAR_LIMIT:
+                ret = self.handle_char_limit_exceeded(ret, self.no_emails_missing_msg)
 
         return ret, 200
+
+    def handle_char_limit_exceeded(self, ret_str, find_str):
+        last_find_idx = ret_str.rfind(find_str)
+        temp_str1 = ret_str[:last_find_idx]
+        temp_str2 = ret_str[last_find_idx:]
+        temp_str3 = temp_str1[:self.MAX_CHAR_LIMIT - len(temp_str2) - len(self.char_limit_exceed_msg)]
+        last_comma_idx = temp_str3.rfind(',')
+        temp_str3 = temp_str3[:last_comma_idx]
+        return temp_str3 + "```\n\n" \
+               + self.char_limit_exceed_msg + "\n\n" \
+               + temp_str2
