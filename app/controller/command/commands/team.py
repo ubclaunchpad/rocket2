@@ -144,6 +144,8 @@ class TeamCommand(Command):
                                  help="Platform the team should have.")
         parser_edit.add_argument("--folder", type=str, action='store',
                                  help="Drive folder ID for this team.")
+        parser_edit.add_argument("--github", type=str, action='store',
+                                 help="New github team name to be replaced.")
 
         """Parser for lead command."""
         parser_lead = subparsers.add_parser("lead")
@@ -243,6 +245,7 @@ class TeamCommand(Command):
                 "displayname": args.displayname,
                 "platform": args.platform,
                 "folder": args.folder,
+                "new_team_name": args.github
             }
             return self.edit_helper(param_list, user_id)
 
@@ -553,6 +556,9 @@ class TeamCommand(Command):
             if param_list['folder'] is not None:
                 msg += f"folder: {param_list['folder']}"
                 team.folder = param_list['folder']
+            if param_list['new_team_name'] is not None:
+                msg += f"new github team name: {param_list['new_team_name']}"
+                team.github_team_name = param_list['new_team_name']
             self.facade.store(team)
 
             # Update drive shares if folder was changed
