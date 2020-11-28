@@ -95,7 +95,7 @@ class TeamCommand(Command):
         parser_create.add_argument("team_name", metavar='team-name',
                                    type=str, action='store',
                                    help="Github name of your team (required).")
-        parser_create.add_argument("--display_name", type=str, action='store',
+        parser_create.add_argument("--displayname", type=str, action='store',
                                    help="Display name of your team.")
         parser_create.add_argument("--platform", type=str, action='store',
                                    help="The team's main platform.")
@@ -138,7 +138,7 @@ class TeamCommand(Command):
         parser_edit.add_argument("team_name", metavar='team-name',
                                  type=str, action='store',
                                  help="Name of team to edit.")
-        parser_edit.add_argument("--display_name", type=str, action='store',
+        parser_edit.add_argument("--displayname", type=str, action='store',
                                  help="Display name the team should have.")
         parser_edit.add_argument("--platform", type=str, action='store',
                                  help="Platform the team should have.")
@@ -215,7 +215,7 @@ class TeamCommand(Command):
         elif args.which == "create":
             param_list = {
                 "team_name": args.team_name,
-                "display_name": args.display_name,
+                "displayname": args.displayname,
                 "platform": args.platform,
                 "channel": args.channel,
                 "lead": args.lead,
@@ -240,7 +240,7 @@ class TeamCommand(Command):
         elif args.which == "edit":
             param_list = {
                 "team_name": args.team_name,
-                "display_name": args.display_name,
+                "displayname": args.displayname,
                 "platform": args.platform,
                 "folder": args.folder,
             }
@@ -309,9 +309,9 @@ class TeamCommand(Command):
         """
         Create team and calls GitHub API to create the team in GitHub.
 
-        If ``param_list[display_name] is not None``, will add a display name.
-        If ``param_list[channel] is not None``, will add all members
-        of channel in which the command was called into the team.
+        If ``param_list[displayname] is not None``, will add a display name. If
+        ``param_list[channel] is not None``, will add all members of channel in
+        which the command was called into the team.
 
         :param param_list: List of parameters for creating team
         :param user_id: Slack ID of user who called command
@@ -331,9 +331,9 @@ class TeamCommand(Command):
             msg = f"New team created: {param_list['team_name']}, "
             team_id = str(self.gh.org_create_team(param_list['team_name']))
             team = Team(team_id, param_list['team_name'], "")
-            if param_list["display_name"] is not None:
-                msg += f"display_name: {param_list['display_name']}, "
-                team.display_name = param_list['display_name']
+            if param_list["displayname"] is not None:
+                msg += f"displayname: {param_list['displayname']}, "
+                team.display_name = param_list['displayname']
             if param_list["platform"] is not None:
                 msg += f"platform: {param_list['platform']}, "
                 team.platform = param_list['platform']
@@ -486,7 +486,7 @@ class TeamCommand(Command):
             sync_team_email_perms(self.gcp, self.facade, team)
 
             # If the user is being removed from a team with special
-            # permisisons, figure out a demotion strategy.
+            # permissions, figure out a demotion strategy.
             demoted_level = None
             if command_team == self.config.github_team_leads:
                 # If the user is currently an admin, we only demote this user
@@ -544,9 +544,9 @@ class TeamCommand(Command):
             if not check_permissions(command_user, team):
                 return self.permission_error, 200
             msg = f"Team edited: {command_team}, "
-            if param_list['display_name'] is not None:
-                msg += f"display_name: {param_list['display_name']}, "
-                team.display_name = param_list['display_name']
+            if param_list['displayname'] is not None:
+                msg += f"displayname: {param_list['displayname']}, "
+                team.display_name = param_list['displayname']
             if param_list['platform'] is not None:
                 msg += f"platform: {param_list['platform']}"
                 team.platform = param_list['platform']
@@ -766,7 +766,7 @@ class TeamCommand(Command):
         ]
         logging.info(f'refreshing Rocket permissions for teams {teams}')
         for t in teams:
-            team_name = t['name']
+            team_name = t['displayname']
             if len(team_name) == 0:
                 continue
 
