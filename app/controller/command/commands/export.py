@@ -182,11 +182,12 @@ class ExportCommand(Command):
         last_find_idx = ret_str.rfind(find_str)
         temp_str1 = ret_str[:last_find_idx]
         temp_str2 = ret_str[last_find_idx:]
-        temp_str3 = temp_str1[:self.MAX_CHAR_LIMIT -
-                               len(temp_str2) -
-                               len(self.char_limit_exceed_msg)]
+        max_end_idx = \
+            self.MAX_CHAR_LIMIT \
+            - len(temp_str2) - len(self.char_limit_exceed_msg)
+        temp_str3 = temp_str1[:max_end_idx]
         last_comma_idx = temp_str3.rfind(',')
         temp_str3 = temp_str3[:last_comma_idx]
-        return temp_str3 + "```\n\n" \
-               + temp_str2 + "\n\n" \
-               + self.char_limit_exceed_msg
+        return \
+            temp_str3 + "```\n\n" + temp_str2 \
+            + "\n\n" + self.char_limit_exceed_msg
