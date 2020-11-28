@@ -184,5 +184,5 @@ class ExportCommand(Command):
         last_comma_idx = temp_str3.rfind(',')
         temp_str3 = temp_str3[:last_comma_idx]
         return temp_str3 + "```\n\n" \
-               + self.char_limit_exceed_msg + "\n\n" \
-               + temp_str2
+               + temp_str2 + "\n\n" \
+               + self.char_limit_exceed_msg
