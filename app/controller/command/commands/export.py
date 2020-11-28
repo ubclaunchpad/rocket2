@@ -165,8 +165,9 @@ class ExportCommand(Command):
 
         if len(ids_missing_emails) != 0:
             ret = "```" + emails_str + "```\n\n" \
-                  + "\n\nMembers who don't have an email: {}".format(
-                ",".join(map(lambda u: f"<@{u}>", ids_missing_emails)))
+                  + "\n\nMembers who don't have an " \
+                    "email: {}".format(
+                        ",".join(map(lambda u: f"<@{u}>", ids_missing_emails)))
             if len(ret) >= self.MAX_CHAR_LIMIT:
                 ret = self.handle_char_limit_exceeded(ret, "\n\nMembers who")
         else:
