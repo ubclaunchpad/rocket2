@@ -375,7 +375,8 @@ class TeamCommand(Command):
                 team.add_team_lead(lead_user.github_id)
                 if not self.gh.has_team_member(lead_user.github_username,
                                                team_id):
-                    self.gh.add_team_maintainer(lead_user.github_username, team_id)
+                    self.gh.add_team_maintainer(
+                        lead_user.github_username, team_id)
             else:
                 team.add_team_lead(command_user.github_id)
 
