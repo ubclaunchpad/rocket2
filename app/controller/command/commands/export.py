@@ -26,7 +26,8 @@ class ExportCommand(Command):
                                   "provided name!\n" \
                                   "Please change the team names to be unique"
     desc = f"for dealing with {command_name}s"
-    MAX_CHAR_LIMIT = 15950  # Slack currently allows to send 16000 characters max
+    # Slack currently allows to send 16000 characters max
+    MAX_CHAR_LIMIT = 15950
 
     def __init__(self,
                  db_facade: DBFacade,
@@ -172,7 +173,8 @@ class ExportCommand(Command):
             ret = "```" + emails_str + "```" \
                   + "\n\n" + self.no_emails_missing_msg
             if len(ret) >= self.MAX_CHAR_LIMIT:
-                ret = self.handle_char_limit_exceeded(ret, self.no_emails_missing_msg)
+                ret = self.handle_char_limit_exceeded(
+                    ret, self.no_emails_missing_msg)
 
         return ret, 200
 
@@ -180,7 +182,9 @@ class ExportCommand(Command):
         last_find_idx = ret_str.rfind(find_str)
         temp_str1 = ret_str[:last_find_idx]
         temp_str2 = ret_str[last_find_idx:]
-        temp_str3 = temp_str1[:self.MAX_CHAR_LIMIT - len(temp_str2) - len(self.char_limit_exceed_msg)]
+        temp_str3 = temp_str1[:self.MAX_CHAR_LIMIT -
+                               len(temp_str2) -
+                               len(self.char_limit_exceed_msg)]
         last_comma_idx = temp_str3.rfind(',')
         temp_str3 = temp_str3[:last_comma_idx]
         return temp_str3 + "```\n\n" \
