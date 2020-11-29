@@ -153,10 +153,10 @@ class TestTeamCommand(TestCase):
         # The new team must be retrieved
         team: Team = self.db.retrieve(Team, tid)
         self.assertEqual(team.github_team_name, 'b-s')
-        self.assertEqual(team.display_name, 'B S')
+        self.assertEqual(team.displayname, 'B S')
         self.assertEqual(team.platform, 'web')
-        self.assertSetEqual(team.members, set([self.u0.github_id]))
-        self.assertSetEqual(team.team_leads, set([self.u0.github_id]))
+        self.assertSetEqual(team.members, {self.u0.github_id})
+        self.assertSetEqual(team.team_leads, {self.u0.github_id})
 
     def test_handle_create_no_gh_for_users_in_channel(self):
         self.gh.org_create_team.return_value = 8934095
@@ -446,7 +446,7 @@ class TestTeamCommand(TestCase):
         cmdtxt += ' --displayname brS --platform web'
         with self.app.app_context():
             self.cmd.handle(cmdtxt, self.admin.slack_id)
-            self.assertEqual(self.t0.display_name, 'brS')
+            self.assertEqual(self.t0.displayname, 'brS')
             self.assertEqual(self.t0.platform, 'web')
 
     def test_handle_edit_not_admin(self):
