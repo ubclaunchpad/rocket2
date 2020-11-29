@@ -3,7 +3,7 @@ from unittest import TestCase, mock
 from app.model import User, Team, Permissions
 from tests.memorydb import MemoryDB
 from tests.util import create_test_admin
-from interface.slack import Bot, SlackAPIError
+from interface.slack import Bot
 
 
 class TestExportCommand(TestCase):
