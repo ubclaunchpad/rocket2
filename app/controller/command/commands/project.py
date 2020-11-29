@@ -162,7 +162,7 @@ class ProjectCommand(Command):
 
         elif args.which == "create":
             param_list = {
-                "display_name": args.name
+                "displayname": args.name
             }
             return self.create_helper(args.gh_repo,
                                       args.github_team_name,
@@ -174,7 +174,7 @@ class ProjectCommand(Command):
 
         elif args.which == "edit":
             param_list = {
-                "display_name": args.name
+                "displayname": args.name
             }
             return self.edit_helper(args.project_id, param_list)
 
@@ -208,7 +208,7 @@ class ProjectCommand(Command):
         for project in projects:
             project_list_str += f"{project.project_id} : " \
                 f"{project.github_team_id} : " \
-                f"{project.display_name}\n"
+                f"{project.displayname}\n"
         return project_list_str, 200
 
     def view_helper(self,
@@ -271,8 +271,8 @@ class ProjectCommand(Command):
 
             project = Project(team.github_team_id, [gh_repo])
 
-            if param_list["display_name"]:
-                project.display_name = param_list["display_name"]
+            if param_list["displayname"]:
+                project.displayname = param_list["displayname"]
 
             self.facade.store(project)
 
@@ -328,10 +328,10 @@ class ProjectCommand(Command):
         try:
             project = self.facade.retrieve(Project, project_id)
 
-            if param_list["display_name"]:
-                project.display_name = param_list["display_name"]
+            if param_list["displayname"]:
+                project.displayname = param_list["displayname"]
                 logging.debug("Changed display "
-                              f"name to {project.display_name}")
+                              f"name to {project.displayname}")
 
             self.facade.store(project)
 
