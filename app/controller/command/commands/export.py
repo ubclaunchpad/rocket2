@@ -6,7 +6,8 @@ from argparse import ArgumentParser, _SubParsersAction
 from app.controller import ResponseTuple
 from app.controller.command.commands.base import Command
 from db.facade import DBFacade
-from app.model import User, Team, Permissions
+from app.model import User, Permissions
+from db.utils import get_team_by_name
 from interface.slack import Bot
 
 
@@ -21,10 +22,6 @@ class ExportCommand(Command):
     char_limit_exceed_msg = "WARNING! Could not export all emails for " \
                             "exceeding slack character limits :("
     no_user_msg = "No members found for exporting emails!"
-    no_team_found_msg = "No teams exist with the provided name!"
-    multiple_team_same_name_msg = "There is more than one team with the " \
-                                  "provided name!\n" \
-                                  "Please change the team names to be unique"
     desc = f"for dealing with {command_name}s"
     # Slack currently allows to send 16000 characters max
     MAX_CHAR_LIMIT = 15950
@@ -124,27 +121,17 @@ class ExportCommand(Command):
             return self.get_help(), 200
 
     def get_team_users(self, team_name):
-        teams = get_team_by_name(team_name)
-
-        if len(teams) > 1:
-            return self.multiple_team_same_name_msg, 200
-
-        if len(teams) == 0:
-            return self.no_team_found_msg, 200
+        team = get_team_by_name(self.facade, team_name)
 
         params = [('github_user_id', ids)
-                  for ids in list(teams[0].members)]
+                  for ids in list(team.members)]
         return self.facade.query_or(User, params)
 
     def export_emails_helper(self,
                              users: list) -> ResponseTuple:
         """
-        1. if team name not provided -> export emails of all users
-         as a string + names of the users who do not have an email
-
-        2. if team name provided -> export emails of all members of
-         the team + names of the users who do not have an email
-
+         returns emails of all users
+         + names of the users who do not have an email
         """
 
         if len(users) == 0:
@@ -179,6 +166,13 @@ class ExportCommand(Command):
         return ret, 200
 
     def handle_char_limit_exceeded(self, ret_str, find_str):
+        """
+        finds the last occurrence (index) of find_str
+        and chops off emails before that index
+
+        returns a email string with char limit exceed
+        warning message that is under MAX_CHAR_LIMIT
+        """
         last_find_idx = ret_str.rfind(find_str)
         temp_str1 = ret_str[:last_find_idx]
         temp_str2 = ret_str[last_find_idx:]
