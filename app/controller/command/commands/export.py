@@ -6,7 +6,7 @@ from argparse import ArgumentParser, _SubParsersAction
 from app.controller import ResponseTuple
 from app.controller.command.commands.base import Command
 from db.facade import DBFacade
-from app.model import User, Permissions
+from app.model import User
 from db.utils import get_team_by_name
 from interface.slack import Bot
 from utils.slack_parse import check_permissions
