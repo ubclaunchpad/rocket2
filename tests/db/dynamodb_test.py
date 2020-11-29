@@ -214,7 +214,7 @@ class TestDynamoDB(TestCase):
     @pytest.mark.db
     def test_query_or_teams(self):
         """Test edge cases like set inclusion in query_or."""
-        teams = [create_test_team(str(i), "glob", "name") for i in range(10)]
+        teams = [create_test_team(str(i), "glob", "displayname") for i in range(10)]
         member_to_check = list(teams[0].members)[0]
         param = [('members', member_to_check)]
         for team in teams:
