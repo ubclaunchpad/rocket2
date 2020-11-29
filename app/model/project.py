@@ -24,7 +24,7 @@ class Project(RocketModel):
         self.github_team_id = github_team_id
         self.github_urls = github_urls
 
-        self.display_name = ''
+        self.displayname = ''
         self.short_description = ''
         self.long_description = ''
         self.tags: List[str] = []
@@ -39,7 +39,7 @@ class Project(RocketModel):
             ('Project ID', self.project_id),
             ('Github Team ID', self.github_team_id),
             ('GitHub URLs', '\n'.join(self.github_urls)),
-            ('Display Name', self.display_name),
+            ('Display Name', self.displayname),
             ('Short Description', self.short_description),
             ('Long Description', self.long_description),
             ('Tags', '\n'.join(self.tags)),
@@ -65,7 +65,7 @@ class Project(RocketModel):
         """
         p = cls(d['github_team_id'], d['github_urls'])
         p.project_id = d['project_id']
-        p.display_name = d.get('display_name', '')
+        p.displayname = d.get('displayname', '')
         p.short_description = d.get('short_description', '')
         p.long_description = d.get('long_description', '')
         p.tags = d.get('tags', [])
@@ -97,7 +97,7 @@ class Project(RocketModel):
             'github_urls': p.github_urls
         }
         place_if_filled('github_team_id', p.github_team_id)
-        place_if_filled('display_name', p.display_name)
+        place_if_filled('displayname', p.displayname)
         place_if_filled('short_description', p.short_description)
         place_if_filled('long_description', p.long_description)
         place_if_filled('tags', p.tags)
