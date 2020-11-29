@@ -370,12 +370,13 @@ class TeamCommand(Command):
                 self.gh.add_team_member(command_user.github_username, team_id)
                 team.add_member(command_user.github_id)
             if param_list["lead"] is not None:
-                msg += "added lead"
+                msg += "added lead as a maintainer"
                 lead_user = self.facade.retrieve(User, param_list["lead"])
                 team.add_team_lead(lead_user.github_id)
                 if not self.gh.has_team_member(lead_user.github_username,
                                                team_id):
-                    self.gh.add_team_member(lead_user.github_username, team_id)
+                    self.gh.add_team_maintainer(
+                        lead_user.github_username, team_id)
             else:
                 team.add_team_lead(command_user.github_id)
 
