@@ -50,12 +50,12 @@ class ExportCommand(Command):
         # Parser for emails command
         parser_view = subparsers.add_parser("emails")
         parser_view.set_defaults(which="emails",
-                                 help="(Admin only) Export emails "
+                                 help="(Admin/Lead only) Export emails "
                                       "of all users")
         parser_view.add_argument("--team", metavar="TEAM",
                                  type=str, action='store',
                                  help="(Admin/Lead only) Export emails"
-                                      " by Team Name")
+                                      " by team name")
 
         return subparsers
 
@@ -118,7 +118,7 @@ class ExportCommand(Command):
 
     def get_team_users(self, team_name):
         team = get_team_by_name(self.facade, team_name)
-        return get_team_members(team)
+        return get_team_members(self.facade, team)
 
     def export_emails_helper(self,
                              users: list) -> ResponseTuple:

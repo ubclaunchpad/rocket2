@@ -15,6 +15,7 @@ def create_test_admin(slack_id: str) -> User:
     Email       admin@ubc.ca
     Name        Iemann Atmin
     Github      kibbles
+    Github ID   123453
     Image URL   https://via.placeholder.com/150
     Major       Computer Science
     Permission  Admin
