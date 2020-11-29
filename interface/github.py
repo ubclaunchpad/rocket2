@@ -211,4 +211,5 @@ class GithubInterface:
     def add_team_maintainer(self, username: str, team_id: str):
         """Add maintainer with given username to team with id team_id."""
         team = self.org.get_team(int(team_id))
-        team.add_membership(username, 'maintainer')
+        to_be_maintainer = cast(NamedUser, self.github.get_user(username))
+        team.add_membership(to_be_maintainer, 'maintainer')
