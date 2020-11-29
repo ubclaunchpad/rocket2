@@ -124,8 +124,7 @@ class ExportCommand(Command):
             return self.get_help(), 200
 
     def get_team_users(self, team_name):
-        teams = self.facade.query_or(
-            Team, [('github_team_name', str(team_name))])
+        teams = get_team_by_name(team_name)
 
         if len(teams) > 1:
             return self.multiple_team_same_name_msg, 200
