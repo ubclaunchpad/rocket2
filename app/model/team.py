@@ -11,7 +11,7 @@ class Team(RocketModel):
     def __init__(self,
                  github_team_id: str,
                  github_team_name: str,
-                 display_name: str):
+                 displayname: str):
         """
         Initialize the team.
 
@@ -19,7 +19,7 @@ class Team(RocketModel):
         """
         self.github_team_id = github_team_id
         self.github_team_name = github_team_name
-        self.display_name = display_name
+        self.display_name = displayname
         self.platform = ""
         self.team_leads: Set[str] = set()
         self.members: Set[str] = set()
@@ -95,7 +95,7 @@ class Team(RocketModel):
             'github_team_id': team.github_team_id,
             'github_team_name': team.github_team_name
         }
-        place_if_filled('display_name', team.display_name)
+        place_if_filled('displayname', team.display_name)
         place_if_filled('platform', team.platform)
         place_if_filled('members', team.members)
         place_if_filled('team_leads', team.team_leads)
