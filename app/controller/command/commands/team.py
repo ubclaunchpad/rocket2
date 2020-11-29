@@ -336,7 +336,7 @@ class TeamCommand(Command):
             team = Team(team_id, param_list['team_name'], "")
             if param_list["displayname"] is not None:
                 msg += f"displayname: {param_list['displayname']}, "
-                team.displayname = param_list['displayname']
+                team.display_name = param_list['displayname']
             if param_list["platform"] is not None:
                 msg += f"platform: {param_list['platform']}, "
                 team.platform = param_list['platform']
@@ -549,7 +549,7 @@ class TeamCommand(Command):
             msg = f"Team edited: {command_team}, "
             if param_list['displayname'] is not None:
                 msg += f"displayname: {param_list['displayname']}, "
-                team.displayname = param_list['displayname']
+                team.display_name = param_list['displayname']
             if param_list['platform'] is not None:
                 msg += f"platform: {param_list['platform']}"
                 team.platform = param_list['platform']
