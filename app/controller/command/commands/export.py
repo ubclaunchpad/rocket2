@@ -7,7 +7,7 @@ from app.controller import ResponseTuple
 from app.controller.command.commands.base import Command
 from db.facade import DBFacade
 from app.model import User
-from db.utils import get_team_by_name
+from db.utils import get_team_by_name, get_team_members
 from interface.slack import Bot
 from utils.slack_parse import check_permissions
 
@@ -118,10 +118,7 @@ class ExportCommand(Command):
 
     def get_team_users(self, team_name):
         team = get_team_by_name(self.facade, team_name)
-
-        params = [('github_user_id', ids)
-                  for ids in list(team.members)]
-        return self.facade.query_or(User, params)
+        return get_team_members(team)
 
     def export_emails_helper(self,
                              users: list) -> ResponseTuple:
