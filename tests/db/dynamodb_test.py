@@ -146,7 +146,7 @@ class TestDynamoDB(TestCase):
         projects = self.ddb.query(Project, [('tags', 'python')])
         query = [('tags', 'python'),
                  ('tags', 'docker'),
-                 ('displayname', 'Rocket2')]
+                 ('display_name', 'Rocket2')]
         strict_projects = self.ddb.query(Project, query)
         all_projects = self.ddb.query(Project)
 
