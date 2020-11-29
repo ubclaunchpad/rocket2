@@ -9,6 +9,7 @@ from db.facade import DBFacade
 from app.model import User, Permissions
 from db.utils import get_team_by_name
 from interface.slack import Bot
+from utils.slack_parse import check_permissions
 
 
 class ExportCommand(Command):
@@ -99,22 +100,17 @@ class ExportCommand(Command):
 
         if args.which == "emails":
             try:
-                user_command = self.facade.retrieve(User, user_id)
+                command_user = self.facade.retrieve(User, user_id)
+                if not check_permissions(command_user, None):
+                    return self.permission_error, 200
 
                 # Check if team name is provided
                 if args.team is not None:
-                    if user_command.permissions_level == \
-                            Permissions.team_lead or Permissions.admin:
-                        users = self.get_team_users(args.team)
-                        return self.export_emails_helper(users)
-                    else:
-                        return self.permission_error, 200
+                    users = self.get_team_users(args.team)
+                    return self.export_emails_helper(users)
                 else:  # if team name is not provided, export all emails
-                    if user_command.permissions_level == Permissions.admin:
-                        users = self.facade.query(User)
-                        return self.export_emails_helper(users)
-                    else:
-                        return self.permission_error, 200
+                    users = self.facade.query(User)
+                    return self.export_emails_helper(users)
             except LookupError:
                 return self.lookup_error, 200
         else:
