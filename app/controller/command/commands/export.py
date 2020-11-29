@@ -22,7 +22,7 @@ class ExportCommand(Command):
                             "exceeding slack character limits :("
     no_user_msg = "No members found for exporting emails!"
     no_team_found_msg = "No teams exist with the provided name!"
-    multiple_team_same_name_msg = "There are more than one team with the " \
+    multiple_team_same_name_msg = "There is more than one team with the " \
                                   "provided name!\n" \
                                   "Please change the team names to be unique"
     desc = f"for dealing with {command_name}s"
