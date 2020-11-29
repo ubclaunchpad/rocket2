@@ -66,7 +66,7 @@ class Team(RocketModel):
         """
         team = cls(d['github_team_id'],
                    d['github_team_name'],
-                   d.get('display_name', ''))
+                   d.get('displayname', ''))
         team.platform = d.get('platform', '')
         team.folder = d.get('folder', '')
         team.team_leads = set(d.get('team_leads', []))

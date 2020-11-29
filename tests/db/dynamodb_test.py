@@ -269,9 +269,9 @@ class TestDynamoDB(TestCase):
         self.assertTrue(self.ddb.store(team))
         self.assertTrue(self.ddb.store(team2))
 
-        another_team = self.ddb.query(Team, [('display_name', 'Rocket 2.0')])
+        another_team = self.ddb.query(Team, [('displayname', 'Rocket 2.0')])
         same_team = self.ddb.query(Team, [('platform', 'slack')])
-        multi_queries = self.ddb.query(Team, [('display_name', 'Rocket 2.0'),
+        multi_queries = self.ddb.query(Team, [('displayname', 'Rocket 2.0'),
                                               ('platform', 'slack')])
         member_team = self.ddb.query(Team, [('members', 'abc_123'),
                                             ('members', 'apple')])
