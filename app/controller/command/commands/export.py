@@ -8,7 +8,6 @@ from app.controller.command.commands.base import Command
 from db.facade import DBFacade
 from app.model import User
 from db.utils import get_team_by_name, get_team_members
-from interface.slack import Bot
 from utils.slack_parse import check_permissions
 
 
@@ -27,9 +26,7 @@ class ExportCommand(Command):
     # Slack currently allows to send 16000 characters max
     MAX_CHAR_LIMIT = 15950
 
-    def __init__(self,
-                 db_facade: DBFacade,
-                 bot: Bot):
+    def __init__(self, db_facade: DBFacade):
         """Initialize export command."""
         logging.info("Initializing ExportCommand instance")
         self.parser = ArgumentParser(prog="/rocket")
@@ -37,7 +34,6 @@ class ExportCommand(Command):
         self.subparser = self.init_subparsers()
         self.help = self.get_help()
         self.facade = db_facade
-        self.bot = bot
 
     def init_subparsers(self) -> _SubParsersAction:
         """

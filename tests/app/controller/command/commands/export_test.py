@@ -1,9 +1,8 @@
 from app.controller.command.commands import ExportCommand
-from unittest import TestCase, mock
+from unittest import TestCase
 from app.model import User, Team, Permissions
 from tests.memorydb import MemoryDB
 from tests.util import create_test_admin
-from interface.slack import Bot
 
 
 class TestExportCommand(TestCase):
@@ -34,8 +33,7 @@ class TestExportCommand(TestCase):
         self.db = MemoryDB(users=[self.u0, self.u1, self.admin, self.lead],
                            teams=[self.t0, self.t1])
 
-        self.bot = mock.MagicMock(Bot)
-        self.cmd = ExportCommand(self.db, self.bot)
+        self.cmd = ExportCommand(self.db)
 
     def test_get_all_emails(self):
         resp, _ = self.cmd.handle('export emails', self.admin.slack_id)
