@@ -163,11 +163,13 @@ class ExportCommand(Command):
 
     def handle_char_limit_exceeded(self, ret_str, find_str):
         """
-        finds the last occurrence (index) of find_str
-        and chops off emails before that index
+        Find the last occurrence (index) of ``find_str``
+        and chop off items before that index
 
-        returns a email string with char limit exceed
-        warning message that is under MAX_CHAR_LIMIT
+        Assume that items are separated by commas.
+
+        :return: a string of emails with char limit exceed
+                 warning message that is under ``MAX_CHAR_LIMIT``
         """
         last_find_idx = ret_str.rfind(find_str)
         temp_str1 = ret_str[:last_find_idx]
