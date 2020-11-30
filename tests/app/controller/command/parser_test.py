@@ -61,3 +61,14 @@ class TestParser(TestCase):
         self.parser.handle_app_command('i-quit', 'UFJ43EU67', '')
         self.metrics.submit_cmd_mstime.assert_called_once_with(
             'i-quit', mock.ANY)
+
+    def test_handle_single_cmd_iquit_with_dash(self):
+        self.parser.handle_app_command('i-quit --help', 'UFJ43EU67', '')
+        self.metrics.submit_cmd_mstime.assert_called_once_with(
+            'i-quit', mock.ANY)
+
+    @mock.patch('requests.post')
+    def test_handle_make_post_req(self, post):
+        self.parser.handle_app_command('i-quit', 'UFJ43EU67',
+                                       'https://google.com')
+        post.assert_called_once_with(url='https://google.com', json=mock.ANY)
