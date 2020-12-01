@@ -100,7 +100,7 @@ class UserCommand(Command):
                                  help="(Admin only) Add to edit properties "
                                       "of another user.")
         parser_edit.add_argument("--permission",
-                                 type=lambda x: Permissions[x],
+                                 type=lambda x: Permissions.__getitem__(x),
                                  help="(Admin only) Add to edit permission "
                                       "level of a user.",
                                  action='store', choices=list(Permissions))

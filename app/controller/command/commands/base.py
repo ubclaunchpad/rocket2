@@ -37,18 +37,15 @@ class Command(ABC):
         if self.subparser is None:
             return self.desc
 
-        def get_subcommand_help(sc: str) -> str:
-            """Return the help message of a specific subcommand."""
-            cmd = self.subparser.choices[sc]
-            return f'\n*{cmd.prog}*: {cmd.description}\n'
-
         if subcommand is None or subcommand not in self.subparser.choices:
+            # Return commands and their descriptions
             res = f"\n*{self.command_name} commands:*"
             for argument in self.subparser.choices:
                 cmd = self.subparser.choices[argument]
-                res += f'\n*{cmd.prog}*: {cmd.description}'
+                res += f'\n> *{cmd.prog}*: {cmd.description}'
             return res
         else:
+            # Return specific help-text of command
             res = "\n```"
             cmd = self.subparser.choices[subcommand]
             res += cmd.format_help()
