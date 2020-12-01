@@ -506,11 +506,11 @@
         },
         "pygithub": {
             "hashes": [
-                "sha256:776befaddab9d8fddd525d52a6ca1ac228cf62b5b1e271836d766f4925e1452e",
-                "sha256:8ad656bf79958e775ec59f7f5a3dbcbadac12147ae3dc42708b951064096af15"
+                "sha256:053f1b8d553a344ebd3ca3972765d923ee7e8ecc3ea55bd203683f164348fa1a",
+                "sha256:14c96d55e3c0e295598e52fbbbf2a7862a293723482ae9000cb9c816faab4fb4"
             ],
             "index": "pypi",
-            "version": "==1.53"
+            "version": "==1.54"
         },
         "pyjwt": {
             "hashes": [
