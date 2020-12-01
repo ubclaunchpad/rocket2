@@ -26,7 +26,6 @@ class TestTeamCommand(TestCase):
 
         self.sc = mock.MagicMock()
         self.cmd = TeamCommand(self.config, self.db, self.gh, self.sc)
-        self.help_text = self.cmd.help
         self.maxDiff = None
 
         self.config.github_team_all = 'all'
@@ -36,7 +35,7 @@ class TestTeamCommand(TestCase):
     def test_get_help(self):
         subcommands = list(self.cmd.subparser.choices.keys())
         help_message = self.cmd.get_help()
-        self.assertEqual(len(subcommands), help_message.count("usage"))
+        self.assertEqual(len(subcommands) + 1, help_message.count("\n"))
 
     def test_get_subcommand_help(self):
         subcommands = list(self.cmd.subparser.choices.keys())

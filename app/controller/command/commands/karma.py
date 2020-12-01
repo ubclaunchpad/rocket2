@@ -28,7 +28,6 @@ class KarmaCommand(Command):
         self.parser.add_argument("karma")
         self.subparser = self.init_subparsers()
         self.facade = db_facade
-        self.help = self.get_help()
 
     def init_subparsers(self) -> _SubParsersAction:
         """

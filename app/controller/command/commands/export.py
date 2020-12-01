@@ -32,7 +32,6 @@ class ExportCommand(Command):
         self.parser = ArgumentParser(prog="/rocket")
         self.parser.add_argument("export")
         self.subparser = self.init_subparsers()
-        self.help = self.get_help()
         self.facade = db_facade
 
     def init_subparsers(self) -> _SubParsersAction:

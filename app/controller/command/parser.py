@@ -117,7 +117,7 @@ class CommandParser:
         :return: Preformatted ``flask.Response`` object containing help
                  messages
         """
-        wrapped = wrap_slack_code('/rocket [command] help')
+        wrapped = wrap_slack_code('/rocket [command] -h')
         message = f'''Displaying all available commands.
 To read about a specific command, use {wrapped}.
 For arguments containing spaces, please enclose them with quotations.'''

@@ -53,7 +53,6 @@ class TeamCommand(Command):
         self.parser = ArgumentParser(prog="/rocket")
         self.parser.add_argument("team")
         self.subparser = self.init_subparsers()
-        self.help = self.get_help()
 
     def init_subparsers(self) -> _SubParsersAction:
         """
@@ -153,24 +152,6 @@ class TeamCommand(Command):
             "refresh", description="(Admin only) Refresh local team database.")
 
         return subparsers
-
-    def get_help(self, subcommand: str = None) -> str:
-        """Return command options for team events with Slack formatting."""
-        def get_subcommand_help(sc: str) -> str:
-            """Return the help message of a specific subcommand."""
-            message = f"\n*{sc.capitalize()}*\n"
-            message += self.subparser.choices[sc].format_help()
-            return message
-
-        if subcommand is None or subcommand not in self.subparser.choices:
-            res = f"\n*{self.command_name} commands:*```"
-            for argument in self.subparser.choices:
-                res += get_subcommand_help(argument)
-            return res + "```"
-        else:
-            res = "\n```"
-            res += get_subcommand_help(subcommand)
-            return res + "```"
 
     def handle(self,
                command: str,

@@ -45,13 +45,13 @@ class TestUserCommand(TestCase):
         """Test user with no sub-parsers."""
         self.assertEqual(self.testcommand.handle('user',
                                                  self.u0.slack_id),
-                         (self.testcommand.help, 200))
+                         (self.testcommand.get_help(), 200))
 
     def test_handle_bad_args(self):
         """Test user with invalid arguments."""
         self.assertEqual(self.testcommand.handle('user geese',
                                                  self.u0.slack_id),
-                         (self.testcommand.help, 200))
+                         (self.testcommand.get_help(), 200))
 
     def test_handle_add(self):
         """Test user command add method."""
@@ -144,7 +144,7 @@ class TestUserCommand(TestCase):
     def test_handle_help(self):
         self.assertEqual(self.testcommand.handle('user help',
                                                  self.u0.slack_id),
-                         (self.testcommand.help, 200))
+                         (self.testcommand.get_help(), 200))
 
     def test_handle_delete(self):
         message = f'Deleted user with Slack ID: {self.u0.slack_id}'

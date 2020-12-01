@@ -27,7 +27,6 @@ class ProjectCommand(Command):
         self.parser = ArgumentParser(prog="/rocket")
         self.parser.add_argument("project")
         self.subparser = self.init_subparsers()
-        self.help = self.get_help()
         self.facade = db_facade
 
     def init_subparsers(self) -> _SubParsersAction:
