@@ -117,17 +117,11 @@ class CommandParser:
         :return: Preformatted ``flask.Response`` object containing help
                  messages
         """
-        message = {"text": "Displaying all available commands. "
-                           "To read about a specific command, use "
-                           f"\n{wrap_slack_code('/rocket [command] help')}\n"
-                           "For arguments containing spaces, "
-                           "please enclose them with quotations.\n",
-                   "mrkdwn": "true"}
-        attachments = []
+        wrapped = wrap_slack_code('/rocket [command] -h')
+        message = f'''Displaying all available commands.
+To read about a specific command, use {wrapped}.
+For arguments containing spaces, please enclose them with quotations.'''
         for cmd in self.commands.values():
             cmd_name = cmd.command_name
-            cmd_text = f"*{cmd_name}:* {cmd.desc}"
-            attachment = {"text": cmd_text, "mrkdwn_in": ["text"]}
-            attachments.append(attachment)
-        message["attachments"] = attachments  # type: ignore
+            message += f"\n> *{cmd_name}:* {cmd.desc}"
         return message, 200

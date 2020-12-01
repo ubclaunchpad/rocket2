@@ -20,13 +20,10 @@ class KarmaCommandTest(TestCase):
         self.testcommand = KarmaCommand(self.db)
         self.maxDiff = None
 
-    def test_get_help(self):
-        assert self.testcommand.get_help() == self.testcommand.help
-
     def test_handle_bad_args(self):
         self.assertEqual(self.testcommand.handle('karma ggwp',
                                                  self.u0.slack_id),
-                         (self.testcommand.help, 200))
+                         (self.testcommand.get_help(), 200))
 
     def test_handle_view(self):
         self.u1.karma = 15

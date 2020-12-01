@@ -22,12 +22,12 @@ class KarmaCommand(Command):
 
     def __init__(self, db_facade):
         """Initialize karma command."""
+        super().__init__()
         logging.info("Starting karma command initializer")
         self.parser = ArgumentParser(prog="/rocket")
         self.parser.add_argument("karma")
         self.subparser = self.init_subparsers()
         self.facade = db_facade
-        self.help = self.get_help()
 
     def init_subparsers(self) -> _SubParsersAction:
         """
@@ -39,9 +39,8 @@ class KarmaCommand(Command):
             self.parser.add_subparsers(dest="which")
 
         """Parser for set command."""
-        parser_set = subparsers.add_parser("set")
-        parser_set.set_defaults(which="set",
-                                help="Manually sets a user's karma")
+        parser_set = subparsers.add_parser(
+            "set", description="Manually sets a user's karma")
         parser_set.add_argument("username", metavar="USERNAME",
                                 type=str, action='store',
                                 help="slack id of kuser's karma to set")
@@ -50,16 +49,14 @@ class KarmaCommand(Command):
                                 help="Amount of karma to set into user")
 
         """Parser for reset command."""
-        parser_reset = subparsers.add_parser("reset")
-        parser_reset.set_defaults(which="reset",
-                                  help="resets users id")
+        parser_reset = subparsers.add_parser(
+            "reset", description="Reset a user's karma")
         parser_reset.add_argument("-a", "--all", action="store_true",
                                   help="Use to reset all user's karma amount")
 
         """Parser for view command."""
-        parser_view = subparsers.add_parser("view")
-        parser_view.set_defaults(which="view",
-                                 help="view a user's karma amount")
+        parser_view = subparsers.add_parser(
+            "view", description="View a user's karma")
         parser_view.add_argument("username", metavar="USERNAME",
                                  type=str, action='store',
                                  help="slack id of user karma to view")
@@ -84,15 +81,6 @@ class KarmaCommand(Command):
             return self.view_helper(user_id, args.username)
         else:
             return self.get_help(), 200
-
-    def get_help(self) -> str:
-        """Return command options for team events."""
-        res = "\n*" + self.command_name + " commands:*```"
-        for argument in self.subparser.choices:
-            name = argument.capitalize()
-            res += "\n*" + name + "*\n"
-            res += self.subparser.choices[argument].format_help()
-        return res + "```"
 
     def set_helper(self,
                    user_id: str,

@@ -32,7 +32,6 @@ class ExportCommand(Command):
         self.parser = ArgumentParser(prog="/rocket")
         self.parser.add_argument("export")
         self.subparser = self.init_subparsers()
-        self.help = self.get_help()
         self.facade = db_facade
 
     def init_subparsers(self) -> _SubParsersAction:
@@ -54,25 +53,6 @@ class ExportCommand(Command):
                                       " by team name")
 
         return subparsers
-
-    def get_help(self, subcommand: str = None) -> str:
-        """Return command options for user events with Slack formatting."""
-
-        def get_subcommand_help(sc: str) -> str:
-            """Return the help message of a specific subcommand."""
-            message = f"\n*{sc.capitalize()}*\n"
-            message += self.subparser.choices[sc].format_help()
-            return message
-
-        if subcommand is None or subcommand not in self.subparser.choices:
-            res = f"\n*{self.command_name} commands:*```"
-            for argument in self.subparser.choices:
-                res += get_subcommand_help(argument)
-            return res + "```"
-        else:
-            res = "\n```"
-            res += get_subcommand_help(subcommand)
-            return res + "```"
 
     def handle(self,
                command: str,
