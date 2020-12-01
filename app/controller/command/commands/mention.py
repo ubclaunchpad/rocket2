@@ -19,6 +19,7 @@ class MentionCommand(Command):
 
     def __init__(self, db_facade: DBFacade):
         """Initialize Mention command."""
+        super().__init__()
         logging.info("Starting Mention command initializer")
         self.parser = argparse.ArgumentParser(prog="Mention")
         self.parser.add_argument("Mention")
