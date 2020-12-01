@@ -31,6 +31,7 @@ class UserCommand(Command):
                  github_interface: GithubInterface,
                  gcp: Optional[GCPInterface]):
         """Initialize user command."""
+        super().__init__()
         logging.info("Initializing UserCommand instance")
         self.parser = ArgumentParser(prog="/rocket")
         self.parser.add_argument("user")
@@ -49,9 +50,8 @@ class UserCommand(Command):
         subparsers = self.parser.add_subparsers(dest="which")
 
         # Parser for view command
-        parser_view = subparsers.add_parser("view")
-        parser_view.set_defaults(which="view",
-                                 help="View information about a given user.")
+        parser_view = subparsers.add_parser(
+            "view", description="View information about a given user")
         parser_view.add_argument("--username", metavar="USERNAME",
                                  type=str, action='store',
                                  help="Query user by Slack ID")
@@ -65,29 +65,25 @@ class UserCommand(Command):
                                  help='See team memberships of user')
 
         """Parser for add command."""
-        parser_add = subparsers.add_parser("add")
-        parser_add.set_defaults(which="add",
-                                help="Add a user to rocket2's database.")
+        parser_add = subparsers.add_parser(
+            "add", description="Add a user to rocket2's database.")
         parser_add.add_argument("-f", "--force", action="store_true",
                                 help="Set to store user even if already "
                                      "added to database.")
 
         """Parser for delete command."""
-        parser_delete = subparsers.add_parser("delete")
-        parser_delete.set_defaults(which="delete",
-                                   help="(Admin only) permanently delete "
-                                        "member's profile.")
+        parser_delete = subparsers.add_parser(
+            "delete", description="(Admin only) permanently delete"
+                                  " member's profile.")
         parser_delete.add_argument("username", metavar="USERNAME",
                                    type=str, action='store',
                                    help="Slack id of member to delete.")
 
         """Parser for edit command."""
-        parser_edit = subparsers. \
-            add_parser("edit",
-                       help="Edit properties of your Launch Pad "
-                            "profile (surround arguments containing "
-                            "spaces with quotes)")
-        parser_edit.set_defaults(which='edit')
+        parser_edit = subparsers.add_parser(
+            "edit", description="Edit properties of your Launch Pad "
+                                "profile (surround arguments containing "
+                                "spaces with quotes)")
         parser_edit.add_argument("--name", type=str, action='store',
                                  help="Add to change your name.")
         parser_edit.add_argument("--email", type=str, action='store',
@@ -104,29 +100,11 @@ class UserCommand(Command):
                                  help="(Admin only) Add to edit properties "
                                       "of another user.")
         parser_edit.add_argument("--permission",
-                                 type=lambda x: Permissions.__getitem__(x),
+                                 type=lambda x: Permissions[x],
                                  help="(Admin only) Add to edit permission "
                                       "level of a user.",
                                  action='store', choices=list(Permissions))
         return subparsers
-
-    def get_help(self, subcommand: str = None) -> str:
-        """Return command options for user events with Slack formatting."""
-        def get_subcommand_help(sc: str) -> str:
-            """Return the help message of a specific subcommand."""
-            message = f"\n*{sc.capitalize()}*\n"
-            message += self.subparser.choices[sc].format_help()
-            return message
-
-        if subcommand is None or subcommand not in self.subparser.choices:
-            res = f"\n*{self.command_name} commands:*```"
-            for argument in self.subparser.choices:
-                res += get_subcommand_help(argument)
-            return res + "```"
-        else:
-            res = "\n```"
-            res += get_subcommand_help(subcommand)
-            return res + "```"
 
     def handle(self,
                command: str,

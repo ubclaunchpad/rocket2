@@ -31,6 +31,7 @@ class TokenCommand(Command):
         :param config: :class:`app.controller.command.commands
                                .TokenCommandConfig` object
         """
+        super().__init__()
         logging.info("Initializing TokenCommand instance")
         self.facade = db_facade
         self.expiry = config.expiry

@@ -27,7 +27,7 @@ class TestUserCommand(TestCase):
         """Test user command get_help method."""
         subcommands = list(self.testcommand.subparser.choices.keys())
         help_message = self.testcommand.get_help()
-        self.assertEqual(len(subcommands), help_message.count("usage"))
+        self.assertEqual(len(subcommands) + 1, help_message.count("\n"))
 
     def test_get_subcommand_help(self):
         """Test user command get_help method for specific subcommands."""
