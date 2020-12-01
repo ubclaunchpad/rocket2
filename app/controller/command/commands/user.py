@@ -2,7 +2,7 @@
 import logging
 import shlex
 
-from argparse import ArgumentParser, _SubParsersAction
+from argparse import ArgumentParser, _SubParsersAction, Namespace
 from app.controller import ResponseTuple
 from app.controller.command.commands.base import Command
 from db.facade import DBFacade
@@ -10,7 +10,7 @@ from interface.github import GithubAPIException, GithubInterface
 from interface.gcp import GCPInterface
 from interface.gcp_utils import sync_user_email_perms
 from app.model import User, Team, Permissions
-from typing import Dict, cast, Optional
+from typing import Optional
 from utils.slack_parse import escape_email
 
 
@@ -127,12 +127,7 @@ class UserCommand(Command):
             return self.get_help(subcommand=present_subcommand), 200
 
         if args.which == "view":
-            return self.view_helper(user_id, {
-                'username': args.username,
-                'github': args.github,
-                'email': args.email,
-                'inspect': args.inspect,
-            })
+            return self.view_helper(user_id, args)
 
         elif args.which == "add":
             return self.add_helper(user_id, args.force)
@@ -141,17 +136,7 @@ class UserCommand(Command):
             return self.delete_helper(user_id, args.username)
 
         elif args.which == "edit":
-            param_list = {
-                "username": args.username,
-                "name": args.name,
-                "email": args.email,
-                "pos": args.pos,
-                "github": args.github,
-                "major": args.major,
-                "bio": args.bio,
-                "permission": args.permission,
-            }
-            return self.edit_helper(user_id, param_list)
+            return self.edit_helper(user_id, args)
 
         else:
             return self.get_help(), 200
@@ -195,30 +180,30 @@ class UserCommand(Command):
 
     def edit_helper(self,
                     user_id: str,
-                    param_list: Dict[str, str]) -> ResponseTuple:
+                    args: Namespace) -> ResponseTuple:
         """
         Edit user from database.
 
-        If ``param_list['username'] is not None``, this function edits using
-        the ID from ``param_list['username']`` (must be an admin to do so).
+        If ``args.username is not None``, this function edits using
+        the ID from ``args.username`` (must be an admin to do so).
         Otherwise, edits the user that called the function.
 
         :param user_id: Slack ID of user who is calling the command
-        :param param_list: List of user parameters that are to be edited
+        :param args: List of user parameters that are to be edited
         :return: error message if not admin and command edits another user,
             or the edit message if user is edited
         """
         is_admin = False
         edited_user = None
         msg = ""
-        if param_list["username"] is not None:
+        if args.username is not None:
             try:
                 admin_user = self.facade.retrieve(User, user_id)
                 if admin_user.permissions_level != Permissions.admin:
                     return self.permission_error, 200
                 else:
                     is_admin = True
-                    edited_id = param_list["username"]
+                    edited_id = args.username
                     edited_user = self.facade.retrieve(User, edited_id)
             except LookupError:
                 return self.lookup_error, 200
@@ -228,29 +213,28 @@ class UserCommand(Command):
             except LookupError:
                 return self.lookup_error, 200
 
-        if param_list["name"]:
-            edited_user.name = param_list["name"]
-        if param_list["email"]:
-            edited_user.email = escape_email(param_list["email"])
-        if param_list["pos"]:
-            edited_user.position = param_list["pos"]
-        if param_list["github"]:
+        if args.name:
+            edited_user.name = args.name
+        if args.email:
+            edited_user.email = escape_email(args.email)
+        if args.pos:
+            edited_user.position = args.pos
+        if args.github:
             try:
-                github_id = self.github.org_add_member(param_list["github"])
-                edited_user.github_username = param_list["github"]
+                github_id = self.github.org_add_member(args.github)
+                edited_user.github_username = args.github
                 edited_user.github_id = github_id
             except GithubAPIException:
-                msg = f"\nError adding user {param_list['github']} to " \
+                msg = f"\nError adding user {args.github} to " \
                       f"GitHub organization"
                 logging.error(msg)
-        if param_list["major"]:
-            edited_user.major = param_list["major"]
-        if param_list["bio"]:
-            edited_user.biography = param_list["bio"]
-        if param_list["permission"] and is_admin:
-            edited_user.permissions_level = cast(Permissions,
-                                                 param_list["permission"])
-        elif param_list["permission"] and not is_admin:
+        if args.major:
+            edited_user.major = args.major
+        if args.bio:
+            edited_user.biography = args.bio
+        if args.permission and is_admin:
+            edited_user.permissions_level = args.permission
+        elif args.permission and not is_admin:
             msg += "\nCannot change own permission: user isn't admin."
             logging.warning(f"User {user_id} tried to elevate permissions"
                             " level.")
@@ -258,7 +242,7 @@ class UserCommand(Command):
         self.facade.store(edited_user)
 
         # Sync permissions only if email was updated
-        if param_list["email"]:
+        if args.email:
             sync_user_email_perms(self.gcp, self.facade, edited_user)
 
         ret = {'attachments': [edited_user.get_attachment()]}
@@ -297,32 +281,32 @@ class UserCommand(Command):
 
     def view_helper(self,
                     user_id: str,
-                    param_list: Dict[str, str]) -> ResponseTuple:
+                    args: Namespace) -> ResponseTuple:
         """
         View user info from database.
 
         If no parameters are provided, returns information of ``user_id``. If
-        ``param_list['username']`` is provided, returns the specific user
+        ``args.username`` is provided, returns the specific user
         matching the Slack ID provided, otherwise returns all users that match
         all traits of other provided parameters (e.g. ``github`` and ``email``)
 
         :param user_id: Slack ID of user who is calling command
-        :param param_list: List of user parameters defining the query
+        :param args: List of user parameters defining the query
         :return: error message if user not found in database, else information
                  about the user, or users.
         """
         try:
-            if param_list['username']:
-                user = self.facade.retrieve(User, param_list['username'])
+            if args.username:
+                user = self.facade.retrieve(User, args.username)
             # If no query parameters are provided, get the sender
-            elif not param_list['github'] and not param_list['email']:
+            elif not args.github and not args.email:
                 user = self.facade.retrieve(User, user_id)
             else:
                 query = []
-                if param_list['github']:
-                    query.append(('github', param_list['github']))
-                if param_list['email']:
-                    query.append(('email', escape_email(param_list['email'])))
+                if args.github:
+                    query.append(('github', args.github))
+                if args.email:
+                    query.append(('email', escape_email(args.email)))
 
                 users = self.facade.query(User, query)
                 if len(users) == 0:
@@ -335,7 +319,7 @@ class UserCommand(Command):
                 else:
                     user = users[0]
 
-            if param_list['inspect']:
+            if args.inspect:
                 return {'attachments': [
                     user.get_attachment(),
                     self.viewinspect_helper(user)

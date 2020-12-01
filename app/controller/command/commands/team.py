@@ -1,7 +1,7 @@
 """Command parsing for team events."""
 import logging
 import shlex
-from argparse import ArgumentParser, _SubParsersAction
+from argparse import ArgumentParser, _SubParsersAction, Namespace
 from app.controller import ResponseTuple
 from app.controller.command.commands.base import Command
 from app.model.permissions import Permissions
@@ -202,46 +202,19 @@ class TeamCommand(Command):
             return self.delete_helper(args.team_name, user_id)
 
         elif args.which == "create":
-            param_list = {
-                "team_name": args.team_name,
-                "name": args.name,
-                "platform": args.platform,
-                "channel": args.channel,
-                "lead": args.lead,
-                "folder": args.folder,
-            }
-            return self.create_helper(param_list, user_id)
+            return self.create_helper(args, user_id)
 
         elif args.which == "add":
-            param_list = {
-                "team_name": args.team_name,
-                "username": args.username
-            }
-            return self.add_helper(param_list, user_id)
+            return self.add_helper(args, user_id)
 
         elif args.which == "remove":
-            param_list = {
-                "team_name": args.team_name,
-                "username": args.username
-            }
-            return self.remove_helper(param_list, user_id)
+            return self.remove_helper(args, user_id)
 
         elif args.which == "edit":
-            param_list = {
-                "team_name": args.team_name,
-                "name": args.name,
-                "platform": args.platform,
-                "folder": args.folder,
-            }
-            return self.edit_helper(param_list, user_id)
+            return self.edit_helper(args, user_id)
 
         elif args.which == "lead":
-            param_list = {
-                "team_name": args.team_name,
-                "username": args.username,
-                "remove": args.remove
-            }
-            return self.lead_helper(param_list, user_id)
+            return self.lead_helper(args, user_id)
 
         elif args.which == "refresh":
             return self.refresh_helper(user_id)
@@ -263,7 +236,7 @@ class TeamCommand(Command):
                       team in teams]
         return {'attachments': attachment}, 200
 
-    def view_helper(self, team_name) -> ResponseTuple:
+    def view_helper(self, team_name: str) -> ResponseTuple:
         """
         Return display information and members of specified team.
 
@@ -294,15 +267,15 @@ class TeamCommand(Command):
         except LookupError:
             return self.lookup_error, 200
 
-    def create_helper(self, param_list, user_id) -> ResponseTuple:
+    def create_helper(self, args: Namespace, user_id: str) -> ResponseTuple:
         """
         Create team and calls GitHub API to create the team in GitHub.
 
-        If ``param_list[name] is not None``, will add a display name. If
-        ``param_list[channel] is not None``, will add all members of channel in
+        If ``args.name is not None``, will add a display name. If
+        ``args.channel is not None``, will add all members of channel in
         which the command was called into the team.
 
-        :param param_list: List of parameters for creating team
+        :param args: Parameters for creating team
         :param user_id: Slack ID of user who called command
         :return: error message if team created unsuccessfully otherwise returns
                  success message
@@ -317,22 +290,22 @@ class TeamCommand(Command):
                     f" Register with `/rocket user edit --github username`."
                 logging.error(msg)
                 return msg, 200
-            msg = f"New team created: {param_list['team_name']}, "
-            team_id = str(self.gh.org_create_team(param_list['team_name']))
-            team = Team(team_id, param_list['team_name'], "")
-            if param_list["name"] is not None:
-                msg += f"name: {param_list['name']}, "
-                team.display_name = param_list['name']
-            if param_list["platform"] is not None:
-                msg += f"platform: {param_list['platform']}, "
-                team.platform = param_list['platform']
-            if param_list["folder"] is not None:
-                msg += f"folder: {param_list['folder']}"
-                team.folder = param_list['folder']
-            if param_list["channel"] is not None:
+            msg = f"New team created: {args.team_name}, "
+            team_id = str(self.gh.org_create_team(args.team_name))
+            team = Team(team_id, args.team_name, "")
+            if args.name is not None:
+                msg += f"name: {args.name}, "
+                team.display_name = args.name
+            if args.platform is not None:
+                msg += f"platform: {args.platform}, "
+                team.platform = args.platform
+            if args.folder is not None:
+                msg += f"folder: {args.folder}"
+                team.folder = args.folder
+            if args.channel is not None:
                 msg += "added channel"
                 channel_users = self.sc.get_channel_users(
-                    param_list['channel'])
+                    args.channel)
                 users_no_ghid = []
                 for member_id in channel_users:
                     try:
@@ -358,9 +331,9 @@ class TeamCommand(Command):
             else:
                 self.gh.add_team_member(command_user.github_username, team_id)
                 team.add_member(command_user.github_id)
-            if param_list["lead"] is not None:
+            if args.lead is not None:
                 msg += "added lead"
-                lead_user = self.facade.retrieve(User, param_list["lead"])
+                lead_user = self.facade.retrieve(User, args.lead)
                 team.add_team_lead(lead_user.github_id)
                 if not self.gh.has_team_member(lead_user.github_username,
                                                team_id):
@@ -382,14 +355,14 @@ class TeamCommand(Command):
             return f"Team creation unsuccessful with the" \
                    f" following error: {e.error}", 200
 
-    def add_helper(self, param_list, user_id) -> ResponseTuple:
+    def add_helper(self, args: Namespace, user_id: str) -> ResponseTuple:
         """
         Add user to team.
 
         If user is not admin or team lead of specified team, the user will not
         be added and an error message is returned.
 
-        :param param_list: List of parameters for adding user
+        :param args: Parameters for adding user
         :param user_id: Slack ID of user who called command
         :return: error message if user added unsuccessfully or if user has
                  insufficient permission level, otherwise returns success
@@ -397,12 +370,12 @@ class TeamCommand(Command):
         """
         try:
             command_user = self.facade.retrieve(User, user_id)
-            command_team = param_list['team_name']
+            command_team = args.team_name
             team = get_team_by_name(self.facade, command_team)
             if not check_permissions(command_user, team):
                 return self.permission_error, 200
 
-            user = self.facade.retrieve(User, param_list['username'])
+            user = self.facade.retrieve(User, args.username)
             if len(user.github_id) == 0:
                 return self.no_ghusername_error, 200
             team.add_member(user.github_id)
@@ -437,7 +410,7 @@ class TeamCommand(Command):
             return f"User added unsuccessfully with the " \
                    f"following error: {e.data}", 200
 
-    def remove_helper(self, param_list, user_id) -> ResponseTuple:
+    def remove_helper(self, args: Namespace, user_id: str) -> ResponseTuple:
         """
         Remove specified user from a team.
 
@@ -445,7 +418,7 @@ class TeamCommand(Command):
         user is not admin or team lead of specified team, user will not be
         removed and an error message is returned.
 
-        :param param_list: List of parameters for removing user
+        :param args: List of parameters for removing user
         :param user_id: Slack ID of user who called command
         :return: error message if user removed unsuccessfully, if user is not
                  in team, or if user has insufficient permission level,
@@ -453,12 +426,12 @@ class TeamCommand(Command):
         """
         try:
             command_user = self.facade.retrieve(User, user_id)
-            command_team = param_list['team_name']
+            command_team = args.team_name
             team = get_team_by_name(self.facade, command_team)
             if not check_permissions(command_user, team):
                 return self.permission_error, 200
 
-            user = self.facade.retrieve(User, param_list['username'])
+            user = self.facade.retrieve(User, args.username)
             if not self.gh.has_team_member(user.github_username,
                                            team.github_team_id):
                 return "User not in team!", 200
@@ -514,38 +487,38 @@ class TeamCommand(Command):
             return f"User removed unsuccessfully with " \
                    f"the following error: {e.data}", 200
 
-    def edit_helper(self, param_list, user_id) -> ResponseTuple:
+    def edit_helper(self, args: Namespace, user_id: str) -> ResponseTuple:
         """
         Edit the properties of a specific team.
 
         Team leads can only edit the teams that they are a part of, but admins
         can edit any teams.
 
-        :param param_list: List of parameters for editing team
+        :param args: Parameters for editing team
         :param user_id: Slack ID of user who called command
         :return: error message if user has insufficient permission level or
                  team edited unsuccessfully, otherwise return success message
         """
         try:
             command_user = self.facade.retrieve(User, user_id)
-            command_team = param_list['team_name']
+            command_team = args.team_name
             team = get_team_by_name(self.facade, command_team)
             if not check_permissions(command_user, team):
                 return self.permission_error, 200
             msg = f"Team edited: {command_team}, "
-            if param_list['name'] is not None:
-                msg += f"name: {param_list['name']}, "
-                team.display_name = param_list['name']
-            if param_list['platform'] is not None:
-                msg += f"platform: {param_list['platform']}"
-                team.platform = param_list['platform']
-            if param_list['folder'] is not None:
-                msg += f"folder: {param_list['folder']}"
-                team.folder = param_list['folder']
+            if args.name is not None:
+                msg += f"name: {args.name}, "
+                team.display_name = args.name
+            if args.platform is not None:
+                msg += f"platform: {args.platform}"
+                team.platform = args.platform
+            if args.folder is not None:
+                msg += f"folder: {args.folder}"
+                team.folder = args.folder
             self.facade.store(team)
 
             # Update drive shares if folder was changed
-            if param_list['folder']:
+            if args.folder:
                 sync_team_email_perms(self.gcp, self.facade, team)
 
             ret = {'attachments': [team.get_attachment()], 'text': msg}
@@ -553,27 +526,27 @@ class TeamCommand(Command):
         except LookupError:
             return self.lookup_error, 200
 
-    def lead_helper(self, param_list, user_id) -> ResponseTuple:
+    def lead_helper(self, args: Namespace, user_id: str) -> ResponseTuple:
         """
         Add a user as team lead, and add them to team if not already added.
 
         If ``--remove`` flag is used, user is instead demoted from being a team
         lead, but not from the team.
 
-        :param param_list: List of parameters for editing leads
+        :param args: Parameters for editing leads
         :param user_id: Slack ID of user who called command
         :return: error message if user has insufficient permission level or
                  lead demoted unsuccessfully, otherwise return success message
         """
         try:
             command_user = self.facade.retrieve(User, user_id)
-            command_team = param_list['team_name']
+            command_team = args.team_name
             team = get_team_by_name(self.facade, command_team)
             if not check_permissions(command_user, team):
                 return self.permission_error, 200
-            user = self.facade.retrieve(User, param_list["username"])
+            user = self.facade.retrieve(User, args.username)
             msg = ""
-            if param_list["remove"]:
+            if args.remove:
                 if not team.has_member(user.github_id):
                     return "User not in team!", 200
                 if team.has_team_lead(user.github_id):
