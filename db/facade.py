@@ -1,11 +1,9 @@
 """Database Facade."""
-from app.model.user import User
-from app.model.team import Team
-from app.model.project import Project
+from app.model import User, Team
 from typing import List, Tuple, TypeVar, Type
 from abc import ABC, abstractmethod
 
-T = TypeVar('T', User, Team, Project)
+T = TypeVar('T', User, Team)
 
 
 class DBFacade(ABC):
@@ -23,8 +21,8 @@ class DBFacade(ABC):
         """
         Store object into the correct table.
 
-        Object can be of type :class:`app.model.user.User`,
-        :class:`app.model.team.Team`, or :class:`app.model.project.Project`.
+        Object can be of type :class:`app.model.user.User` or
+        :class:`app.model.team.Team`.
 
         :param obj: Object to store in database
         :return: True if object was stored, and false otherwise
@@ -76,13 +74,12 @@ class DBFacade(ABC):
         If you try to query a table without any parameters, the function will
         return all objects of that table.::
 
-            projects = ddb.query(Project)
+            teams = ddb.query(Team)
 
-        Attributes that are sets (e.g. ``team.member``,
-        ``project.github_urls``) would be treated differently. This function
-        would check to see if the entry **contains** a certain element. You can
-        specify multiple elements, but they must be in different parameters
-        (one element per tuple).::
+        Attributes that are sets (e.g. ``team.member``) would be treated
+        differently. This function would check to see if the entry
+        **contains** a certain element. You can specify multiple elements,
+        but they must be in different parameters (one element per tuple).::
 
             teams = ddb.query(Team, [('members', 'abc123'),
                                      ('members', '231abc')])
@@ -113,13 +110,12 @@ class DBFacade(ABC):
         If you try to query a table without any parameters, the function will
         return all objects of that table.::
 
-            projects = ddb.query_or(Project)
+            teams = ddb.query_or(Team)
 
-        Attributes that are sets (e.g. ``team.member``,
-        ``project.github_urls``) would be treated differently. This function
-        would check to see if the entry **contains** a certain element. You can
-        specify multiple elements, but they must be in different parameters
-        (one element per tuple).::
+        Attributes that are sets (e.g. ``team.member``) would be treated
+        differently. This function would check to see if the entry
+        **contains** a certain element. You can specify multiple elements,
+        but they must be in different parameters (one element per tuple).::
 
             teams = ddb.query_or(Team, [('members', 'abc123'),
                                         ('members', '231abc')])

@@ -4,9 +4,9 @@ from unittest import TestCase
 import pytest
 import boto3
 
-from app.model import User, Project, Team, Permissions
+from app.model import User, Team, Permissions
 from config import Config
-from tests.util import create_test_team, create_test_admin, create_test_project
+from tests.util import create_test_team, create_test_admin
 from db.dynamodb import DynamoDB
 
 
@@ -18,7 +18,6 @@ class TestDDBConstants(TestCase):
         self.config = MagicMock(Config)
         self.config.aws_users_tablename = 'users'
         self.config.aws_teams_tablename = 'teams'
-        self.config.aws_projects_tablename = 'projects'
         self.const = DynamoDB.Const(self.config)
 
     def test_get_bad_table_name(self):
@@ -42,7 +41,6 @@ class TestDynamoDB(TestCase):
         self.config = MagicMock(Config)
         self.config.aws_users_tablename = 'users_test'
         self.config.aws_teams_tablename = 'teams_test'
-        self.config.aws_projects_tablename = 'projects_test'
         self.config.aws_local = True
         self.ddb = DynamoDB(self.config)
 
@@ -74,12 +72,6 @@ class TestDynamoDB(TestCase):
         self.assertFalse(self.ddb.store(team))
 
     @pytest.mark.db
-    def test_store_invalid_project(self):
-        project = Project('12456', [''])
-        project.github_urls = []
-        self.assertFalse(self.ddb.store(project))
-
-    @pytest.mark.db
     def test_store_same_users(self):
         """Test how database handles overwriting same user (same slack_id)."""
         user = create_test_admin('abc_123')
@@ -102,28 +94,10 @@ class TestDynamoDB(TestCase):
         self.assertEqual(user, another_user)
 
     @pytest.mark.db
-    def test_store_retrieve_project(self):
-        """Test to see if we can store and retrieve the same user."""
-        urls = ['https://github.com/ubclaunchpad/rocket2']
-        project = create_test_project('123456', urls)
-
-        success = self.ddb.store(project)
-        another_project = self.ddb.retrieve(Project, project.project_id)
-
-        self.assertTrue(success)
-        self.assertEqual(project, another_project)
-
-    @pytest.mark.db
     def test_retrieve_invalid_user(self):
         """Test to see if we can retrieve a non-existant user."""
         with self.assertRaises(LookupError):
             self.ddb.retrieve(User, 'abc_123')
-
-    @pytest.mark.db
-    def test_retrieve_invalid_project(self):
-        """Test to see if we can retrieve a non-existant user."""
-        with self.assertRaises(LookupError):
-            self.ddb.retrieve(Project, 'abc_123')
 
     @pytest.mark.db
     def test_query_user(self):
@@ -137,22 +111,6 @@ class TestDynamoDB(TestCase):
         self.assertEqual(user, users[0])
         self.assertEqual(user, all_users[0])
         self.assertEqual(user, strict_users[0])
-
-    @pytest.mark.db
-    def test_query_project(self):
-        """Test to see if we can store and query the same project."""
-        project = create_test_project('123456', ['abcd'])
-        self.assertTrue(self.ddb.store(project))
-        projects = self.ddb.query(Project, [('tags', 'python')])
-        query = [('tags', 'python'),
-                 ('tags', 'docker'),
-                 ('display_name', 'Rocket2')]
-        strict_projects = self.ddb.query(Project, query)
-        all_projects = self.ddb.query(Project)
-
-        self.assertEqual(project, projects[0])
-        self.assertEqual(project, strict_projects[0])
-        self.assertEqual(project, all_projects[0])
 
     @pytest.mark.db
     def test_retrieve_invalid_team(self):
@@ -300,12 +258,3 @@ class TestDynamoDB(TestCase):
         self.assertEqual(len(self.ddb.query(Team)), 1)
         self.ddb.delete(Team, '1')
         self.assertEqual(len(self.ddb.query(Team)), 0)
-
-    @pytest.mark.db
-    def test_delete_project(self):
-        project = create_test_project('abc_123', ['a'])
-        self.assertTrue(self.ddb.store(project))
-
-        self.assertEqual(len(self.ddb.query(Project)), 1)
-        self.ddb.delete(Project, project.project_id)
-        self.assertEqual(len(self.ddb.query(Project)), 0)

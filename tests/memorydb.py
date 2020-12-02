@@ -1,8 +1,8 @@
 from db.facade import DBFacade
-from app.model import User, Team, Project, Permissions
+from app.model import User, Team, Permissions
 from typing import TypeVar, List, Type, Tuple, cast, Set
 
-T = TypeVar('T', User, Team, Project)
+T = TypeVar('T', User, Team)
 
 
 # Convert DB field names to python attribute names
@@ -31,25 +31,9 @@ TEAM_ATTRS = {
 }
 
 
-PROJ_ATTRS = {
-    'project_id': 'project_id',
-    'github_urls': 'github_urls',
-    'github_team_id': 'github_team_id',
-    'display_name': 'display_name',
-    'short_description': 'short_description',
-    'long_description': 'long_description',
-    'tags': 'tags',
-    'website_url': 'website_url',
-    'appstore_url': 'appstore_url',
-    'playstore_url': 'playstore_url'
-}
-
-
 def field_is_set(Model: Type[T], field: str) -> bool:
     if Model is Team:
         return field in ['team_leads', 'members']
-    elif Model is Project:
-        return field in ['tags', 'github_urls']
     else:
         return False
 
@@ -59,8 +43,6 @@ def field_to_attr(Model: Type[T], field: str) -> str:
         return USER_ATTRS[field]
     elif Model is Team:
         return TEAM_ATTRS[field]
-    elif Model is Project:
-        return PROJ_ATTRS[field]
     return field
 
 
@@ -89,8 +71,6 @@ def get_key(m: T) -> str:
         return cast(User, m).slack_id
     elif isinstance(m, Team):
         return cast(Team, m).github_team_id
-    elif isinstance(m, Project):
-        return cast(Project, m).project_id
 
 
 class MemoryDB(DBFacade):
@@ -107,27 +87,22 @@ class MemoryDB(DBFacade):
 
     def __init__(self,
                  users: List[User] = [],
-                 teams: List[Team] = [],
-                 projs: List[Project] = []):
+                 teams: List[Team] = []):
         """
         Initialize with lists of objects.
 
         :param users: list of users to initialize the db
         :param teams: list of teams to initialize the db
-        :param projs: list of projects to initialize the db
         """
         self.users = {u.slack_id: u for u in users}
         self.teams = {t.github_team_id: t for t in teams}
-        self.projs = {p.project_id: p for p in projs}
 
     def get_db(self, Model: Type[T]):
         if Model is User:
             return self.users
         elif Model is Team:
             return self.teams
-        elif Model is Project:
-            return self.projs
-        return {}
+        raise LookupError(f'Unknown model {Model}')
 
     def store(self, obj: T) -> bool:
         Model = obj.__class__

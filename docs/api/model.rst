@@ -13,12 +13,6 @@ Team
 .. autoclass:: app.model.team.Team
     :members:
 
-Project
--------
-
-.. autoclass:: app.model.project.Project
-    :members:
-
 Permissions
 -----------
 

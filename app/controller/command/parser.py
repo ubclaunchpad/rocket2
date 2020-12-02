@@ -1,7 +1,7 @@
 """Handle Rocket 2 commands."""
 from app.controller import ResponseTuple
 from app.controller.command.commands import UserCommand, TeamCommand,\
-    ExportCommand, TokenCommand, ProjectCommand, KarmaCommand,\
+    ExportCommand, TokenCommand, KarmaCommand,\
     MentionCommand, IQuitCommand
 from app.controller.command.commands.base import Command
 from app.controller.command.commands.token import TokenCommandConfig
@@ -47,13 +47,9 @@ class CommandParser:
                                             gcp=self.__gcp)
         self.commands["export"] = ExportCommand(self.__facade)
         self.commands["token"] = TokenCommand(self.__facade, token_config)
-        self.commands["project"] = ProjectCommand(self.__facade)
         self.commands["karma"] = KarmaCommand(self.__facade)
         self.commands["mention"] = MentionCommand(self.__facade)
         self.commands["i-quit"] = IQuitCommand(self.__facade)
-
-        # Disable project commands (delete when we enable it again)
-        del self.commands['project']
 
     def handle_app_command(self,
                            cmd_txt: str,
