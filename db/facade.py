@@ -21,8 +21,8 @@ class DBFacade(ABC):
         """
         Store object into the correct table.
 
-        Object can be of type :class:`app.model.user.User` or
-        :class:`app.model.team.Team`.
+        Object can be of type :class:`app.model.User` or
+        :class:`app.model.Team`.
 
         :param obj: Object to store in database
         :return: True if object was stored, and false otherwise

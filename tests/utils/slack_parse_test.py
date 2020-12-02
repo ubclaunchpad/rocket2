@@ -1,8 +1,6 @@
 """Some tests for utility functions in slack parsing utility."""
 import utils.slack_parse as util
-from app.model.user import User
-from app.model.team import Team
-from app.model.permissions import Permissions
+from app.model import User, Team, Permissions
 from unittest import TestCase
 
 

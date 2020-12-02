@@ -4,7 +4,7 @@ import shlex
 from argparse import ArgumentParser, _SubParsersAction, Namespace
 from app.controller import ResponseTuple
 from app.controller.command.commands.base import Command
-from app.model.permissions import Permissions
+from app.model import Permissions
 from db.facade import DBFacade
 from db.utils import get_team_by_name, get_team_members
 from interface.github import GithubAPIException, GithubInterface
