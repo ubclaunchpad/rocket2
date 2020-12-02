@@ -3,12 +3,12 @@ import logging
 
 from boto3.dynamodb.conditions import Attr
 from functools import reduce, wraps
-from app.model import User, Team, Project
+from app.model import User, Team
 from typing import Tuple, List, Type, TypeVar
 from config import Config
 from db.facade import DBFacade
 
-T = TypeVar('T', User, Team, Project)
+T = TypeVar('T', User, Team)
 
 
 def fragment(items_per_call=100):
@@ -48,24 +48,21 @@ class DynamoDB(DBFacade):
             """Initialize the constants."""
             self.users_table: str = config.aws_users_tablename
             self.teams_table: str = config.aws_teams_tablename
-            self.projects_table: str = config.aws_projects_tablename
 
         def get_table_name(self, cls: Type[T]) -> str:
             """
             Convert class into corresponding table name.
 
-            :param cls: Either ``User``, ``Team``, or ``Project``
-            :raises: TypeError if it is not either User, Team, or Project
+            :param cls: Either ``User`` or ``Team``
+            :raises: TypeError if it is not either User or Team
             :return: table name string
             """
             if cls == User:
                 return self.users_table
             elif cls == Team:
                 return self.teams_table
-            elif cls == Project:
-                return self.projects_table
             else:
-                raise TypeError('Type of class one of [User, Team, Project]')
+                raise TypeError('Type of class one of [User, Team]')
 
         def get_key(self, table_name: str) -> str:
             """
@@ -79,8 +76,6 @@ class DynamoDB(DBFacade):
                 return 'slack_id'
             elif table_name == self.teams_table:
                 return 'github_team_id'
-            elif table_name == self.projects_table:
-                return 'project_id'
             else:
                 raise TypeError('Table name does not correspond to anything')
 
@@ -96,8 +91,6 @@ class DynamoDB(DBFacade):
                 return []
             elif table_name == self.teams_table:
                 return ['team_leads', 'members']
-            elif table_name == self.projects_table:
-                return ['tags', 'github_urls']
             else:
                 raise TypeError('Table name does not correspond to anything')
 
@@ -122,7 +115,6 @@ class DynamoDB(DBFacade):
         logging.info("Initializing DynamoDb")
         self.users_table = config.aws_users_tablename
         self.teams_table = config.aws_teams_tablename
-        self.projects_table = config.aws_projects_tablename
         self.CONST = DynamoDB.Const(config)
 
         if config.aws_local:
@@ -147,8 +139,6 @@ class DynamoDB(DBFacade):
             self.__create_table(self.users_table)
         if not self.check_valid_table(self.teams_table):
             self.__create_table(self.teams_table)
-        if not self.check_valid_table(self.projects_table):
-            self.__create_table(self.projects_table)
 
     def __create_table(self, table_name: str, key_type: str = 'S'):
         """
@@ -196,7 +186,7 @@ class DynamoDB(DBFacade):
 
     def store(self, obj: T) -> bool:
         Model = obj.__class__
-        if Model not in [User, Team, Project]:
+        if Model not in [User, Team]:
             logging.error(f"Cannot store object {str(obj)}")
             raise RuntimeError(f'Cannot store object{str(obj)}')
 

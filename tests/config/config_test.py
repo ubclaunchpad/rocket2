@@ -26,7 +26,6 @@ class TestConfig(TestCase):
             'AWS_SECRET_KEY': 'more secret',
             'AWS_USERS_TABLE': 'users',
             'AWS_TEAMS_TABLE': 'teams',
-            'AWS_PROJECTS_TABLE': 'projects',
             'AWS_REGION': 'us-west-2',
             'AWS_LOCAL': 'True',
 
@@ -43,7 +42,6 @@ class TestConfig(TestCase):
             'AWS_SECRET_KEY': 'more secret',
             'AWS_USERS_TABLE': 'users',
             'AWS_TEAMS_TABLE': 'teams',
-            'AWS_PROJECTS_TABLE': 'projects',
             'AWS_REGION': 'us-west-2',
         }
 

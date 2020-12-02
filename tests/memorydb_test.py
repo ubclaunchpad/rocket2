@@ -2,8 +2,8 @@ from unittest import TestCase
 from uuid import uuid4
 from typing import List
 import random
-from tests.memorydb import MemoryDB
-from app.model import User, Team  # , Project, Permissions
+from tests.memorydb import MemoryDB, field_to_attr
+from app.model import User, Team
 import tests.util as util
 
 
@@ -28,6 +28,12 @@ def makeTeams() -> List[Team]:
     return [t0, t1]
 
 
+class TestFieldToAttr(TestCase):
+    def test_field_case(self):
+        self.assertEqual(field_to_attr(TestFieldToAttr, 'some'),
+                         'some')
+
+
 class TestMemoryDB(TestCase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -39,6 +45,10 @@ class TestMemoryDB(TestCase):
     def setUp(self):
         self.db = MemoryDB(users=list(self.users.values()),
                            teams=list(self.teams.values()))
+
+    def test_get_db_lookup_error(self):
+        with self.assertRaises(LookupError):
+            self.db.get_db(TestMemoryDB)
 
     def test_users_dont_affect_DB(self):
         """

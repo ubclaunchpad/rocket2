@@ -31,7 +31,6 @@ class Config:
         'AWS_SECRET_KEY': 'aws_secret_key',
         'AWS_USERS_TABLE': 'aws_users_tablename',
         'AWS_TEAMS_TABLE': 'aws_teams_tablename',
-        'AWS_PROJECTS_TABLE': 'aws_projects_tablename',
         'AWS_REGION': 'aws_region',
         'AWS_LOCAL': 'aws_local',
 
@@ -103,7 +102,6 @@ class Config:
         self.aws_secret_key = ''
         self.aws_users_tablename = ''
         self.aws_teams_tablename = ''
-        self.aws_projects_tablename = ''
         self.aws_region = ''
         self.aws_local: bool = False
 
