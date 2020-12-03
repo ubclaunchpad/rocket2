@@ -120,9 +120,7 @@ class TestExportCommand(TestCase):
         old_lim = ExportCommand.MAX_CHAR_LIMIT
         ExportCommand.MAX_CHAR_LIMIT = 30
         self.u0.email = ''
-        resp, _ = self.cmd.handle(
-            f'export emails',
-            self.lead.slack_id)
+        resp, _ = self.cmd.handle('export emails', self.lead.slack_id)
         self.assertIn(self.u0.slack_id, resp)
         self.assertIn('Members who don\'t have an email:', resp)
         self.assertNotIn(ExportCommand.no_emails_missing_msg, resp)
