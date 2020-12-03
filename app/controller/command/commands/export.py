@@ -43,10 +43,9 @@ class ExportCommand(Command):
         subparsers = self.parser.add_subparsers(dest="which")
 
         # Parser for emails command
-        parser_view = subparsers.add_parser("emails")
-        parser_view.set_defaults(which="emails",
-                                 help="(Admin/Lead only) Export emails "
-                                      "of all users")
+        parser_view = subparsers.add_parser(
+            'emails', description='(Admin/Lead only) Export emails of all '
+                                  'users')
         parser_view.add_argument("--team", metavar="TEAM",
                                  type=str, action='store',
                                  help="(Admin/Lead only) Export emails"
