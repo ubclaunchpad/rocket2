@@ -519,6 +519,7 @@ class TestTeamCommand(TestCase):
         with self.app.app_context():
             resp, _ = self.cmd.handle('team refresh',
                                       self.admin.slack_id)
+
             self.assertCountEqual(resp['attachments'], attachments)
             self.assertEqual(resp['text'], status)
             self.assertEqual(len(self.db.teams), 2)
