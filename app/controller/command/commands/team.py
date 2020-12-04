@@ -693,7 +693,6 @@ class TeamCommand(Command):
                         self.facade.store(old_team)
                         num_changed += 1
                         modified.append(old_team.get_attachment())
-
             # add all members (if not already added) to the 'all' team
             self.refresh_all_team()
 
@@ -772,7 +771,7 @@ class TeamCommand(Command):
         ]
         logging.info(f'refreshing Rocket permissions for teams {teams}')
         for t in teams:
-            team_name = t['displayname']
+            team_name = t['name']
             if len(team_name) == 0:
                 continue
 
