@@ -1,6 +1,5 @@
 """Some important (and often-used) utility functions."""
-from app.model import User, Team, Project, Permissions
-from typing import List
+from app.model import User, Team, Permissions
 
 
 def create_test_admin(slack_id: str) -> User:
@@ -15,6 +14,7 @@ def create_test_admin(slack_id: str) -> User:
     Email       admin@ubc.ca
     Name        Iemann Atmin
     Github      kibbles
+    Github ID   123453
     Image URL   https://via.placeholder.com/150
     Major       Computer Science
     Permission  Admin
@@ -63,42 +63,3 @@ def create_test_team(tid: str,
     t.platform = 'slack'
     t.add_member('abc_123')
     return t
-
-
-def create_test_project(github_team_id: str,
-                        github_urls: List[str]) -> Project:
-    r"""
-    Create a test project with project ID, URLs, and all other attributes set.
-
-    ===============   =============================
-    Property          Preset
-    ===============   =============================
-    ID                ``SHA1(github_urls[0], time.time())``
-    Team ID           ``github_team_id``
-    Github URLs       ``github_urls``
-    Display Name      Rocket2
-    Short Descrip.    Slack bot, team management, and onboarding system for...
-    Long Descrip.     Slack bot, team management, and onboarding system for...
-    Tags              python, docker, pipenv, waterboarding
-    Website           https://github.com/ubclaunchpad/rocket2
-    Appstore URL      ¯\\_(ツ)_/¯
-    Playstore URL     ¯\\_(ツ)_/¯
-    ===============   =============================
-
-    :param github_team_id: The Github team ID
-    :param github_urls: The URLs to all connected projects
-    :return: a filled-in project model (no empty strings)
-    """
-    p = Project(github_team_id, github_urls)
-    p.display_name = 'Rocket2'
-    p.short_description = \
-        'Slack bot, team management, and onboarding system for UBC Launch Pad'
-    p.long_description = '''
-        Slack bot, team management, and onboarding system for UBC Launch Pad
-    '''
-    p.tags = ['python', 'docker', 'pipenv', 'waterboarding']
-    p.website_url = 'https://github.com/ubclaunchpad/rocket2'
-    p.appstore_url = '¯\\_(ツ)_/¯'
-    p.playstore_url = '¯\\_(ツ)_/¯'
-
-    return p

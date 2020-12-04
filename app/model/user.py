@@ -95,8 +95,8 @@ class User(RocketModel):
         user.position = d.get('position', '')
         user.biography = d.get('bio', '')
         user.image_url = d.get('image_url', '')
-        user.permissions_level = Permissions[d.get('permission_level',
-                                                   'member')]
+        user.permissions_level =\
+            Permissions[d.get('permission_level', 'member')]
         user.karma = int(d.get('karma', 1))
         return user
 

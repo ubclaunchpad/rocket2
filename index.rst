@@ -30,7 +30,6 @@
 
     docs/UserCommands
     docs/TeamCommands
-    docs/ProjectCommands
     docs/KarmaCommands
 
 .. toctree::

@@ -28,6 +28,7 @@ class IQuitCommand(Command):
 
     def __init__(self, dbf: DBFacade):
         """Initialize iquit command."""
+        super().__init__()
         logging.info("Initializing IQuitCommand instance")
         self.parser = ArgumentParser(prog="/rocket")
         self.parser.add_argument("i-quit")
