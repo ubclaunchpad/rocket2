@@ -36,6 +36,7 @@ class TeamCommand(Command):
                  gcp: Optional[GCPInterface] = None):
         """
         Initialize team command parser.
+
         :param db_facade: Given Dynamo_DB Facade
         :param gh: Given Github Interface
         :param sc: Given Slack Client Interface
@@ -56,6 +57,7 @@ class TeamCommand(Command):
     def init_subparsers(self) -> _SubParsersAction:
         """
         Initialize subparsers for team command.
+
         :meta private:
         """
         subparsers = self.parser.add_subparsers(dest="which")
@@ -206,6 +208,7 @@ class TeamCommand(Command):
     def list_helper(self) -> ResponseTuple:
         """
         Return display information of all teams.
+
         :return: error message if lookup error or no teams,
                  otherwise return teams' information
         """
@@ -219,6 +222,7 @@ class TeamCommand(Command):
     def view_helper(self, team_name: str) -> ResponseTuple:
         """
         Return display information and members of specified team.
+
         :param team_name: name of team being viewed
         :return: error message if team not found,
                  otherwise return team information
@@ -249,6 +253,7 @@ class TeamCommand(Command):
     def create_helper(self, args: Namespace, user_id: str) -> ResponseTuple:
         """
         Create team and calls GitHub API to create the team in GitHub.
+
         If ``args.displayname is not None``, will add a display name. If
         ``args.channel is not None``, will add all members of channel in
         which the command was called into the team.
@@ -335,8 +340,10 @@ class TeamCommand(Command):
     def add_helper(self, args: Namespace, user_id: str) -> ResponseTuple:
         """
         Add user to team.
+
         If user is not admin or team lead of specified team, the user will not
         be added and an error message is returned.
+
         :param args: Parameters for adding user
         :param user_id: Slack ID of user who called command
         :return: error message if user added unsuccessfully or if user has
@@ -388,9 +395,11 @@ class TeamCommand(Command):
     def remove_helper(self, args: Namespace, user_id: str) -> ResponseTuple:
         """
         Remove specified user from a team.
+
         If the user is also a team lead, removes team lead status from Team. If
         user is not admin or team lead of specified team, user will not be
         removed and an error message is returned.
+
         :param args: List of parameters for removing user
         :param user_id: Slack ID of user who called command
         :return: error message if user removed unsuccessfully, if user is not
@@ -463,8 +472,10 @@ class TeamCommand(Command):
     def edit_helper(self, args: Namespace, user_id: str) -> ResponseTuple:
         """
         Edit the properties of a specific team.
+
         Team leads can only edit the teams that they are a part of, but admins
         can edit any teams.
+
         :param args: Parameters for editing team
         :param user_id: Slack ID of user who called command
         :return: error message if user has insufficient permission level or
@@ -503,8 +514,10 @@ class TeamCommand(Command):
     def lead_helper(self, args: Namespace, user_id: str) -> ResponseTuple:
         """
         Add a user as team lead, and add them to team if not already added.
+
         If ``--remove`` flag is used, user is instead demoted from being a team
         lead, but not from the team.
+
         :param args: Parameters for editing leads
         :param user_id: Slack ID of user who called command
         :return: error message if user has insufficient permission level or
@@ -547,6 +560,7 @@ class TeamCommand(Command):
     def delete_helper(self, team_name, user_id) -> ResponseTuple:
         """
         Permanently delete a team.
+
         :param team_name: Name of team to be deleted
         :param user_id: Slack ID of user who called command
         :return: error message if user has insufficient permission level or
@@ -570,9 +584,11 @@ class TeamCommand(Command):
     def refresh_helper(self, user_id) -> ResponseTuple:
         """
         Ensure that the local team database is the same as GitHub's.
+
         In the event that our local team database is outdated compared to
         the teams on GitHub, this command can be called to fix these
         inconsistencies.
+
         :return: error message if user has insufficient permission level
                  otherwise returns success messages with # of teams changed
         """
@@ -643,6 +659,7 @@ class TeamCommand(Command):
     def refresh_all_team(self):
         """
         Refresh the 'all' team - this team is used to track all members.
+
         Should only be called after the teams have all synced, or bugs will
         probably occur. See https://github.com/orgs/ubclaunchpad/teams/all
         """
@@ -680,6 +697,7 @@ class TeamCommand(Command):
         """
         Refresh Rocket permissions for members in teams like
         GITHUB_ADMIN_TEAM_NAME and GITHUB_LEADS_TEAM_NAME.
+
         It only ever promotes users, and does not demote users.
         """
         # provide teams from low permissions level to high
