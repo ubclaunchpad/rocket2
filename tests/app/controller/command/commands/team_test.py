@@ -133,7 +133,7 @@ class TestTeamCommand(TestCase):
         self.gh.org_delete_team.assert_called_once_with(int('12345'))
 
     def test_handle_create(self):
-        inputstring = "team create b-s --name 'B S'"
+        inputstring = "team create b-s --displayname 'B S'"
         inputstring += ' --platform web'
         inputstring += " --channel 'channelID'"
         inputstring += f' --lead {self.u0.slack_id}'
@@ -152,14 +152,14 @@ class TestTeamCommand(TestCase):
         # The new team must be retrieved
         team: Team = self.db.retrieve(Team, tid)
         self.assertEqual(team.github_team_name, 'b-s')
-        self.assertEqual(team.display_name, 'B S')
+        self.assertEqual(team.displayname, 'B S')
         self.assertEqual(team.platform, 'web')
         self.assertSetEqual(team.members, set([self.u0.github_id]))
         self.assertSetEqual(team.team_leads, set([self.u0.github_id]))
 
     def test_handle_create_no_gh_for_users_in_channel(self):
         self.gh.org_create_team.return_value = 8934095
-        inputstring = "team create b-s --name 'B S'"
+        inputstring = "team create b-s --displayname 'B S'"
 
         self.gh.add_team_member.side_effect = GithubAPIException('bad')
         inputstring += " --channel 'channelID'"
@@ -172,7 +172,7 @@ class TestTeamCommand(TestCase):
         self.u0.github_username = 'githubuser'
         self.u0.github_id = '12'
         self.gh.org_create_team.return_value = 93048304
-        inputstring = "team create b-s --name 'B S'"
+        inputstring = "team create b-s --displayname 'B S'"
         self.assertTupleEqual(self.cmd.handle(inputstring,
                                               self.u0.slack_id),
                               (self.cmd.permission_error, 200))
@@ -187,7 +187,7 @@ class TestTeamCommand(TestCase):
 
     def test_handle_create_github_error(self):
         self.gh.org_create_team.return_value = 302084
-        inputstring = "team create b-s --name 'B S'"
+        inputstring = "team create b-s --displayname 'B S'"
         self.gh.add_team_member.side_effect = GithubAPIException('error')
         self.assertTupleEqual(self.cmd.handle(inputstring,
                                               self.admin.slack_id),
@@ -195,7 +195,7 @@ class TestTeamCommand(TestCase):
                                'following error: error', 200))
 
     def test_handle_create_lookup_error(self):
-        inputstring = "team create b-s --name 'B S'"
+        inputstring = "team create b-s --displayname 'B S'"
         self.assertTupleEqual(self.cmd.handle(inputstring, 'rando'),
                               (self.cmd.lookup_error, 200))
 
@@ -442,10 +442,10 @@ class TestTeamCommand(TestCase):
 
     def test_handle_edit(self):
         cmdtxt = f'team edit {self.t0.github_team_name}'
-        cmdtxt += ' --name brS --platform web'
+        cmdtxt += ' --displayname brS --platform web'
         with self.app.app_context():
             self.cmd.handle(cmdtxt, self.admin.slack_id)
-            self.assertEqual(self.t0.display_name, 'brS')
+            self.assertEqual(self.t0.displayname, 'brS')
             self.assertEqual(self.t0.platform, 'web')
 
     def test_handle_edit_not_admin(self):

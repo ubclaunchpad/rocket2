@@ -36,7 +36,6 @@ class TeamCommand(Command):
                  gcp: Optional[GCPInterface] = None):
         """
         Initialize team command parser.
-
         :param db_facade: Given Dynamo_DB Facade
         :param gh: Given Github Interface
         :param sc: Given Slack Client Interface
@@ -57,7 +56,6 @@ class TeamCommand(Command):
     def init_subparsers(self) -> _SubParsersAction:
         """
         Initialize subparsers for team command.
-
         :meta private:
         """
         subparsers = self.parser.add_subparsers(dest="which")
@@ -89,7 +87,7 @@ class TeamCommand(Command):
         parser_create.add_argument("team_name", metavar='team-name',
                                    type=str, action='store',
                                    help="Github name of your team (required).")
-        parser_create.add_argument("--name", type=str, action='store',
+        parser_create.add_argument("--displayname", type=str, action='store',
                                    help="Display name of your team.")
         parser_create.add_argument("--platform", type=str, action='store',
                                    help="The team's main platform.")
@@ -128,12 +126,14 @@ class TeamCommand(Command):
         parser_edit.add_argument("team_name", metavar='team-name',
                                  type=str, action='store',
                                  help="Name of team to edit.")
-        parser_edit.add_argument("--name", type=str, action='store',
+        parser_edit.add_argument("--displayname", type=str, action='store',
                                  help="Display name the team should have.")
         parser_edit.add_argument("--platform", type=str, action='store',
                                  help="Platform the team should have.")
         parser_edit.add_argument("--folder", type=str, action='store',
                                  help="Drive folder ID for this team.")
+        parser_edit.add_argument("--github", type=str, action='store',
+                                 help="New github team name to be replaced.")
 
         """Parser for lead command."""
         parser_lead = subparsers.add_parser(
@@ -206,7 +206,6 @@ class TeamCommand(Command):
     def list_helper(self) -> ResponseTuple:
         """
         Return display information of all teams.
-
         :return: error message if lookup error or no teams,
                  otherwise return teams' information
         """
@@ -220,7 +219,6 @@ class TeamCommand(Command):
     def view_helper(self, team_name: str) -> ResponseTuple:
         """
         Return display information and members of specified team.
-
         :param team_name: name of team being viewed
         :return: error message if team not found,
                  otherwise return team information
@@ -251,11 +249,9 @@ class TeamCommand(Command):
     def create_helper(self, args: Namespace, user_id: str) -> ResponseTuple:
         """
         Create team and calls GitHub API to create the team in GitHub.
-
-        If ``args.name is not None``, will add a display name. If
+        If ``args.displayname is not None``, will add a display name. If
         ``args.channel is not None``, will add all members of channel in
         which the command was called into the team.
-
         :param args: Parameters for creating team
         :param user_id: Slack ID of user who called command
         :return: error message if team created unsuccessfully otherwise returns
@@ -274,9 +270,9 @@ class TeamCommand(Command):
             msg = f"New team created: {args.team_name}, "
             team_id = str(self.gh.org_create_team(args.team_name))
             team = Team(team_id, args.team_name, "")
-            if args.name is not None:
-                msg += f"name: {args.name}, "
-                team.display_name = args.name
+            if args.displayname is not None:
+                msg += f"displayname: {args.displayname}, "
+                team.displayname = args.displayname
             if args.platform is not None:
                 msg += f"platform: {args.platform}, "
                 team.platform = args.platform
@@ -339,10 +335,8 @@ class TeamCommand(Command):
     def add_helper(self, args: Namespace, user_id: str) -> ResponseTuple:
         """
         Add user to team.
-
         If user is not admin or team lead of specified team, the user will not
         be added and an error message is returned.
-
         :param args: Parameters for adding user
         :param user_id: Slack ID of user who called command
         :return: error message if user added unsuccessfully or if user has
@@ -394,11 +388,9 @@ class TeamCommand(Command):
     def remove_helper(self, args: Namespace, user_id: str) -> ResponseTuple:
         """
         Remove specified user from a team.
-
         If the user is also a team lead, removes team lead status from Team. If
         user is not admin or team lead of specified team, user will not be
         removed and an error message is returned.
-
         :param args: List of parameters for removing user
         :param user_id: Slack ID of user who called command
         :return: error message if user removed unsuccessfully, if user is not
@@ -471,10 +463,8 @@ class TeamCommand(Command):
     def edit_helper(self, args: Namespace, user_id: str) -> ResponseTuple:
         """
         Edit the properties of a specific team.
-
         Team leads can only edit the teams that they are a part of, but admins
         can edit any teams.
-
         :param args: Parameters for editing team
         :param user_id: Slack ID of user who called command
         :return: error message if user has insufficient permission level or
@@ -487,15 +477,18 @@ class TeamCommand(Command):
             if not check_permissions(command_user, team):
                 return self.permission_error, 200
             msg = f"Team edited: {command_team}, "
-            if args.name is not None:
-                msg += f"name: {args.name}, "
-                team.display_name = args.name
+            if args.displayname is not None:
+                msg += f"displayname: {args.displayname}, "
+                team.displayname = args.displayname
             if args.platform is not None:
                 msg += f"platform: {args.platform}"
                 team.platform = args.platform
             if args.folder is not None:
                 msg += f"folder: {args.folder}"
                 team.folder = args.folder
+            if args.github is not None:
+                msg += f"new github team name: {args.github}"
+                team.github_team_name = args.github
             self.facade.store(team)
 
             # Update drive shares if folder was changed
@@ -510,10 +503,8 @@ class TeamCommand(Command):
     def lead_helper(self, args: Namespace, user_id: str) -> ResponseTuple:
         """
         Add a user as team lead, and add them to team if not already added.
-
         If ``--remove`` flag is used, user is instead demoted from being a team
         lead, but not from the team.
-
         :param args: Parameters for editing leads
         :param user_id: Slack ID of user who called command
         :return: error message if user has insufficient permission level or
@@ -556,7 +547,6 @@ class TeamCommand(Command):
     def delete_helper(self, team_name, user_id) -> ResponseTuple:
         """
         Permanently delete a team.
-
         :param team_name: Name of team to be deleted
         :param user_id: Slack ID of user who called command
         :return: error message if user has insufficient permission level or
@@ -580,11 +570,9 @@ class TeamCommand(Command):
     def refresh_helper(self, user_id) -> ResponseTuple:
         """
         Ensure that the local team database is the same as GitHub's.
-
         In the event that our local team database is outdated compared to
         the teams on GitHub, this command can be called to fix these
         inconsistencies.
-
         :return: error message if user has insufficient permission level
                  otherwise returns success messages with # of teams changed
         """
@@ -655,7 +643,6 @@ class TeamCommand(Command):
     def refresh_all_team(self):
         """
         Refresh the 'all' team - this team is used to track all members.
-
         Should only be called after the teams have all synced, or bugs will
         probably occur. See https://github.com/orgs/ubclaunchpad/teams/all
         """
@@ -693,7 +680,6 @@ class TeamCommand(Command):
         """
         Refresh Rocket permissions for members in teams like
         GITHUB_ADMIN_TEAM_NAME and GITHUB_LEADS_TEAM_NAME.
-
         It only ever promotes users, and does not demote users.
         """
         # provide teams from low permissions level to high
