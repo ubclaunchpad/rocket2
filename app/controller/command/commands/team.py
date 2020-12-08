@@ -500,6 +500,8 @@ class TeamCommand(Command):
             if args.github is not None:
                 msg += f"new github team name: {args.github}"
                 team.github_team_name = args.github
+                self.gh.org_edit_team(
+                    int(team.github_team_id), team.github_team_name)
             self.facade.store(team)
 
             # Update drive shares if folder was changed
