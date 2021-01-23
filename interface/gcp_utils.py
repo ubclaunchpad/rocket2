@@ -62,8 +62,8 @@ def sync_team_email_perms(gcp: Optional[GCPInterface],
             try:
                 emails.append(standardize_email(user.email))
             except Exception as e:
-                logging.warn(f'Found malformed email {user.email} for user '
-                             + f'{user.github_username}: {e}')
+                logging.warning(f'Found malformed email {user.email} for user '
+                                + f'{user.github_username}: {e}')
 
     # Sync permissions
     if len(emails) > 0:

@@ -89,7 +89,7 @@ class TeamCommand(Command):
         parser_create.add_argument("team_name", metavar='team-name',
                                    type=str, action='store',
                                    help="Github name of your team (required).")
-        parser_create.add_argument("--name", type=str, action='store',
+        parser_create.add_argument("--displayname", type=str, action='store',
                                    help="Display name of your team.")
         parser_create.add_argument("--platform", type=str, action='store',
                                    help="The team's main platform.")
@@ -128,12 +128,14 @@ class TeamCommand(Command):
         parser_edit.add_argument("team_name", metavar='team-name',
                                  type=str, action='store',
                                  help="Name of team to edit.")
-        parser_edit.add_argument("--name", type=str, action='store',
+        parser_edit.add_argument("--displayname", type=str, action='store',
                                  help="Display name the team should have.")
         parser_edit.add_argument("--platform", type=str, action='store',
                                  help="Platform the team should have.")
         parser_edit.add_argument("--folder", type=str, action='store',
                                  help="Drive folder ID for this team.")
+        parser_edit.add_argument("--github", type=str, action='store',
+                                 help="New github team name to be replaced.")
 
         """Parser for lead command."""
         parser_lead = subparsers.add_parser(
@@ -252,10 +254,9 @@ class TeamCommand(Command):
         """
         Create team and calls GitHub API to create the team in GitHub.
 
-        If ``args.name is not None``, will add a display name. If
+        If ``args.displayname is not None``, will add a display name. If
         ``args.channel is not None``, will add all members of channel in
         which the command was called into the team.
-
         :param args: Parameters for creating team
         :param user_id: Slack ID of user who called command
         :return: error message if team created unsuccessfully otherwise returns
@@ -274,9 +275,9 @@ class TeamCommand(Command):
             msg = f"New team created: {args.team_name}, "
             team_id = str(self.gh.org_create_team(args.team_name))
             team = Team(team_id, args.team_name, "")
-            if args.name is not None:
-                msg += f"name: {args.name}, "
-                team.display_name = args.name
+            if args.displayname is not None:
+                msg += f"displayname: {args.displayname}, "
+                team.displayname = args.displayname
             if args.platform is not None:
                 msg += f"platform: {args.platform}, "
                 team.platform = args.platform
@@ -487,15 +488,20 @@ class TeamCommand(Command):
             if not check_permissions(command_user, team):
                 return self.permission_error, 200
             msg = f"Team edited: {command_team}, "
-            if args.name is not None:
-                msg += f"name: {args.name}, "
-                team.display_name = args.name
+            if args.displayname is not None:
+                msg += f"displayname: {args.displayname}, "
+                team.displayname = args.displayname
             if args.platform is not None:
                 msg += f"platform: {args.platform}"
                 team.platform = args.platform
             if args.folder is not None:
                 msg += f"folder: {args.folder}"
                 team.folder = args.folder
+            if args.github is not None:
+                msg += f"new github team name: {args.github}"
+                team.github_team_name = args.github
+                self.gh.org_edit_team(
+                    int(team.github_team_id), team.github_team_name)
             self.facade.store(team)
 
             # Update drive shares if folder was changed

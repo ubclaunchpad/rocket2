@@ -61,7 +61,7 @@ class TestTeamModel(TestCase):
         self.brussel_sprouts.platform = "web"
         expected = "{'github_team_id': '1'," \
             " 'github_team_name': 'brussel-sprouts'," \
-            " 'display_name': 'Brussel Sprouts'," \
+            " 'displayname': 'Brussel Sprouts'," \
             " 'platform': 'web'," \
             " 'team_leads': {'U0G9QF9C6'}," \
             " 'members': {'U0G9QF9C6'}," \
