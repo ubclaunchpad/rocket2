@@ -161,3 +161,25 @@ containers to run together.
 
 Docker is different than virtual machines because it can run multiple
 containers using only one kernel which makes it more lightweight.
+
+Dumping the Database
+--------------------
+
+There are 2 scripts: ``dump-db.py`` and ``restore-db.py``.
+
+``dump-db.py`` scans all database tables and returns the data in Python
+Pickle format, which is written to file ``db.pkl``.
+
+.. code-block:: js
+
+    data = {
+        'teams': '<list of app.model.Team>',
+        'users': '<list of app.model.User>'
+    }
+
+``restore-db.py`` reads the file ``db.pkl`` and calls
+:class:`db.facade.DBFacade.store` on every single element in the lists. Because
+of how DynamoDB works, when you try to store an element that already exists
+(i.e. has the same primary key), it just updates it instead of creating a
+duplicate. Thus, the only thing that can lead to data loss is if you run this
+using an out-dated ``db.pkl``.
