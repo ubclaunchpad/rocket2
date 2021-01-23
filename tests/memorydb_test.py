@@ -137,3 +137,8 @@ class TestMemoryDB(TestCase):
         self.db.delete(User, slack_id)
         with self.assertRaises(LookupError):
             self.db.retrieve(User, slack_id)
+
+    def test_displayname(self):
+        ts = self.db.query(Team, [('displayname', 'T Zero Blasters')])
+        self.assertEqual(len(ts), 1)
+        self.assertEqual(ts[0], self.teams['t0'])

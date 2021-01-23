@@ -24,7 +24,7 @@ USER_ATTRS = {
 TEAM_ATTRS = {
     'github_team_id': 'github_team_id',
     'github_team_name': 'github_team_name',
-    'display_name': 'display_name',
+    'displayname': 'displayname',
     'platform': 'platform',
     'members': 'members',
     'team_leads': 'team_leads'
