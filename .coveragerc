@@ -10,6 +10,9 @@ omit =
 	app/controller/webhook/github/events/base.py
 	app/controller/command/commands/base.py
 	factory/__init__.py
+    scripts/*
+    dump-db.py
+    restore-db.py
 
 [report]
 exclude_lines =

@@ -19,3 +19,6 @@ _build/
 
 # Credentials
 /credentials/
+
+# Database dumps
+db.pkl
