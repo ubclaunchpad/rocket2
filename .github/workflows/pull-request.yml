@@ -3,7 +3,7 @@ name: Pull request
 on: pull_request
 
 env:
-  PIPENV_CACHE_DIR: ~/.cache/
+  PIPENV_CACHE_DIR: ~/.cache/pipenv
 
 jobs:
   pipeline:
@@ -17,7 +17,7 @@ jobs:
     - name: Cache Pipfile Dependencies
       uses: actions/cache@v2
       with:
-        path: ~/.cache/
+        path: ~/.cache/pipenv
         key: ${{ runner.os }}-build-pipfile-${{ hashFiles('Pipfile*') }}
         restore-keys: |
           ${{ runner.os }}-build-pipfile-
