@@ -88,6 +88,6 @@ Any contribution (pull requests, feedback, bug reports, ideas, etc.) is welcome!
 Please refer to our `contribution guide`_ for contribution guidelines as well as
 detailed guides to help you get started with Rocket 2's codebase.
 
-.. _contribution guide: CONTRIBUTING.html
+.. _contribution guide: CONTRIBUTING.rst
 
 |

@@ -3,7 +3,7 @@ name: Pull request
 on: pull_request
 
 env:
-  PIPENV_CACHE_DIR: ${{ secrets.PIPENV_CACHE_DIR }}
+  PIPENV_CACHE_DIR: ~/.cache/pipenv
 
 jobs:
   pipeline:
@@ -17,7 +17,7 @@ jobs:
     - name: Cache Pipfile Dependencies
       uses: actions/cache@v2
       with:
-        path: ${{ secrets.PIPENV_CACHE_DIR }}
+        path: ~/.cache/pipenv
         key: ${{ runner.os }}-build-pipfile-${{ hashFiles('Pipfile*') }}
         restore-keys: |
           ${{ runner.os }}-build-pipfile-
@@ -41,8 +41,5 @@ jobs:
     - name: Start local DynamoDB
       run: scripts/download_dynamodb_and_run.sh
     - name: Test everything
-      env:
-        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       run: |
         scripts/build_check.sh
-        pipenv run codecov --required
