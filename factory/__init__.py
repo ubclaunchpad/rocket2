@@ -27,8 +27,9 @@ def make_dbfacade(config: Config) -> DBFacade:
 
 
 def make_github_interface(config: Config) -> GithubInterface:
+    public_key = open(config.github_key).read()
     return GithubInterface(DefaultGithubFactory(config.github_app_id,
-                                                config.github_key),
+                                                public_key),
                            config.github_org_name)
 
 
